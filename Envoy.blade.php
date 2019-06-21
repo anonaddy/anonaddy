@@ -4,7 +4,7 @@ $dotenv = Dotenv\Dotenv::create(__DIR__, ".env");
 $dotenv->load();
 
 $userAndServer = getenv("ENVOY_USER_AND_SERVER");
-$repository = "willbrowningme/anonaddy";
+$repository = "anonaddy/anonaddy";
 $baseDir = getenv("ENVOY_BASE_DIR");
 $releasesDir = "{$baseDir}/releases";
 $persistentDir = "{$baseDir}/persistent";
