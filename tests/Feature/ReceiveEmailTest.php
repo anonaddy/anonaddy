@@ -409,6 +409,70 @@ class ReceiveEmailTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_count_unsubscribe_recipient_when_calculating_size()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        factory(Alias::class)->create([
+            'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain')
+        ]);
+
+        factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'will@anonaddy.com'
+        ]);
+
+        $this->assertDatabaseHas('aliases', [
+            'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'active' => true
+        ]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_unsubscribe_plus_other_recipient.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.me', 'another@johndoe.anonaddy.me'],
+                '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712', 'another'],
+                '--extension' => ['', ''],
+                '--domain' => ['unsubscribe.anonaddy.me', 'johndoe.anonaddy.me'],
+                '--size' => '1000'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+            'active' => false
+        ]);
+        $this->assertDatabaseHas('aliases', [
+            'user_id' => $this->user->id,
+            'email' => 'another@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'another',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+            'active' => true
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '1000'
+        ]);
+
+        Mail::assertNotSent(ForwardEmail::class);
+    }
+
+    /** @test */
     public function it_cannot_unsubscribe_alias_if_not_a_verified_user_recipient()
     {
         Mail::fake();
