@@ -137,6 +137,9 @@ You will need to set up your own server with Postfix so that you can pipe the re
 
 For any others questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com)
 
+## Thanks
+
+Thanks to [https://gitlab.com/mailcare/mailcare](https://gitlab.com/mailcare/mailcare) and [https://github.com/niftylettuce/forward-email](https://github.com/niftylettuce/forward-email) for their awesome open-source projects that helped me along the way.
 
 ## License
 
