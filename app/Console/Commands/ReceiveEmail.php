@@ -71,8 +71,10 @@ class ReceiveEmail extends Command
                 ];
             });
 
-            // Divide the size of the email by the number of recipients to prevent it being added multiple times
-            $this->size = $this->option('size') / count($recipients);
+            // Divide the size of the email by the number of recipients (excluding any unsubscribe recipients) to prevent it being added multiple times
+            $recipientCount = $recipients->where('domain', '!=', 'unsubscribe.'.config('anonaddy.domain'))->count();
+
+            $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $key => $recipient) {
                 $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.config('anonaddy.domain'))); // e.g. johndoe
@@ -132,7 +134,7 @@ class ReceiveEmail extends Command
                 })
                 ->toArray();
 
-            if (in_array($this->parser->getAddresses('from')[0]['address'], $userRecipients)) {
+            if (in_array($this->option('sender'), $userRecipients)) {
                 $alias->deactivate();
             }
         }
