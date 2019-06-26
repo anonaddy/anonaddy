@@ -30,7 +30,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "devDependencies": {
-        "husky": "^2.4.1",
+        "husky": "^2.5.0",
         "lint-staged": "^8.2.1",
         "prettier": "1.16.4"
     },

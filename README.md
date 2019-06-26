@@ -132,6 +132,10 @@ Yes it has automated PHPUnit tests written.
 
 You will need to set up your own server with Postfix so that you can pipe the received mail to the application. I'll add more details and instructions here soon.
 
+#### Who's behind AnonAddy?
+
+My name is Will Browning, I'm a web developer from the UK and an advocate for online privacy and open-source software. You can find me on [Twitter](https://twitter.com/willbrowningme) although I don't tweet that much!
+
 
 #### I couldn't find an answer to my question, how can I contact you?
 
