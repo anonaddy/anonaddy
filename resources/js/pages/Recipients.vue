@@ -223,6 +223,9 @@
         >
           Add new recipient
         </h2>
+        <p class="mt-4 text-grey-700">
+          Enter the individual email of the new recipient you'd like to add.
+        </p>
         <div class="mt-6">
           <p v-show="errors.newRecipient" class="mb-3 text-red-500">
             {{ errors.newRecipient }}
