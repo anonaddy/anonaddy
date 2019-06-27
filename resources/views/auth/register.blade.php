@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="flex flex-wrap">
-                            <input type="checkbox" class="mr-2" id="terms">
+                            <input type="checkbox" name="terms" class="mr-2" id="terms">
 
                             <label class="text-sm text-grey-700" for="terms">
                                 I accept the <a href="https://anonaddy.com/terms" class="text-indigo-800" target="_blank" rel="nofollow noreferrer noopener">terms</a> and <a href="https://anonaddy.com/privacy" class="text-indigo-800" target="_blank" rel="nofollow noreferrer noopener">privacy policy</a>
