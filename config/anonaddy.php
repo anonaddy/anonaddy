@@ -52,6 +52,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Newsletter URL
+    |--------------------------------------------------------------------------
+    |
+    | This value is the url to subscribe new registrations to the newsletter if they opt in
+    |
+    */
+
+    'newsletter_url' => env('ANONADDY_NEWSLETTER_URL'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Newsletter List
+    |--------------------------------------------------------------------------
+    |
+    | This value is the ID of the list to subscribe to
+    |
+    */
+
+    'newsletter_list' => env('ANONADDY_NEWSLETTER_LIST'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Username Blacklist
     |--------------------------------------------------------------------------
     |

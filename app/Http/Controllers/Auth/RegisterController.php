@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SubscribeToNewsletter;
 use App\Recipient;
 use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
@@ -63,6 +64,7 @@ class RegisterController extends Controller
             ],
             'email' => ['required', 'email', 'max:254', 'confirmed'],
             'password' => ['required', 'min:8'],
+            'newsletter' => ['nullable'],
             'terms' => ['required', 'accepted']
         ]);
     }
@@ -81,6 +83,10 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'user_id' => $userId
         ]);
+
+        if (isset($data['newsletter'])) {
+            SubscribeToNewsletter::dispatch($data['email']);
+        }
 
         $twoFactor = app('pragmarx.google2fa');
 

@@ -74,7 +74,21 @@
                             @endif
                         </div>
 
-                        <div class="flex flex-wrap">
+                        <div class="flex flex-wrap mb-3 items-center">
+                            <input type="checkbox" name="newsletter" class="mr-2" id="newsletter">
+
+                            <label class="text-sm text-grey-700" for="newsletter">
+                                Sign up to our newsletter
+                            </label>
+
+                            @if ($errors->has('newsletter'))
+                                <p class="text-red-500 text-xs italic mt-4">
+                                    {{ $errors->first('newsletter') }}
+                                </p>
+                            @endif
+                        </div>
+
+                        <div class="flex flex-wrap items-center">
                             <input type="checkbox" name="terms" class="mr-2" id="terms">
 
                             <label class="text-sm text-grey-700" for="terms">
