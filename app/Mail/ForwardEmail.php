@@ -17,6 +17,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $user;
     protected $alias;
     protected $sender;
+    protected $displayFrom;
     protected $emailSubject;
     protected $emailText;
     protected $emailHtml;
@@ -33,6 +34,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
     {
         $this->alias = $alias;
         $this->sender = $emailData->sender;
+        $this->displayFrom = $emailData->display_from;
         $this->emailSubject = $emailData->subject;
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
@@ -52,7 +54,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $replyToEmail = $this->alias->local_part.'+'.sha1(config('anonaddy.secret').$this->sender).'@'.$this->alias->domain;
 
         $email =  $this
-            ->from(config('mail.from.address'), $this->sender.' via '.config('app.name'))
+            ->from(config('mail.from.address'), $this->displayFrom."'".$this->sender."' via ".config('app.name'))
             ->replyTo($replyToEmail, $this->sender)
             ->subject($this->emailSubject)
             ->text('emails.forward.text')->with([
@@ -66,10 +68,11 @@ class ForwardEmail extends Mailable implements ShouldQueue
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
-                        ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '>, <' . $this->deactivateUrl . '>');
+                        ->addTextHeader('List-Unsubscribe', '<' . $this->deactivateUrl . '>,
+                        <mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '>');
 
                 $message->getHeaders()
-                        ->addTextHeader('Return-Path', config('mail.from.address'));
+                        ->addTextHeader('Return-Path', 'bounce@' . config('anonaddy.domain'));
             });
 
         if ($this->emailHtml) {

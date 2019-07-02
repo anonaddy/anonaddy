@@ -211,7 +211,7 @@ class ReceiveEmail extends Command
                 function () use ($user) {
 
                     // Rate limit reached, return error message
-                    $this->error('5.7.1 Rate limit exceeded for user ' . $user->username . '. Please try again later.');
+                    $this->error('4.2.1 Rate limit exceeded for user ' . $user->username . '. Please try again later.');
 
                     exit(1);
                 }
