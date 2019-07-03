@@ -69,6 +69,9 @@ class ForwardEmail extends Mailable implements ShouldQueue
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
                         ->addTextHeader('List-Unsubscribe', '<' . $this->deactivateUrl . '>, <mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '>');
+
+                $message->getHeaders()
+                        ->addTextHeader('Return-Path', 'bounces@' . config('anonaddy.domain'));
             });
 
         if ($this->emailHtml) {

@@ -51,7 +51,11 @@ class ReplyToEmail extends Mailable implements ShouldQueue
             ->subject($this->emailSubject)
             ->text('emails.reply.text')->with([
                 'text' => $this->emailText
-            ]);
+            ])
+            ->withSwiftMessage(function ($message) {
+                $message->getHeaders()
+                        ->addTextHeader('Return-Path', 'bounces@' . config('anonaddy.domain'));
+            });
 
         if ($this->emailHtml) {
             $email->view('emails.reply.html')->with([
