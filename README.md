@@ -15,7 +15,7 @@ I use this service myself for the vast majority of sites I'm signed up to.
 
 #### Do you store emails?
 
-No I definitely do not store/record any emails that pass through the server.
+No I definitely do not store/save any emails that pass through the server.
 
 
 #### Can I use my own domain?
@@ -49,12 +49,12 @@ The limit is currently set to 10 which should suffice in the vast majority of si
 When you delete your account the following happens:
 
 * All of your recipients are deleted from the database
-* All of your other aliases are deleted from the database (aliases with a custom domain are soft deleted - see why below)
+* All of your aliases are deleted from the database (aliases with a custom domain are soft deleted - see why below)
 * All of your custom domains are deleted from the database
 * Your user details are deleted from the database
 * Your username is encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
 
-The reason aliases with a custom domain are soft deleted (a deleted_at column if filled in the database) is to ensure that nobody else can register your same domain in the future and then sign up to our site and receive emails for aliases you have previously used.
+The reason aliases with a custom domain are soft deleted (a deleted_at column is filled in the database) is to ensure that nobody else can register your same domain in the future and then sign up to our site and receive emails for aliases you have previously used.
 
 
 #### Does this work with any email provider?
@@ -140,6 +140,46 @@ My name is Will Browning, I'm a web developer from the UK and an advocate for on
 #### I couldn't find an answer to my question, how can I contact you?
 
 For any others questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com)
+
+## Self Hosting
+
+#### Prerequisites
+
+* Postfix (2.7)+
+* PHP (7.1+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension
+* Port 25 unblocked and open
+* Redis (4.x+) not required if you don't need it for throttling or queues
+* FQDN as hostname e.g. mail.anonaddy.me
+* MariaDB / MySQL (or any other database compatible with Laravel)
+* Nginx
+* SpamAssassin, Amavis, OpenDKIM, OpenDMARC, postfix-policyd-spf-python
+* DNS records - MX, SPF, DKIM, DMARC
+* Reverse DNS
+* SSL/TLS Encryption - you can install a free certificate from Let’s Encrypt.
+
+#### Postfix configuration
+
+In /etc/postfix/master.cf you need to make sure it has this at the top:
+
+```cf
+smtp       inet  n       -       -       -       -       smtpd
+        -o content_filter=anonaddy:dummy
+```
+
+This should be the only line for smtp.
+
+Then add this these lines to the bottom:
+
+```cf
+anonaddy unix - n n - - pipe
+  flags=F user=youruser argv=php /path/to/your/webapp/artisan anonaddy:receive-email --sender=${sender} --recipient=${recipient} --local_part=${user} --extension=${extension} --domain=${domain} --size=${size}
+```
+
+Making sure to replace `youruser` with the username of the user who will run the artisan command and also to update the /path to your installation.
+
+This is what will pipe the email through to our applicaton so we can determine who the alias belongs to and who to forward the email to.
+
+More instructions to follow soon...
 
 ## Thanks
 
