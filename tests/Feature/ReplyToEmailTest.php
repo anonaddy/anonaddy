@@ -44,10 +44,10 @@ class ReplyToEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_reply.eml'),
                 '--sender' => $this->user->defaultRecipient->email,
-                '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [$extension],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -90,12 +90,12 @@ class ReplyToEmailTest extends TestCase
                 'file' => base_path('tests/emails/email_multiple_reply.eml'),
                 '--sender' => $this->user->defaultRecipient->email,
                 '--recipient' => [
-                    'ebay+'.$extension1.'@johndoe.anonaddy.me',
-                    'ebay+'.$extension2.'@johndoe.anonaddy.me'
+                    'ebay+'.$extension1.'@johndoe.anonaddy.com',
+                    'ebay+'.$extension2.'@johndoe.anonaddy.com'
                 ],
                 '--local_part' => ['ebay', 'ebay'],
                 '--extension' => [$extension1, $extension2],
-                '--domain' => ['johndoe.anonaddy.me', 'johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com', 'johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);

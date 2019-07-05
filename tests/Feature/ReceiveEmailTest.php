@@ -41,10 +41,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -82,10 +82,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_with_attachment.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['attachment@johndoe.anonaddy.me'],
+                '--recipient' => ['attachment@johndoe.anonaddy.com'],
                 '--local_part' => ['attachment'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -121,10 +121,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_multiple_recipients.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.me', 'amazon@johndoe.anonaddy.me', 'paypal@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay@johndoe.anonaddy.com', 'amazon@johndoe.anonaddy.com', 'paypal@johndoe.anonaddy.me'],
                 '--local_part' => ['ebay', 'amazon', 'paypal'],
                 '--extension' => ['', '', ''],
-                '--domain' => ['johndoe.anonaddy.me', 'johndoe.anonaddy.me', 'johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com', 'johndoe.anonaddy.com', 'johndoe.anonaddy.com'],
                 '--size' => '1217'
             ]
         )->assertExitCode(0);
@@ -174,10 +174,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_with_extension.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay+a@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay+a@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => ['a'],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '789'
             ]
         )->assertExitCode(0);
@@ -222,10 +222,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '559'
             ]
         )->assertExitCode(0);
@@ -286,10 +286,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '444'
             ]
         )->assertExitCode(0);
@@ -327,10 +327,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -381,10 +381,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_unsubscribe.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.me'],
+                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.com'],
                 '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712'],
                 '--extension' => [''],
-                '--domain' => ['unsubscribe.anonaddy.me'],
+                '--domain' => ['unsubscribe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -438,10 +438,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_unsubscribe_plus_other_recipient.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.me', 'another@johndoe.anonaddy.me'],
+                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.com', 'another@johndoe.anonaddy.com'],
                 '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712', 'another'],
                 '--extension' => ['', ''],
-                '--domain' => ['unsubscribe.anonaddy.me', 'johndoe.anonaddy.me'],
+                '--domain' => ['unsubscribe.anonaddy.com', 'johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -497,10 +497,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_unsubscribe.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.me'],
+                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.com'],
                 '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712'],
                 '--extension' => [''],
-                '--domain' => ['unsubscribe.anonaddy.me'],
+                '--domain' => ['unsubscribe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -545,9 +545,9 @@ class ReceiveEmailTest extends TestCase
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
-            'email' => 'ebay@'.config('anonaddy.domain'),
+            'email' => 'ebay@anonaddy.me',
             'local_part' => 'ebay',
-            'domain' => config('anonaddy.domain'),
+            'domain' => 'anonaddy.me',
             'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
@@ -622,10 +622,10 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.me'],
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.me'],
+                '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
@@ -663,18 +663,18 @@ class ReceiveEmailTest extends TestCase
             [
                 'file' => base_path('tests/emails/email_other_domain.eml'),
                 '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--recipient' => ['ebay@johndoe.anonaddy.me'],
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
-                '--domain' => ['johndoe.anonaddy.com'],
+                '--domain' => ['johndoe.anonaddy.me'],
                 '--size' => '1000'
             ]
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
-            'email' => 'ebay@johndoe.anonaddy.com',
+            'email' => 'ebay@johndoe.anonaddy.me',
             'local_part' => 'ebay',
-            'domain' => 'johndoe.anonaddy.com',
+            'domain' => 'johndoe.anonaddy.me',
             'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
