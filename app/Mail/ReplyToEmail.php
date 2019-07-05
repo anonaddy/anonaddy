@@ -54,7 +54,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
-                        ->addTextHeader('Return-Path', 'bounces@' . config('anonaddy.domain'));
+                        ->addTextHeader('Return-Path', 'bounces@anonaddy.me');
             });
 
         if ($this->emailHtml) {
