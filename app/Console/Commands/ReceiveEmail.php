@@ -13,6 +13,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
 
 class ReceiveEmail extends Command
@@ -77,7 +78,13 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $key => $recipient) {
-                $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.config('anonaddy.domain'))); // e.g. johndoe
+                $parentDomain = collect(config('anonaddy.all_domains'))
+                    ->filter(function ($name) use ($recipient) {
+                        return Str::endsWith($recipient['domain'], $name);
+                    })
+                    ->first();
+
+                $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain)); // e.g. johndoe
 
                 $displayTo = $this->parser->getAddresses('to')[$key]['display'];
 
@@ -96,7 +103,7 @@ class ReceiveEmail extends Command
                     }
 
                     // Check if this is the root domain e.g. anonaddy.me
-                    if ($recipient['domain'] === config('anonaddy.domain') && !empty(config('anonaddy.admin_username'))) {
+                    if ($recipient['domain'] === $parentDomain && !empty(config('anonaddy.admin_username'))) {
                         $user = User::where('username', config('anonaddy.admin_username'))->first();
                     }
                 }

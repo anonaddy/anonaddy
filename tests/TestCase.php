@@ -15,6 +15,12 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        config([
+            'anonaddy.limit' => 1000,
+            'anonaddy.domain' => 'anonaddy.me',
+            'anonaddy.all_domains' => ['anonaddy.me','anonaddy.com']
+        ]);
+
         //$this->withoutExceptionHandling();
 
         TestResponse::macro('data', function ($key) {

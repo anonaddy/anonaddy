@@ -24,8 +24,6 @@ class ReceiveEmailTest extends TestCase
     {
         parent::setUp();
 
-        config(['anonaddy.limit' => 1000]);
-
         $this->user = factory(User::class)->create(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
@@ -650,5 +648,47 @@ class ReceiveEmailTest extends TestCase
             $this->user,
             NearBandwidthLimit::class
         );
+    }
+
+    /** @test */
+    public function it_can_forward_email_from_file_for_all_domains()
+    {
+        Mail::fake();
+        Notification::fake();
+
+        Mail::assertNothingSent();
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_other_domain.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [''],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1000'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'ebay@johndoe.anonaddy.com',
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.anonaddy.com',
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertEquals(1, $this->user->aliases()->count());
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '1000'
+        ]);
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) {
+            return $mail->hasTo($this->user->email);
+        });
+
+        Notification::assertNothingSent();
     }
 }

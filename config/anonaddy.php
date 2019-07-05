@@ -28,6 +28,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | All Domains
+    |--------------------------------------------------------------------------
+    |
+    | If you would like to have other domains to use e.g. @username.yourdomain2.com
+    | enter a comma separated list in your .env file like so, anonaddy.me,anonaddy.com
+    |
+    */
+
+    'all_domains' => explode(',', env('ANONADDY_ALL_DOMAINS')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Secret
     |--------------------------------------------------------------------------
     |
