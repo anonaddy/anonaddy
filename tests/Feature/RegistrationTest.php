@@ -118,12 +118,50 @@ class RegistrationTest extends TestCase
     }
 
     /** @test */
+    public function user_cannot_register_with_uppercase_blacklisted_username()
+    {
+        $response = $this->post('/register', [
+            'username' => 'Www',
+            'email' => 'johndoe@example.com',
+            'email_confirmation' => 'johndoe@example.com',
+            'password' => 'mypassword',
+            'terms' => true,
+        ]);
+
+        $response->assertSessionHasErrors(['username']);
+
+        $this->assertDatabaseMissing('users', [
+            'username' => 'www'
+        ]);
+    }
+
+    /** @test */
     public function user_cannot_register_with_deleted_username()
     {
         DeletedUsername::create(['username' => 'johndoe']);
 
         $response = $this->post('/register', [
             'username' => 'johndoe',
+            'email' => 'johndoe@example.com',
+            'email_confirmation' => 'johndoe@example.com',
+            'password' => 'mypassword',
+            'terms' => true,
+        ]);
+
+        $response->assertSessionHasErrors(['username']);
+
+        $this->assertDatabaseMissing('users', [
+            'username' => 'johndoe'
+        ]);
+    }
+
+    /** @test */
+    public function user_cannot_register_with_uppercase_deleted_username()
+    {
+        DeletedUsername::create(['username' => 'johndoe']);
+
+        $response = $this->post('/register', [
+            'username' => 'joHndoe',
             'email' => 'johndoe@example.com',
             'email_confirmation' => 'johndoe@example.com',
             'password' => 'mypassword',

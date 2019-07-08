@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 class RecipientVerificationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:1,300');
+    }
+
     public function resend($id)
     {
         $recipient = user()->recipients()->findOrFail($id);

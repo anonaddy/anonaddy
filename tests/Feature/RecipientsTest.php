@@ -6,8 +6,10 @@ use App\Alias;
 use App\AliasRecipient;
 use App\Recipient;
 use App\User;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RecipientsTest extends TestCase
@@ -114,6 +116,23 @@ class RecipientsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_not_create_the_same_recipient_in_uppercase()
+    {
+        factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'johndoe@example.com'
+        ]);
+
+        $response = $this->json('POST', '/recipients', [
+            'email' => 'JOHNdoe@example.com'
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('email');
+    }
+
+    /** @test */
     public function user_can_not_create_the_same_recipient_as_default()
     {
         $this->user->recipients()->save($this->user->defaultRecipient);
@@ -164,5 +183,53 @@ class RecipientsTest extends TestCase
         $response->assertStatus(403);
         $this->assertCount(1, $this->user->recipients);
         $this->assertEquals($defaultRecipient->id, $this->user->defaultRecipient->id);
+    }
+
+    /** @test */
+    public function user_can_resend_recipient_verification_email()
+    {
+        Notification::fake();
+
+        Notification::assertNothingSent();
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email_verified_at' => null
+        ]);
+
+        $response = $this->get('/recipients/'.$recipient->id.'/email/resend');
+
+        $response->assertStatus(200);
+
+        Notification::assertSentTo(
+            $recipient,
+            VerifyEmail::class
+        );
+    }
+
+    /** @test */
+    public function user_must_wait_before_resending_recipient_verification_email()
+    {
+        Notification::fake();
+
+        Notification::assertNothingSent();
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email_verified_at' => null
+        ]);
+
+        $response = $this->get('/recipients/'.$recipient->id.'/email/resend');
+
+        $response->assertStatus(200);
+
+        Notification::assertSentTo(
+            $recipient,
+            VerifyEmail::class
+        );
+
+        $response2 = $this->get('/recipients/'.$recipient->id.'/email/resend');
+
+        $response2->assertStatus(429);
     }
 }

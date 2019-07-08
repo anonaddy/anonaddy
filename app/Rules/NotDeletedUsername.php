@@ -32,7 +32,7 @@ class NotDeletedUsername implements Rule
             })
             ->toArray();
 
-        return !in_array($value, $deletedUsernames);
+        return !in_array(strtolower($value), $deletedUsernames);
     }
 
     /**

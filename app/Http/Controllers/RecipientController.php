@@ -19,7 +19,7 @@ class RecipientController extends Controller
 
     public function store(StoreRecipientRequest $request)
     {
-        $recipient = user()->recipients()->create(['email' => $request->email]);
+        $recipient = user()->recipients()->create(['email' => strtolower($request->email)]);
 
         $recipient->sendEmailVerificationNotification();
 

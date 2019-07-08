@@ -26,6 +26,10 @@
                         <a class="bg-cyan-400 w-full text-center hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:shadow-outline no-underline mx-auto" href="{{ route('verification.resend') }}">
                             {{ __('Resend verification email') }}
                         </a>
+
+                        <p class="text-sm text-grey-600 mt-4 text-center w-full">
+                            You can resend once every 5 minutes.
+                        </p>
                     </div>
                 </div>
             </div>

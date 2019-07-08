@@ -654,7 +654,6 @@ class ReceiveEmailTest extends TestCase
     public function it_can_forward_email_from_file_for_all_domains()
     {
         Mail::fake();
-        Notification::fake();
 
         Mail::assertNothingSent();
 
@@ -688,7 +687,5 @@ class ReceiveEmailTest extends TestCase
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
         });
-
-        Notification::assertNothingSent();
     }
 }
