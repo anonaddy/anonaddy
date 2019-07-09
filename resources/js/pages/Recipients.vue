@@ -410,7 +410,12 @@ export default {
         })
         .catch(error => {
           this.resendVerificationLoading = false
-          this.error()
+          console.log(error.response)
+          if (error.response.status === 429) {
+            this.error('You can only resend the email once every 5 minutes')
+          } else {
+            this.error()
+          }
         })
     },
     openDeleteModal(id) {

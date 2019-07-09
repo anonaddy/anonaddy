@@ -205,4 +205,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return ($this->bandwidth / $this->getBandwidthLimit()) > 0.9;
     }
+
+    public function hasExceededNewAliasLimit()
+    {
+        return $this
+                ->aliases()
+                ->where('created_at', '>=', now()->subHour())
+                ->count() >= 10; // TODO update for different plans
+    }
 }

@@ -13,8 +13,8 @@
     "dependencies": {
         "axios": "^0.18.1",
         "cross-env": "^5.1",
-        "dayjs": "^1.8.14",
-        "laravel-mix": "^4.0.16",
+        "dayjs": "^1.8.15",
+        "laravel-mix": "^4.1.2",
         "laravel-mix-purgecss": "^4.1.0",
         "lodash": "^4.17.11",
         "portal-vue": "^2.1.5",

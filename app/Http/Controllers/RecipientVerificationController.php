@@ -6,7 +6,7 @@ class RecipientVerificationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('throttle:1,300');
+        $this->middleware('throttle:1,5');
     }
 
     public function resend($id)

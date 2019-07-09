@@ -180,12 +180,22 @@ class ReceiveEmail extends Command
             // or pass number and if forwarded equals that no. then block?
         }
 
-        $alias = $user->aliases()->firstOrCreate([
+        $alias = $user->aliases()->firstOrNew([
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
             'domain_id' => $customDomainId
-        ])->refresh();
+        ]);
+
+        if (!isset($alias->id) && $user->hasExceededNewAliasLimit()) {
+            // New aliases per hour limit exceededs
+            $this->error('4.2.1 New aliases per hour limit exceeded for user ' . $user->username . '.');
+
+            exit(1);
+        } else {
+            $alias->save();
+            $alias->refresh();
+        }
 
         // This is simply a class that allows us to base64_encode all attachment data before serialization
         $emailData = new EmailData($this->parser);
@@ -222,7 +232,7 @@ class ReceiveEmail extends Command
 
                     exit(1);
                 }
-        );
+            );
     }
 
     protected function getParser($file)
