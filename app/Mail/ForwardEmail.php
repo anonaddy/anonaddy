@@ -46,6 +46,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->bannerLocation = $this->alias->user->banner_location;
 
         $this->openpgpsigner = OpenPGPSigner::newInstance();
+        $this->openpgpsigner->setGnupgHome('~/.gnupg');
         $this->openpgpsigner->setEncrypt($shouldEncrypt);
 
         if ($fingerprint) {

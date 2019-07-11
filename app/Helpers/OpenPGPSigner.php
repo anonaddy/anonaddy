@@ -71,7 +71,7 @@ class OpenPGPSigner implements Swift_Signers_BodySigner
      *
      * @var string
      */
-    protected $gnupgHome = '~/.gnupg';
+    protected $gnupgHome = null;
 
     /**
      * @var bool
