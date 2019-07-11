@@ -79,7 +79,7 @@ class Alias extends Model
     }
 
     /**
-     * Get the verified recipients for the email alias.
+     * Get all of the verified recipients for the email alias.
      */
     public function verifiedRecipients()
     {
@@ -87,15 +87,45 @@ class Alias extends Model
     }
 
     /**
-     * Get the verified emails of recipients for the email alias.
+     * Get the verified emails of recipients not using PGP for the email alias.
      */
-    public function recipientEmails()
+    public function nonPgpRecipientEmails()
     {
-        return $this->verifiedRecipients()->count() ? $this->verifiedRecipients()
-        ->get()
-        ->map(function ($recipient) {
-            return $recipient->email;
-        })->toArray() : $this->user->email;
+        if ($this->verifiedRecipients()->count() === 0 && !$this->user->defaultRecipient->should_encrypt) {
+            return [$this->user->email];
+        }
+
+        return $this
+                ->verifiedRecipients()
+                ->where('should_encrypt', false)
+                ->get()
+                ->map(function ($recipient) {
+                    return $recipient->email;
+                })->toArray();
+    }
+
+    /**
+     * Check if the email alias has any recipients not using PGP.
+     */
+    public function hasNonPgpRecipients()
+    {
+        return count($this->nonPgpRecipientEmails()) > 0;
+    }
+
+    /**
+     * Get the verified recipients using PGP for the email alias.
+     */
+    public function recipientsUsingPgp()
+    {
+        if ($this->verifiedRecipients()->count() === 0 && $this->user->defaultRecipient->should_encrypt) {
+            return $this->user->defaultRecipient();
+        }
+
+        return $this
+                ->verifiedRecipients()
+                ->where('should_encrypt', true)
+                ->whereNotNull('fingerprint')
+                ->get();
     }
 
     public function deactivate()

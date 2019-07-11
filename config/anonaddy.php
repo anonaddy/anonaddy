@@ -86,6 +86,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Signing Key Fingerprint
+    |--------------------------------------------------------------------------
+    |
+    | This is the fingerprint of the gpg key to be used to sign forwarded
+    | emails, it should be the same as your mail from email address
+    |
+    */
+
+    'signing_key_fingerprint' => env('ANONADDY_SIGNING_KEY_FINGERPRINT'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Username Blacklist
     |--------------------------------------------------------------------------
     |

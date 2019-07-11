@@ -16,12 +16,15 @@ class Recipient extends Model
     public $incrementing = false;
 
     protected $encrypted = [
-        'email'
+        'email',
+        'fingerprint'
     ];
 
     protected $fillable = [
         'email',
         'user_id',
+        'should_encrypt',
+        'fingerprint',
         'email_verified_at'
     ];
 
@@ -33,7 +36,8 @@ class Recipient extends Model
 
     protected $casts = [
         'id' => 'string',
-        'user_id' => 'string'
+        'user_id' => 'string',
+        'should_encrypt' => 'boolean'
     ];
 
     /**

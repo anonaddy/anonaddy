@@ -131,19 +131,8 @@ class ReceiveEmail extends Command
     {
         $alias = Alias::find($recipient['local_part']);
 
-        if ($alias) {
-            // Make sure the sender is one of the user's recipients
-            $userRecipients = $alias->user
-                ->verifiedRecipients()
-                ->get()
-                ->map(function ($recipient) {
-                    return $recipient->email;
-                })
-                ->toArray();
-
-            if (in_array($this->option('sender'), $userRecipients)) {
-                $alias->deactivate();
-            }
+        if (!is_null($alias) && $alias->user->isVerifiedRecipient($this->option('sender'))) {
+            $alias->deactivate();
         }
     }
 
@@ -152,7 +141,6 @@ class ReceiveEmail extends Command
         $alias = $user->aliases()->where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first();
 
         if (!is_null($alias) && filter_var($displayTo, FILTER_VALIDATE_EMAIL)) {
-            // This is simply a class that allows us to base64_encode all attachment data before serialization
             $emailData = new EmailData($this->parser);
 
             $message = (new ReplyToEmail($user, $alias, $emailData))->onQueue('default');
@@ -188,7 +176,6 @@ class ReceiveEmail extends Command
         ]);
 
         if (!isset($alias->id) && $user->hasExceededNewAliasLimit()) {
-            // New aliases per hour limit exceededs
             $this->error('4.2.1 New aliases per hour limit exceeded for user ' . $user->username . '.');
 
             exit(1);
@@ -200,9 +187,19 @@ class ReceiveEmail extends Command
         // This is simply a class that allows us to base64_encode all attachment data before serialization
         $emailData = new EmailData($this->parser);
 
-        $message = (new ForwardEmail($alias, $emailData))->onQueue('default');
 
-        Mail::to($alias->recipientEmails())->queue($message);
+        $alias->recipientsUsingPgp()->each(function ($recipient) use ($alias, $emailData) {
+            $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt, $recipient->fingerprint))->onQueue('default');
+
+            Mail::to($recipient->email)->queue($message);
+        });
+
+
+        if ($alias->hasNonPgpRecipients()) {
+            $message = (new ForwardEmail($alias, $emailData))->onQueue('default');
+
+            Mail::to($alias->nonPgpRecipientEmails())->queue($message);
+        }
 
         if (!Mail::failures()) {
             $alias->emails_forwarded += 1;
@@ -226,8 +223,6 @@ class ReceiveEmail extends Command
                 function () {
                 },
                 function () use ($user) {
-
-                    // Rate limit reached, return error message
                     $this->error('5.2.1 Rate limit exceeded for user ' . $user->username . '. Please try again later.');
 
                     exit(1);

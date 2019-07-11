@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Alias;
 use App\EmailData;
+use App\Helpers\OpenPGPSigner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -24,13 +25,14 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $emailAttachments;
     protected $deactivateUrl;
     protected $bannerLocation;
+    protected $openpgpsigner;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Alias $alias, EmailData $emailData)
+    public function __construct(Alias $alias, EmailData $emailData, $shouldEncrypt = false, $fingerprint = null)
     {
         $this->alias = $alias;
         $this->sender = $emailData->sender;
@@ -42,6 +44,15 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->bannerLocation = $this->alias->user->banner_location;
+
+        $this->openpgpsigner = OpenPGPSigner::newInstance();
+        $this->openpgpsigner->setEncrypt($shouldEncrypt);
+
+        if ($fingerprint) {
+            $this->openpgpsigner->addRecipient($fingerprint);
+        }
+
+        $this->openpgpsigner->addSignature(config('mail.from.address'), config('anonaddy.signing_key_fingerprint'));
     }
 
     /**
@@ -72,6 +83,8 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
                 $message->getHeaders()
                         ->addTextHeader('Return-Path', 'bounces@anonaddy.me');
+
+                $message->attachSigner($this->openpgpsigner);
             });
 
         if ($this->emailHtml) {

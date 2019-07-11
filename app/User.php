@@ -213,4 +213,15 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->where('created_at', '>=', now()->subHour())
                 ->count() >= 10; // TODO update for different plans
     }
+
+    public function isVerifiedRecipient($email)
+    {
+        return $this
+                ->verifiedRecipients()
+                ->get()
+                ->map(function ($recipient) {
+                    return $recipient->email;
+                })
+                ->contains($email);
+    }
 }
