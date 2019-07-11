@@ -46,7 +46,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->bannerLocation = $this->alias->user->banner_location;
 
         $path = "~/.gnupg";
-        $this->openpgpsigner = OpenPGPSigner::newInstance();
+        $this->openpgpsigner = OpenPGPSigner::newInstance($signingKey = config('anonaddy.signing_key_fingerprint'), $recipientKeys = [], $gnupgHome = $path);
         $this->openpgpsigner->setGnupgHome($path);
         $this->openpgpsigner->setEncrypt($shouldEncrypt);
 
