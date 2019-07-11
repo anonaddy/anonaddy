@@ -168,7 +168,7 @@ php artisan route:cache
 php artisan queue:restart
 @endtask
 
-@task("deploymentRollback")
+@task("deploymentRollback", ["on" => "remote"])
 cd {{ $releasesDir }}
 ln -nfs {{ $releasesDir }}/$(find . -maxdepth 1 -name "20*" | sort  | tail -n 2 | head -n1) {{ $baseDir }}/current
 echo "Rolled back to $(find . -maxdepth 1 -name "20*" | sort  | tail -n 2 | head -n1)"

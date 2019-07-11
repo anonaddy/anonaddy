@@ -87,7 +87,7 @@ class OpenPGPSigner implements Swift_Signers_BodySigner
         $this->gnupgHome     = $gnupgHome;
     }
 
-    public static function newInstance($signingKey = null, $recipientKeys = [], $gnupgHome = null)
+    public static function newInstance($signingKey = null, $recipientKeys = [], $gnupgHome = '~/.gnupg')
     {
         return new self($signingKey, $recipientKeys, $gnupgHome);
     }
