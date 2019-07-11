@@ -45,8 +45,9 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->bannerLocation = $this->alias->user->banner_location;
 
+        $path = "~/.gnupg";
         $this->openpgpsigner = OpenPGPSigner::newInstance();
-        $this->openpgpsigner->setGnupgHome('~/.gnupg');
+        $this->openpgpsigner->setGnupgHome($path);
         $this->openpgpsigner->setEncrypt($shouldEncrypt);
 
         if ($fingerprint) {
