@@ -45,7 +45,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->bannerLocation = $this->alias->user->banner_location;
 
-        $path = "~/.gnupg";
+        /* $path = "~/.gnupg";
         $this->openpgpsigner = OpenPGPSigner::newInstance($signingKey = config('anonaddy.signing_key_fingerprint'), $recipientKeys = [], $gnupgHome = $path);
         $this->openpgpsigner->setGnupgHome($path);
         $this->openpgpsigner->setEncrypt($shouldEncrypt);
@@ -54,7 +54,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
             $this->openpgpsigner->addRecipient($fingerprint);
         }
 
-        $this->openpgpsigner->addSignature(config('mail.from.address'), config('anonaddy.signing_key_fingerprint'));
+        $this->openpgpsigner->addSignature(config('mail.from.address'), config('anonaddy.signing_key_fingerprint')); */
     }
 
     /**
@@ -86,7 +86,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 $message->getHeaders()
                         ->addTextHeader('Return-Path', 'bounces@anonaddy.me');
 
-                $message->attachSigner($this->openpgpsigner);
+                //$message->attachSigner($this->openpgpsigner);
             });
 
         if ($this->emailHtml) {
