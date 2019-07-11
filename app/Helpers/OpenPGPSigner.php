@@ -79,7 +79,7 @@ class OpenPGPSigner implements Swift_Signers_BodySigner
     protected $encrypt = true;
 
 
-    public function __construct($signingKey = null, $recipientKeys = [], $gnupgHome = '~/.gnupg')
+    public function __construct($signingKey = null, $recipientKeys = [], $gnupgHome = null)
     {
         $this->initGNUPG();
         $this->signingKey    = $signingKey;
@@ -87,7 +87,7 @@ class OpenPGPSigner implements Swift_Signers_BodySigner
         $this->gnupgHome     = $gnupgHome;
     }
 
-    public static function newInstance($signingKey = null, $recipientKeys = [], $gnupgHome = '~/.gnupg')
+    public static function newInstance($signingKey = null, $recipientKeys = [], $gnupgHome = null)
     {
         return new self($signingKey, $recipientKeys, $gnupgHome);
     }
