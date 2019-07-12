@@ -551,7 +551,7 @@ export default {
           this.addRecipientKeyLoading = false
 
           let recipient = _.find(this.recipients, ['id', this.recipientToAddKey.id])
-          recipient.shoud_encrypt = data.data.should_encrypt
+          recipient.should_encrypt = data.data.should_encrypt
           recipient.fingerprint = data.data.fingerprint
 
           this.recipientKey = ''
