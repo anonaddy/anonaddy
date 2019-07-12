@@ -338,16 +338,6 @@ EOT;
             $this->gnupgHome = getenv('HOME') . '/.gnupg';
         }
 
-        if (!$this->gnupgHome) {
-            throw new Swift_SwiftException('Unable to detect GnuPG home path, please call PHPMailerPGP::setGPGHome()');
-        }
-
-        if (!file_exists($this->gnupgHome)) {
-            throw new Swift_SwiftException('GnuPG home path does not exist');
-        }
-
-        putenv("GNUPGHOME=" . escapeshellcmd($this->gnupgHome));
-
         if (!$this->gnupg) {
             $this->gnupg = new \gnupg();
         }

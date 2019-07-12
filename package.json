@@ -21,7 +21,7 @@
         "postcss-import": "^11.1.0",
         "postcss-nesting": "^5.0.0",
         "resolve-url-loader": "^2.3.2",
-        "tailwindcss": "^1.0.4",
+        "tailwindcss": "^1.0.5",
         "tippy.js": "^4.3.4",
         "v-clipboard": "^2.2.2",
         "vue": "^2.6.10",

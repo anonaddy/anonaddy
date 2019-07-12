@@ -184,16 +184,13 @@ class ReceiveEmail extends Command
             $alias->refresh();
         }
 
-        // This is simply a class that allows us to base64_encode all attachment data before serialization
         $emailData = new EmailData($this->parser);
-
 
         $alias->recipientsUsingPgp()->each(function ($recipient) use ($alias, $emailData) {
             $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt, $recipient->fingerprint))->onQueue('default');
 
             Mail::to($recipient->email)->queue($message);
         });
-
 
         if ($alias->hasNonPgpRecipients()) {
             $message = (new ForwardEmail($alias, $emailData))->onQueue('default');
