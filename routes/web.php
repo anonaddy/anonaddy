@@ -27,6 +27,12 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::post('/recipients', 'RecipientController@store')->name('recipients.store');
     Route::delete('/recipients/{id}', 'RecipientController@destroy')->name('recipients.destroy');
 
+    Route::patch('/recipient-keys/{id}', 'RecipientKeyController@update')->name('recipient_keys.update');
+    Route::delete('/recipient-keys/{id}', 'RecipientKeyController@destroy')->name('recipient_keys.destroy');
+
+    Route::post('/encrypted-recipients', 'EncryptedRecipientController@store')->name('encrypted_recipients.store');
+    Route::delete('/encrypted-recipients/{id}', 'EncryptedRecipientController@destroy')->name('encrypted_recipients.destroy');
+
     Route::post('/alias-recipients', 'AliasRecipientController@store')->name('alias_recipients.store');
 
     Route::get('/recipients/{id}/email/resend', 'RecipientVerificationController@resend')->name('recipient_verification.resend');

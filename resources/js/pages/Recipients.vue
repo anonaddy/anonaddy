@@ -97,6 +97,11 @@
               </div>
             </div>
           </th>
+          <th class="p-4">
+            <div class="flex items-center">
+              Encryption
+            </div>
+          </th>
           <th class="p-4" colspan="2">
             <div class="flex items-center">
               Verified
@@ -176,6 +181,28 @@
           </td>
           <td class="border-grey-200 border-t">
             <div class="p-4 flex items-center focus:text-indigo-500 text-sm">
+              <span v-if="recipient.fingerprint" class="flex">
+                <Toggle
+                  v-model="recipient.should_encrypt"
+                  @on="turnOnEncryption(recipient)"
+                  @off="turnOffEncryption(recipient)"
+                />
+                <icon
+                  name="fingerprint"
+                  class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current ml-2"
+                  :data-tippy-content="recipient.fingerprint"
+                  v-clipboard="() => recipient.fingerprint"
+                  v-clipboard:success="clipboardSuccess"
+                  v-clipboard:error="clipboardError"
+                />
+              </span>
+              <button v-else @click="openRecipientKeyModal(recipient)" class="focus:outline-none">
+                Add GPG key
+              </button>
+            </div>
+          </td>
+          <td class="border-grey-200 border-t">
+            <div class="p-4 flex items-center focus:text-indigo-500 text-sm">
               <span
                 name="check"
                 v-if="recipient.email_verified_at"
@@ -208,7 +235,7 @@
         <tr v-if="queriedRecipients.length === 0">
           <td
             class="border-grey-200 border-t p-4 text-center h-24 text-lg text-grey-700"
-            colspan="4"
+            colspan="5"
           >
             No recipients found for that search!
           </td>
@@ -256,6 +283,47 @@
       </div>
     </Modal>
 
+    <Modal :open="addRecipientKeyModalOpen" @close="closeRecipientKeyModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Add Public GPG Key
+        </h2>
+        <p class="mt-4 text-grey-700">Enter your <b>PUBLIC</b> in the text area below.</p>
+        <div class="mt-6">
+          <p v-show="errors.recipientKey" class="mb-3 text-red-500">
+            {{ errors.recipientKey }}
+          </p>
+          <textarea
+            v-model="recipientKey"
+            type="email"
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
+            :class="errors.recipientKey ? 'border-red-500' : ''"
+            placeholder="Begins with '-----BEGIN PGP PUBLIC KEY BLOCK-----'"
+            rows="15"
+            autofocus
+          >
+          </textarea>
+          <button
+            type="button"
+            @click="validateRecipientKey"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            :class="addRecipientKeyLoading ? 'cursor-not-allowed' : ''"
+            :disabled="addRecipientKeyLoading"
+          >
+            Add Key
+          </button>
+          <button
+            @click="closeRecipientKeyModal"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+
     <Modal :open="deleteRecipientModalOpen" @close="closeDeleteModal">
       <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
         <h2
@@ -288,6 +356,7 @@
 
 <script>
 import Modal from './../components/Modal.vue'
+import Toggle from './../components/Toggle.vue'
 import tippy from 'tippy.js'
 
 export default {
@@ -307,6 +376,7 @@ export default {
   },
   components: {
     Modal,
+    Toggle,
   },
   created() {
     this.defaultRecipient = _.find(this.recipients, ['id', this.user.default_recipient_id])
@@ -320,12 +390,16 @@ export default {
       recipients: this.initialRecipients,
       defaultRecipient: {},
       newRecipient: '',
+      recipientKey: '',
       search: '',
       addRecipientLoading: false,
       addRecipientModalOpen: false,
       recipientIdToDelete: null,
       deleteRecipientLoading: false,
       deleteRecipientModalOpen: false,
+      addRecipientKeyLoading: false,
+      addRecipientKeyModalOpen: false,
+      recipientToAddKey: {},
       resendVerificationLoading: false,
       currentSort: 'created_at',
       currentSortDir: 'desc',
@@ -334,6 +408,9 @@ export default {
   },
   watch: {
     queriedRecipients: _.debounce(function() {
+      this.addTooltips()
+    }, 50),
+    addRecipientKeyModalOpen: _.debounce(function() {
       this.addTooltips()
     }, 50),
   },
@@ -442,6 +519,86 @@ export default {
           this.deleteRecipientModalOpen = false
         })
     },
+    validateRecipientKey(e) {
+      this.errors = {}
+
+      if (!this.recipientKey) {
+        this.errors.recipientKey = 'Key required'
+      } else if (!this.validKey(this.recipientKey)) {
+        this.errors.recipientKey = 'Valid Key required'
+      }
+
+      if (!this.errors.recipientKey) {
+        this.addRecipientKey()
+      }
+
+      e.preventDefault()
+    },
+    addRecipientKey() {
+      this.addRecipientKeyLoading = true
+
+      axios
+        .patch(
+          `/recipient-keys/${this.recipientToAddKey.id}`,
+          JSON.stringify({
+            key_data: this.recipientKey,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(({ data }) => {
+          this.addRecipientKeyLoading = false
+
+          let recipient = _.find(this.recipients, ['id', this.recipientToAddKey.id])
+          recipient.shoud_encrypt = data.data.should_encrypt
+          recipient.fingerprint = data.data.fingerprint
+
+          this.recipientKey = ''
+          this.addRecipientKeyModalOpen = false
+          this.success(
+            `Key Successfully Added for ${
+              this.recipientToAddKey.email
+            }. Make sure to check the fingerprint is correct!`
+          )
+        })
+        .catch(error => {
+          this.addRecipientKeyLoading = false
+          if (error.response !== undefined) {
+            this.error(error.response.data.message)
+          } else {
+            this.error()
+          }
+        })
+    },
+    turnOnEncryption(recipient) {
+      axios
+        .post(
+          `/encrypted-recipients`,
+          JSON.stringify({
+            id: recipient.id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
+    turnOffEncryption(recipient) {
+      axios
+        .delete(`/encrypted-recipients/${recipient.id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
     sort(col, dir) {
       if (this.currentSort === col && this.currentSortDir === dir) {
         this.currentSort = 'created_at'
@@ -453,12 +610,24 @@ export default {
 
       this.reSort()
     },
+    openRecipientKeyModal(recipient) {
+      this.addRecipientKeyModalOpen = true
+      this.recipientToAddKey = recipient
+    },
+    closeRecipientKeyModal() {
+      this.addRecipientKeyModalOpen = false
+      this.recipientToAddKey = {}
+    },
     reSort() {
       this.recipients = _.orderBy(this.recipients, [this.currentSort], [this.currentSortDir])
     },
     validEmail(email) {
       let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       return re.test(email)
+    },
+    validKey(key) {
+      let re = /-----BEGIN PGP PUBLIC KEY BLOCK-----([A-Za-z0-9+=\/\n]+)-----END PGP PUBLIC KEY BLOCK-----/i
+      return re.test(key)
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

@@ -92,6 +92,12 @@
     ></path>
   </svg>
 
+  <svg v-else-if="name === 'fingerprint'" xmlns="http://www.w3.org/2000/svg" viewBox="-5 -2 24 24">
+    <path
+      d="M2 7a1 1 0 1 1-2 0 7 7 0 1 1 14 0v2a1 1 0 0 1-2 0V7A5 5 0 1 0 2 7zm3 3a1 1 0 0 1-2 0V7a4 4 0 1 1 8 0 1 1 0 0 1-2 0 2 2 0 1 0-4 0v3zm-2 3a1 1 0 0 1 2 0 2 2 0 1 0 4 0v-3a1 1 0 1 1 2 0v3a4 4 0 1 1-8 0zm3-5a1 1 0 1 1 2 0v4a1 1 0 0 1-2 0V8zm-6 3a1 1 0 0 1 2 0v2a5 5 0 0 0 10 0 1 1 0 0 1 2 0 7 7 0 0 1-14 0v-2z"
+    ></path>
+  </svg>
+
   <svg
     v-else-if="name === 'blocked'"
     xmlns="http://www.w3.org/2000/svg"

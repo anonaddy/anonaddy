@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\UpdateRecipientKeyRequest;
+use App\Http\Resources\RecipientResource;
+
+class RecipientKeyController extends Controller
+{
+    protected $gnupg;
+
+    public function __construct()
+    {
+        $this->gnupg = new \gnupg();
+    }
+
+    public function update(UpdateRecipientKeyRequest $request, $id)
+    {
+        $recipient = user()->recipients()->findOrFail($id);
+
+        $info = $this->gnupg->import($request->key_data);
+
+        if (!$info || !$info['imported']) {
+            return response('Key could not be imported', 404);
+        }
+
+        $recipient->update([
+            'should_encrypt' => true,
+            'fingerprint' => $info['fingerprint']
+        ]);
+
+        return new RecipientResource($recipient->fresh());
+    }
+
+    public function destroy($id)
+    {
+        $recipient = user()->recipients()->findOrFail($id);
+
+        if (!$this->gnupg->deletekey($recipient->fingerprint)) {
+            return response('Key could not be deleted', 404);
+        }
+
+        $recipient->update([
+            'should_encrypt' => false,
+            'fingerprint' => null
+        ]);
+
+        return response('', 204);
+    }
+}

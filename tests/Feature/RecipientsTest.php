@@ -232,4 +232,104 @@ class RecipientsTest extends TestCase
 
         $response2->assertStatus(429);
     }
+
+    /** @test */
+    public function user_can_add_gpg_key_to_recipient()
+    {
+        $gnupg = new \gnupg();
+        $gnupg->deletekey('26A987650243B28802524E2F809FD0D502E2F695');
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('PATCH', '/recipient-keys/'.$recipient->id, [
+            'key_data' => file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc'))
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertTrue($response->getData()->data->should_encrypt);
+    }
+
+    /** @test */
+    public function gpg_key_must_be_correct_format()
+    {
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('PATCH', '/recipient-keys/'.$recipient->id, [
+            'key_data' => 'Invalid Key Data'
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('key_data');
+    }
+
+    /** @test */
+    public function gpg_key_must_be_valid()
+    {
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('PATCH', '/recipient-keys/'.$recipient->id, [
+            'key_data' => file_get_contents(base_path('tests/keys/InvalidAnonAddyPublicKey.asc'))
+        ]);
+
+        $response
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    public function user_can_remove_gpg_key_from_recipient()
+    {
+        $gnupg = new \gnupg();
+        $gnupg->import(file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc')));
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'should_encrypt' => true,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('DELETE', '/recipient-keys/'.$recipient->id);
+
+        $response->assertStatus(204);
+        $this->assertNull($this->user->recipients[0]->fingerprint);
+        $this->assertFalse($this->user->recipients[0]->should_encrypt);
+    }
+
+    /** @test */
+    public function user_can_turn_on_encryption_for_recipient()
+    {
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'should_encrypt' => false,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('POST', '/encrypted-recipients/', [
+            'id' => $recipient->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $response->getData()->data->should_encrypt);
+    }
+
+    /** @test */
+    public function user_can_turn_off_encryption_for_recipient()
+    {
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'should_encrypt' => true,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('DELETE', '/encrypted-recipients/'.$recipient->id);
+
+        $response->assertStatus(200);
+        $this->assertEquals(false, $response->getData()->data->should_encrypt);
+    }
 }
