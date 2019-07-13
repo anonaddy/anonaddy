@@ -44,7 +44,6 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->emailAttachments = $emailData->attachments;
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->bannerLocation = $this->alias->user->banner_location;
-
         $this->shouldEncrypt = $shouldEncrypt;
 
         if ($shouldEncrypt) {

@@ -197,7 +197,7 @@
                 />
               </span>
               <button v-else @click="openRecipientKeyModal(recipient)" class="focus:outline-none">
-                Add GPG key
+                Add public key
               </button>
             </div>
           </td>
@@ -290,7 +290,7 @@
         >
           Add Public GPG Key
         </h2>
-        <p class="mt-4 text-grey-700">Enter your <b>PUBLIC</b> in the text area below.</p>
+        <p class="mt-4 text-grey-700">Enter your <b>PUBLIC</b> key data in the text area below.</p>
         <div class="mt-6">
           <p v-show="errors.recipientKey" class="mb-3 text-red-500">
             {{ errors.recipientKey }}
