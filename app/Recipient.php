@@ -40,6 +40,20 @@ class Recipient extends Model
         'should_encrypt' => 'boolean'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        Recipient::deleting(function ($recipient) {
+            if ($recipient->fingerprint) {
+                $gnupg = new \gnupg();
+                $gnupg->deletekey($recipient->fingerprint);
+            }
+
+            $recipient->aliases()->detach();
+        });
+    }
+
     /**
      * Get the user the recipient belongs to.
      */

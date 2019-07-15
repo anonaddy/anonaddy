@@ -187,7 +187,7 @@ class ReceiveEmail extends Command
         $emailData = new EmailData($this->parser);
 
         $alias->recipientsUsingPgp()->each(function ($recipient) use ($alias, $emailData) {
-            $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt, $recipient->fingerprint))->onQueue('default');
+            $message = (new ForwardEmail($alias, $emailData, $recipient->fingerprint))->onQueue('default');
 
             Mail::to($recipient->email)->queue($message);
         });

@@ -15,13 +15,4 @@ class AliasRecipientController extends Controller
 
         return new AliasResource($alias);
     }
-
-    public function destroy($id)
-    {
-        $aliasRecipient = user()->aliasRecipients()->findOrFail($id);
-
-        $aliasRecipient->delete();
-
-        return response('', 204);
-    }
 }

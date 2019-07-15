@@ -34,8 +34,6 @@ class RecipientController extends Controller
 
         $recipient = user()->recipients()->findOrFail($id);
 
-        $recipient->aliases()->detach();
-
         $recipient->delete();
 
         return response('', 204);
