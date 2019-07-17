@@ -1,5 +1,5 @@
 @if($location === 'top')
-This email was sent to {{ $aliasEmail }} from {{ $fromEmail }} {!! $replacedSubject !!} and has been forwarded by AnonAddy.
+This email was sent to {{ $aliasEmail }} from {{ $fromEmail }}{!! $replacedSubject !!} and has been forwarded by AnonAddy.
 To deactivate this alias copy and paste the url below into your web browser.
 
 {{ $deactivateUrl }}
@@ -14,7 +14,7 @@ To deactivate this alias copy and paste the url below into your web browser.
 
 -----
 
-This email was sent to {{ $aliasEmail }} from {{ $fromEmail }} {!! $replacedSubject !!} and has been forwarded by AnonAddy.
+This email was sent to {{ $aliasEmail }} from {{ $fromEmail }}{!! $replacedSubject !!} and has been forwarded by AnonAddy.
 To deactivate this alias copy and paste the url below into your web browser.
 
 {{ $deactivateUrl }}

@@ -73,7 +73,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 'deactivateUrl' => $this->deactivateUrl,
                 'aliasEmail' => $this->alias->email,
                 'fromEmail' => $this->sender,
-                'replacedSubject' => $this->user->email_subject ? 'with subject "' . $this->emailSubject . '"' : null
+                'replacedSubject' => $this->user->email_subject ? ' with subject "' . $this->emailSubject . '"' : null
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()

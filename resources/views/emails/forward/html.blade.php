@@ -3,7 +3,7 @@
     @if($location === 'top')
       <tr>
         <td style="padding:10px 20px;background-color:#fff;text-align:center;line-height:1.5;border-bottom:1px solid #cbd2d9;font-size:12px;width:100%;">
-          This email was sent to {{ $aliasEmail }} from {{ $fromEmail }} {{ $replacedSubject }} and has been forwarded by <a href="https://anonaddy.com" style="color:#2d3a8c;text-decoration:underline;" target="_blank">AnonAddy</a><br>Click <a href="{{ $deactivateUrl }}" style="color:#2d3a8c;text-decoration:underline;" target="_blank">here</a> to deactivate this alias
+          This email was sent to {{ $aliasEmail }} from {{ $fromEmail }}{{ $replacedSubject }} and has been forwarded by <a href="https://anonaddy.com" style="color:#2d3a8c;text-decoration:underline;" target="_blank">AnonAddy</a><br>Click <a href="{{ $deactivateUrl }}" style="color:#2d3a8c;text-decoration:underline;" target="_blank">here</a> to deactivate this alias
         </td>
       </tr>
     @endif
@@ -15,7 +15,7 @@
     @if($location === 'bottom')
       <tr>
         <td style="padding:10px 20px;background-color:#fff;text-align:center;line-height:1.5;border-top:1px solid #cbd2d9;font-size:12px;width:100%;">
-          This email was sent to {{ $aliasEmail }} from {{ $fromEmail }} {{ $replacedSubject }} and has been forwarded by <a href="https://anonaddy.com" style="color:#2d3a8c;text-decoration:underline;" target="_blank">AnonAddy</a><br>Click <a href="{{ $deactivateUrl }}" style="color:#2d3a8c;text-decoration:underline;" target="_blank">here</a> to deactivate this alias
+          This email was sent to {{ $aliasEmail }} from {{ $fromEmail }}{{ $replacedSubject }} and has been forwarded by <a href="https://anonaddy.com" style="color:#2d3a8c;text-decoration:underline;" target="_blank">AnonAddy</a><br>Click <a href="{{ $deactivateUrl }}" style="color:#2d3a8c;text-decoration:underline;" target="_blank">here</a> to deactivate this alias
         </td>
       </tr>
     @endif
