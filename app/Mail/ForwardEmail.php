@@ -35,6 +35,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
      */
     public function __construct(Alias $alias, EmailData $emailData, $fingerprint = null)
     {
+        $this->user = $alias->user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
         $this->displayFrom = $emailData->display_from;
@@ -46,12 +47,13 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->bannerLocation = $this->alias->user->banner_location;
 
         if ($this->fingerprint = $fingerprint) {
-            $this->openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [$fingerprint], "~/.gnupg");
+            $this->openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
+            $this->openpgpsigner->addRecipient($fingerprint);
         }
     }
 
     /**
-     * Build the message.
+     * Build the message.4
      *
      * @return $this
      */
@@ -62,7 +64,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $email =  $this
             ->from(config('mail.from.address'), $this->displayFrom." '".$this->sender."' via ".config('app.name'))
             ->replyTo($replyToEmail, $this->sender)
-            ->subject($this->emailSubject)
+            ->subject($this->user->email_subject ?? $this->emailSubject)
             ->text('emails.forward.text')->with([
                 'text' => $this->emailText
             ])
@@ -70,7 +72,8 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 'location' => $this->bannerLocation,
                 'deactivateUrl' => $this->deactivateUrl,
                 'aliasEmail' => $this->alias->email,
-                'fromEmail' => $this->sender
+                'fromEmail' => $this->sender,
+                'replacedSubject' => $this->user->email_subject ? 'with subject "' . $this->emailSubject . '"' : null
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()

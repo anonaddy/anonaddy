@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\UniqueRecipient;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRecipientRequest extends FormRequest
+class UpdateEmailSubjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,13 +24,7 @@ class StoreRecipientRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => [
-                'required',
-                'string',
-                'max:254',
-                'email',
-                new UniqueRecipient
-            ]
+            'email_subject' => 'nullable|string|max:50'
         ];
     }
 }

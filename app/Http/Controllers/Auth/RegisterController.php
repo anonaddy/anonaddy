@@ -7,6 +7,7 @@ use App\Jobs\SubscribeToNewsletter;
 use App\Recipient;
 use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
+use App\Rules\RegisterUniqueRecipient;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -62,7 +63,13 @@ class RegisterController extends Controller
                 new NotBlacklisted,
                 new NotDeletedUsername
             ],
-            'email' => ['required', 'email', 'max:254', 'confirmed'],
+            'email' => [
+                'required',
+                'email',
+                'max:254',
+                'confirmed',
+                new RegisterUniqueRecipient
+            ],
             'password' => ['required', 'min:8'],
             'newsletter' => ['nullable'],
             'terms' => ['required', 'accepted']

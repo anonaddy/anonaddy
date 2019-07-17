@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\DeletedUsername;
+use App\Recipient;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -63,6 +64,27 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'username' => 'johndoe'
         ]);
+    }
+
+    /** @test */
+    public function user_cannot_register_with_existing_email()
+    {
+        $user = factory(User::class)->create(['username' => 'johndoe']);
+
+        factory(Recipient::class)->create([
+            'user_id' => $user->id,
+            'email' => 'johndoe@example.com'
+        ]);
+
+        $response = $this->post('/register', [
+            'username' => 'johndoe',
+            'email' => 'johndoe@example.com',
+            'email_confirmation' => 'johndoe@example.com',
+            'password' => 'mypassword',
+            'terms' => true,
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
     }
 
     /** @test */

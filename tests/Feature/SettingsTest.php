@@ -92,6 +92,32 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_update_email_subject()
+    {
+        $this->assertNull($this->user->email_subject);
+
+        $response = $this->post('/settings/email-subject', [
+            'email_subject' => 'The subject'
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertEquals('The subject', $this->user->email_subject);
+    }
+
+    /** @test */
+    public function user_can_update_email_subject_to_empty()
+    {
+        $this->assertNull($this->user->email_subject);
+
+        $response = $this->post('/settings/email-subject', [
+            'email_subject' => ''
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertEquals(null, $this->user->email_subject);
+    }
+
+    /** @test */
     public function user_can_update_email_banner_location()
     {
         $this->assertEquals('top', $this->user->banner_location);

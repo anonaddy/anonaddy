@@ -57,6 +57,8 @@ Route::middleware(['auth', '2fa'])->group(function () {
 
     Route::post('/settings/from-name', 'FromNameController@update')->name('settings.from_name');
 
+    Route::post('/settings/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');
+
     Route::post('/settings/banner-location', 'BannerLocationController@update')->name('settings.banner_location');
 
     Route::post('/settings/password', 'PasswordController@update')->name('settings.password');

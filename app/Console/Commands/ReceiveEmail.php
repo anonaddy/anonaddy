@@ -124,6 +124,10 @@ class ReceiveEmail extends Command
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+
+            $this->error('4.3.0 An error has occurred, please try again later.');
+
+            exit(1);
         }
     }
 
@@ -220,7 +224,7 @@ class ReceiveEmail extends Command
                 function () {
                 },
                 function () use ($user) {
-                    $this->error('5.2.1 Rate limit exceeded for user ' . $user->username . '. Please try again later.');
+                    $this->error('4.2.1 Rate limit exceeded for user ' . $user->username . '. Please try again later.');
 
                     exit(1);
                 }

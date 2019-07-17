@@ -279,7 +279,7 @@
 
             </form>
 
-            <form method="POST" action="{{ route('settings.banner_location') }}">
+            <form class="mb-16" method="POST" action="{{ route('settings.banner_location') }}">
                 @csrf
 
                 <div class="mb-6">
@@ -320,6 +320,44 @@
 
                 <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
                     {{ __('Update Banner Location') }}
+                </button>
+
+            </form>
+
+            <form method="POST" action="{{ route('settings.email_subject') }}">
+                @csrf
+
+                <div class="mb-6">
+
+                    <h3 class="font-bold text-xl">
+                        Replace Email Subject
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="mt-6">This is useful if you are <b>using encryption</b>. After you add your public GPG/OpenPGP key for a recipient the body of forwarded emails will be encrypted (this includes email attachments). Unfortunately the email subject cannot be encrypted as it is one of the headers. To prevent revealing the contents of emails you can replace the subject with something generic below e.g. "The subject" or "Hello".</p>
+                    <p class="mt-4">If set to empty then the email's original subject will be used.</p>
+
+                    <div class="mt-6 flex flex-wrap mb-4">
+                        <label for="email_subject" class="block text-grey-700 text-sm mb-2">
+                            {{ __('Email Subject') }}:
+                        </label>
+
+                        <div class="block relative w-full">
+                            <input id="email_subject" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="email_subject" value="{{ $user->email_subject }}" placeholder="The subject" />
+                        </div>
+
+                        @if ($errors->has('email_subject'))
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('email_subject') }}
+                            </p>
+                        @endif
+                    </div>
+
+                </div>
+
+                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                    {{ __('Update Email Subject') }}
                 </button>
 
             </form>

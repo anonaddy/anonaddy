@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'id',
         'username',
         'from_name',
+        'email_subject',
         'banner_location',
         'bandwidth',
         'default_recipient_id',
@@ -33,6 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $encrypted = [
         'from_name',
+        'email_subject',
         'two_factor_secret'
     ];
 

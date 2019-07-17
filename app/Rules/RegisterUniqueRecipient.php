@@ -2,12 +2,11 @@
 
 namespace App\Rules;
 
+use App\Recipient;
 use Illuminate\Contracts\Validation\Rule;
 
-class UniqueUserRecipient implements Rule
+class RegisterUniqueRecipient implements Rule
 {
-    protected $user;
-
     /**
      * Create a new rule instance.
      *
@@ -15,7 +14,7 @@ class UniqueUserRecipient implements Rule
      */
     public function __construct()
     {
-        $this->user = user();
+        //
     }
 
     /**
@@ -27,15 +26,15 @@ class UniqueUserRecipient implements Rule
      */
     public function passes($attribute, $value)
     {
-        $userRecipients = $this->user
-            ->recipients()
+        $items = Recipient::whereNotNull('email_verified_at')
             ->get()
-            ->map(function ($recipient) {
-                return $recipient->email;
-            })
-            ->toArray();
+            ->filter(function ($recipient) use ($value) {
+                if (($recipient->email) == strtolower($value)) {
+                    return $recipient;
+                }
+            });
 
-        return !in_array(strtolower($value), $userRecipients);
+        return count($items) === 0;
     }
 
     /**
@@ -45,6 +44,6 @@ class UniqueUserRecipient implements Rule
      */
     public function message()
     {
-        return 'A recipient with that email already exists.';
+        return 'A user with that email already exists.';
     }
 }
