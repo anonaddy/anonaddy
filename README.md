@@ -177,9 +177,9 @@ For any others questions just send an email to - [contact@anonaddy.com](mailto:c
 #### Prerequisites
 
 * Postfix (2.7)+
-* PHP (7.1+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension
+* PHP (7.1+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension plus the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails
 * Port 25 unblocked and open
-* Redis (4.x+) not required if you don't need it for throttling or queues
+* Redis (4.x+) not required if you don't plan to use it for throttling or queues
 * FQDN as hostname e.g. mail.anonaddy.me
 * MariaDB / MySQL (or any other database compatible with Laravel)
 * Nginx
