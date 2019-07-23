@@ -14,6 +14,7 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
+        "mews/captcha": "^2.2",
         "php-mime-mail-parser/php-mime-mail-parser": "^5.0",
         "pragmarx/google2fa-laravel": "^1.0",
         "predis/predis": "^1.1",

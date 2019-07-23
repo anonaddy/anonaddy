@@ -10,6 +10,7 @@ use App\Rules\NotDeletedUsername;
 use App\Rules\RegisterUniqueRecipient;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Ramsey\Uuid\Uuid;
@@ -72,8 +73,13 @@ class RegisterController extends Controller
             ],
             'password' => ['required', 'min:8'],
             'newsletter' => ['nullable'],
-            'terms' => ['required', 'accepted']
-        ]);
+            'terms' => ['required', 'accepted'],
+        ], [
+            'captcha.captcha' => 'The text entered was incorrect, please try again.',
+        ])
+        ->sometimes('captcha', 'required|captcha', function () {
+            return ! App::environment('testing');
+        });
     }
 
     /**

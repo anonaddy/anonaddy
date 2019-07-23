@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('anonaddy:reset-bandwidth')->monthlyOn(1, '00:00');
-        $schedule->command('auth:clear-resets')->hourly();
+        $schedule->command('auth:clear-resets')->daily();
     }
 
     /**

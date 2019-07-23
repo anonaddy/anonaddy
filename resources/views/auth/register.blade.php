@@ -74,6 +74,24 @@
                             @endif
                         </div>
 
+                        <div class="flex flex-wrap mb-4 items-center">
+                            <label for="captcha" class="block w-full text-grey-700 text-sm mb-2">
+                                Verification:
+                            </label>
+
+                            <div class="flex flex-grow">
+                                <img src="{{captcha_src('mini')}}" class="h-12 w-16 mr-2">
+
+                                <input id="captcha" type="text" class="w-full appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:shadow-outline{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
+                            </div>
+
+                            @if ($errors->has('captcha'))
+                                <p class="text-red-500 text-xs italic mt-4">
+                                    {{ $errors->first('captcha') }}
+                                </p>
+                            @endif
+                        </div>
+
                         <div class="flex flex-wrap mb-3 items-center">
                             <input type="checkbox" name="newsletter" class="mr-2" id="newsletter">
 
