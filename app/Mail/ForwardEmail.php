@@ -80,7 +80,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
                         ->addTextHeader('List-Unsubscribe', '<' . $this->deactivateUrl . '>, <mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '>');
 
                 $message->getHeaders()
-                        ->addTextHeader('Return-Path', 'bounces@anonaddy.me');
+                        ->addTextHeader('Return-Path', config('anonaddy.return_path'));
 
                 if ($this->fingerprint) {
                     $message->attachSigner($this->openpgpsigner);
