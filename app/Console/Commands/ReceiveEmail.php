@@ -73,6 +73,8 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $key => $recipient) {
+                $displayTo = $this->parser->getAddresses('to')[$key]['display'];
+
                 $parentDomain = collect(config('anonaddy.all_domains'))
                     ->filter(function ($name) use ($recipient) {
                         return Str::endsWith($recipient['domain'], $name);
@@ -80,8 +82,6 @@ class ReceiveEmail extends Command
                     ->first();
 
                 $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain)); // e.g. johndoe
-
-                $displayTo = $this->parser->getAddresses('to')[$key]['display'];
 
                 if ($subdomain === 'unsubscribe') {
                     $this->handleUnsubscribe($recipient);
@@ -96,6 +96,8 @@ class ReceiveEmail extends Command
                     if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
                         $user = $customDomain->user;
                     }
+
+                    // TODO add check here for uuid pre-generated aliases e.g. 68699f3b-a8c3-4374-9dbf-bdde64afd3e4@anonaddy.me
 
                     // Check if this is the root domain e.g. anonaddy.me
                     if ($recipient['domain'] === $parentDomain && !empty(config('anonaddy.admin_username'))) {
@@ -182,10 +184,11 @@ class ReceiveEmail extends Command
                 $recipient_ids = $user
                                     ->recipients()
                                     ->oldest()
-                                    ->pluck('id')
-                                    ->filter(function ($value, $key) use ($keys) {
-                                        return in_array($key+1, $keys);
+                                    ->get()
+                                    ->filter(function ($item, $key) use ($keys) {
+                                        return in_array($key+1, $keys) && ! is_null($item['email_verified_at']);
                                     })
+                                    ->pluck('id')
                                     ->take(10)
                                     ->toArray();
             }

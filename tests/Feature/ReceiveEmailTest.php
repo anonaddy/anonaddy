@@ -314,7 +314,6 @@ class ReceiveEmailTest extends TestCase
     /** @test */
     public function it_can_attach_recipients_to_new_alias_with_extension()
     {
-        $this->withoutExceptionHandling();
         Mail::fake();
 
         Mail::assertNothingSent();
@@ -356,6 +355,59 @@ class ReceiveEmailTest extends TestCase
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient, $recipient2) {
             return $mail->hasTo($recipient->email) &&
                    $mail->hasTo($recipient2->email);
+        });
+    }
+
+    /** @test */
+    public function it_can_not_attach_unverified_recipient_to_new_alias_with_extension()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $defaultRecipient = $this->user->defaultRecipient;
+
+        factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'one@example.com',
+            'email_verified_at' => null
+        ]);
+
+        $verifiedRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'two@example.com'
+        ]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_with_extension.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => ['2.3'],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '444'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '444'
+        ]);
+
+        $alias = $this->user->aliases()->where('email', 'ebay@johndoe.'.config('anonaddy.domain'))->first();
+
+        $this->assertCount(1, $alias->recipients);
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($defaultRecipient, $verifiedRecipient) {
+            return $mail->hasTo($verifiedRecipient->email);
         });
     }
 
