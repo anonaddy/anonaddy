@@ -57,6 +57,39 @@
           </th>
           <th class="p-4">
             <div class="flex items-center">
+              Key
+              <div class="inline-flex flex-col">
+                <icon
+                  name="chevron-up"
+                  @click.native="sort('key', 'asc')"
+                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
+                  :class="{ 'text-grey-800': isCurrentSort('key', 'asc') }"
+                />
+                <icon
+                  name="chevron-down"
+                  @click.native="sort('key', 'desc')"
+                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
+                  :class="{
+                    'text-grey-800': isCurrentSort('key', 'desc'),
+                  }"
+                />
+              </div>
+              <span
+                class="tooltip outline-none"
+                :data-tippy-content="
+                  `Use this to attach recipients to new aliases as they are created e.g. alias+key@${
+                    user.username
+                  }.anonaddy.com. You can attach multiple recipients by doing alias+2.3@${
+                    user.username
+                  }.anonaddy.com`
+                "
+              >
+                <icon name="info" class="inline-block w-4 h-4 text-grey-200 fill-current" />
+              </span>
+            </div>
+          </th>
+          <th class="p-4">
+            <div class="flex items-center">
               Email
               <div class="inline-flex flex-col">
                 <icon
@@ -138,6 +171,11 @@
                 :data-tippy-content="recipient.created_at | formatDate"
                 >{{ recipient.created_at | timeAgo }}</span
               >
+            </div>
+          </td>
+          <td class="border-grey-200 border-t">
+            <div class="p-4 flex items-center">
+              {{ recipient.key }}
             </div>
           </td>
           <td class="border-grey-200 border-t">
@@ -235,7 +273,7 @@
         <tr v-if="queriedRecipients.length === 0">
           <td
             class="border-grey-200 border-t p-4 text-center h-24 text-lg text-grey-700"
-            colspan="5"
+            colspan="6"
           >
             No recipients found for that search!
           </td>
@@ -465,6 +503,7 @@ export default {
         )
         .then(({ data }) => {
           this.addRecipientLoading = false
+          data.data.key = this.recipients.length + 1
           this.recipients.push(data.data)
           this.reSort()
           this.newRecipient = ''

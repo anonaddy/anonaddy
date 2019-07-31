@@ -147,8 +147,7 @@ class ReceiveEmail extends Command
             Mail::to($displayTo)->queue($message);
 
             if (!Mail::failures()) {
-                $alias->emails_replied += 1;
-                $alias->save();
+                $alias->increment('emails_replied');
 
                 $user->bandwidth += $this->size;
                 $user->save();
@@ -178,15 +177,16 @@ class ReceiveEmail extends Command
             }
 
             if ($recipient['extension'] !== '') {
-                $ids = explode('.', $recipient['extension']);
+                $keys = explode('.', $recipient['extension']);
 
                 $recipient_ids = $user
                                     ->recipients()
-                                    ->latest()
+                                    ->oldest()
                                     ->pluck('id')
-                                    ->filter(function ($value, $key) use ($ids) {
-                                        return in_array($key+1, $ids);
+                                    ->filter(function ($value, $key) use ($keys) {
+                                        return in_array($key+1, $keys);
                                     })
+                                    ->take(10)
                                     ->toArray();
             }
         }
@@ -213,8 +213,7 @@ class ReceiveEmail extends Command
         }
 
         if (!Mail::failures()) {
-            $alias->emails_forwarded += 1;
-            $alias->save();
+            $alias->increment('emails_forwarded');
 
             $user->bandwidth += $this->size;
             $user->save();
