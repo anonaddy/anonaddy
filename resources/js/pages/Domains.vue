@@ -428,7 +428,11 @@ export default {
         })
         .catch(error => {
           this.addDomainLoading = false
-          this.error()
+          if (error.response.status == 422) {
+            this.error(error.response.data.errors.domain[0])
+          } else {
+            this.error()
+          }
         })
     },
     openDeleteModal(id) {

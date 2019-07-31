@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\NotLocalDomain;
 use App\Rules\ValidDomain;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,7 +31,8 @@ class StoreDomainRequest extends FormRequest
                 'string',
                 'max:50',
                 'unique:domains',
-                new ValidDomain
+                new ValidDomain,
+                new NotLocalDomain
             ]
         ];
     }

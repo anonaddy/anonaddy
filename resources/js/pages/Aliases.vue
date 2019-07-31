@@ -122,7 +122,7 @@
     <div class="bg-white rounded shadow overflow-x-auto">
       <table v-if="initialAliases.length" class="w-full whitespace-no-wrap">
         <tr class="text-left font-semibold text-grey-500 text-sm tracking-wider">
-          <th class="p-4">
+          <th class="pl-4 pr-2 py-4">
             <div class="flex items-center">
               Created
               <div class="inline-flex flex-col">
@@ -143,7 +143,7 @@
               </div>
             </div>
           </th>
-          <th class="p-4">
+          <th class="px-2 py-4">
             <div class="flex items-center">
               Alias
               <div class="inline-flex flex-col">
@@ -162,7 +162,7 @@
               </div>
             </div>
           </th>
-          <th class="p-4">
+          <th class="px-2 py-4">
             <div class="flex items-center">
               Recipients
               <div class="inline-flex flex-col">
@@ -181,12 +181,12 @@
               </div>
             </div>
           </th>
-          <th class="p-4">
+          <th class="px-2 py-4">
             <div class="flex items-center">
               Description
             </div>
           </th>
-          <th class="p-4">
+          <th class="px-2 py-4">
             <div class="flex items-center">
               Forwarded
               <div class="inline-flex flex-col">
@@ -209,7 +209,7 @@
               </div>
             </div>
           </th>
-          <th class="p-4 items-center">
+          <th class="px-2 py-4 items-center">
             <div class="flex items-center">
               Blocked
               <div class="inline-flex flex-col">
@@ -232,7 +232,30 @@
               </div>
             </div>
           </th>
-          <th class="p-4 items-center" colspan="2">
+          <th class="px-2 py-4 items-center">
+            <div class="flex items-center">
+              Replies
+              <div class="inline-flex flex-col">
+                <icon
+                  name="chevron-up"
+                  @click.native="sort('emails_replied', 'asc')"
+                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
+                  :class="{
+                    'text-grey-800': isCurrentSort('emails_replied', 'asc'),
+                  }"
+                />
+                <icon
+                  name="chevron-down"
+                  @click.native="sort('emails_replied', 'desc')"
+                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
+                  :class="{
+                    'text-grey-800': isCurrentSort('emails_replied', 'desc'),
+                  }"
+                />
+              </div>
+            </div>
+          </th>
+          <th class="px-2 py-4 items-center" colspan="2">
             <div class="flex items-center">
               Active
               <div class="inline-flex flex-col">
@@ -258,7 +281,7 @@
           class="hover:bg-grey-50 focus-within:bg-grey-50 h-20"
         >
           <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
+            <div class="pl-4 pr-2 py-4 flex items-center">
               <span
                 class="tooltip outline-none text-sm"
                 :data-tippy-content="alias.created_at | formatDate"
@@ -267,7 +290,7 @@
             </div>
           </td>
           <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
+            <div class="px-2 py-4 flex items-center">
               <span
                 class="tooltip cursor-pointer outline-none"
                 data-tippy-content="Click to copy"
@@ -278,17 +301,17 @@
                 <span class="font-semibold text-indigo-800">{{
                   alias.local_part | truncate(20)
                 }}</span>
-                <span class="block text-grey-400 text-sm">{{ alias.email | truncate(28) }}</span>
+                <span class="block text-grey-400 text-sm">{{ alias.email | truncate(35) }}</span>
               </span>
             </div>
           </td>
           <td class="border-grey-200 border-t">
-            <div class="px-4 flex items-center">
+            <div class="px-2 flex items-center">
               <span
                 v-if="alias.recipients.length && alias.id !== recipientsAliasToEdit.id"
                 class="tooltip outline-none"
                 :data-tippy-content="recipientsTooltip(alias.recipients)"
-                >{{ alias.recipients[0].email | truncate(20) }}
+                >{{ alias.recipients[0].email | truncate(25) }}
                 <span
                   v-if="alias.recipients.length > 1"
                   class="block text-center text-grey-500 text-sm"
@@ -313,8 +336,8 @@
               />
             </div>
           </td>
-          <td class="border-grey-200 border-t w-64">
-            <div class="p-4 text-sm">
+          <td class="border-grey-200 border-t">
+            <div class="px-2 py-4 text-sm">
               <div
                 v-if="aliasIdToEdit === alias.id"
                 class="w-full flex items-center justify-between"
@@ -343,10 +366,19 @@
                   @click.native="editAlias(alias)"
                 />
               </div>
-              <div v-else-if="alias.description" class="flex items-center justify-between w-full">
-                <span class="tooltip outline-none" :data-tippy-content="alias.description">{{
-                  alias.description | truncate(25)
-                }}</span>
+              <div v-else-if="alias.description" class="flex items-center justify-around">
+                <span
+                  class="tooltip outline-none"
+                  :data-tippy-content="alias.description"
+                  v-clipboard="() => alias.description"
+                  v-clipboard:success="clipboardSuccess"
+                  v-clipboard:error="clipboardError"
+                >
+                  <icon
+                    name="desc"
+                    class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                  />
+                </span>
                 <icon
                   name="edit"
                   class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
@@ -365,17 +397,22 @@
             </div>
           </td>
           <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center justify-center font-semibold text-indigo-800">
+            <div class="px-2 py-4 flex items-center justify-center font-semibold text-indigo-800">
               {{ alias.emails_forwarded }}
             </div>
           </td>
           <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center justify-center font-semibold text-indigo-800">
+            <div class="px-2 py-4 flex items-center justify-center font-semibold text-indigo-800">
               {{ alias.emails_blocked }}
             </div>
           </td>
           <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center justify-center">
+            <div class="px-2 py-4 flex items-center justify-center font-semibold text-indigo-800">
+              {{ alias.emails_replied }}
+            </div>
+          </td>
+          <td class="border-grey-200 border-t">
+            <div class="px-2 py-4 flex items-center justify-center">
               <Toggle
                 v-model="alias.active"
                 @on="activateAlias(alias)"
@@ -396,7 +433,7 @@
         <tr v-if="queriedAliases.length === 0">
           <td
             class="border-grey-200 border-t px-6 py-4 text-center h-24 text-lg text-grey-700"
-            colspan="8"
+            colspan="9"
           >
             No aliases found for that search!
           </td>

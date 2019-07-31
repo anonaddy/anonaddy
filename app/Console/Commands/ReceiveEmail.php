@@ -59,18 +59,13 @@ class ReceiveEmail extends Command
     public function handle()
     {
         try {
+            $this->exitIfFromSelf();
+
             $file = $this->argument('file');
 
             $this->parser = $this->getParser($file);
 
-            $recipients = collect($this->option('recipient'))->map(function ($item, $key) {
-                return [
-                    'email' => $item,
-                    'local_part' => $this->option('local_part')[$key],
-                    'extension' => $this->option('extension')[$key],
-                    'domain' => $this->option('domain')[$key]
-                ];
-            });
+            $recipients = $this->getRecipients();
 
             // Divide the size of the email by the number of recipients (excluding any unsubscribe recipients) to prevent it being added multiple times
             $recipientCount = $recipients->where('domain', '!=', 'unsubscribe.'.config('anonaddy.domain'))->count();
@@ -231,6 +226,18 @@ class ReceiveEmail extends Command
             );
     }
 
+    protected function getRecipients()
+    {
+        return collect($this->option('recipient'))->map(function ($item, $key) {
+            return [
+                'email' => $item,
+                'local_part' => $this->option('local_part')[$key],
+                'extension' => $this->option('extension')[$key],
+                'domain' => $this->option('domain')[$key]
+            ];
+        });
+    }
+
     protected function getParser($file)
     {
         $parser = new Parser;
@@ -247,5 +254,13 @@ class ReceiveEmail extends Command
             $parser->setPath($file);
         }
         return $parser;
+    }
+
+    protected function exitIfFromSelf()
+    {
+        // To prevent recipient alias infinite nested looping
+        if (in_array($this->option('sender'), [config('mail.from.address'), config('anonaddy.return_path')])) {
+            exit(0);
+        }
     }
 }

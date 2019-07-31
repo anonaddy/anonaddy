@@ -473,7 +473,11 @@ export default {
         })
         .catch(error => {
           this.addRecipientLoading = false
-          this.error()
+          if (error.response.status == 422) {
+            this.error(error.response.data.errors.email[0])
+          } else {
+            this.error()
+          }
         })
     },
     resendVerification(id) {
@@ -487,7 +491,6 @@ export default {
         })
         .catch(error => {
           this.resendVerificationLoading = false
-          console.log(error.response)
           if (error.response.status === 429) {
             this.error('You can only resend the email once every 5 minutes')
           } else {

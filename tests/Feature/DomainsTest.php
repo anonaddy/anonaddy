@@ -115,6 +115,30 @@ class DomainsTest extends TestCase
     }
 
     /** @test */
+    public function new_domain_must_not_be_local()
+    {
+        $response = $this->json('POST', '/domains', [
+            'domain' => config('anonaddy.domain')
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('domain');
+    }
+
+    /** @test */
+    public function new_domain_must_not_be_local_subdomain()
+    {
+        $response = $this->json('POST', '/domains', [
+            'domain' => 'subdomain'.config('anonaddy.domain')
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('domain');
+    }
+
+    /** @test */
     public function user_can_activate_domain()
     {
         $domain = factory(Domain::class)->create([
