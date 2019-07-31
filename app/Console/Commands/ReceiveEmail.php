@@ -162,11 +162,6 @@ class ReceiveEmail extends Command
 
     protected function handleForward($user, $recipient, $customDomainId)
     {
-        if ($recipient['extension'] !== '') {
-            // TODO override default recipient for alias?
-            // or pass number and if forwarded equals that no. then block?
-        }
-
         $alias = $user->aliases()->firstOrNew([
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
@@ -174,13 +169,33 @@ class ReceiveEmail extends Command
             'domain_id' => $customDomainId
         ]);
 
-        if (!isset($alias->id) && $user->hasExceededNewAliasLimit()) {
-            $this->error('4.2.1 New aliases per hour limit exceeded for user ' . $user->username . '.');
+        if (!isset($alias->id)) {
+            // this is a new alias
+            if ($user->hasExceededNewAliasLimit()) {
+                $this->error('4.2.1 New aliases per hour limit exceeded for user ' . $user->username . '.');
 
-            exit(1);
-        } else {
-            $alias->save();
-            $alias->refresh();
+                exit(1);
+            }
+
+            if ($recipient['extension'] !== '') {
+                $ids = explode('.', $recipient['extension']);
+
+                $recipient_ids = $user
+                                    ->recipients()
+                                    ->latest()
+                                    ->pluck('id')
+                                    ->filter(function ($value, $key) use ($ids) {
+                                        return in_array($key+1, $ids);
+                                    })
+                                    ->toArray();
+            }
+        }
+
+        $alias->save();
+        $alias->refresh();
+
+        if (isset($recipient_ids)) {
+            $alias->recipients()->sync($recipient_ids);
         }
 
         $emailData = new EmailData($this->parser);

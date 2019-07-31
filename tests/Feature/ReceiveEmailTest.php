@@ -176,7 +176,7 @@ class ReceiveEmailTest extends TestCase
                 '--sender' => 'will@anonaddy.com',
                 '--recipient' => ['ebay+a@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
-                '--extension' => ['a'],
+                '--extension' => ['2.3'],
                 '--domain' => ['johndoe.anonaddy.com'],
                 '--size' => '789'
             ]
@@ -308,6 +308,54 @@ class ReceiveEmailTest extends TestCase
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo('one@example.com') &&
                    $mail->hasTo('two@example.com');
+        });
+    }
+
+    /** @test */
+    public function it_can_attach_recipients_to_new_alias_with_extension()
+    {
+        $this->withoutExceptionHandling();
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'one@example.com'
+        ]);
+
+        $recipient2 = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'two@example.com'
+        ]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_with_extension.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => ['2.3'],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '444'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '444'
+        ]);
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient, $recipient2) {
+            return $mail->hasTo($recipient->email) &&
+                   $mail->hasTo($recipient2->email);
         });
     }
 
