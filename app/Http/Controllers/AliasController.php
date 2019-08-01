@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
+use Ramsey\Uuid\Uuid;
 
 class AliasController extends Controller
 {
@@ -19,6 +20,24 @@ class AliasController extends Controller
             'domain' => user()->username.'.'.config('anonaddy.domain'),
             'bandwidthMb' => user()->bandwidth_mb
         ]);
+    }
+
+    public function store()
+    {
+        if (user()->hasExceededNewAliasLimit()) {
+            return response('', 429);
+        }
+
+        $uuid = Uuid::uuid4();
+
+        $alias = user()->aliases()->create([
+            'id' => $uuid,
+            'email' => $uuid . '@anonaddy.me',
+            'local_part' => $uuid,
+            'domain' => 'anonaddy.me'
+        ]);
+
+        return new AliasResource($alias->fresh());
     }
 
     public function update(UpdateAliasRequest $request, $id)

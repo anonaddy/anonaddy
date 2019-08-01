@@ -17,6 +17,7 @@ Route::post('/login/2fa', 'TwoFactorAuthController@authenticateTwoFactor')->name
 
 Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::get('/', 'AliasController@index')->name('aliases.index');
+    Route::post('/aliases', 'AliasController@store')->name('aliases.store');
     Route::patch('/aliases/{id}', 'AliasController@update')->name('aliases.update');
     Route::delete('/aliases/{id}', 'AliasController@destroy')->name('aliases.destroy');
 

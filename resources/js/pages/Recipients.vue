@@ -79,7 +79,7 @@
                 :data-tippy-content="
                   `Use this to attach recipients to new aliases as they are created e.g. alias+key@${
                     user.username
-                  }.anonaddy.com. You can attach multiple recipients by doing alias+2.3@${
+                  }.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${
                     user.username
                   }.anonaddy.com`
                 "

@@ -144,6 +144,16 @@ class AliasesTest extends TestCase
     }
 
     /** @test */
+    public function user_can_generate_new_alias()
+    {
+        $response = $this->json('POST', '/aliases', []);
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $this->user->aliases);
+        $this->assertEquals($this->user->aliases[0]->email, $response->getData()->data->email);
+    }
+
+    /** @test */
     public function user_can_activate_alias()
     {
         $alias = factory(Alias::class)->create([

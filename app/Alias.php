@@ -18,6 +18,7 @@ class Alias extends Model
     ];
 
     protected $fillable = [
+        'id',
         'active',
         'description',
         'email',

@@ -97,10 +97,10 @@ class ReceiveEmail extends Command
                         $user = $customDomain->user;
                     }
 
-                    // TODO add check here for uuid pre-generated aliases e.g. 68699f3b-a8c3-4374-9dbf-bdde64afd3e4@anonaddy.me
-
-                    // Check if this is the root domain e.g. anonaddy.me
-                    if ($recipient['domain'] === $parentDomain && !empty(config('anonaddy.admin_username'))) {
+                    // check if this is a uuid generated alias
+                    if ($alias = Alias::find($recipient['local_part'])) {
+                        $user = $alias->user;
+                    } elseif ($recipient['domain'] === $parentDomain && !empty(config('anonaddy.admin_username'))) {
                         $user = User::where('username', config('anonaddy.admin_username'))->first();
                     }
                 }

@@ -118,6 +118,14 @@
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current pointer-events-none mr-2 flex items-center"
         />
       </div>
+      <div class="mt-4 md:mt-0">
+        <button
+          @click="generateAliasModalOpen = true"
+          class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
+        >
+          Generate New Alias
+        </button>
+      </div>
     </div>
     <div class="bg-white rounded shadow overflow-x-auto">
       <table v-if="initialAliases.length" class="w-full whitespace-no-wrap">
@@ -299,10 +307,10 @@
                 v-clipboard:error="clipboardError"
               >
                 <span class="font-semibold text-indigo-800">{{
-                  alias.local_part | truncate(20)
+                  alias.local_part | truncate(25)
                 }}</span>
                 <span class="block text-grey-400 text-sm">{{
-                  getAliasEmail(alias) | truncate(35)
+                  getAliasEmail(alias) | truncate(40)
                 }}</span>
               </span>
             </div>
@@ -469,6 +477,40 @@
       </div>
     </div>
 
+    <Modal :open="generateAliasModalOpen" @close="generateAliasModalOpen = false">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Generate new UUID alias
+        </h2>
+        <p class="mt-4 text-grey-700">
+          This will generate a new unique alias in the form of<br /><br />
+          86064c92-da41-443e-a2bf-5a7b0247842f@anonaddy.me<br /><br />
+          Useful if you do not wish to include your username in the email as a potential link
+          between aliases.<br /><br />
+          Other aliases e.g. alias@{{ domain }} or .me are created automatically when they receive
+          their first email.
+        </p>
+        <div class="mt-6">
+          <button
+            @click="generateNewAlias"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            :class="generateAliasLoading ? 'cursor-not-allowed' : ''"
+            :disabled="generateAliasLoading"
+          >
+            Generate Alias
+          </button>
+          <button
+            @click="generateAliasModalOpen = false"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+
     <Modal :open="editAliasRecipientsModalOpen" @close="closeAliasRecipientsModal">
       <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
         <h2
@@ -615,6 +657,8 @@ export default {
       currentSortDir: 'desc',
       editAliasRecipientsLoading: false,
       editAliasRecipientsModalOpen: false,
+      generateAliasModalOpen: false,
+      generateAliasLoading: false,
       recipientsAliasToEdit: {},
       aliasRecipientsToEdit: [],
     }
@@ -689,6 +733,9 @@ export default {
 
       this.aliases = _.orderBy(this.aliases, [this.currentSort], [this.currentSortDir])
     },
+    reSort() {
+      this.aliases = _.orderBy(this.aliases, [this.currentSort], [this.currentSortDir])
+    },
     openAliasRecipientsModal(alias) {
       this.editAliasRecipientsModalOpen = true
       this.recipientsAliasToEdit = alias
@@ -729,6 +776,29 @@ export default {
           this.recipientsAliasToEdit = {}
           this.aliasRecipientsToEdit = []
           this.error()
+        })
+    },
+    generateNewAlias() {
+      this.generateAliasLoading = true
+
+      axios
+        .post('/aliases', JSON.stringify({}), {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(({ data }) => {
+          this.generateAliasLoading = false
+          this.aliases.push(data.data)
+          this.reSort()
+          this.generateAliasModalOpen = false
+          this.success('New alias generated successfully')
+        })
+        .catch(error => {
+          this.generateAliasLoading = false
+          if (error.response.status === 429) {
+            this.error('You have reached your hourly limit for creating new aliases')
+          } else {
+            this.error()
+          }
         })
     },
     editAlias(alias) {
