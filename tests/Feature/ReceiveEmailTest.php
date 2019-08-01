@@ -342,6 +342,7 @@ class ReceiveEmailTest extends TestCase
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
+            'extension' => '2.3',
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'emails_forwarded' => 1,
             'emails_blocked' => 0

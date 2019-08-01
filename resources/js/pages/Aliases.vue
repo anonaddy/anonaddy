@@ -294,14 +294,16 @@
               <span
                 class="tooltip cursor-pointer outline-none"
                 data-tippy-content="Click to copy"
-                v-clipboard="() => alias.email"
+                v-clipboard="() => getAliasEmail(alias)"
                 v-clipboard:success="clipboardSuccess"
                 v-clipboard:error="clipboardError"
               >
                 <span class="font-semibold text-indigo-800">{{
                   alias.local_part | truncate(20)
                 }}</span>
-                <span class="block text-grey-400 text-sm">{{ alias.email | truncate(35) }}</span>
+                <span class="block text-grey-400 text-sm">{{
+                  getAliasEmail(alias) | truncate(35)
+                }}</span>
               </span>
             </div>
           </td>
@@ -783,6 +785,11 @@ export default {
         .catch(error => {
           this.error()
         })
+    },
+    getAliasEmail(alias) {
+      return alias.extension
+        ? `${alias.local_part}+${alias.extension}@${alias.domain}`
+        : alias.email
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

@@ -179,9 +179,11 @@ class ReceiveEmail extends Command
             }
 
             if ($recipient['extension'] !== '') {
+                $alias->extension = $recipient['extension'];
+
                 $keys = explode('.', $recipient['extension']);
 
-                $recipient_ids = $user
+                $recipientIds = $user
                                     ->recipients()
                                     ->oldest()
                                     ->get()
@@ -197,8 +199,8 @@ class ReceiveEmail extends Command
         $alias->save();
         $alias->refresh();
 
-        if (isset($recipient_ids)) {
-            $alias->recipients()->sync($recipient_ids);
+        if (isset($recipientIds)) {
+            $alias->recipients()->sync($recipientIds);
         }
 
         $emailData = new EmailData($this->parser);
