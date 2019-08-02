@@ -307,7 +307,7 @@
                 v-clipboard:error="clipboardError"
               >
                 <span class="font-semibold text-indigo-800">{{
-                  alias.local_part | truncate(25)
+                  alias.local_part | truncate(36)
                 }}</span>
                 <span class="block text-grey-400 text-sm">{{
                   getAliasEmail(alias) | truncate(40)

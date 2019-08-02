@@ -42,6 +42,7 @@ Here are a few reasons I can think of:
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
 * Multiple domains to choose for aliases (currently anonaddy.com and anonaddy.me)
+* Ability to generate UUID aliases
 * New features added regularly
 
 
