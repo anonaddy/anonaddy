@@ -150,7 +150,8 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertCount(1, $this->user->aliases);
-        $this->assertEquals($this->user->aliases[0]->email, $response->getData()->data->email);
+        $this->assertEquals($this->user->aliases[0]->id, $response->getData()->data->local_part);
+        $this->assertEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
     }
 
     /** @test */

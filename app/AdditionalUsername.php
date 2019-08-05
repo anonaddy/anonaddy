@@ -6,7 +6,7 @@ use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 
-class Domain extends Model
+class AdditionalUsername extends Model
 {
     use HasUuid, HasEncryptedAttributes;
 
@@ -17,7 +17,7 @@ class Domain extends Model
     ];
 
     protected $fillable = [
-        'domain',
+        'username',
         'description',
         'active'
     ];
@@ -34,15 +34,15 @@ class Domain extends Model
     ];
 
     /**
-     * Set the domain's name.
+     * Set the username.
      */
-    public function setDomainAttribute($value)
+    public function setUsernameAttribute($value)
     {
-        $this->attributes['domain'] = strtolower($value);
+        $this->attributes['username'] = strtolower($value);
     }
 
     /**
-     * Get the user for the custom domain.
+     * Get the user for the additional username.
      */
     public function user()
     {
@@ -50,15 +50,7 @@ class Domain extends Model
     }
 
     /**
-     * Get all of the domains's aliases.
-     */
-    public function aliases()
-    {
-        return $this->hasMany(Alias::class);
-    }
-
-    /**
-     * Deactivate the domain.
+     * Deactivate the username.
      */
     public function deactivate()
     {
@@ -66,7 +58,7 @@ class Domain extends Model
     }
 
     /**
-     * Activate the domain.
+     * Activate the username.
      */
     public function activate()
     {

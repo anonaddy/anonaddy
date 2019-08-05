@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\AdditionalUsername;
 use App\Alias;
 use App\AliasRecipient;
 use App\Domain;
@@ -756,6 +757,50 @@ class ReceiveEmailTest extends TestCase
             'id' => $this->user->id,
             'username' => 'johndoe',
             'bandwidth' => '871'
+        ]);
+        $this->assertEquals(1, $this->user->aliases()->count());
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) {
+            return $mail->hasTo($this->user->email);
+        });
+    }
+
+    /** @test */
+    public function it_can_forward_email_for_additional_username()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id,
+            'username' => 'janedoe'
+        ]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_additional_username.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@janedoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [''],
+                '--domain' => ['janedoe.anonaddy.com'],
+                '--size' => '638'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'ebay@janedoe.anonaddy.com',
+            'local_part' => 'ebay',
+            'domain' => 'janedoe.anonaddy.com',
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '638'
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 

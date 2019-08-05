@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Resources\AdditionalUsernameResource;
+use Illuminate\Http\Request;
+
+class ActiveAdditionalUsernameController extends Controller
+{
+    public function store(Request $request)
+    {
+        $username = user()->additionalUsernames()->findOrFail($request->id);
+
+        $username->activate();
+
+        return new AdditionalUsernameResource($username);
+    }
+
+    public function destroy($id)
+    {
+        $username = user()->additionalUsernames()->findOrFail($id);
+
+        $username->deactivate();
+
+        return new AdditionalUsernameResource($username);
+    }
+}

@@ -148,6 +148,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's additional usernames.
+     */
+    public function additionalUsernames()
+    {
+        return $this->hasMany(AdditionalUsername::class);
+    }
+
+    /**
      * Get all of the user's verified recipients.
      */
     public function verifiedRecipients()
@@ -214,6 +222,11 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->aliases()
                 ->where('created_at', '>=', now()->subHour())
                 ->count() >= 10; // TODO update for different plans
+    }
+
+    public function hasReachedAdditionalUsernameLimit()
+    {
+        return $this->username_count >= 3;
     }
 
     public function isVerifiedRecipient($email)

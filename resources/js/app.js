@@ -22,6 +22,7 @@ Vue.component('icon', require('./components/Icon.vue').default)
 Vue.component('aliases', require('./pages/Aliases.vue').default)
 Vue.component('recipients', require('./pages/Recipients.vue').default)
 Vue.component('domains', require('./pages/Domains.vue').default)
+Vue.component('usernames', require('./pages/Usernames.vue').default)
 
 Vue.filter('formatDate', value => {
   return dayjs(value).format('Do MMM YYYY')

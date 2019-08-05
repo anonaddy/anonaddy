@@ -46,6 +46,14 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::post('/active-domains', 'ActiveDomainController@store')->name('active_domains.store');
     Route::delete('/active-domains/{id}', 'ActiveDomainController@destroy')->name('active_domains.destroy');
 
+    Route::get('/usernames', 'AdditionalUsernameController@index')->name('usernames.index');
+    Route::post('/usernames', 'AdditionalUsernameController@store')->name('usernames.store');
+    Route::patch('/usernames/{id}', 'AdditionalUsernameController@update')->name('usernames.update');
+    Route::delete('/usernames/{id}', 'AdditionalUsernameController@destroy')->name('usernames.destroy');
+
+    Route::post('/active-usernames', 'ActiveAdditionalUsernameController@store')->name('active_usernames.store');
+    Route::delete('/active-usernames/{id}', 'ActiveAdditionalUsernameController@destroy')->name('active_usernames.destroy');
+
     Route::get('/deactivate/{alias}', 'DeactivateAliasController@deactivate')->name('deactivate');
 });
 

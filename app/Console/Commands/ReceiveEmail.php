@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\AdditionalUsername;
 use App\Alias;
 use App\Domain;
 use App\EmailData;
@@ -95,6 +96,11 @@ class ReceiveEmail extends Command
                     // check if this is a custom domain
                     if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
                         $user = $customDomain->user;
+                    }
+
+                    // check if this is an additional username
+                    if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
+                        $user = $additionalUsername->user;
                     }
 
                     // check if this is a uuid generated alias

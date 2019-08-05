@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 
 $factory->define(App\User::class, function (Faker $faker) {
     return [
-        'username' => $faker->username,
+        'username' => $faker->userName,
         'banner_location' => 'top',
         'bandwidth' => 0,
         'default_recipient_id' => function () {

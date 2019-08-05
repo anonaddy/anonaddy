@@ -64,7 +64,6 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_create_new_domain()
     {
-        $this->withoutExceptionHandling();
         $response = $this->json('POST', '/domains', [
             'domain' => 'example.com'
         ]);
