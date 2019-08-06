@@ -451,17 +451,23 @@
       </table>
 
       <div v-else class="p-8 text-center text-lg text-grey-700">
-        <h1 class="mb-6 text-xl text-indigo-800 font-semibold">
+        <h1 class="mb-6 text-2xl text-indigo-800 font-semibold">
           It doesn't look like you have any aliases yet!
         </h1>
         <div class="mx-auto mb-6 w-24 border-b-2 border-grey-200"></div>
         <p class="mb-4">
-          To get started all you have to do is make up any new alias and give that out instead of
-          your real email address.
+          There are two ways to create new aliases.
+        </p>
+        <h3 class="mb-4 text-xl text-indigo-800 font-semibold">
+          Option 1: Create aliases on the fly
+        </h3>
+        <p class="mb-4">
+          To create aliases on the fly all you have to do is make up any new alias and give that out
+          instead of your real email address.
         </p>
         <p class="mb-4">
           Let's say you're signing up to <b>example.com</b> you could enter
-          <b>example@{{ domain }}</b> as your email address.
+          <b>example@{{ domain }}</b> (or .me) as your email address.
         </p>
         <p class="mb-4">
           The alias will show up here automatically as soon as it has forwarded its first email.
@@ -470,9 +476,19 @@
           If you start receiving spam to the alias you can simply deactivate it or delete it all
           together!
         </p>
-        <p>
+        <p class="mb-4">
           Try it out now by sending an email to <b>first@{{ domain }}</b> and then refresh this
           page.
+        </p>
+        <h3 class="mb-4 text-xl text-indigo-800 font-semibold">
+          Option 2: Generate a unique random alias
+        </h3>
+        <p class="mb-4">
+          You can click the button above to generate a random UUID alias that will look something
+          like this:
+        </p>
+        <p class="mb-4">
+          <b>86064c92-da41-443e-a2bf-5a7b0247842f@anonaddy.me</b>
         </p>
       </div>
     </div>
