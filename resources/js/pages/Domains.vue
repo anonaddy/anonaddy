@@ -165,12 +165,12 @@
                 />
                 <icon
                   name="close"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                  class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
                   @click.native="domainIdToEdit = domainDescriptionToEdit = ''"
                 />
                 <icon
                   name="save"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                  class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
                   @click.native="editDomain(domain)"
                 />
               </div>

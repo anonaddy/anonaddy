@@ -146,12 +146,12 @@
                 />
                 <icon
                   name="close"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                  class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
                   @click.native="usernameIdToEdit = usernameDescriptionToEdit = ''"
                 />
                 <icon
                   name="save"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                  class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
                   @click.native="editUsername(username)"
                 />
               </div>
