@@ -27,7 +27,7 @@
           @click="addUsernameModalOpen = true"
           class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
         >
-          Add Additional Username
+          Add Username
         </button>
       </div>
     </div>
@@ -220,14 +220,12 @@
         </p>
         <p class="mb-4">
           You can then separate aliases under your different usernames to reduce the chance of
-          anyone linking ownership of them together.
-        </p>
-        <p class="mb-4">
-          You can add a maximum of 3 additional usernames.
+          anyone linking ownership of them together. Great for compartmentalisation e.g. for work
+          and personal emails.
         </p>
         <p>
-          If you add 3 usernames here and then delete one, you will not be able to re-add that
-          username or add any others so please choose carefully.
+          You can add a maximum of 3 additional usernames. Deleted usernames still count towards
+          your limit so please choose carefully.
         </p>
       </div>
     </div>
@@ -237,7 +235,7 @@
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
-          Add new additional username
+          Add new username
         </h2>
         <p class="mt-4 text-grey-700">
           Please choose additional usernames carefully as you can only add a maximum of three.

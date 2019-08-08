@@ -11,7 +11,7 @@ I made this service after trying a few other options that do a similar thing. I 
 I also wanted to address some issues with other services such as:
 
 * Proprietary closed source code
-* Adverts, analytics and trackers on the sites
+* Adverts, analytics and trackers used on the sites
 * No option to encrypt emails using a GPG/OpenPGP key
 * No option for multiple recipients
 
@@ -27,14 +27,14 @@ No I definitely do not store/save any emails that pass through the server.
 
 #### **Can I use my own domain?**
 
-Yes you can use your own domain name so you can also have *@yourdomain.com as your aliases. To do so you simply need to add an MX record to your domain so that our server can handle incoming emails.
+Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add an MX record to your domain so that our server can handle incoming emails.
 
 
 #### **Why should I use this instead of a similar service?**
 
 Here are a few reasons I can think of:
 
-* Bring your own GPG/OpenPGP key to encrypt your forwarded emails (and replace subjects)
+* Bring your own GPG/OpenPGP key to encrypt your forwarded emails (and the option to replace subjects)
 * No adverts
 * No analytics or trackers (just server access logs)
 * No third party content
@@ -43,6 +43,7 @@ Here are a few reasons I can think of:
 * Generous monthly bandwidth
 * Multiple domains to choose for aliases (currently anonaddy.com and anonaddy.me)
 * Ability to generate UUID aliases
+* Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
 
 
@@ -54,7 +55,7 @@ On the recipients page you simply need to click "Add public key" and paste in yo
 
 Yes attachments are part of the email body and are also encrypted if you have it enabled.
 
-#### **Are forwarded emails signed when encrption is enabled?**
+#### **Are forwarded emails signed when encryption is enabled?**
 
 Yes when you have encryption enabled all forwarded emails are signed using our mailer@anonaddy.me private key.
 
@@ -63,9 +64,17 @@ You can add this key to your own keyring so that you can verify emails have come
 The fingerprint of the mailer@anonaddy.me key is "26A987650243B28802524E2F809FD0D502E2F695" you can find the key on [https://keys.openpgp.org](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695).
 
 
+#### **What if I don't want anyone to link ownership of my aliases together?**
+
+If you're concerned that your aliases are all linked by your username e.g. @johndoe.anonaddy.com, then you have a couple of options:
+
+1. You can generate UUID aliases instead, these are all under the root domain and cannot be linked to a user.
+2. You can add additional usernames and separate your aliases under your these. e.g. you could have one username for personal stuff, another for work, another for hobbies etc.
+
+
 #### **What if I don't trust you?**
 
-It's good to keep your guard up when online so you should never trust anyone 100%. I'll try my best to be as honest and transparent as I can but if you still aren't convinced you can always just fire up your own server and self-host this application. I'll be adding more details on how to do this soon.
+It's good to keep your guard up when online so you should never trust anyone 100%. I'll try my best to be as honest and transparent as I can but if you still aren't convinced you can always just fire up your own server and self-host this application. You'll need to know about server administration and PHP. I'll be adding more details on how to do this soon.
 
 
 #### **What is the maximum number of recipients I can add to an alias?**
@@ -81,7 +90,7 @@ When you delete your account the following happens:
 * All of your aliases are deleted from the database (aliases with a custom domain are soft deleted - see why below)
 * All of your custom domains are deleted from the database
 * Your user details are deleted from the database
-* Your username is encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
+* Your username and any additional usernames you added are encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
 
 The reason aliases with a custom domain are soft deleted (a deleted_at column is filled in the database) is to ensure that nobody else can register your same domain in the future and then sign up to our site and receive emails for aliases you have previously used.
 
@@ -98,12 +107,12 @@ No, your real email will not be shown, the email will look as if it has come fro
 
 #### **Can emails have attachments?**
 
-Yes you can add attachments to emails forwarded and replies. Attachments do count towards your bandwidth.
+Yes you can add attachments to emails forwarded and replies. Attachments count towards your bandwidth.
 
 
 #### **What is the max email size limit?**
 
-The max email size is currently set to 10MB.
+The max email size is currently set to 10MB (including attachments).
 
 
 #### **How do you prevent spammers?**
@@ -133,7 +142,7 @@ Currently you are limited to creating 10 new aliases per hour. If you try to cre
 
 #### **How is my bandwidth calculated?**
 
-Each time a new email is received Postfix calculates its size in bytes, a column in our database is then simply incremented by the size if the email is forwarded or replied. At the start of each month your bandwidth is reset to 0.
+Each time a new email is received Postfix calculates its size in bytes. A column in the database is then simply incremented by that size when the email is forwarded or a reply is sent. At the start of each month your bandwidth is reset to 0.
 
 I don't use rolling 30 day total as the only way to do this would be to log the date and size of every single email received.
 
@@ -152,17 +161,17 @@ Please make sure to add mailer@anonaddy.me to your address book and check your s
 
 #### **How do I know this site won't disappear next month?**
 
-I am very passionite about this project. I use it myself everyday and will definitely be keeping it running.
+I am very passionite about this project. I use it myself everyday and will be keeping it running indefinitely.
 
 
 #### **Is the application tested?**
 
-Yes it has automated PHPUnit tests written.
+Yes it has over 100 automated PHPUnit tests written.
 
 
 #### **How do I host this myself?**
 
-You will need to set up your own server with Postfix so that you can pipe the received mail to the application. I'll add more details and instructions here soon.
+You will need to set up your own server with Postfix so that you can pipe the received mail to the application. You can find more information here [https://github.com/anonaddy/anonaddy#self-hosting](https://github.com/anonaddy/anonaddy#self-hosting).
 
 #### **Who's behind AnonAddy?**
 
@@ -171,7 +180,7 @@ My name is Will Browning, I'm a web developer from the UK and an advocate for on
 
 #### **I couldn't find an answer to my question, how can I contact you?**
 
-For any others questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com)
+For any other questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com)
 
 ## Self Hosting
 
