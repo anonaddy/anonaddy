@@ -98,7 +98,7 @@
               </div>
             </div>
           </th>
-          <th class="p-4 items-center" colspan="2">
+          <th class="p-4 items-center">
             <div class="flex items-center">
               Active
               <div class="inline-flex flex-col">
@@ -113,6 +113,29 @@
                   @click.native="sort('active', 'desc')"
                   class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
                   :class="{ 'text-grey-800': isCurrentSort('active', 'desc') }"
+                />
+              </div>
+            </div>
+          </th>
+          <th class="p-4" colspan="2">
+            <div class="flex items-center">
+              Verified
+              <div class="inline-flex flex-col">
+                <icon
+                  name="chevron-up"
+                  @click.native="sort('domain_verified_at', 'asc')"
+                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
+                  :class="{
+                    'text-grey-800': isCurrentSort('domain_verified_at', 'asc'),
+                  }"
+                />
+                <icon
+                  name="chevron-down"
+                  @click.native="sort('domain_verified_at', 'desc')"
+                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
+                  :class="{
+                    'text-grey-800': isCurrentSort('domain_verified_at', 'desc'),
+                  }"
                 />
               </div>
             </div>
@@ -209,6 +232,26 @@
               />
             </div>
           </td>
+          <td class="border-grey-200 border-t">
+            <div class="p-4 flex items-center focus:text-indigo-500 text-sm">
+              <span
+                name="check"
+                v-if="domain.domain_verified_at"
+                class="py-1 px-2 bg-green-200 text-green-900 rounded-full"
+              >
+                verified
+              </span>
+              <button
+                v-else
+                @click="recheckRecords(domain)"
+                class="focus:outline-none"
+                :class="recheckRecordsLoading ? 'cursor-not-allowed' : ''"
+                :disabled="recheckRecordsLoading"
+              >
+                Recheck domain
+              </button>
+            </div>
+          </td>
           <td class="border-grey-200 border-t w-px">
             <div
               class="px-4 flex items-center cursor-pointer outline-none focus:text-indigo-500"
@@ -222,7 +265,7 @@
         <tr v-if="queriedDomains.length === 0">
           <td
             class="border-grey-200 border-t p-4 text-center h-24 text-lg text-grey-700"
-            colspan="5"
+            colspan="6"
           >
             No domains found for that search!
           </td>
@@ -362,6 +405,7 @@ export default {
       domainDescriptionToEdit: '',
       deleteDomainLoading: false,
       deleteDomainModalOpen: false,
+      recheckRecordsLoading: false,
       currentSort: 'created_at',
       currentSortDir: 'desc',
       errors: {},
@@ -428,8 +472,32 @@ export default {
         })
         .catch(error => {
           this.addDomainLoading = false
-          if (error.response.status == 422) {
+          if (error.response.status === 422) {
             this.error(error.response.data.errors.domain[0])
+          } else {
+            this.error()
+          }
+        })
+    },
+    recheckRecords(domain) {
+      this.recheckRecordsLoading = true
+
+      axios
+        .get(`/domains/${domain.id}/recheck`)
+        .then(({ data }) => {
+          this.recheckRecordsLoading = false
+
+          if (data.data.domain_verified_at === null) {
+            this.warn('MX record not found, please try again later')
+          } else {
+            this.success('Domain verified successfully')
+            domain.domain_verified_at = data.data.domain_verified_at
+          }
+        })
+        .catch(error => {
+          this.recheckRecordsLoading = false
+          if (error.response.status === 429) {
+            this.error('You can only recheck the records once a minute')
           } else {
             this.error()
           }
@@ -538,6 +606,13 @@ export default {
 
     clipboardError() {
       this.error('Could not copy to clipboard')
+    },
+    warn(text = '') {
+      this.$notify({
+        title: 'Information',
+        text: text,
+        type: 'warn',
+      })
     },
     success(text = '') {
       this.$notify({

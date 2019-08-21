@@ -66,7 +66,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
             ->replyTo($replyToEmail, $this->sender)
             ->subject($this->user->email_subject ?? $this->emailSubject)
             ->text('emails.forward.text')->with([
-                'text' => $this->emailText
+                'text' => base64_decode($this->emailText)
             ])
             ->with([
                 'location' => $this->bannerLocation,
@@ -89,7 +89,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
         if ($this->emailHtml) {
             $email->view('emails.forward.html')->with([
-                'html' => $this->emailHtml
+                'html' => base64_decode($this->emailHtml)
             ]);
         }
 

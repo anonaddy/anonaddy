@@ -513,7 +513,7 @@ export default {
         })
         .catch(error => {
           this.addRecipientLoading = false
-          if (error.response.status == 422) {
+          if (error.response.status === 422) {
             this.error(error.response.data.errors.email[0])
           } else {
             this.error()

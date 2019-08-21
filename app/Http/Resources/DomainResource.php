@@ -15,6 +15,7 @@ class DomainResource extends JsonResource
             'description' => $this->description,
             'aliases' => $this->aliases,
             'active' => $this->active,
+            'domain_verified_at' => $this->domain_verified_at ? $this->domain_verified_at->toDateTimeString() : null,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

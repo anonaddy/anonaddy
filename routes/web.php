@@ -28,6 +28,8 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::post('/recipients', 'RecipientController@store')->name('recipients.store');
     Route::delete('/recipients/{id}', 'RecipientController@destroy')->name('recipients.destroy');
 
+    Route::get('/recipients/{id}/email/resend', 'RecipientVerificationController@resend')->name('recipient_verification.resend');
+
     Route::patch('/recipient-keys/{id}', 'RecipientKeyController@update')->name('recipient_keys.update');
     Route::delete('/recipient-keys/{id}', 'RecipientKeyController@destroy')->name('recipient_keys.destroy');
 
@@ -36,12 +38,12 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
 
     Route::post('/alias-recipients', 'AliasRecipientController@store')->name('alias_recipients.store');
 
-    Route::get('/recipients/{id}/email/resend', 'RecipientVerificationController@resend')->name('recipient_verification.resend');
-
     Route::get('/domains', 'DomainController@index')->name('domains.index');
     Route::post('/domains', 'DomainController@store')->name('domains.store');
     Route::patch('/domains/{id}', 'DomainController@update')->name('domains.update');
     Route::delete('/domains/{id}', 'DomainController@destroy')->name('domains.destroy');
+
+    Route::get('/domains/{id}/recheck', 'DomainVerificationController@recheck')->name('domain_verification.recheck');
 
     Route::post('/active-domains', 'ActiveDomainController@store')->name('active_domains.store');
     Route::delete('/active-domains/{id}', 'ActiveDomainController@destroy')->name('active_domains.destroy');

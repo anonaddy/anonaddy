@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ab9e7ebe3aa110aaedb169c102eb527",
+    "content-hash": "4e49b7e999da1d1b9491f4017efc9d51",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2412,6 +2412,59 @@
                 "uuid"
             ],
             "time": "2018-07-19T23:38:55+00:00"
+        },
+        {
+            "name": "spatie/dns",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/dns.git",
+                "reference": "403865f19c01e0b9cfa9356fba5748dd5307b35c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/dns/zipball/403865f19c01e0b9cfa9356fba5748dd5307b35c",
+                "reference": "403865f19c01e0b9cfa9356fba5748dd5307b35c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "symfony/process": "^4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Dns\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "role": "Developer",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be"
+                },
+                {
+                    "name": "Harish Toshniwal",
+                    "role": "Developer",
+                    "email": "harish@spatie.be",
+                    "homepage": "https://spatie.be"
+                }
+            ],
+            "description": "Retrieve DNS records",
+            "homepage": "https://github.com/spatie/dns",
+            "keywords": [
+                "dns",
+                "spatie"
+            ],
+            "time": "2019-05-17T07:19:43+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

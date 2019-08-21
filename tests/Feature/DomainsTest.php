@@ -138,6 +138,25 @@ class DomainsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_verify_domain_records()
+    {
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id,
+            'domain' => 'anonaddy.me'
+        ]);
+
+        $response = $this->get('/domains/'.$domain->id.'/recheck');
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('domains', [
+            'user_id' => $this->user->id,
+            'domain' => 'anonaddy.me',
+            'domain_verified_at' => now()
+        ]);
+    }
+
+    /** @test */
     public function user_can_activate_domain()
     {
         $domain = factory(Domain::class)->create([

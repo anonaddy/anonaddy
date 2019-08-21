@@ -18,7 +18,8 @@
         "php-mime-mail-parser/php-mime-mail-parser": "^5.0",
         "pragmarx/google2fa-laravel": "^1.0",
         "predis/predis": "^1.1",
-        "ramsey/uuid": "^3.8"
+        "ramsey/uuid": "^3.8",
+        "spatie/dns": "^1.4"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

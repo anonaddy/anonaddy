@@ -19,6 +19,8 @@ class DomainController extends Controller
     {
         $domain = user()->domains()->create(['domain' => $request->domain]);
 
+        $domain->checkVerification();
+
         return new DomainResource($domain->fresh());
     }
 

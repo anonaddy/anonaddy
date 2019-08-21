@@ -5,6 +5,8 @@ namespace App;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Spatie\Dns\Dns;
 
 class Domain extends Model
 {
@@ -24,7 +26,8 @@ class Domain extends Model
 
     protected $dates = [
         'created_at',
-        'updated_at'
+        'updated_at',
+        'domain_verified_at'
     ];
 
     protected $casts = [
@@ -71,5 +74,41 @@ class Domain extends Model
     public function activate()
     {
         $this->update(['active' => true]);
+    }
+
+    /**
+     * Determine if the domain is verified.
+     *
+     * @return bool
+     */
+    public function isVerified()
+    {
+        return ! is_null($this->domain_verified_at);
+    }
+
+    /**
+     * Mark this domain as verified.
+     *
+     * @return bool
+     */
+    public function markDomainAsVerified()
+    {
+        return $this->forceFill([
+            'domain_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    /**
+     * Checks if the domain has the correct records.
+     *
+     * @return void
+     */
+    public function checkVerification()
+    {
+        $dns = new Dns($this->domain, '1.1.1.1');
+
+        if (Str::contains($dns->getRecords('MX'), 'MX 10 mail.anonaddy.me.')) {
+            $this->markDomainAsVerified();
+        }
     }
 }

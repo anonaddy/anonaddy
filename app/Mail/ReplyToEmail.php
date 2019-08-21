@@ -50,7 +50,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
             ->replyTo($this->alias->email, $fromName)
             ->subject($this->emailSubject)
             ->text('emails.reply.text')->with([
-                'text' => $this->emailText
+                'text' => base64_decode($this->emailText)
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
@@ -59,7 +59,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
 
         if ($this->emailHtml) {
             $email->view('emails.reply.html')->with([
-                'html' => $this->emailHtml
+                'html' => base64_decode($this->emailHtml)
             ]);
         }
 
