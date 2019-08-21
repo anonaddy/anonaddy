@@ -74,7 +74,7 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $key => $recipient) {
-                $displayTo = $this->parser->getAddresses('to')[$key]['display'];
+                $displayTo = $this->parser->getAddresses('to')[$key]['display'] ?? null;
 
                 $parentDomain = collect(config('anonaddy.all_domains'))
                     ->filter(function ($name) use ($recipient) {
