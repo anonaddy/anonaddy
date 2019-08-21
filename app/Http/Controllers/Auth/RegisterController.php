@@ -60,7 +60,8 @@ class RegisterController extends Controller
                 'required',
                 'alpha_num',
                 'max:20',
-                'unique:users',
+                'unique:users,username',
+                'unique:additional_usernames,username',
                 new NotBlacklisted,
                 new NotDeletedUsername
             ],

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\AdditionalUsername;
 use App\DeletedUsername;
 use App\Recipient;
 use App\User;
@@ -109,6 +110,22 @@ class RegistrationTest extends TestCase
     public function user_cannot_register_with_existing_username()
     {
         factory(User::class)->create(['username' => 'johndoe']);
+
+        $response = $this->post('/register', [
+            'username' => 'johndoe',
+            'email' => 'johndoe@example.com',
+            'email_confirmation' => 'johndoe@example.com',
+            'password' => 'mypassword',
+            'terms' => true,
+        ]);
+
+        $response->assertSessionHasErrors(['username']);
+    }
+
+    /** @test */
+    public function user_cannot_register_with_existing_additional_username()
+    {
+        factory(AdditionalUsername::class)->create(['username' => 'johndoe']);
 
         $response = $this->post('/register', [
             'username' => 'johndoe',
