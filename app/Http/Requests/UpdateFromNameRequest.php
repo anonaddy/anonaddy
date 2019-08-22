@@ -13,7 +13,7 @@ class UpdateFromNameRequest extends FormRequest
      */
     public function authorize()
     {
-        return true; // Pro plan
+        return true;
     }
 
     /**

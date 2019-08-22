@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\AdditionalUsername;
 use App\Alias;
 use App\AliasRecipient;
 use App\DeletedUsername;
@@ -178,6 +179,10 @@ class SettingsTest extends TestCase
             'domain_id' => $domain->id
         ]);
 
+        $additionalUsername = factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
         $response = $this->post('/settings/account', [
             'current_password_delete' => 'mypassword'
         ]);
@@ -216,7 +221,13 @@ class SettingsTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
+        $this->assertDatabaseMissing('additional_usernames', [
+            'id' => $additionalUsername->id,
+            'user_id' => $this->user->id
+        ]);
+
         $this->assertEquals(DeletedUsername::first()->username, $this->user->username);
+        $this->assertEquals(DeletedUsername::skip(1)->first()->username, $additionalUsername->username);
     }
 
     /** @test */

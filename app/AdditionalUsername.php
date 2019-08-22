@@ -33,6 +33,15 @@ class AdditionalUsername extends Model
         'active' => 'boolean'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        AdditionalUsername::deleting(function ($username) {
+            DeletedUsername::create(['username' => $username->username]);
+        });
+    }
+
     /**
      * Set the username.
      */

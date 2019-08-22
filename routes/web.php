@@ -11,7 +11,7 @@
 |
 */
 
-Auth::routes(['verify' => true]);
+Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
 
 Route::post('/login/2fa', 'TwoFactorAuthController@authenticateTwoFactor')->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
 

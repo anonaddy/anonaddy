@@ -362,8 +362,11 @@ class ReceiveEmailTest extends TestCase
         ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
-            return $mail->hasTo('one@example.com') &&
-                   $mail->hasTo('two@example.com');
+            return $mail->hasTo('one@example.com');
+        });
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) {
+            return $mail->hasTo('two@example.com');
         });
     }
 
@@ -409,9 +412,12 @@ class ReceiveEmailTest extends TestCase
             'bandwidth' => '444'
         ]);
 
-        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient, $recipient2) {
-            return $mail->hasTo($recipient->email) &&
-                   $mail->hasTo($recipient2->email);
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient) {
+            return $mail->hasTo($recipient->email);
+        });
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient2) {
+            return $mail->hasTo($recipient2->email);
         });
     }
 

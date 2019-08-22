@@ -55,50 +55,6 @@ class AliasTest extends TestCase
     }
 
     /** @test */
-    public function alias_can_get_verified_recipient_emails()
-    {
-        $alias = factory(Alias::class)->create([
-            'user_id' => $this->user->id
-        ]);
-
-        $recipientOne = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'email' => 'one@example.com'
-        ]);
-
-        $recipientTwo = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'email' => 'two@example.com'
-        ]);
-
-        $recipientThree = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'email' => 'three@example.com'
-        ]);
-
-        AliasRecipient::create([
-            'alias' => $alias,
-            'recipient' => $recipientOne
-        ]);
-
-        AliasRecipient::create([
-            'alias' => $alias,
-            'recipient' => $recipientTwo
-        ]);
-
-        AliasRecipient::create([
-            'alias' => $alias,
-            'recipient' => $recipientThree
-        ]);
-
-        $recipientEmails = $alias->nonPgpRecipientEmails();
-
-        $this->assertCount(3, $recipientEmails);
-        $this->assertIsArray($recipientEmails);
-        $this->assertEquals([$recipientOne->email, $recipientTwo->email, $recipientThree->email], $recipientEmails);
-    }
-
-    /** @test */
     public function alias_can_set_default_recipient_email()
     {
         factory(Alias::class)->create([
@@ -119,7 +75,7 @@ class AliasTest extends TestCase
     /** @test */
     public function alias_can_get_default_recipient_email()
     {
-        factory(Alias::class)->create([
+        $alias = factory(Alias::class)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -129,12 +85,17 @@ class AliasTest extends TestCase
         ]);
 
         $this->user->defaultRecipient = $recipient;
+        $this->user->save();
 
         $this->assertEquals($this->user->email, $recipient->email);
+        $this->assertCount(1, $alias->verifiedRecipientsOrDefault()->get());
+        $alias->verifiedRecipientsOrDefault()->each(function ($recipient) {
+            $this->assertEquals($this->user->email, $recipient->email);
+        });
     }
 
     /** @test */
-    public function alias_can_get_recipients_using_pgp_or_not()
+    public function alias_can_get_verified_recipients_or_default()
     {
         $alias = factory(Alias::class)->create([
             'user_id' => $this->user->id
@@ -168,6 +129,14 @@ class AliasTest extends TestCase
             'fingerprint' => null
         ]);
 
+        $recipientFive = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'five@example.com',
+            'should_encrypt' => false,
+            'fingerprint' => null,
+            'email_verified_at' => null
+        ]);
+
         AliasRecipient::create([
             'alias' => $alias,
             'recipient' => $recipientOne
@@ -188,15 +157,12 @@ class AliasTest extends TestCase
             'recipient' => $recipientFour
         ]);
 
-        $pgpRecipients = $alias->recipientsUsingPgp();
+        AliasRecipient::create([
+            'alias' => $alias,
+            'recipient' => $recipientFive
+        ]);
 
-        $nonPgpRecipients = $alias->nonPgpRecipientEmails();
-
-        $this->assertCount(1, $nonPgpRecipients);
-        $this->assertIsArray($nonPgpRecipients);
-        $this->assertEquals([$recipientThree->email], $nonPgpRecipients);
-
-        $this->assertTrue($alias->hasNonPgpRecipients());
-        $this->assertCount(2, $pgpRecipients);
+        $this->assertCount(4, $alias->verifiedRecipientsOrDefault());
+        $this->assertCount(5, $alias->recipients);
     }
 }

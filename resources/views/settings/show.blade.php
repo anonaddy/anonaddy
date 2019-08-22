@@ -4,10 +4,6 @@
     <div class="container py-8">
         @include('shared.status')
 
-        <div class="text-sm border border-t-8 rounded text-yellow-800 border-yellow-600 bg-yellow-100 px-3 py-4 mb-4" role="alert">
-            We're currently in <b>beta</b>, you'll be able to use all features to test everything out and you'll also have a <b>100MB bandwidth limit</b> each calendar month!
-        </div>
-
         <div class="mb-4">
             <h2 class="text-3xl font-bold">
                 Usage

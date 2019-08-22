@@ -224,8 +224,8 @@
           and personal emails.
         </p>
         <p>
-          You can add a maximum of 3 additional usernames. Deleted usernames still count towards
-          your limit so please choose carefully.
+          You can add a maximum of {{ usernameCount }} additional usernames. Deleted usernames still
+          count towards your limit so please choose carefully.
         </p>
       </div>
     </div>
@@ -238,7 +238,8 @@
           Add new username
         </h2>
         <p class="mt-4 text-grey-700">
-          Please choose additional usernames carefully as you can only add a maximum of three.
+          Please choose additional usernames carefully as you can only add a maximum of
+          {{ usernameCount }}.
         </p>
         <div class="mt-6">
           <p v-show="errors.newUsername" class="mb-3 text-red-500">
@@ -313,6 +314,10 @@ export default {
   props: {
     initialUsernames: {
       type: Array,
+      required: true,
+    },
+    usernameCount: {
+      type: Number,
       required: true,
     },
   },

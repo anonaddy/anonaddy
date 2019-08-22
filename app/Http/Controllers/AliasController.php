@@ -32,9 +32,9 @@ class AliasController extends Controller
 
         $alias = user()->aliases()->create([
             'id' => $uuid,
-            'email' => $uuid . '@anonaddy.me',
+            'email' => $uuid.'@'.config('anonaddy.domain'),
             'local_part' => $uuid,
-            'domain' => 'anonaddy.me'
+            'domain' => config('anonaddy.domain')
         ]);
 
         return new AliasResource($alias->fresh());

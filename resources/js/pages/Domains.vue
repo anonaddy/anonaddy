@@ -286,7 +286,8 @@
         </p>
         <p class="mb-4">
           Host: <b>@</b><br />
-          Value: <b>mail.anonaddy.me</b><br />
+          Value: <b>{{ hostname }}</b
+          ><br />
           Priority: <b>10</b><br />
           TTL: <b>3600</b>
         </p>
@@ -306,7 +307,8 @@
         <p class="mt-4 text-grey-700">
           Make sure you add the following MX record to your domain.<br /><br />
           Host: <b>@</b><br />
-          Value: <b>mail.anonaddy.me</b><br />
+          Value: <b>{{ hostname }}</b
+          ><br />
           Priority: <b>10</b><br />
           TTL: <b>3600</b><br /><br />
           Just include the domain/subdomain e.g. example.com without any http protocol.
@@ -383,6 +385,10 @@ export default {
   props: {
     initialDomains: {
       type: Array,
+      required: true,
+    },
+    hostname: {
+      type: String,
       required: true,
     },
   },

@@ -1,6 +1,6 @@
 # Anonymous Email Forwarding
 
-This is the source code for [app.anonaddy.com](https://app.anonaddy.com).
+This is the source code for self-hosting AnonAddy.
 
 ## FAQ
 

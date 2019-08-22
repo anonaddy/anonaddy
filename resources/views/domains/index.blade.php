@@ -4,6 +4,6 @@
     <div class="container py-8">
         @include('shared.status')
 
-        <domains :initial-domains="{{json_encode($domains)}}" />
+        <domains :initial-domains="{{json_encode($domains)}}" hostname="{{config('anonaddy.hostname')}}" />
     </div>
 @endsection

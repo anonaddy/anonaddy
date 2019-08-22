@@ -467,7 +467,7 @@
         </p>
         <p class="mb-4">
           Let's say you're signing up to <b>example.com</b> you could enter
-          <b>example@{{ domain }}</b> (or .me) as your email address.
+          <b>example@{{ subdomain }}</b> as your email address.
         </p>
         <p class="mb-4">
           The alias will show up here automatically as soon as it has forwarded its first email.
@@ -477,7 +477,7 @@
           together!
         </p>
         <p class="mb-4">
-          Try it out now by sending an email to <b>first@{{ domain }}</b> and then refresh this
+          Try it out now by sending an email to <b>first@{{ subdomain }}</b> and then refresh this
           page.
         </p>
         <h3 class="mb-4 text-xl text-indigo-800 font-semibold">
@@ -488,7 +488,7 @@
           like this:
         </p>
         <p class="mb-4">
-          <b>86064c92-da41-443e-a2bf-5a7b0247842f@anonaddy.me</b>
+          <b>86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</b>
         </p>
       </div>
     </div>
@@ -502,11 +502,11 @@
         </h2>
         <p class="mt-4 text-grey-700">
           This will generate a new unique alias in the form of<br /><br />
-          86064c92-da41-443e-a2bf-5a7b0247842f@anonaddy.me<br /><br />
+          86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}<br /><br />
           Useful if you do not wish to include your username in the email as a potential link
           between aliases.<br /><br />
-          Other aliases e.g. alias@{{ domain }} or .me are created automatically when they receive
-          their first email.
+          Other aliases e.g. alias@{{ subdomain }} are created automatically when they receive their
+          first email.
         </p>
         <div class="mt-6">
           <button
@@ -640,6 +640,10 @@ export default {
       required: true,
     },
     domain: {
+      type: String,
+      required: true,
+    },
+    subdomain: {
       type: String,
       required: true,
     },

@@ -19,7 +19,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | If set this value will be used and allow you to receive forwarded emails
-    | at the root domain, e.g. @anonaddy.me aswell as @username.anonaddy.me
+    | at the root domain, e.g. @example.com aswell as @username.example.com
     |
     */
 
@@ -27,11 +27,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Registration
+    |--------------------------------------------------------------------------
+    |
+    | If set to false this will prevent new users from registering on the site
+    | useful if you are self-hosting and do not want anyone else to be able to register
+    |
+    */
+
+    'enable_registration' => env('ANONADDY_ENABLE_REGISTRATION', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Domain
     |--------------------------------------------------------------------------
     |
     | If set and you are self hosting AnonAddy then a check will be done so that you can
-    | receive email at the root domain, e.g. @yourdomain.com aswell as @username.yourdomain.com
+    | receive email at the root domain, e.g. @example.com aswell as @username.example.com
     |
     */
 
@@ -39,11 +51,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Hostname
+    |--------------------------------------------------------------------------
+    |
+    | This value is your FQDN hostname for your server e.g. mail.example.com
+    | it is used to validate records on custom domains that are added by users
+    |
+    */
+
+    'hostname' => env('ANONADDY_HOSTNAME'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | DNS Resolver
+    |--------------------------------------------------------------------------
+    |
+    | This value is used when validating records on custom domains that are added
+    | by users, if you don't have a local caching name server you can use 1.1.1.1 etc.
+    |
+    */
+
+    'dns_resolver' => env('ANONADDY_DNS_RESOLVER', '127.0.0.1'),
+
+    /*
+    |--------------------------------------------------------------------------
     | All Domains
     |--------------------------------------------------------------------------
     |
-    | If you would like to have other domains to use e.g. @username.yourdomain2.com
-    | enter a comma separated list in your .env file like so, anonaddy.me,anonaddy.com
+    | If you would like to have other domains to use e.g. @username.example2.com
+    | enter a comma separated list in your .env file like so, example.com,example2.com
     |
     */
 
@@ -63,7 +99,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Limit
+    | Hourly Email Limit
     |--------------------------------------------------------------------------
     |
     | This value is an integer that determines the number of emails a user can forward
@@ -71,29 +107,43 @@ return [
     |
     */
 
-    'limit' => env('ANONADDY_LIMIT'),
+    'limit' => env('ANONADDY_LIMIT', 200),
 
     /*
     |--------------------------------------------------------------------------
-    | Newsletter URL
+    | Monthly Bandwidth Limit
     |--------------------------------------------------------------------------
     |
-    | This value is the url to subscribe new registrations to the newsletter if they opt in
+    | This value is an integer that determines the monthly bandwidth
+    | limit for users in bytes the default value is 104857600 which is 100MB
     |
     */
 
-    'newsletter_url' => env('ANONADDY_NEWSLETTER_URL'),
+    'bandwidth_limit' => env('ANONADDY_BANDWIDTH_LIMIT', 104857600),
 
     /*
     |--------------------------------------------------------------------------
-    | Newsletter List
+    | New Alias Hourly Limit
     |--------------------------------------------------------------------------
     |
-    | This value is the ID of the list to subscribe to
+    | This value is an integer that determines the number of new aliases
+    | a user can create each hour, the default value is 10 aliases per hour
     |
     */
 
-    'newsletter_list' => env('ANONADDY_NEWSLETTER_LIST'),
+    'new_alias_hourly_limit' => env('ANONADDY_NEW_ALIAS_LIMIT', 10),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Additional Username Limit
+    |--------------------------------------------------------------------------
+    |
+    | This value is an integer that determines the number of additional
+    | usernames a user can add to their account, the default value is 3
+    |
+    */
+
+    'additional_username_limit' => env('ANONADDY_ADDITIONAL_USERNAME_LIMIT', 3),
 
     /*
     |--------------------------------------------------------------------------

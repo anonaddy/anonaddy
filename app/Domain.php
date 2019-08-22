@@ -105,9 +105,9 @@ class Domain extends Model
      */
     public function checkVerification()
     {
-        $dns = new Dns($this->domain, '1.1.1.1');
+        $dns = new Dns($this->domain, config('anonaddy.dns_resolver'));
 
-        if (Str::contains($dns->getRecords('MX'), 'MX 10 mail.anonaddy.me.')) {
+        if (Str::contains($dns->getRecords('MX'), 'MX 10 ' . config('anonaddy.hostname') . '.')) {
             $this->markDomainAsVerified();
         }
     }

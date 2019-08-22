@@ -92,34 +92,6 @@
                             @endif
                         </div>
 
-                        <div class="flex flex-wrap mb-3 items-center">
-                            <input type="checkbox" name="newsletter" class="mr-2" id="newsletter">
-
-                            <label class="text-sm text-grey-700" for="newsletter">
-                                Sign up to our newsletter
-                            </label>
-
-                            @if ($errors->has('newsletter'))
-                                <p class="text-red-500 text-xs italic mt-4">
-                                    {{ $errors->first('newsletter') }}
-                                </p>
-                            @endif
-                        </div>
-
-                        <div class="flex flex-wrap items-center">
-                            <input type="checkbox" name="terms" class="mr-2" id="terms">
-
-                            <label class="text-sm text-grey-700" for="terms">
-                                I accept the <a href="https://anonaddy.com/terms" class="text-indigo-800" target="_blank" rel="nofollow noreferrer noopener">terms</a> and <a href="https://anonaddy.com/privacy" class="text-indigo-800" target="_blank" rel="nofollow noreferrer noopener">privacy policy</a>
-                            </label>
-
-                            @if ($errors->has('terms'))
-                                <p class="text-red-500 text-xs italic mt-4">
-                                    {{ $errors->first('terms') }}
-                                </p>
-                            @endif
-                        </div>
-
                     </div>
 
                     <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 flex flex-wrap items-center">

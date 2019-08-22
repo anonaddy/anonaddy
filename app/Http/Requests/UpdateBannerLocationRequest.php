@@ -13,7 +13,7 @@ class UpdateBannerLocationRequest extends FormRequest
      */
     public function authorize()
     {
-        return true; // Pro plan
+        return true;
     }
 
     /**

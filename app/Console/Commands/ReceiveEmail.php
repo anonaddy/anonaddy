@@ -68,7 +68,7 @@ class ReceiveEmail extends Command
 
             $recipients = $this->getRecipients();
 
-            // Divide the size of the email by the number of recipients (excluding any unsubscribe recipients) to prevent it being added multiple times
+            // Divide the size of the email by the number of recipients (excluding any unsubscribe recipients) to prevent it being added multiple times.
             $recipientCount = $recipients->where('domain', '!=', 'unsubscribe.'.config('anonaddy.domain'))->count();
 
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
@@ -82,7 +82,7 @@ class ReceiveEmail extends Command
                     })
                     ->first();
 
-                $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain)); // e.g. johndoe
+                $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain));
 
                 if ($subdomain === 'unsubscribe') {
                     $this->handleUnsubscribe($recipient);
@@ -91,19 +91,18 @@ class ReceiveEmail extends Command
 
                 $user = User::where('username', $subdomain)->first();
 
-                // If no user is found for the subdomain check if it is a custom or root domain instead
                 if (is_null($user)) {
-                    // check if this is a custom domain
+                    // Check if this is a custom domain.
                     if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
                         $user = $customDomain->user;
                     }
 
-                    // check if this is an additional username
+                    // Check if this is an additional username.
                     if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
                         $user = $additionalUsername->user;
                     }
 
-                    // check if this is a uuid generated alias
+                    // Check if this is a uuid generated alias.
                     if ($alias = Alias::find($recipient['local_part'])) {
                         $user = $alias->user;
                     } elseif ($recipient['domain'] === $parentDomain && !empty(config('anonaddy.admin_username'))) {
@@ -111,14 +110,14 @@ class ReceiveEmail extends Command
                     }
                 }
 
-                // If there is still no user or the user has no verified default recipient then continue
+                // If there is still no user or the user has no verified default recipient then continue.
                 if (is_null($user) || !$user->hasVerifiedDefaultRecipient()) {
                     continue;
                 }
 
                 $this->checkRateLimit($user);
 
-                // check whether this email is a reply or a new email to be forwarded
+                // Check whether this email is a reply or a new email to be forwarded.
                 if ($recipient['extension'] === sha1(config('anonaddy.secret').$displayTo)) {
                     $this->handleReply($user, $recipient, $displayTo);
                 } else {
@@ -177,7 +176,7 @@ class ReceiveEmail extends Command
         ]);
 
         if (!isset($alias->id)) {
-            // this is a new alias
+            // This is a new alias.
             if ($user->hasExceededNewAliasLimit()) {
                 $this->error('4.2.1 New aliases per hour limit exceeded for user ' . $user->username . '.');
 
@@ -211,17 +210,11 @@ class ReceiveEmail extends Command
 
         $emailData = new EmailData($this->parser);
 
-        $alias->recipientsUsingPgp()->each(function ($recipient) use ($alias, $emailData) {
-            $message = (new ForwardEmail($alias, $emailData, $recipient->fingerprint))->onQueue('default');
+        $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
+            $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt ? $recipient->fingerprint : null))->onQueue('default');
 
             Mail::to($recipient->email)->queue($message);
         });
-
-        if ($alias->hasNonPgpRecipients()) {
-            $message = (new ForwardEmail($alias, $emailData))->onQueue('default');
-
-            Mail::to($alias->nonPgpRecipientEmails())->queue($message);
-        }
 
         if (!Mail::failures()) {
             $alias->increment('emails_forwarded');
@@ -283,7 +276,7 @@ class ReceiveEmail extends Command
 
     protected function exitIfFromSelf()
     {
-        // To prevent recipient alias infinite nested looping
+        // To prevent recipient alias infinite nested looping.
         if (in_array($this->option('sender'), [config('mail.from.address'), config('anonaddy.return_path')])) {
             exit(0);
         }

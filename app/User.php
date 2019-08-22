@@ -201,8 +201,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getBandwidthLimit()
     {
-        // TODO check user's limit and return
-        return 104857600;
+        return config('anonaddy.bandwidth_limit');
     }
 
     public function getBandwidthLimitMb()
@@ -221,12 +220,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this
                 ->aliases()
                 ->where('created_at', '>=', now()->subHour())
-                ->count() >= 10; // TODO update for different plans
+                ->count() >= config('anonaddy.new_alias_hourly_limit');
     }
 
     public function hasReachedAdditionalUsernameLimit()
     {
-        return $this->username_count >= 3;
+        return $this->username_count >= config('anonaddy.additional_username_limit');
     }
 
     public function isVerifiedRecipient($email)
