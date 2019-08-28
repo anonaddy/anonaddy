@@ -249,6 +249,7 @@
                 :disabled="recheckRecordsLoading"
               >
                 Recheck domain
+                <loader v-if="recheckRecordsLoading" />
               </button>
             </div>
           </td>
@@ -332,6 +333,7 @@
             :disabled="addDomainLoading"
           >
             Add Domain
+            <loader v-if="addDomainLoading" />
           </button>
           <button
             @click="addDomainModalOpen = false"
@@ -363,6 +365,7 @@
             :disabled="deleteDomainLoading"
           >
             Delete domain
+            <loader v-if="deleteDomainLoading" />
           </button>
           <button
             @click="closeDeleteModal"

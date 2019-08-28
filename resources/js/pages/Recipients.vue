@@ -79,9 +79,9 @@
                 :data-tippy-content="
                   `Use this to attach recipients to new aliases as they are created e.g. alias+key@${
                     user.username
-                  }.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${
+                  }.${domain}. You can attach multiple recipients by doing alias+2.3.4@${
                     user.username
-                  }.anonaddy.com`
+                  }.${domain}`
                 "
               >
                 <icon name="info" class="inline-block w-4 h-4 text-grey-200 fill-current" />
@@ -310,6 +310,7 @@
             :disabled="addRecipientLoading"
           >
             Add Recipient
+            <loader v-if="addRecipientLoading" />
           </button>
           <button
             @click="addRecipientModalOpen = false"
@@ -352,6 +353,7 @@
             :disabled="addRecipientKeyLoading"
           >
             Add Key
+            <loader v-if="addRecipientKeyLoading" />
           </button>
           <button
             @click="closeRecipientKeyModal"
@@ -380,6 +382,7 @@
             :disabled="deleteRecipientLoading"
           >
             Delete recipient
+            <loader v-if="deleteRecipientLoading" />
           </button>
           <button
             @click="closeDeleteModal"
@@ -410,6 +413,10 @@ export default {
     },
     aliasesUsingDefault: {
       type: Array,
+      required: true,
+    },
+    domain: {
+      type: String,
       required: true,
     },
   },

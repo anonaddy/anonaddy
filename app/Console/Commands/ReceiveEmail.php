@@ -149,7 +149,7 @@ class ReceiveEmail extends Command
         if (!is_null($alias) && filter_var($displayTo, FILTER_VALIDATE_EMAIL)) {
             $emailData = new EmailData($this->parser);
 
-            $message = (new ReplyToEmail($user, $alias, $emailData))->onQueue('default');
+            $message = (new ReplyToEmail($user, $alias, $emailData));
 
             Mail::to($displayTo)->queue($message);
 
@@ -211,7 +211,7 @@ class ReceiveEmail extends Command
         $emailData = new EmailData($this->parser);
 
         $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
-            $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt ? $recipient->fingerprint : null))->onQueue('default');
+            $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt ? $recipient->fingerprint : null));
 
             Mail::to($recipient->email)->queue($message);
         });

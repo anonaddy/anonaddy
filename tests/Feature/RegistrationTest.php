@@ -89,24 +89,6 @@ class RegistrationTest extends TestCase
     }
 
     /** @test */
-    public function user_must_accept_terms()
-    {
-        $response = $this->post('/register', [
-            'username' => 'johndoe',
-            'email' => 'johndoe@example.com',
-            'email_confirmation' => 'johndoe@example.com',
-            'password' => 'mypassword',
-            'terms' => false,
-        ]);
-
-        $response->assertSessionHasErrors(['terms']);
-
-        $this->assertDatabaseMissing('users', [
-            'username' => 'johndoe'
-        ]);
-    }
-
-    /** @test */
     public function user_cannot_register_with_existing_username()
     {
         factory(User::class)->create(['username' => 'johndoe']);

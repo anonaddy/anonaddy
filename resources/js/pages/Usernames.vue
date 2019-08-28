@@ -260,6 +260,7 @@
             :disabled="addUsernameLoading"
           >
             Add Username
+            <loader v-if="addUsernameLoading" />
           </button>
           <button
             @click="addUsernameModalOpen = false"
@@ -292,6 +293,7 @@
             :disabled="deleteUsernameLoading"
           >
             Delete username
+            <loader v-if="deleteUsernameLoading" />
           </button>
           <button
             @click="closeDeleteModal"

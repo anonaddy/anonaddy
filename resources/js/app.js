@@ -17,6 +17,7 @@ Vue.use(PortalVue)
 Vue.use(Clipboard)
 Vue.use(Notifications)
 
+Vue.component('loader', require('./components/Loader.vue').default)
 Vue.component('dropdown', require('./components/DropdownNav.vue').default)
 Vue.component('icon', require('./components/Icon.vue').default)
 Vue.component('aliases', require('./pages/Aliases.vue').default)

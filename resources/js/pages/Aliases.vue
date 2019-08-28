@@ -516,6 +516,7 @@
             :disabled="generateAliasLoading"
           >
             Generate Alias
+            <loader v-if="generateAliasLoading" />
           </button>
           <button
             @click="generateAliasModalOpen = false"
@@ -564,6 +565,7 @@
             :disabled="editAliasRecipientsLoading"
           >
             Update Recipients
+            <loader v-if="editAliasRecipientsLoading" />
           </button>
           <button
             @click="closeAliasRecipientsModal()"
@@ -594,6 +596,7 @@
             :disabled="deleteAliasLoading"
           >
             Delete alias
+            <loader v-if="deleteAliasLoading" />
           </button>
           <button
             @click="closeDeleteModal"
