@@ -186,17 +186,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function totalEmailsForwarded()
     {
-        return $this->aliases()->sum('emails_forwarded');
+        return $this->aliases()->withTrashed()->sum('emails_forwarded');
     }
 
     public function totalEmailsBlocked()
     {
-        return $this->aliases()->sum('emails_blocked');
+        return $this->aliases()->withTrashed()->sum('emails_blocked');
     }
 
     public function totalEmailsReplied()
     {
-        return $this->aliases()->sum('emails_replied');
+        return $this->aliases()->withTrashed()->sum('emails_replied');
     }
 
     public function getBandwidthLimit()
@@ -213,6 +213,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function nearBandwidthLimit()
     {
         return ($this->bandwidth / $this->getBandwidthLimit()) > 0.9;
+    }
+
+    public function hasReachedBandwidthLimit()
+    {
+        return $this->bandwidth >= $this->getBandwidthLimit();
     }
 
     public function hasExceededNewAliasLimit()

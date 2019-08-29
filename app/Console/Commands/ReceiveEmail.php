@@ -115,6 +115,8 @@ class ReceiveEmail extends Command
                     continue;
                 }
 
+                $this->checkBandwidthLimit($user);
+
                 $this->checkRateLimit($user);
 
                 // Check whether this email is a reply or a new email to be forwarded.
@@ -158,10 +160,6 @@ class ReceiveEmail extends Command
 
                 $user->bandwidth += $this->size;
                 $user->save();
-
-                if ($user->nearBandwidthLimit()) {
-                    $user->notify(new NearBandwidthLimit());
-                }
             }
         }
     }
@@ -178,7 +176,7 @@ class ReceiveEmail extends Command
         if (!isset($alias->id)) {
             // This is a new alias.
             if ($user->hasExceededNewAliasLimit()) {
-                $this->error('4.2.1 New aliases per hour limit exceeded for user ' . $user->username . '.');
+                $this->error('4.2.1 New aliases per hour limit exceeded for user.');
 
                 exit(1);
             }
@@ -221,10 +219,19 @@ class ReceiveEmail extends Command
 
             $user->bandwidth += $this->size;
             $user->save();
+        }
+    }
 
-            if ($user->nearBandwidthLimit()) {
-                $user->notify(new NearBandwidthLimit());
-            }
+    protected function checkBandwidthLimit($user)
+    {
+        if ($user->hasReachedBandwidthLimit()) {
+            $this->error('5.2.1 Bandwidth limit exceeded for user. Please try again later.');
+
+            exit(1);
+        }
+
+        if ($user->nearBandwidthLimit()) {
+            $user->notify(new NearBandwidthLimit());
         }
     }
 
@@ -236,8 +243,8 @@ class ReceiveEmail extends Command
             ->then(
                 function () {
                 },
-                function () use ($user) {
-                    $this->error('4.2.1 Rate limit exceeded for user ' . $user->username . '. Please try again later.');
+                function () {
+                    $this->error('4.2.1 Rate limit exceeded for user. Please try again later.');
 
                     exit(1);
                 }

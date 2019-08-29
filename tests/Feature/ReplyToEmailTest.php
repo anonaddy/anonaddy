@@ -68,7 +68,7 @@ class ReplyToEmailTest extends TestCase
     }
 
     /** @test */
-    public function it_can_reply_to__multiple_emails_from_file()
+    public function it_can_reply_to_multiple_emails_from_file()
     {
         Mail::fake();
 

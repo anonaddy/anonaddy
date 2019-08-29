@@ -65,7 +65,7 @@ class UserTest extends TestCase
             'active' => false
         ]);
 
-        $this->assertEquals(7, $this->user->totalEmailsForwarded());
+        $this->assertEquals(10, $this->user->totalEmailsForwarded());
     }
 
     /** @test */
@@ -88,7 +88,7 @@ class UserTest extends TestCase
             'active' => false
         ]);
 
-        $this->assertEquals(4, $this->user->totalEmailsBlocked());
+        $this->assertEquals(8, $this->user->totalEmailsBlocked());
     }
 
     /** @test */
@@ -111,7 +111,7 @@ class UserTest extends TestCase
             'active' => false
         ]);
 
-        $this->assertEquals(3, $this->user->totalEmailsReplied());
+        $this->assertEquals(7, $this->user->totalEmailsReplied());
     }
 
     /** @test */
