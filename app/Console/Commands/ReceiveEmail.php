@@ -225,7 +225,7 @@ class ReceiveEmail extends Command
     protected function checkBandwidthLimit($user)
     {
         if ($user->hasReachedBandwidthLimit()) {
-            $this->error('5.2.1 Bandwidth limit exceeded for user. Please try again later.');
+            $this->error('4.2.1 Bandwidth limit exceeded for user. Please try again later.');
 
             exit(1);
         }

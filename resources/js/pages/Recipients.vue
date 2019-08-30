@@ -291,6 +291,10 @@
         <p class="mt-4 text-grey-700">
           Enter the individual email of the new recipient you'd like to add.
         </p>
+        <p class="mt-4 text-grey-700">
+          You will receive an email with a verification link that will expire in one hour, you can
+          click "Resend email" to get a new one.
+        </p>
         <div class="mt-6">
           <p v-show="errors.newRecipient" class="mb-3 text-red-500">
             {{ errors.newRecipient }}
@@ -615,7 +619,7 @@ export default {
         .catch(error => {
           this.addRecipientKeyLoading = false
           if (error.response !== undefined) {
-            this.error(error.response.data.message)
+            this.error(error.response.data)
           } else {
             this.error()
           }

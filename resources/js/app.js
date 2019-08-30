@@ -3,9 +3,11 @@ require('./bootstrap')
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(advancedFormat)
 dayjs.extend(relativeTime)
+dayjs.extend(utc)
 
 window.Vue = require('vue')
 
@@ -30,7 +32,7 @@ Vue.filter('formatDate', value => {
 })
 
 Vue.filter('timeAgo', value => {
-  return dayjs(value).fromNow()
+  return dayjs.utc(value).fromNow()
 })
 
 Vue.filter('truncate', (string, value) => {
