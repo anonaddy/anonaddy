@@ -11,7 +11,6 @@ use App\Mail\ReplyToEmail;
 use App\Notifications\NearBandwidthLimit;
 use App\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
@@ -127,7 +126,7 @@ class ReceiveEmail extends Command
                 }
             }
         } catch (\Exception $e) {
-            Log::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+            report($e);
 
             $this->error('4.3.0 An error has occurred, please try again later.');
 

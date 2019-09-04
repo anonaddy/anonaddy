@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "axios": "^0.18.1",
-        "cross-env": "^5.1",
+        "cross-env": "^5.2.1",
         "dayjs": "^1.8.16",
         "laravel-mix": "^4.1.2",
         "laravel-mix-purgecss": "^4.1.0",
@@ -34,21 +34,19 @@
         "lint-staged": "^8.2.1",
         "prettier": "1.16.4"
     },
-    "lint-staged": {
-        "linters": {
-            "resources/**/*.{css,js,vue}": [
-                "prettier --write",
-                "git add"
-            ],
-            "*.php": [
-                "composer format",
-                "git add"
-            ]
-        }
-    },
     "husky": {
         "hooks": {
             "pre-commit": "lint-staged"
         }
+    },
+    "lint-staged": {
+        "*.{css,js,vue}": [
+            "npm run format --",
+            "git add"
+        ],
+        "*.php": [
+            "composer format",
+            "git add"
+        ]
     }
 }
