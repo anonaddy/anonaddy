@@ -48,7 +48,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
         $email =  $this
             ->from(config('mail.from.address'), $fromName)
             ->replyTo($this->alias->email, $fromName)
-            ->subject($this->emailSubject)
+            ->subject(base64_decode($this->emailSubject))
             ->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText)
             ])

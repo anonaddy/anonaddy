@@ -62,9 +62,9 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $replyToEmail = $this->alias->local_part.'+'.sha1(config('anonaddy.secret').$this->sender).'@'.$this->alias->domain;
 
         $email =  $this
-            ->from(config('mail.from.address'), $this->displayFrom." '".$this->sender."' via ".config('app.name'))
+            ->from(config('mail.from.address'), base64_decode($this->displayFrom)." '".$this->sender."' via ".config('app.name'))
             ->replyTo($replyToEmail, $this->sender)
-            ->subject($this->user->email_subject ?? $this->emailSubject)
+            ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->text('emails.forward.text')->with([
                 'text' => base64_decode($this->emailText)
             ])
@@ -73,7 +73,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 'deactivateUrl' => $this->deactivateUrl,
                 'aliasEmail' => $this->alias->email,
                 'fromEmail' => $this->sender,
-                'replacedSubject' => $this->user->email_subject ? ' with subject "' . $this->emailSubject . '"' : null
+                'replacedSubject' => $this->user->email_subject ? ' with subject "' . base64_decode($this->emailSubject) . '"' : null
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
