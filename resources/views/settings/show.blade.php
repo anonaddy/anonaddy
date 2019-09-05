@@ -35,49 +35,102 @@
 
         <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
 
-            <form class="mb-16" method="POST" action="{{ route('settings.default_recipient') }}">
-                @csrf
+            @if($user->hasVerifiedDefaultRecipient())
 
-                <div class="mb-6">
+                <form class="mb-16" method="POST" action="{{ route('settings.default_recipient') }}">
+                    @csrf
 
-                    <h3 class="font-bold text-xl">
-                        Update Default Recipient
-                    </h3>
+                    <div class="mb-6">
 
-                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+                        <h3 class="font-bold text-xl">
+                            Update Default Recipient
+                        </h3>
 
-                    <p class="mt-6">The default recipient is used for all new aliases and any aliases that do not have any recipients attached. Once an alias has been created in your dashboard you can update the recipient to a different one.</p>
+                        <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
-                    <div class="mt-6 flex flex-wrap mb-4">
-                        <label for="default-recipient" class="block text-grey-700 text-sm mb-2">
-                            {{ __('Select Recipient') }}:
-                        </label>
+                        <p class="mt-6">The default recipient is used for all new aliases and any aliases that do not have any recipients attached. Once an alias has been created in your dashboard you can update the recipient to a different one.</p>
 
-                        <div class="block relative w-full">
-                            <select id="default-recipient" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="default_recipient" required>
-                                @foreach($recipientOptions as $recipient)
-                                <option value="{{ $recipient->id }}" {{ $user->email === $recipient->email ? 'selected' : '' }}>{{ $recipient->email }}</option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        <div class="mt-6 flex flex-wrap mb-4">
+                            <label for="default-recipient" class="block text-grey-700 text-sm mb-2">
+                                {{ __('Select Recipient') }}:
+                            </label>
+
+                            <div class="block relative w-full">
+                                <select id="default-recipient" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="default_recipient" required>
+                                    @foreach($recipientOptions as $recipient)
+                                    <option value="{{ $recipient->id }}" {{ $user->email === $recipient->email ? 'selected' : '' }}>{{ $recipient->email }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+
+                            @if ($errors->has('default_recipient'))
+                                <p class="text-red-500 text-xs italic mt-4">
+                                    {{ $errors->first('default_recipient') }}
+                                </p>
+                            @endif
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                        {{ __('Update Default Recipient') }}
+                    </button>
+
+                </form>
+
+            @else
+
+                <form class="mb-16" method="POST" action="{{ route('settings.edit_default_recipient') }}">
+                    @csrf
+
+                    <div class="mb-6">
+
+                        <h3 class="font-bold text-xl">
+                            Update Email
+                        </h3>
+
+                        <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                        <p class="mt-6">Made a mistake or typo with the email addresss you signed up with? Update your email below, you'll receive a new email verification link.</p>
+
+                        <div class="mt-6 flex flex-wrap mb-4">
+                            <label for="email" class="block text-grey-700 text-sm mb-2">
+                                {{ __('Email') }}:
+                            </label>
+
+                            <div class="block relative w-full">
+                                <input id="email" type="email" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="email" value="{{ old('email') ?? $user->email }}">
+                            </div>
+
+                            @if ($errors->has('email'))
+                                <p class="text-red-500 text-xs italic mt-4">
+                                    {{ $errors->first('email') }}
+                                </p>
+                            @endif
+                        </div>
+
+                        <div class="mt-6 flex flex-wrap mb-4">
+                            <label for="email_confirmation" class="block text-grey-700 text-sm mb-2">
+                                {{ __('Confirm Email') }}:
+                            </label>
+
+                            <div class="block relative w-full">
+                                <input id="email_confirmation" type="email" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="email_confirmation">
                             </div>
                         </div>
 
-                        @if ($errors->has('default_recipient'))
-                            <p class="text-red-500 text-xs italic mt-4">
-                                {{ $errors->first('default_recipient') }}
-                            </p>
-                        @endif
                     </div>
 
-                </div>
+                    <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                        {{ __('Update Email') }}
+                    </button>
 
-                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
-                    {{ __('Update Default Recipient') }}
-                </button>
+                </form>
 
-            </form>
+            @endif
 
             <form class="mb-16" method="POST" action="{{ route('settings.password') }}">
                 @csrf

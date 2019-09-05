@@ -65,6 +65,7 @@ Route::middleware(['auth', '2fa'])->group(function () {
     Route::post('/settings/account', 'SettingController@destroy')->name('account.destroy');
 
     Route::post('/settings/default-recipient', 'DefaultRecipientController@update')->name('settings.default_recipient');
+    Route::post('/settings/edit-default-recipient', 'DefaultRecipientController@edit')->name('settings.edit_default_recipient');
 
     Route::post('/settings/from-name', 'FromNameController@update')->name('settings.from_name');
 
