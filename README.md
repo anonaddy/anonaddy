@@ -37,7 +37,7 @@ Here are a few reasons I can think of:
 * Bring your own GPG/OpenPGP key to encrypt your forwarded emails (and the option to replace subjects)
 * No adverts
 * No analytics or trackers (just server access logs)
-* No third party content
+* No third party content (excluding stripe on the subscription page)
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
@@ -91,6 +91,7 @@ When you delete your account the following happens:
 * All of your custom domains are deleted from the database
 * Your user details are deleted from the database
 * Your username and any additional usernames you added are encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
+* Any subscription information is deleted from the database
 
 The reason aliases with a custom domain are soft deleted (a deleted_at column is filled in the database) is to ensure that nobody else can register your same domain in the future and then sign up to our site and receive emails for aliases you have previously used.
 
@@ -138,7 +139,7 @@ Not unless you are really going to town. Each user is throttled to 200 emails pe
 
 #### **Is there a limit to how many aliases I can create?**
 
-Currently you are limited to creating 10 new aliases per hour. If you try to create more than this the emails will be deferred until you are back below the limit.
+Currently you are limited to creating 10 new aliases per hour on the free plan and 50 per hour on the pro plan. If you try to create more than this the emails will be deferred until you are back below the limit.
 
 #### **How is my bandwidth calculated?**
 
