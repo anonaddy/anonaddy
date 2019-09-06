@@ -37,7 +37,7 @@ Here are a few reasons I can think of:
 * Bring your own GPG/OpenPGP key to encrypt your forwarded emails (and the option to replace subjects)
 * No adverts
 * No analytics or trackers (just server access logs)
-* No third party content (excluding stripe on the subscription page)
+* No third party content (excluding stripe.js on the subscription page)
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
@@ -70,6 +70,11 @@ If you're concerned that your aliases are all linked by your username e.g. @john
 
 1. You can generate UUID aliases instead, these are all under the root domain and cannot be linked to a user.
 2. You can add additional usernames and separate your aliases under your these. e.g. you could have one username for personal stuff, another for work, another for hobbies etc.
+
+
+#### **Where is the server located?**
+
+The server is located in Amsterdam, Netherlands with [Greenhost.net](https://greenhost.net/). Greenhost focuses greatly on privacy and security and their servers run entirely on Dutch wind energy.
 
 
 #### **What if I don't trust you?**
@@ -130,7 +135,7 @@ The following is in place to help prevent spam:
 
 #### **What do you use to do DNS lookups on domain names?**
 
-The server is running a local DNS caching server to improve the speed of queries. Cloudflare's (1.1.1.1) is used as a fallback.
+The server is running a local DNS caching server to improve the speed of queries. DNS.WATCH resolvers are used as a fallback.
 
 
 #### **Is there a limit to how many emails I can forward?**

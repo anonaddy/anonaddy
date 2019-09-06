@@ -14,7 +14,7 @@
         "axios": "^0.18.1",
         "cross-env": "^5.2.1",
         "dayjs": "^1.8.16",
-        "laravel-mix": "^4.1.2",
+        "laravel-mix": "^4.1.4",
         "laravel-mix-purgecss": "^4.1.0",
         "lodash": "^4.17.15",
         "portal-vue": "^2.1.6",
