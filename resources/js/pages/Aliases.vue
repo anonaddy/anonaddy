@@ -490,6 +490,10 @@
         <p class="mb-4">
           <b>86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</b>
         </p>
+        <p>
+          Useful if you do not wish to include your username in the email as a potential link
+          between aliases.
+        </p>
       </div>
     </div>
 
@@ -500,14 +504,47 @@
         >
           Generate new UUID alias
         </h2>
+
         <p class="mt-4 text-grey-700">
-          This will generate a new unique alias in the form of<br /><br />
-          86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}<br /><br />
-          Useful if you do not wish to include your username in the email as a potential link
-          between aliases.<br /><br />
+          This will generate a new unique alias in the form of
+          <span class="text-sm block mt-2 font-semibold"
+            >86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</span
+          >
+        </p>
+
+        <p class="mt-2 text-grey-700">
           Other aliases e.g. alias@{{ subdomain }} are created automatically when they receive their
           first email.
         </p>
+
+        <label for="banner_location" class="block text-grey-700 text-sm my-2">
+          Alias Domain:
+        </label>
+        <div class="block relative w-full">
+          <select
+            v-model="generateAliasDomain"
+            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
+            required
+          >
+            <option v-for="domainOption in allDomains" :key="domainOption" :value="domainOption">{{
+              domainOption
+            }}</option>
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+          >
+            <svg
+              class="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+              />
+            </svg>
+          </div>
+        </div>
+
         <div class="mt-6">
           <button
             @click="generateNewAlias"
@@ -658,6 +695,10 @@ export default {
       type: String,
       required: true,
     },
+    allDomains: {
+      type: Array,
+      required: true,
+    },
   },
   components: {
     Modal,
@@ -682,6 +723,7 @@ export default {
       editAliasRecipientsModalOpen: false,
       generateAliasModalOpen: false,
       generateAliasLoading: false,
+      generateAliasDomain: this.domain,
       recipientsAliasToEdit: {},
       aliasRecipientsToEdit: [],
     }
@@ -805,9 +847,15 @@ export default {
       this.generateAliasLoading = true
 
       axios
-        .post('/aliases', JSON.stringify({}), {
-          headers: { 'Content-Type': 'application/json' },
-        })
+        .post(
+          '/aliases',
+          JSON.stringify({
+            domain: this.generateAliasDomain,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
         .then(({ data }) => {
           this.generateAliasLoading = false
           this.aliases.push(data.data)

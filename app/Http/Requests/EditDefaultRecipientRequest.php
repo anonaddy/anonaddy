@@ -27,7 +27,7 @@ class EditDefaultRecipientRequest extends FormRequest
         return [
             'email' => [
                 'required',
-                'email',
+                'email:rfc,dns',
                 'max:254',
                 'confirmed',
                 new RegisterUniqueRecipient,

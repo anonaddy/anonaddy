@@ -146,7 +146,7 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_generate_new_alias()
     {
-        $response = $this->json('POST', '/aliases', []);
+        $response = $this->json('POST', '/aliases', ['domain' => 'anonaddy.com']);
 
         $response->assertStatus(200);
         $this->assertCount(1, $this->user->aliases);

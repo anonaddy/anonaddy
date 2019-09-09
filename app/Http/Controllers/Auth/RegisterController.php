@@ -66,7 +66,7 @@ class RegisterController extends Controller
             ],
             'email' => [
                 'required',
-                'email',
+                'email:rfc,dns',
                 'max:254',
                 'confirmed',
                 new RegisterUniqueRecipient

@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\UniqueRecipient;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreRecipientRequest extends FormRequest
+class StoreAliasRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,10 @@ class StoreRecipientRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => [
+            'domain' => [
                 'required',
                 'string',
-                'max:254',
-                'email:rfc,dns',
-                new UniqueRecipient
+                Rule::in(config('anonaddy.all_domains'))
             ]
         ];
     }

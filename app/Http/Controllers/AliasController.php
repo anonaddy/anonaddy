@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
 use Ramsey\Uuid\Uuid;
@@ -22,7 +23,7 @@ class AliasController extends Controller
         ]);
     }
 
-    public function store()
+    public function store(StoreAliasRequest $request)
     {
         if (user()->hasExceededNewAliasLimit()) {
             return response('', 429);
@@ -32,9 +33,9 @@ class AliasController extends Controller
 
         $alias = user()->aliases()->create([
             'id' => $uuid,
-            'email' => $uuid.'@'.config('anonaddy.domain'),
+            'email' => $uuid.'@'.$request->domain,
             'local_part' => $uuid,
-            'domain' => config('anonaddy.domain')
+            'domain' => $request->domain
         ]);
 
         return new AliasResource($alias->fresh());
