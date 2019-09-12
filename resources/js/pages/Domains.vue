@@ -249,7 +249,6 @@
                 :disabled="recheckRecordsLoading"
               >
                 Recheck domain
-                <loader v-if="recheckRecordsLoading" />
               </button>
             </div>
           </td>

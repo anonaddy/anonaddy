@@ -10,7 +10,7 @@ class PasswordController extends Controller
     public function update(UpdatePasswordRequest $request)
     {
         if (!Hash::check($request->current, user()->password)) {
-            return back()->withErrors(['current' => 'Current password incorrect']);
+            return redirect(url()->previous().'#update-password')->withErrors(['current' => 'Current password incorrect']);
         }
 
         user()->password = Hash::make($request->password);

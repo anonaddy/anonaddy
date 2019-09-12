@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
@@ -34,6 +35,41 @@ class LoginTest extends TestCase
 
         $response
             ->assertRedirect('/')
+            ->assertSessionHasNoErrors();
+    }
+
+    /** @test */
+    public function user_can_login_successfully_using_backup_code()
+    {
+        $this->user->update([
+            'two_factor_enabled' => true,
+            'two_factor_secret' => 'secret',
+            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+        ]);
+
+        $response = $this->post('/login', [
+            'username' => 'johndoe',
+            'password' => 'mypassword'
+        ]);
+
+        $response
+            ->assertRedirect('/')
+            ->assertSessionHasNoErrors();
+
+        $secondFactor = $this->get('/recipients');
+
+        $secondFactor->assertSee('2nd Factor Authentication');
+
+        $backupCodeView = $this->get('/login/backup-code');
+
+        $backupCodeView->assertSee('Login Using 2FA Backup Code');
+
+        $backupCodeLogin = $this->post('/login/backup-code', [
+            'backup_code' => $code
+        ]);
+
+        $backupCodeLogin
+            ->assertRedirect('/recipients')
             ->assertSessionHasNoErrors();
     }
 }

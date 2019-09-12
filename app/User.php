@@ -29,7 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_recipient_id',
         'password',
         'two_factor_enabled',
-        'two_factor_secret'
+        'two_factor_secret',
+        'two_factor_backup_code'
     ];
 
     protected $encrypted = [
@@ -46,7 +47,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
-        'two_factor_secret'
+        'two_factor_secret',
+        'two_factor_backup_code'
     ];
 
     /**
@@ -57,7 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'id' => 'string',
         'default_recipient_id' => 'string',
-        'two_factor_enabled' => 'boolean',
+        'two_factor_enabled' => 'boolean'
     ];
 
     protected $dates = [

@@ -15,6 +15,10 @@ Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registrati
 
 Route::post('/login/2fa', 'TwoFactorAuthController@authenticateTwoFactor')->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
 
+Route::get('/login/backup-code', 'BackupCodeController@index')->name('login.backup_code.index')->middleware('auth');
+Route::post('/login/backup-code', 'BackupCodeController@login')->name('login.backup_code.login')->middleware('auth');
+
+
 Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::get('/', 'AliasController@index')->name('aliases.index');
     Route::post('/aliases', 'AliasController@store')->name('aliases.store');

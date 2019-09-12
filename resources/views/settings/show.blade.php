@@ -4,6 +4,20 @@
     <div class="container py-8">
         @include('shared.status')
 
+        @if(session('backupCode'))
+            <div class="text-sm border-t-8 rounded text-yellow-800 border-yellow-600 bg-yellow-100 px-3 py-4 mb-4" role="alert">
+                <div class="flex items-center mb-2">
+                    <span class="rounded-full bg-yellow-400 uppercase px-2 py-1 text-xs font-bold mr-2">Important</span>
+                    <div>
+                        2FA enabled successfully, please <b>make a copy of your backup code below</b>. If you lose your 2FA device you can use this backup code to disable 2FA on your account. <b>This is the only time this code will be displayed, so be sure not to lose it!</b>
+                    </div>
+                </div>
+                <pre class="flex p-3 text-grey-900 bg-white border rounded">
+                    <code class="break-all whitespace-normal">{{ session('backupCode') }}</code>
+                </pre>
+            </div>
+        @endif
+
         <div class="mb-4">
             <h2 class="text-3xl font-bold">
                 Usage
@@ -37,7 +51,7 @@
 
             @if($user->hasVerifiedDefaultRecipient())
 
-                <form class="mb-16" method="POST" action="{{ route('settings.default_recipient') }}">
+                <form method="POST" action="{{ route('settings.default_recipient') }}">
                     @csrf
 
                     <div class="mb-6">
@@ -83,7 +97,7 @@
 
             @else
 
-                <form class="mb-16" method="POST" action="{{ route('settings.edit_default_recipient') }}">
+                <form method="POST" action="{{ route('settings.edit_default_recipient') }}">
                     @csrf
 
                     <div class="mb-6">
@@ -132,7 +146,7 @@
 
             @endif
 
-            <form class="mb-16" method="POST" action="{{ route('settings.password') }}">
+            <form id="update-password" method="POST" action="{{ route('settings.password') }}" class="pt-16">
                 @csrf
 
                 <div class="mb-6">
@@ -188,97 +202,98 @@
             </form>
 
 
+            <div id="two-factor" class="pt-16">
+                @if($user->two_factor_enabled)
 
-            @if($user->two_factor_enabled)
+                    <form method="POST" action="{{ route('settings.2fa_disable') }}">
+                        @csrf
 
-                <form method="POST" action="{{ route('settings.2fa_disable') }}">
-                    @csrf
+                        <div class="mb-6">
+
+                            <h3 class="font-bold text-xl">
+                                Disable 2 Factor Authentication
+                            </h3>
+
+                            <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                            <p class="mt-6">To disable 2 factor authentication enter your password below. You can always enable it again later if you wish.</p>
+
+                            <div class="mt-6 flex flex-wrap">
+                                <label for="current_password_2fa" class="block text-grey-700 text-sm mb-2">
+                                    {{ __('Current Password') }}:
+                                </label>
+
+                                <input id="current_password_2fa" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('current_password_2fa') ? ' border-red-500' : '' }}" name="current_password_2fa" placeholder="********" required>
+
+                                @if ($errors->has('current_password_2fa'))
+                                    <p class="text-red-500 text-xs italic mt-4">
+                                        {{ $errors->first('current_password_2fa') }}
+                                    </p>
+                                @endif
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                            {{ __('Disable 2FA') }}
+                        </button>
+
+                    </form>
+
+                @else
+
 
                     <div class="mb-6">
 
                         <h3 class="font-bold text-xl">
-                            Disable 2 Factor Authentication
+                            Enable 2 Factor Authentication
                         </h3>
 
                         <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
-                        <p class="mt-6">To disable 2 factor authentication enter your password below. You can always enable it again later if you wish.</p>
+                        <p class="mt-6">2 factor authentication requires the use of Google Authenticator or another compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively, you can use the code below. Make sure that you write down your secret code in a safe place.</p>
 
-                        <div class="mt-6 flex flex-wrap">
-                            <label for="current_password_2fa" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Current Password') }}:
+                        <div>
+                            <img src="{{ $qrCode }}">
+                            <p class="mb-2">Secret: {{ $authSecret }}</p>
+                            <form method="POST" action="{{ route('settings.2fa_regenerate') }}">
+                                @csrf
+                                <input type="submit" class="text-indigo-900 bg-transparent cursor-pointer" value="Click here to regenerate your secret key">
+
+                                @if ($errors->has('regenerate_2fa'))
+                                    <p class="text-red-500 text-xs italic mt-4">
+                                        {{ $errors->first('regenerate_2fa') }}
+                                    </p>
+                                @endif
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <form method="POST" action="{{ route('settings.2fa_enable') }}">
+                        @csrf
+                        <div class="my-6 flex flex-wrap">
+                            <label for="two_factor_token" class="block text-grey-700 text-sm mb-2">
+                                {{ __('Verify and Enable') }}:
                             </label>
 
-                            <input id="current_password_2fa" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('current_password_2fa') ? ' border-red-500' : '' }}" name="current_password_2fa" placeholder="********" required>
+                            <div class="block relative w-full">
+                                <input id="two_factor_token" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="two_factor_token" placeholder="123456" />
+                            </div>
 
-                            @if ($errors->has('current_password_2fa'))
+                            @if ($errors->has('two_factor_token'))
                                 <p class="text-red-500 text-xs italic mt-4">
-                                    {{ $errors->first('current_password_2fa') }}
+                                    {{ $errors->first('two_factor_token') }}
                                 </p>
                             @endif
                         </div>
+                        <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                            {{ __('Verify and Enable') }}
+                        </button>
+                    </form>
 
-                    </div>
-
-                    <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
-                        {{ __('Disable 2FA') }}
-                    </button>
-
-                </form>
-
-            @else
-
-
-                <div class="mb-6">
-
-                    <h3 class="font-bold text-xl">
-                        Enable 2 Factor Authentication
-                    </h3>
-
-                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
-
-                    <p class="mt-6">2 factor authentication requires the use of Google Authenticator or another compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively, you can use the code below. Make sure that you write down your secret code in a safe place.</p>
-
-                    <div>
-                        <img src="{{ $qrCode }}">
-                        <p class="mb-2">Secret: {{ $authSecret }}</p>
-                        <form method="POST" action="{{ route('settings.2fa_regenerate') }}">
-                            @csrf
-                            <input type="submit" class="text-indigo-900 bg-transparent cursor-pointer" value="Click here to regenerate your secret key">
-
-                            @if ($errors->has('regenerate_2fa'))
-                                <p class="text-red-500 text-xs italic mt-4">
-                                    {{ $errors->first('regenerate_2fa') }}
-                                </p>
-                            @endif
-                        </form>
-                    </div>
-
-                </div>
-
-                <form method="POST" action="{{ route('settings.2fa_enable') }}">
-                    @csrf
-                    <div class="my-6 flex flex-wrap">
-                        <label for="two_factor_token" class="block text-grey-700 text-sm mb-2">
-                            {{ __('Verify and Enable') }}:
-                        </label>
-
-                        <div class="block relative w-full">
-                            <input id="two_factor_token" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="two_factor_token" placeholder="123456" />
-                        </div>
-
-                        @if ($errors->has('two_factor_token'))
-                            <p class="text-red-500 text-xs italic mt-4">
-                                {{ $errors->first('two_factor_token') }}
-                            </p>
-                        @endif
-                    </div>
-                    <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
-                        {{ __('Verify and Enable') }}
-                    </button>
-                </form>
-
-            @endif
+                @endif
+            </div>
 
         </div>
 
