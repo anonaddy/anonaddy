@@ -257,9 +257,9 @@ class ReceiveEmail extends Command
         return collect($this->option('recipient'))->map(function ($item, $key) {
             return [
                 'email' => $item,
-                'local_part' => $this->option('local_part')[$key],
+                'local_part' => strtolower($this->option('local_part')[$key]),
                 'extension' => $this->option('extension')[$key],
-                'domain' => $this->option('domain')[$key]
+                'domain' => strtolower($this->option('domain')[$key])
             ];
         });
     }

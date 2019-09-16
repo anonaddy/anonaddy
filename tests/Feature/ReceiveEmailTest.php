@@ -72,6 +72,45 @@ class ReceiveEmailTest extends TestCase
     }
 
     /** @test */
+    public function it_can_forward_email_from_file_with_capitals()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_caps.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['EBAY@JOHNDOE.ANONADDY.COM'],
+                '--local_part' => ['EBAY'],
+                '--extension' => [''],
+                '--domain' => ['JOHNDOE.ANONADDY.COM'],
+                '--size' => '1000'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertEquals(1, $this->user->aliases()->count());
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '1000'
+        ]);
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) {
+            return $mail->hasTo($this->user->email);
+        });
+    }
+
+    /** @test */
     public function it_can_forward_email_from_file_with_attachment()
     {
         Mail::fake();
