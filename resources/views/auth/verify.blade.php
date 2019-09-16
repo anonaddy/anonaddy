@@ -20,7 +20,7 @@
 
                     <div class="w-full flex flex-wrap mt-8">
                         <p class="leading-normal mb-6 text-center">
-                            {{ __('Before proceeding, please check your email for a verification link.') }}
+                            {{ __('Before proceeding, please check your email for a verification link.') }} This link will expire after 1 hour.
                         </p>
 
                         <a class="bg-cyan-400 w-full text-center hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:shadow-outline no-underline mx-auto" href="{{ route('verification.resend') }}">

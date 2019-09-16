@@ -40,7 +40,7 @@
 
                         <div class="flex flex-wrap mb-6">
                             <label for="email" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Email') }}:
+                                Default Recipient Email::
                             </label>
 
                             <input id="email" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>

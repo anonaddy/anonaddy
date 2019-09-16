@@ -81,24 +81,26 @@ class ReceiveEmail extends Command
                     })
                     ->first();
 
-                $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain));
+                if ($parentDomain) {
+                    $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain));
 
-                if ($subdomain === 'unsubscribe') {
-                    $this->handleUnsubscribe($recipient);
-                    continue;
-                }
-
-                $user = User::where('username', $subdomain)->first();
-
-                if (is_null($user)) {
-                    // Check if this is a custom domain.
-                    if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
-                        $user = $customDomain->user;
+                    if ($subdomain === 'unsubscribe') {
+                        $this->handleUnsubscribe($recipient);
+                        continue;
                     }
 
                     // Check if this is an additional username.
                     if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
                         $user = $additionalUsername->user;
+                    } else {
+                        $user = User::where('username', $subdomain)->first();
+                    }
+                }
+
+                if (!isset($user)) {
+                    // Check if this is a custom domain.
+                    if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
+                        $user = $customDomain->user;
                     }
 
                     // Check if this is a uuid generated alias.
