@@ -127,330 +127,153 @@
         </button>
       </div>
     </div>
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table v-if="initialAliases.length" class="w-full whitespace-no-wrap">
-        <tr class="text-left font-semibold text-grey-500 text-sm tracking-wider">
-          <th class="pl-4 pr-2 py-4">
-            <div class="flex items-center">
-              Created
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('created_at', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('created_at', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('created_at', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('created_at', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="px-2 py-4">
-            <div class="flex items-center">
-              Alias
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('email', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('email', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('email', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('email', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="px-2 py-4">
-            <div class="flex items-center">
-              Recipients
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('recipients', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('recipients', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('recipients', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('recipients', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="px-2 py-4">
-            <div class="flex items-center">
-              Description
-            </div>
-          </th>
-          <th class="px-2 py-4">
-            <div class="flex items-center">
-              Forwarded
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('emails_forwarded', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('emails_forwarded', 'asc'),
-                  }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('emails_forwarded', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('emails_forwarded', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="px-2 py-4 items-center">
-            <div class="flex items-center">
-              Blocked
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('emails_blocked', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('emails_blocked', 'asc'),
-                  }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('emails_blocked', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('emails_blocked', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="px-2 py-4 items-center">
-            <div class="flex items-center">
-              Replies
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('emails_replied', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('emails_replied', 'asc'),
-                  }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('emails_replied', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('emails_replied', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="px-2 py-4 items-center" colspan="2">
-            <div class="flex items-center">
-              Active
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('active', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('active', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('active', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('active', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-        </tr>
-        <tr
-          v-for="alias in queriedAliases"
-          :key="alias.id"
-          class="hover:bg-grey-50 focus-within:bg-grey-50 h-20"
+
+    <vue-good-table
+      v-if="initialAliases.length"
+      @on-search="debounceToolips"
+      :columns="columns"
+      :rows="rows"
+      :search-options="{
+        enabled: true,
+        skipDiacritics: true,
+        externalQuery: search,
+        placeholder: 'Search aliases',
+      }"
+      :sort-options="{
+        enabled: true,
+      }"
+      styleClass="vgt-table"
+    >
+      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+        No aliases found for that search!
+      </div>
+      <template slot="table-row" slot-scope="props">
+        <span
+          v-if="props.column.field == 'created_at'"
+          class="tooltip outline-none text-sm"
+          :data-tippy-content="props.row.created_at | formatDate"
+          >{{ props.row.created_at | timeAgo }}
+        </span>
+        <span v-else-if="props.column.field == 'email'" class="block">
+          <span
+            class="text-grey-400 tooltip cursor-pointer outline-none"
+            data-tippy-content="Click to copy"
+            v-clipboard="() => getAliasEmail(props.row)"
+            v-clipboard:success="clipboardSuccess"
+            v-clipboard:error="clipboardError"
+            ><span class="font-semibold text-indigo-800">{{
+              getAliasLocalPart(props.row) | truncate(60)
+            }}</span
+            ><span v-if="getAliasLocalPart(props.row).length <= 60">{{
+              ('@' + props.row.domain) | truncate(60 - getAliasLocalPart(props.row).length)
+            }}</span>
+          </span>
+          <div v-if="aliasIdToEdit === props.row.id" class="flex items-center">
+            <input
+              @keyup.enter="editAlias(rows[props.row.originalIndex])"
+              @keyup.esc="aliasIdToEdit = aliasDescriptionToEdit = ''"
+              v-model="aliasDescriptionToEdit"
+              type="text"
+              class="flex-grow text-sm appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              :class="aliasDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'"
+              placeholder="Add description"
+              tabindex="0"
+              autofocus
+            />
+            <icon
+              name="close"
+              class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
+              @click.native="aliasIdToEdit = aliasDescriptionToEdit = ''"
+            />
+            <icon
+              name="save"
+              class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
+              @click.native="editAlias(rows[props.row.originalIndex])"
+            />
+          </div>
+          <div v-else-if="props.row.description" class="flex items-center">
+            <span class="inline-block text-grey-400 text-sm py-1 border border-transparent">
+              {{ props.row.description | truncate(60) }}
+            </span>
+            <icon
+              name="edit"
+              class="inline-block w-6 h-6 ml-2 text-grey-200 fill-current cursor-pointer"
+              @click.native="
+                ;(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = props.row.description)
+              "
+            />
+          </div>
+          <div v-else>
+            <span
+              class="inline-block text-grey-200 text-sm cursor-pointer py-1 border border-transparent"
+              @click="aliasIdToEdit = props.row.id"
+              >Add description</span
+            >
+          </div>
+        </span>
+        <span
+          v-else-if="props.column.field == 'recipients'"
+          class="flex items-center justify-center"
         >
-          <td class="border-grey-200 border-t">
-            <div class="pl-4 pr-2 py-4 flex items-center">
-              <span
-                class="tooltip outline-none text-sm"
-                :data-tippy-content="alias.created_at | formatDate"
-                >{{ alias.created_at | timeAgo }}</span
-              >
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 py-4 flex items-center">
-              <span
-                class="tooltip cursor-pointer outline-none"
-                data-tippy-content="Click to copy"
-                v-clipboard="() => getAliasEmail(alias)"
-                v-clipboard:success="clipboardSuccess"
-                v-clipboard:error="clipboardError"
-              >
-                <span class="font-semibold text-indigo-800">{{
-                  alias.local_part | truncate(36)
-                }}</span>
-                <span class="block text-grey-400 text-sm">{{
-                  getAliasEmail(alias) | truncate(40)
-                }}</span>
-              </span>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 flex items-center">
-              <span
-                v-if="alias.recipients.length && alias.id !== recipientsAliasToEdit.id"
-                class="tooltip outline-none"
-                :data-tippy-content="recipientsTooltip(alias.recipients)"
-                >{{ alias.recipients[0].email | truncate(25) }}
-                <span
-                  v-if="alias.recipients.length > 1"
-                  class="block text-center text-grey-500 text-sm"
-                >
-                  + {{ alias.recipients.length - 1 }}</span
-                >
-              </span>
-              <span v-else-if="alias.id === recipientsAliasToEdit.id">{{
-                aliasRecipientsToEdit.length ? aliasRecipientsToEdit.length : '1'
-              }}</span>
-              <span
-                v-else
-                class="py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
-                :data-tippy-content="defaultRecipient.email"
-                >default</span
-              >
-
-              <icon
-                name="edit"
-                class="ml-2 block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                @click.native="openAliasRecipientsModal(alias)"
-              />
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 py-4 text-sm">
-              <div
-                v-if="aliasIdToEdit === alias.id"
-                class="w-full flex items-center justify-between"
-              >
-                <input
-                  @keyup.enter="editAlias(alias)"
-                  @keyup.esc="aliasIdToEdit = aliasDescriptionToEdit = ''"
-                  v-model="aliasDescriptionToEdit"
-                  type="text"
-                  class="appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
-                  :class="
-                    aliasDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
-                  "
-                  placeholder="Add description"
-                  tabindex="0"
-                  autofocus
-                />
-                <icon
-                  name="close"
-                  class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-                  @click.native="aliasIdToEdit = aliasDescriptionToEdit = ''"
-                />
-                <icon
-                  name="save"
-                  class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-                  @click.native="editAlias(alias)"
-                />
-              </div>
-              <div v-else-if="alias.description" class="flex items-center justify-around">
-                <span
-                  class="tooltip outline-none"
-                  :data-tippy-content="alias.description"
-                  v-clipboard="() => alias.description"
-                  v-clipboard:success="clipboardSuccess"
-                  v-clipboard:error="clipboardError"
-                >
-                  <icon
-                    name="desc"
-                    class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  />
-                </span>
-                <icon
-                  name="edit"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  @click.native="
-                    ;(aliasIdToEdit = alias.id), (aliasDescriptionToEdit = alias.description)
-                  "
-                />
-              </div>
-              <div v-else class="w-full flex justify-center">
-                <icon
-                  name="plus"
-                  class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  @click.native="aliasIdToEdit = alias.id"
-                />
-              </div>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 py-4 flex items-center justify-center font-semibold text-indigo-800">
-              {{ alias.emails_forwarded }}
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 py-4 flex items-center justify-center font-semibold text-indigo-800">
-              {{ alias.emails_blocked }}
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 py-4 flex items-center justify-center font-semibold text-indigo-800">
-              {{ alias.emails_replied }}
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="px-2 py-4 flex items-center justify-center">
-              <Toggle
-                v-model="alias.active"
-                @on="activateAlias(alias)"
-                @off="deactivateAlias(alias)"
-              />
-            </div>
-          </td>
-          <td class="border-grey-200 border-t w-px">
-            <div class="px-4 flex items-center justify-center outline-none" tabindex="-1">
-              <icon
-                name="trash"
-                class="block w-6 h-6 text-grey-200 fill-current  cursor-pointer"
-                @click.native="openDeleteModal(alias.id)"
-              />
-            </div>
-          </td>
-        </tr>
-        <tr v-if="queriedAliases.length === 0">
-          <td
-            class="border-grey-200 border-t px-6 py-4 text-center h-24 text-lg text-grey-700"
-            colspan="9"
+          <span
+            v-if="props.row.recipients.length && props.row.id !== recipientsAliasToEdit.id"
+            class="inline-block tooltip outline-none font-semibold text-indigo-800"
+            :data-tippy-content="recipientsTooltip(props.row.recipients)"
           >
-            No aliases found for that search!
-          </td>
-        </tr>
-      </table>
+            {{ props.row.recipients.length }}
+          </span>
+          <span v-else-if="props.row.id === recipientsAliasToEdit.id">{{
+            aliasRecipientsToEdit.length ? aliasRecipientsToEdit.length : '1'
+          }}</span>
+          <span
+            v-else
+            class="py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
+            :data-tippy-content="defaultRecipient.email"
+            >default</span
+          >
 
-      <div v-else class="p-8 text-center text-lg text-grey-700">
+          <icon
+            name="edit"
+            class="ml-2 inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            @click.native="openAliasRecipientsModal(props.row)"
+          />
+        </span>
+        <span
+          v-else-if="props.column.field == 'emails_forwarded'"
+          class="font-semibold text-indigo-800"
+        >
+          {{ props.row.emails_forwarded }}
+        </span>
+        <span
+          v-else-if="props.column.field == 'emails_blocked'"
+          class="font-semibold text-indigo-800"
+        >
+          {{ props.row.emails_blocked }}
+        </span>
+        <span
+          v-else-if="props.column.field == 'emails_replied'"
+          class="font-semibold text-indigo-800"
+        >
+          {{ props.row.emails_replied }}
+        </span>
+        <span v-else-if="props.column.field === 'active'" class="flex items-center justify-center">
+          <Toggle
+            v-model="rows[props.row.originalIndex].active"
+            @on="activateAlias(props.row.id)"
+            @off="deactivateAlias(props.row.id)"
+          />
+        </span>
+        <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
+          <icon
+            name="trash"
+            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            @click.native="openDeleteModal(props.row.id)"
+          />
+        </span>
+      </template>
+    </vue-good-table>
+    <div v-else class="bg-white rounded shadow overflow-x-auto">
+      <div class="p-8 text-center text-lg text-grey-700">
         <h1 class="mb-6 text-2xl text-indigo-800 font-semibold">
           It doesn't look like you have any aliases yet!
         </h1>
@@ -710,7 +533,6 @@ export default {
   },
   data() {
     return {
-      aliases: this.initialAliases,
       search: '',
       aliasIdToEdit: '',
       aliasDescriptionToEdit: '',
@@ -726,12 +548,67 @@ export default {
       generateAliasDomain: this.domain,
       recipientsAliasToEdit: {},
       aliasRecipientsToEdit: [],
+      columns: [
+        {
+          label: 'Created',
+          field: 'created_at',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Alias',
+          field: 'email',
+        },
+        {
+          label: 'Recipients',
+          field: 'recipients',
+          tdClass: 'text-center',
+          sortable: true,
+          sortFn: this.sortRecipients,
+        },
+        {
+          label: 'Description',
+          field: 'description',
+          sortable: false,
+          hidden: true,
+        },
+        {
+          label: 'Forwarded',
+          field: 'emails_forwarded',
+          type: 'number',
+          tdClass: 'text-center',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Blocked',
+          field: 'emails_blocked',
+          type: 'number',
+          tdClass: 'text-center',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Replies',
+          field: 'emails_replied',
+          type: 'number',
+          tdClass: 'text-center',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Active',
+          field: 'active',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
+          label: '',
+          field: 'actions',
+          sortable: false,
+          globalSearchDisabled: true,
+        },
+      ],
+      rows: this.initialAliases,
     }
   },
   watch: {
-    queriedAliases: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
     aliasIdToEdit: _.debounce(function() {
       this.addTooltips()
     }, 50),
@@ -740,14 +617,14 @@ export default {
     }, 50),
   },
   computed: {
-    queriedAliases() {
-      return _.filter(this.aliases, alias => alias.email.includes(this.search))
+    activeUuidAliases() {
+      return _.filter(this.rows, alias => alias.id === alias.local_part && alias.active)
     },
     totalActive() {
-      return _.filter(this.aliases, 'active').length
+      return _.filter(this.rows, 'active').length
     },
     totalInactive() {
-      return _.reject(this.aliases, 'active').length
+      return _.reject(this.rows, 'active').length
     },
   },
   methods: {
@@ -757,11 +634,11 @@ export default {
         arrowType: 'round',
       })
     },
+    debounceToolips: _.debounce(function() {
+      this.addTooltips()
+    }, 50),
     recipientsTooltip(recipients) {
       return _.reduce(recipients, (list, recipient) => list + `${recipient.email}<br>`, '')
-    },
-    isCurrentSort(col, dir) {
-      return this.currentSort === col && this.currentSortDir === dir
     },
     openDeleteModal(id) {
       this.deleteAliasModalOpen = true
@@ -777,7 +654,7 @@ export default {
       axios
         .delete(`/aliases/${id}`)
         .then(response => {
-          this.aliases = _.filter(this.aliases, aliases => aliases.id !== id)
+          this.rows = _.reject(this.rows, alias => alias.id === id)
           this.deleteAliasModalOpen = false
           this.deleteAliasLoading = false
         })
@@ -786,20 +663,6 @@ export default {
           this.deleteAliasModalOpen = false
           this.deleteAliasLoading = false
         })
-    },
-    sort(col, dir) {
-      if (this.currentSort === col && this.currentSortDir === dir) {
-        this.currentSort = 'created_at'
-        this.currentSortDir = 'desc'
-      } else {
-        this.currentSort = col
-        this.currentSortDir = dir
-      }
-
-      this.aliases = _.orderBy(this.aliases, [this.currentSort], [this.currentSortDir])
-    },
-    reSort() {
-      this.aliases = _.orderBy(this.aliases, [this.currentSort], [this.currentSortDir])
     },
     openAliasRecipientsModal(alias) {
       this.editAliasRecipientsModalOpen = true
@@ -826,7 +689,7 @@ export default {
           }
         )
         .then(response => {
-          let alias = _.find(this.aliases, ['id', this.recipientsAliasToEdit.id])
+          let alias = _.find(this.rows, ['id', this.recipientsAliasToEdit.id])
           alias.recipients = this.aliasRecipientsToEdit
 
           this.editAliasRecipientsModalOpen = false
@@ -858,8 +721,7 @@ export default {
         )
         .then(({ data }) => {
           this.generateAliasLoading = false
-          this.aliases.push(data.data)
-          this.reSort()
+          this.rows.push(data.data)
           this.generateAliasModalOpen = false
           this.success('New alias generated successfully')
         })
@@ -899,12 +761,12 @@ export default {
           this.error()
         })
     },
-    activateAlias(alias) {
+    activateAlias(id) {
       axios
         .post(
           `/active-aliases`,
           JSON.stringify({
-            id: alias.id,
+            id: id,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -917,9 +779,9 @@ export default {
           this.error()
         })
     },
-    deactivateAlias(alias) {
+    deactivateAlias(id) {
       axios
-        .delete(`/active-aliases/${alias.id}`)
+        .delete(`/active-aliases/${id}`)
         .then(response => {
           //
         })
@@ -931,6 +793,12 @@ export default {
       return alias.extension
         ? `${alias.local_part}+${alias.extension}@${alias.domain}`
         : alias.email
+    },
+    getAliasLocalPart(alias) {
+      return alias.extension ? `${alias.local_part}+${alias.extension}` : alias.local_part
+    },
+    sortRecipients(x, y) {
+      return x.length < y.length ? -1 : x.length > y.length ? 1 : 0
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

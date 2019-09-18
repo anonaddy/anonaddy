@@ -14,10 +14,12 @@ window.Vue = require('vue')
 import PortalVue from 'portal-vue'
 import Clipboard from 'v-clipboard'
 import Notifications from 'vue-notification'
+import VueGoodTablePlugin from 'vue-good-table'
 
 Vue.use(PortalVue)
 Vue.use(Clipboard)
 Vue.use(Notifications)
+Vue.use(VueGoodTablePlugin)
 
 Vue.component('loader', require('./components/Loader.vue').default)
 Vue.component('dropdown', require('./components/DropdownNav.vue').default)

@@ -112,7 +112,7 @@ class ReceiveEmail extends Command
                 }
 
                 // If there is still no user or the user has no verified default recipient then continue.
-                if (is_null($user) || !$user->hasVerifiedDefaultRecipient()) {
+                if (!isset($user) || !$user->hasVerifiedDefaultRecipient()) {
                     continue;
                 }
 
@@ -152,7 +152,7 @@ class ReceiveEmail extends Command
         if (!is_null($alias) && filter_var($displayTo, FILTER_VALIDATE_EMAIL)) {
             $emailData = new EmailData($this->parser);
 
-            $message = (new ReplyToEmail($user, $alias, $emailData));
+            $message = new ReplyToEmail($user, $alias, $emailData);
 
             Mail::to($displayTo)->queue($message);
 
@@ -192,7 +192,7 @@ class ReceiveEmail extends Command
                                     ->oldest()
                                     ->get()
                                     ->filter(function ($item, $key) use ($keys) {
-                                        return in_array($key+1, $keys) && ! is_null($item['email_verified_at']);
+                                        return in_array($key+1, $keys) && !is_null($item['email_verified_at']);
                                     })
                                     ->pluck('id')
                                     ->take(10)
@@ -210,7 +210,7 @@ class ReceiveEmail extends Command
         $emailData = new EmailData($this->parser);
 
         $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
-            $message = (new ForwardEmail($alias, $emailData, $recipient->should_encrypt ? $recipient->fingerprint : null));
+            $message = new ForwardEmail($alias, $emailData, $recipient->should_encrypt ? $recipient->fingerprint : null);
 
             Mail::to($recipient->email)->queue($message);
         });
