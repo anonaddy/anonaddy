@@ -206,7 +206,7 @@
           <div v-else>
             <span
               class="inline-block text-grey-200 text-sm cursor-pointer py-1 border border-transparent"
-              @click="aliasIdToEdit = props.row.id"
+              @click=";(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = '')"
               >Add description</span
             >
           </div>

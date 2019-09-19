@@ -31,185 +31,109 @@
         </button>
       </div>
     </div>
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table v-if="initialUsernames.length" class="w-full whitespace-no-wrap">
-        <tr class="text-left font-semibold text-grey-500 text-sm tracking-wider">
-          <th class="p-4">
-            <div class="flex items-center">
-              Created
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('created_at', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('created_at', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('created_at', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('created_at', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Username
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('username', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('v', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('username', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('username', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Description
-            </div>
-          </th>
-          <th class="p-4 items-center" colspan="2">
-            <div class="flex items-center">
-              Active
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('active', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('active', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('active', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('active', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-        </tr>
-        <tr
-          v-for="username in queriedUsernames"
-          :key="username.id"
-          class="hover:bg-grey-50 focus-within:bg-grey-50 h-20"
-        >
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              <span
-                class="tooltip outline-none text-sm"
-                :data-tippy-content="username.created_at | formatDate"
-                >{{ username.created_at | timeAgo }}</span
-              >
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500">
-              <span
-                class="tooltip cursor-pointer outline-none"
-                data-tippy-content="Click to copy"
-                v-clipboard="() => username.username"
-                v-clipboard:success="clipboardSuccess"
-                v-clipboard:error="clipboardError"
-                >{{ username.username | truncate(30) }}</span
-              >
-            </div>
-          </td>
-          <td class="border-grey-200 border-t w-64">
-            <div class="p-4 text-sm">
-              <div
-                v-if="usernameIdToEdit === username.id"
-                class="w-full flex items-center justify-between"
-              >
-                <input
-                  @keyup.enter="editUsername(username)"
-                  @keyup.esc="usernameIdToEdit = usernameDescriptionToEdit = ''"
-                  v-model="usernameDescriptionToEdit"
-                  type="text"
-                  class="appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
-                  :class="
-                    usernameDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
-                  "
-                  placeholder="Add description"
-                  tabindex="0"
-                  autofocus
-                />
-                <icon
-                  name="close"
-                  class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-                  @click.native="usernameIdToEdit = usernameDescriptionToEdit = ''"
-                />
-                <icon
-                  name="save"
-                  class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-                  @click.native="editUsername(username)"
-                />
-              </div>
-              <div
-                v-else-if="username.description"
-                class="flex items-center justify-between w-full"
-              >
-                <span class="tooltip outline-none" :data-tippy-content="username.description">{{
-                  username.description | truncate(25)
-                }}</span>
-                <icon
-                  name="edit"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  @click.native="
-                    ;(usernameIdToEdit = username.id),
-                      (usernameDescriptionToEdit = username.description)
-                  "
-                />
-              </div>
-              <div v-else class="w-full flex justify-center">
-                <icon
-                  name="plus"
-                  class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  @click.native="usernameIdToEdit = username.id"
-                />
-              </div>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              <Toggle
-                v-model="username.active"
-                @on="activateUsername(username)"
-                @off="deactivateUsername(username)"
-              />
-            </div>
-          </td>
-          <td class="border-grey-200 border-t w-px">
-            <div
-              class="px-4 flex items-center cursor-pointer outline-none focus:text-indigo-500"
-              @click="openDeleteModal(username.id)"
-              tabindex="-1"
-            >
-              <icon name="trash" class="block w-6 h-6 text-grey-200 fill-current" />
-            </div>
-          </td>
-        </tr>
-        <tr v-if="queriedUsernames.length === 0">
-          <td
-            class="border-grey-200 border-t p-4 text-center h-24 text-lg text-grey-700"
-            colspan="4"
-          >
-            No usernames found for that search!
-          </td>
-        </tr>
-      </table>
 
-      <div v-else class="p-8 text-center text-lg text-grey-700">
+    <vue-good-table
+      v-if="initialUsernames.length"
+      @on-search="debounceToolips"
+      :columns="columns"
+      :rows="rows"
+      :search-options="{
+        enabled: true,
+        skipDiacritics: true,
+        externalQuery: search,
+      }"
+      :sort-options="{
+        enabled: true,
+        initialSortBy: { field: 'created_at', type: 'desc' },
+      }"
+      styleClass="vgt-table"
+    >
+      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+        No usernames found for that search!
+      </div>
+      <template slot="table-row" slot-scope="props">
+        <span
+          v-if="props.column.field == 'created_at'"
+          class="tooltip outline-none text-sm"
+          :data-tippy-content="props.row.created_at | formatDate"
+          >{{ props.row.created_at | timeAgo }}
+        </span>
+        <span v-else-if="props.column.field == 'username'">
+          <span
+            class="tooltip cursor-pointer outline-none"
+            data-tippy-content="Click to copy"
+            v-clipboard="() => props.row.username"
+            v-clipboard:success="clipboardSuccess"
+            v-clipboard:error="clipboardError"
+            >{{ props.row.username | truncate(30) }}</span
+          >
+        </span>
+        <span v-else-if="props.column.field == 'description'">
+          <div v-if="usernameIdToEdit === props.row.id" class="flex items-center">
+            <input
+              @keyup.enter="editUsername(rows[props.row.originalIndex])"
+              @keyup.esc="usernameIdToEdit = usernameDescriptionToEdit = ''"
+              v-model="usernameDescriptionToEdit"
+              type="text"
+              class="flex-grow appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              :class="
+                usernameDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
+              "
+              placeholder="Add description"
+              tabindex="0"
+              autofocus
+            />
+            <icon
+              name="close"
+              class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
+              @click.native="usernameIdToEdit = usernameDescriptionToEdit = ''"
+            />
+            <icon
+              name="save"
+              class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
+              @click.native="editUsername(rows[props.row.originalIndex])"
+            />
+          </div>
+          <div v-else-if="props.row.description" class="flex items-centers">
+            <span class="tooltip outline-none" :data-tippy-content="props.row.description">{{
+              props.row.description | truncate(60)
+            }}</span>
+            <icon
+              name="edit"
+              class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer ml-2"
+              @click.native="
+                ;(usernameIdToEdit = props.row.id),
+                  (usernameDescriptionToEdit = props.row.description)
+              "
+            />
+          </div>
+          <div v-else class="flex justify-center">
+            <icon
+              name="plus"
+              class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              @click.native=";(usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = '')"
+            />
+          </div>
+        </span>
+        <span v-else-if="props.column.field === 'active'" class="flex items-center">
+          <Toggle
+            v-model="rows[props.row.originalIndex].active"
+            @on="activateUsername(props.row.id)"
+            @off="deactivateUsername(props.row.id)"
+          />
+        </span>
+        <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
+          <icon
+            name="trash"
+            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            @click.native="openDeleteModal(props.row.id)"
+          />
+        </span>
+      </template>
+    </vue-good-table>
+
+    <div v-else class="bg-white rounded shadow overflow-x-auto">
+      <div class="p-8 text-center text-lg text-grey-700">
         <h1 class="mb-6 text-xl text-indigo-800 font-semibold">
           This is where you can add and view additional usernames
         </h1>
@@ -332,7 +256,6 @@ export default {
   },
   data() {
     return {
-      usernames: this.initialUsernames,
       newUsername: '',
       search: '',
       addUsernameLoading: false,
@@ -342,23 +265,42 @@ export default {
       usernameDescriptionToEdit: '',
       deleteUsernameLoading: false,
       deleteUsernameModalOpen: false,
-      currentSort: 'created_at',
-      currentSortDir: 'desc',
       errors: {},
+      columns: [
+        {
+          label: 'Created',
+          field: 'created_at',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Username',
+          field: 'username',
+        },
+        {
+          label: 'Description',
+          field: 'description',
+          width: '500px',
+        },
+        {
+          label: 'Active',
+          field: 'active',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
+          label: '',
+          field: 'actions',
+          sortable: false,
+          globalSearchDisabled: true,
+        },
+      ],
+      rows: this.initialUsernames,
     }
   },
   watch: {
-    queriedUsernames: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
     usernameIdToEdit: _.debounce(function() {
       this.addTooltips()
     }, 50),
-  },
-  computed: {
-    queriedUsernames() {
-      return _.filter(this.usernames, username => username.username.includes(this.search))
-    },
   },
   methods: {
     addTooltips() {
@@ -367,9 +309,9 @@ export default {
         arrowType: 'round',
       })
     },
-    isCurrentSort(col, dir) {
-      return this.currentSort === col && this.currentSortDir === dir
-    },
+    debounceToolips: _.debounce(function() {
+      this.addTooltips()
+    }, 50),
     validateNewUsername(e) {
       this.errors = {}
 
@@ -402,8 +344,7 @@ export default {
         )
         .then(({ data }) => {
           this.addUsernameLoading = false
-          this.usernames.push(data.data)
-          this.reSort()
+          this.rows.push(data.data)
           this.newUsername = ''
           this.addUsernameModalOpen = false
           this.success('Additional Username added')
@@ -455,12 +396,12 @@ export default {
           this.error()
         })
     },
-    activateUsername(username) {
+    activateUsername(id) {
       axios
         .post(
           `/active-usernames`,
           JSON.stringify({
-            id: username.id,
+            id: id,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -473,9 +414,9 @@ export default {
           this.error()
         })
     },
-    deactivateUsername(username) {
+    deactivateUsername(id) {
       axios
-        .delete(`/active-usernames/${username.id}`)
+        .delete(`/active-usernames/${id}`)
         .then(response => {
           //
         })
@@ -489,7 +430,7 @@ export default {
       axios
         .delete(`/usernames/${id}`)
         .then(response => {
-          this.usernames = _.filter(this.usernames, username => username.id !== id)
+          this.rows = _.reject(this.rows, username => username.id === id)
           this.deleteUsernameModalOpen = false
           this.deleteUsernameLoading = false
         })
@@ -498,20 +439,6 @@ export default {
           this.deleteUsernameLoading = false
           this.deleteUsernameModalOpen = false
         })
-    },
-    sort(col, dir) {
-      if (this.currentSort === col && this.currentSortDir === dir) {
-        this.currentSort = 'created_at'
-        this.currentSortDir = 'desc'
-      } else {
-        this.currentSort = col
-        this.currentSortDir = dir
-      }
-
-      this.reSort()
-    },
-    reSort() {
-      this.usernames = _.orderBy(this.usernames, [this.currentSort], [this.currentSortDir])
     },
     validUsername(username) {
       let re = /^[a-zA-Z0-9]*$/
