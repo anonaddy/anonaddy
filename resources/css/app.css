@@ -95,6 +95,10 @@ table.vgt-table td {
   @apply p-3 border-b border-grey-100;
 }
 
+table.vgt-table tbody tr {
+  @apply h-20;
+}
+
 table.vgt-table tr.clickable {
   @apply cursor-pointer;
 }

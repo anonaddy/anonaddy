@@ -31,255 +31,142 @@
         </button>
       </div>
     </div>
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table class="w-full whitespace-no-wrap">
-        <tr class="text-left font-semibold text-grey-500 text-sm tracking-wider">
-          <th class="p-4">
-            <div class="flex items-center">
-              Created
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('created_at', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('created_at', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('created_at', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('created_at', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Key
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('key', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('key', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('key', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('key', 'desc'),
-                  }"
-                />
-              </div>
-              <span
-                class="tooltip outline-none"
-                :data-tippy-content="
-                  `Use this to attach recipients to new aliases as they are created e.g. alias+key@${
-                    user.username
-                  }.${domain}. You can attach multiple recipients by doing alias+2.3.4@${
-                    user.username
-                  }.${domain}`
-                "
-              >
-                <icon name="info" class="inline-block w-4 h-4 text-grey-200 fill-current" />
-              </span>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Email
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('email', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('email', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('email', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('email', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Recipient Aliases
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('aliases', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('aliases', 'asc'),
-                  }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('aliases', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('aliases', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Encryption
-            </div>
-          </th>
-          <th class="p-4" colspan="2">
-            <div class="flex items-center">
-              Verified
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('email_verified_at', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('email_verified_at', 'asc'),
-                  }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('email_verified_at', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('email_verified_at', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-        </tr>
-        <tr
-          v-for="recipient in queriedRecipients"
-          :key="recipient.email"
-          class="hover:bg-grey-50 focus-within:bg-grey-50 h-20"
-        >
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              <span
-                class="tooltip outline-none text-sm"
-                :data-tippy-content="recipient.created_at | formatDate"
-                >{{ recipient.created_at | timeAgo }}</span
-              >
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              {{ recipient.key }}
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500">
-              <span
-                class="tooltip cursor-pointer outline-none"
-                data-tippy-content="Click to copy"
-                v-clipboard="() => recipient.email"
-                v-clipboard:success="clipboardSuccess"
-                v-clipboard:error="clipboardError"
-                >{{ recipient.email | truncate(30) }}</span
-              >
 
-              <span
-                v-if="isDefault(recipient.id)"
-                class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip"
-                data-tippy-content="The default recipient will be used for all aliases with no other recipients assigned"
-              >
-                default
-              </span>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500">
-              <span
-                v-if="recipient.aliases.length"
-                class="tooltip outline-none"
-                :data-tippy-content="aliasesTooltip(recipient.aliases)"
-                >{{ recipient.aliases[0].email | truncate(40) }}
-                <span
-                  v-if="recipient.aliases.length > 1"
-                  class="block text-center text-grey-500 text-sm"
-                >
-                  + {{ recipient.aliases.length - 1 }}</span
-                >
-              </span>
-              <span v-else class="block text-center text-grey-500 text-sm">{{
-                recipient.aliases.length
-              }}</span>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500 text-sm">
-              <span v-if="recipient.fingerprint" class="flex">
-                <Toggle
-                  v-model="recipient.should_encrypt"
-                  @on="turnOnEncryption(recipient)"
-                  @off="turnOffEncryption(recipient)"
-                />
-                <icon
-                  name="fingerprint"
-                  class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current ml-2"
-                  :data-tippy-content="recipient.fingerprint"
-                  v-clipboard="() => recipient.fingerprint"
-                  v-clipboard:success="clipboardSuccess"
-                  v-clipboard:error="clipboardError"
-                />
-              </span>
-              <button v-else @click="openRecipientKeyModal(recipient)" class="focus:outline-none">
-                Add public key
-              </button>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500 text-sm">
-              <span
-                name="check"
-                v-if="recipient.email_verified_at"
-                class="py-1 px-2 bg-green-200 text-green-900 rounded-full"
-              >
-                verified
-              </span>
-              <button
-                v-else
-                @click="resendVerification(recipient.id)"
-                class="focus:outline-none"
-                :class="resendVerificationLoading ? 'cursor-not-allowed' : ''"
-                :disabled="resendVerificationLoading"
-              >
-                Resend email
-              </button>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t w-px">
-            <div
-              v-if="!isDefault(recipient.id)"
-              class="px-4 flex items-center cursor-pointer outline-none focus:text-indigo-500"
-              @click="openDeleteModal(recipient.id)"
-              tabindex="-1"
-            >
-              <icon name="trash" class="block w-6 h-6 text-grey-200 fill-current" />
-            </div>
-          </td>
-        </tr>
-        <tr v-if="queriedRecipients.length === 0">
-          <td
-            class="border-grey-200 border-t p-4 text-center h-24 text-lg text-grey-700"
-            colspan="6"
+    <vue-good-table
+      @on-search="debounceToolips"
+      :columns="columns"
+      :rows="rows"
+      :search-options="{
+        enabled: true,
+        skipDiacritics: true,
+        externalQuery: search,
+      }"
+      :sort-options="{
+        enabled: true,
+        initialSortBy: { field: 'created_at', type: 'desc' },
+      }"
+      styleClass="vgt-table"
+    >
+      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+        No recipients found for that search!
+      </div>
+      <template slot="table-column" slot-scope="props">
+        <span v-if="props.column.label == 'Key'">
+          Key
+          <span
+            class="tooltip outline-none"
+            :data-tippy-content="
+              `Use this to attach recipients to new aliases as they are created e.g. alias+key@${
+                user.username
+              }.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${
+                user.username
+              }.anonaddy.com. Separating each key by a full stop.`
+            "
           >
-            No recipients found for that search!
-          </td>
-        </tr>
-      </table>
-    </div>
+            <icon name="info" class="inline-block w-4 h-4 text-grey-200 fill-current" />
+          </span>
+        </span>
+        <span v-else>
+          {{ props.column.label }}
+        </span>
+      </template>
+      <template slot="table-row" slot-scope="props">
+        <span
+          v-if="props.column.field == 'created_at'"
+          class="tooltip outline-none text-sm"
+          :data-tippy-content="props.row.created_at | formatDate"
+          >{{ props.row.created_at | timeAgo }}
+        </span>
+        <span v-else-if="props.column.field == 'key'">
+          {{ props.row.key }}
+        </span>
+        <span v-else-if="props.column.field == 'email'">
+          <span
+            class="tooltip cursor-pointer outline-none"
+            data-tippy-content="Click to copy"
+            v-clipboard="() => props.row.email"
+            v-clipboard:success="clipboardSuccess"
+            v-clipboard:error="clipboardError"
+            >{{ props.row.email | truncate(30) }}</span
+          >
+
+          <span
+            v-if="isDefault(props.row.id)"
+            class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip"
+            data-tippy-content="The default recipient will be used for all aliases with no other recipients assigned"
+          >
+            default
+          </span>
+        </span>
+        <span v-else-if="props.column.field === 'aliases'">
+          <span
+            v-if="props.row.aliases.length"
+            class="tooltip outline-none"
+            :data-tippy-content="aliasesTooltip(props.row.aliases)"
+            >{{ props.row.aliases[0].email | truncate(40) }}
+            <span v-if="props.row.aliases.length > 1" class="block text-grey-500 text-sm">
+              + {{ props.row.aliases.length - 1 }}</span
+            >
+          </span>
+          <span v-else class="block text-grey-500 text-sm">{{ props.row.aliases.length }}</span>
+        </span>
+        <span v-else-if="props.column.field === 'should_encrypt'">
+          <span v-if="props.row.fingerprint" class="flex">
+            <Toggle
+              v-model="rows[props.row.originalIndex].should_encrypt"
+              @on="turnOnEncryption(props.row)"
+              @off="turnOffEncryption(props.row)"
+            />
+            <icon
+              name="fingerprint"
+              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current mx-2"
+              :data-tippy-content="props.row.fingerprint"
+              v-clipboard="() => props.row.fingerprint"
+              v-clipboard:success="clipboardSuccess"
+              v-clipboard:error="clipboardError"
+            />
+            <icon
+              name="delete"
+              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current"
+              @click.native="openDeleteRecipientKeyModal(props.row.id)"
+              data-tippy-content="Remove public key"
+            />
+          </span>
+          <button
+            v-else
+            @click="openRecipientKeyModal(props.row)"
+            class="focus:outline-none text-sm"
+          >
+            Add public key
+          </button>
+        </span>
+        <span v-else-if="props.column.field === 'email_verified_at'">
+          <span
+            name="check"
+            v-if="props.row.email_verified_at"
+            class="py-1 px-2 bg-green-200 text-green-900 rounded-full text-sm"
+          >
+            verified
+          </span>
+          <button
+            v-else
+            @click="resendVerification(props.row.id)"
+            class="focus:outline-none text-sm"
+            :class="resendVerificationLoading ? 'cursor-not-allowed' : ''"
+            :disabled="resendVerificationLoading"
+          >
+            Resend email
+          </button>
+        </span>
+        <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
+          <icon
+            name="trash"
+            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            @click.native="openDeleteModal(props.row.id)"
+          />
+        </span>
+      </template>
+    </vue-good-table>
 
     <Modal :open="addRecipientModalOpen" @close="addRecipientModalOpen = false">
       <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
@@ -369,6 +256,37 @@
       </div>
     </Modal>
 
+    <Modal :open="deleteRecipientKeyModalOpen" @close="closeDeleteRecipientKeyModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Remove recipient public key
+        </h2>
+        <p class="mt-4 text-grey-700">
+          Are you sure you want to remove the public key for this recipient?
+        </p>
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="deleteRecipientKey(recipientKeyIdToDelete)"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
+            :class="deleteRecipientKeyLoading ? 'cursor-not-allowed' : ''"
+            :disabled="deleteRecipientKeyLoading"
+          >
+            Remove public key
+            <loader v-if="deleteRecipientLoading" />
+          </button>
+          <button
+            @click="closeDeleteRecipientKeyModal"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+
     <Modal :open="deleteRecipientModalOpen" @close="closeDeleteModal">
       <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
         <h2
@@ -429,7 +347,7 @@ export default {
     Toggle,
   },
   created() {
-    this.defaultRecipient = _.find(this.recipients, ['id', this.user.default_recipient_id])
+    this.defaultRecipient = _.find(this.rows, ['id', this.user.default_recipient_id])
     this.defaultRecipient.aliases = this.defaultRecipient.aliases.concat(this.aliasesUsingDefault)
   },
   mounted() {
@@ -437,7 +355,6 @@ export default {
   },
   data() {
     return {
-      recipients: this.initialRecipients,
       defaultRecipient: {},
       newRecipient: '',
       recipientKey: '',
@@ -445,29 +362,63 @@ export default {
       addRecipientLoading: false,
       addRecipientModalOpen: false,
       recipientIdToDelete: null,
+      recipientKeyIdToDelete: null,
       deleteRecipientLoading: false,
       deleteRecipientModalOpen: false,
+      deleteRecipientKeyLoading: false,
+      deleteRecipientKeyModalOpen: false,
       addRecipientKeyLoading: false,
       addRecipientKeyModalOpen: false,
       recipientToAddKey: {},
       resendVerificationLoading: false,
-      currentSort: 'created_at',
-      currentSortDir: 'desc',
       errors: {},
+      columns: [
+        {
+          label: 'Created',
+          field: 'created_at',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Key',
+          field: 'key',
+          type: 'number',
+        },
+        {
+          label: 'Email',
+          field: 'email',
+        },
+        {
+          label: 'Recipient Aliases',
+          field: 'aliases',
+          sortable: true,
+          sortFn: this.sortRecipientAliases,
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Encryption',
+          field: 'should_encrypt',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Verified',
+          field: 'email_verified_at',
+          globalSearchDisabled: true,
+        },
+        {
+          label: '',
+          field: 'actions',
+          sortable: false,
+          globalSearchDisabled: true,
+        },
+      ],
+      rows: this.initialRecipients,
     }
   },
   watch: {
-    queriedRecipients: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
     addRecipientKeyModalOpen: _.debounce(function() {
       this.addTooltips()
     }, 50),
-  },
-  computed: {
-    queriedRecipients() {
-      return _.filter(this.recipients, recipient => recipient.email.includes(this.search))
-    },
   },
   methods: {
     addTooltips() {
@@ -476,14 +427,14 @@ export default {
         arrowType: 'round',
       })
     },
+    debounceToolips: _.debounce(function() {
+      this.addTooltips()
+    }, 50),
     aliasesTooltip(aliases) {
       return _.reduce(aliases, (list, alias) => list + `${alias.email}<br>`, '')
     },
     isDefault(id) {
       return this.user.default_recipient_id === id
-    },
-    isCurrentSort(col, dir) {
-      return this.currentSort === col && this.currentSortDir === dir
     },
     validateNewRecipient(e) {
       this.errors = {}
@@ -515,9 +466,8 @@ export default {
         )
         .then(({ data }) => {
           this.addRecipientLoading = false
-          data.data.key = this.recipients.length + 1
-          this.recipients.push(data.data)
-          this.reSort()
+          data.data.key = this.rows.length + 1
+          this.rows.push(data.data)
           this.newRecipient = ''
           this.addRecipientModalOpen = false
           this.success('Recipient created and verification email sent')
@@ -563,7 +513,7 @@ export default {
       axios
         .delete(`/recipients/${id}`)
         .then(response => {
-          this.recipients = _.filter(this.recipients, recipient => recipient.id !== id)
+          this.recipients = _.reject(this.rows, recipient => recipient.id === id)
           this.deleteRecipientModalOpen = false
           this.deleteRecipientLoading = false
         })
@@ -571,6 +521,32 @@ export default {
           this.error()
           this.deleteRecipientLoading = false
           this.deleteRecipientModalOpen = false
+        })
+    },
+    openDeleteRecipientKeyModal(id) {
+      this.deleteRecipientKeyModalOpen = true
+      this.recipientKeyIdToDelete = id
+    },
+    closeDeleteRecipientKeyModal() {
+      this.deleteRecipientKeyModalOpen = false
+      this.recipientKeyIdToDelete = null
+    },
+    deleteRecipientKey(id) {
+      this.deleteRecipientKeyLoading = true
+
+      axios
+        .delete(`/recipient-keys/${id}`)
+        .then(response => {
+          let recipient = _.find(this.rows, ['id', this.recipientKeyIdToDelete])
+          recipient.should_encrypt = false
+          recipient.fingerprint = null
+          this.deleteRecipientKeyModalOpen = false
+          this.deleteRecipientKeyLoading = false
+        })
+        .catch(error => {
+          this.error()
+          this.deleteRecipientKeyLoading = false
+          this.deleteRecipientKeyModalOpen = false
         })
     },
     validateRecipientKey(e) {
@@ -604,7 +580,7 @@ export default {
         .then(({ data }) => {
           this.addRecipientKeyLoading = false
 
-          let recipient = _.find(this.recipients, ['id', this.recipientToAddKey.id])
+          let recipient = _.find(this.rows, ['id', this.recipientToAddKey.id])
           recipient.should_encrypt = data.data.should_encrypt
           recipient.fingerprint = data.data.fingerprint
 
@@ -653,17 +629,6 @@ export default {
           this.error()
         })
     },
-    sort(col, dir) {
-      if (this.currentSort === col && this.currentSortDir === dir) {
-        this.currentSort = 'created_at'
-        this.currentSortDir = 'desc'
-      } else {
-        this.currentSort = col
-        this.currentSortDir = dir
-      }
-
-      this.reSort()
-    },
     openRecipientKeyModal(recipient) {
       this.addRecipientKeyModalOpen = true
       this.recipientToAddKey = recipient
@@ -671,9 +636,6 @@ export default {
     closeRecipientKeyModal() {
       this.addRecipientKeyModalOpen = false
       this.recipientToAddKey = {}
-    },
-    reSort() {
-      this.recipients = _.orderBy(this.recipients, [this.currentSort], [this.currentSortDir])
     },
     validEmail(email) {
       let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -686,7 +648,6 @@ export default {
     clipboardSuccess() {
       this.success('Copied to clipboard')
     },
-
     clipboardError() {
       this.error('Could not copy to clipboard')
     },

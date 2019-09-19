@@ -137,10 +137,10 @@
         enabled: true,
         skipDiacritics: true,
         externalQuery: search,
-        placeholder: 'Search aliases',
       }"
       :sort-options="{
         enabled: true,
+        initialSortBy: { field: 'created_at', type: 'desc' },
       }"
       styleClass="vgt-table"
     >
@@ -231,7 +231,6 @@
             :data-tippy-content="defaultRecipient.email"
             >default</span
           >
-
           <icon
             name="edit"
             class="ml-2 inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
@@ -272,6 +271,7 @@
         </span>
       </template>
     </vue-good-table>
+
     <div v-else class="bg-white rounded shadow overflow-x-auto">
       <div class="p-8 text-center text-lg text-grey-700">
         <h1 class="mb-6 text-2xl text-indigo-800 font-semibold">
@@ -327,19 +327,16 @@
         >
           Generate new UUID alias
         </h2>
-
         <p class="mt-4 text-grey-700">
           This will generate a new unique alias in the form of
           <span class="text-sm block mt-2 font-semibold"
             >86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</span
           >
         </p>
-
         <p class="mt-2 text-grey-700">
           Other aliases e.g. alias@{{ subdomain }} are created automatically when they receive their
           first email.
         </p>
-
         <label for="banner_location" class="block text-grey-700 text-sm my-2">
           Alias Domain:
         </label>
@@ -399,7 +396,6 @@
           Select the recipients for this alias. You can choose multiple recipients. Leave it empty
           if you would like to use the default recipient.
         </p>
-
         <multiselect
           v-model="aliasRecipientsToEdit"
           :options="recipientOptions"
@@ -415,7 +411,6 @@
           :show-labels="false"
         >
         </multiselect>
-
         <div class="mt-6">
           <button
             type="button"
@@ -539,8 +534,6 @@ export default {
       aliasIdToDelete: '',
       deleteAliasLoading: false,
       deleteAliasModalOpen: false,
-      currentSort: 'created_at',
-      currentSortDir: 'desc',
       editAliasRecipientsLoading: false,
       editAliasRecipientsModalOpen: false,
       generateAliasModalOpen: false,
@@ -564,6 +557,7 @@ export default {
           tdClass: 'text-center',
           sortable: true,
           sortFn: this.sortRecipients,
+          globalSearchDisabled: true,
         },
         {
           label: 'Description',
