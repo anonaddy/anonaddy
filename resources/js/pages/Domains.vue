@@ -31,248 +31,129 @@
         </button>
       </div>
     </div>
-    <div class="bg-white rounded shadow overflow-x-auto">
-      <table v-if="initialDomains.length" class="w-full whitespace-no-wrap">
-        <tr class="text-left font-semibold text-grey-500 text-sm tracking-wider">
-          <th class="p-4">
-            <div class="flex items-center">
-              Created
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('created_at', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('created_at', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('created_at', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('created_at', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Domain
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('domain', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('domain', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('domain', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('domain', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4">
-            <div class="flex items-center">
-              Description
-            </div>
-          </th>
-          <th class="p-4 items-center">
-            <div class="flex items-center">
-              Alias Count
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('aliases', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('aliases', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('aliases', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('aliases', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4 items-center">
-            <div class="flex items-center">
-              Active
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('active', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('active', 'asc') }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('active', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{ 'text-grey-800': isCurrentSort('active', 'desc') }"
-                />
-              </div>
-            </div>
-          </th>
-          <th class="p-4" colspan="2">
-            <div class="flex items-center">
-              Verified
-              <div class="inline-flex flex-col">
-                <icon
-                  name="chevron-up"
-                  @click.native="sort('domain_verified_at', 'asc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('domain_verified_at', 'asc'),
-                  }"
-                />
-                <icon
-                  name="chevron-down"
-                  @click.native="sort('domain_verified_at', 'desc')"
-                  class="w-4 h-4 text-grey-300 fill-current cursor-pointer"
-                  :class="{
-                    'text-grey-800': isCurrentSort('domain_verified_at', 'desc'),
-                  }"
-                />
-              </div>
-            </div>
-          </th>
-        </tr>
-        <tr
-          v-for="domain in queriedDomains"
-          :key="domain.id"
-          class="hover:bg-grey-50 focus-within:bg-grey-50 h-20"
-        >
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              <span
-                class="tooltip outline-none text-sm"
-                :data-tippy-content="domain.created_at | formatDate"
-                >{{ domain.created_at | timeAgo }}</span
-              >
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500">
-              <span
-                class="tooltip cursor-pointer outline-none"
-                data-tippy-content="Click to copy"
-                v-clipboard="() => domain.domain"
-                v-clipboard:success="clipboardSuccess"
-                v-clipboard:error="clipboardError"
-                >{{ domain.domain | truncate(30) }}</span
-              >
-            </div>
-          </td>
-          <td class="border-grey-200 border-t w-64">
-            <div class="p-4 text-sm">
-              <div
-                v-if="domainIdToEdit === domain.id"
-                class="w-full flex items-center justify-between"
-              >
-                <input
-                  @keyup.enter="editDomain(domain)"
-                  @keyup.esc="domainIdToEdit = domainDescriptionToEdit = ''"
-                  v-model="domainDescriptionToEdit"
-                  type="text"
-                  class="appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
-                  :class="
-                    domainDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
-                  "
-                  placeholder="Add description"
-                  tabindex="0"
-                  autofocus
-                />
-                <icon
-                  name="close"
-                  class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-                  @click.native="domainIdToEdit = domainDescriptionToEdit = ''"
-                />
-                <icon
-                  name="save"
-                  class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-                  @click.native="editDomain(domain)"
-                />
-              </div>
-              <div v-else-if="domain.description" class="flex items-center justify-between w-full">
-                <span class="tooltip outline-none" :data-tippy-content="domain.description">{{
-                  domain.description | truncate(25)
-                }}</span>
-                <icon
-                  name="edit"
-                  class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  @click.native="
-                    ;(domainIdToEdit = domain.id), (domainDescriptionToEdit = domain.description)
-                  "
-                />
-              </div>
-              <div v-else class="w-full flex justify-center">
-                <icon
-                  name="plus"
-                  class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-                  @click.native="domainIdToEdit = domain.id"
-                />
-              </div>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              {{ domain.aliases.length }}
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center">
-              <Toggle
-                v-model="domain.active"
-                @on="activateDomain(domain)"
-                @off="deactivateDomain(domain)"
-              />
-            </div>
-          </td>
-          <td class="border-grey-200 border-t">
-            <div class="p-4 flex items-center focus:text-indigo-500 text-sm">
-              <span
-                name="check"
-                v-if="domain.domain_verified_at"
-                class="py-1 px-2 bg-green-200 text-green-900 rounded-full"
-              >
-                verified
-              </span>
-              <button
-                v-else
-                @click="recheckRecords(domain)"
-                class="focus:outline-none"
-                :class="recheckRecordsLoading ? 'cursor-not-allowed' : ''"
-                :disabled="recheckRecordsLoading"
-              >
-                Recheck domain
-              </button>
-            </div>
-          </td>
-          <td class="border-grey-200 border-t w-px">
-            <div
-              class="px-4 flex items-center cursor-pointer outline-none focus:text-indigo-500"
-              @click="openDeleteModal(domain.id)"
-              tabindex="-1"
-            >
-              <icon name="trash" class="block w-6 h-6 text-grey-200 fill-current" />
-            </div>
-          </td>
-        </tr>
-        <tr v-if="queriedDomains.length === 0">
-          <td
-            class="border-grey-200 border-t p-4 text-center h-24 text-lg text-grey-700"
-            colspan="6"
-          >
-            No domains found for that search!
-          </td>
-        </tr>
-      </table>
 
-      <div v-else class="p-8 text-center text-lg text-grey-700">
+    <vue-good-table
+      v-if="initialDomains.length"
+      @on-search="debounceToolips"
+      :columns="columns"
+      :rows="rows"
+      :search-options="{
+        enabled: true,
+        skipDiacritics: true,
+        externalQuery: search,
+      }"
+      :sort-options="{
+        enabled: true,
+        initialSortBy: { field: 'created_at', type: 'desc' },
+      }"
+      styleClass="vgt-table"
+    >
+      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+        No domains found for that search!
+      </div>
+      <template slot="table-row" slot-scope="props">
+        <span
+          v-if="props.column.field == 'created_at'"
+          class="tooltip outline-none text-sm"
+          :data-tippy-content="props.row.created_at | formatDate"
+          >{{ props.row.created_at | timeAgo }}
+        </span>
+        <span v-else-if="props.column.field == 'domain'">
+          <span
+            class="tooltip cursor-pointer outline-none"
+            data-tippy-content="Click to copy"
+            v-clipboard="() => props.row.domain"
+            v-clipboard:success="clipboardSuccess"
+            v-clipboard:error="clipboardError"
+            >{{ props.row.domain | truncate(30) }}</span
+          >
+        </span>
+        <span v-else-if="props.column.field == 'description'">
+          <div v-if="domainIdToEdit === props.row.id" class="flex items-center">
+            <input
+              @keyup.enter="editDomain(rows[props.row.originalIndex])"
+              @keyup.esc="domainIdToEdit = domainDescriptionToEdit = ''"
+              v-model="domainDescriptionToEdit"
+              type="text"
+              class="flex-grow appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              :class="
+                domainDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
+              "
+              placeholder="Add description"
+              tabindex="0"
+              autofocus
+            />
+            <icon
+              name="close"
+              class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
+              @click.native="domainIdToEdit = domainDescriptionToEdit = ''"
+            />
+            <icon
+              name="save"
+              class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
+              @click.native="editDomain(rows[props.row.originalIndex])"
+            />
+          </div>
+          <div v-else-if="props.row.description" class="flex items-centers">
+            <span class="tooltip outline-none" :data-tippy-content="props.row.description">{{
+              props.row.description | truncate(60)
+            }}</span>
+            <icon
+              name="edit"
+              class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer ml-2"
+              @click.native="
+                ;(domainIdToEdit = props.row.id), (domainDescriptionToEdit = props.row.description)
+              "
+            />
+          </div>
+          <div v-else class="flex justify-center">
+            <icon
+              name="plus"
+              class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              @click.native=";(domainIdToEdit = props.row.id), (domainDescriptionToEdit = '')"
+            />
+          </div>
+        </span>
+        <span v-else-if="props.column.field === 'aliases_count'">
+          {{ props.row.aliases.length }}
+        </span>
+        <span v-else-if="props.column.field === 'active'" class="flex items-center">
+          <Toggle
+            v-model="rows[props.row.originalIndex].active"
+            @on="activateDomain(props.row.id)"
+            @off="deactivateDomain(props.row.id)"
+          />
+        </span>
+        <span v-else-if="props.column.field === 'domain_verified_at'">
+          <span
+            name="check"
+            v-if="props.row.domain_verified_at"
+            class="py-1 px-2 bg-green-200 text-green-900 rounded-full text-sm"
+          >
+            verified
+          </span>
+          <button
+            v-else
+            @click="recheckRecords(rows[props.row.originalIndex])"
+            class="focus:outline-none text-sm"
+            :class="recheckRecordsLoading ? 'cursor-not-allowed' : ''"
+            :disabled="recheckRecordsLoading"
+          >
+            Recheck domain
+          </button>
+        </span>
+        <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
+          <icon
+            name="trash"
+            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            @click.native="openDeleteModal(props.row.id)"
+          />
+        </span>
+      </template>
+    </vue-good-table>
+
+    <div v-else class="bg-white rounded shadow overflow-x-auto">
+      <div class="p-8 text-center text-lg text-grey-700">
         <h1 class="mb-6 text-xl text-indigo-800 font-semibold">
           This is where you can set up and view custom domains
         </h1>
@@ -403,7 +284,6 @@ export default {
   },
   data() {
     return {
-      domains: this.initialDomains,
       newDomain: '',
       search: '',
       addDomainLoading: false,
@@ -414,23 +294,53 @@ export default {
       deleteDomainLoading: false,
       deleteDomainModalOpen: false,
       recheckRecordsLoading: false,
-      currentSort: 'created_at',
-      currentSortDir: 'desc',
       errors: {},
+      columns: [
+        {
+          label: 'Created',
+          field: 'created_at',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Domain',
+          field: 'domain',
+        },
+        {
+          label: 'Description',
+          field: 'description',
+          width: '500px',
+        },
+        {
+          label: 'Alias Count',
+          field: 'aliases_count',
+          type: 'number',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Active',
+          field: 'active',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
+          label: 'Verified',
+          field: 'domain_verified_at',
+          globalSearchDisabled: true,
+        },
+        {
+          label: '',
+          field: 'actions',
+          sortable: false,
+          globalSearchDisabled: true,
+        },
+      ],
+      rows: this.initialDomains,
     }
   },
   watch: {
-    queriedDomains: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
     domainIdToEdit: _.debounce(function() {
       this.addTooltips()
     }, 50),
-  },
-  computed: {
-    queriedDomains() {
-      return _.filter(this.domains, domain => domain.domain.includes(this.search))
-    },
   },
   methods: {
     addTooltips() {
@@ -439,16 +349,16 @@ export default {
         arrowType: 'round',
       })
     },
-    isCurrentSort(col, dir) {
-      return this.currentSort === col && this.currentSortDir === dir
-    },
+    debounceToolips: _.debounce(function() {
+      this.addTooltips()
+    }, 50),
     validateNewDomain(e) {
       this.errors = {}
 
       if (!this.newDomain) {
         this.errors.newDomain = 'Domain name required'
       } else if (!this.validDomain(this.newDomain)) {
-        this.errors.newDomain = 'Please enter a valid domain name without http:// or https://'
+        this.errors.newDomain = 'Please enter a valid domain name'
       }
 
       if (!this.errors.newDomain) {
@@ -472,8 +382,7 @@ export default {
         )
         .then(({ data }) => {
           this.addDomainLoading = false
-          this.domains.push(data.data)
-          this.reSort()
+          this.rows.push(data.data)
           this.newDomain = ''
           this.addDomainModalOpen = false
           this.success('Custom domain added')
@@ -546,12 +455,12 @@ export default {
           this.error()
         })
     },
-    activateDomain(domain) {
+    activateDomain(id) {
       axios
         .post(
           `/active-domains`,
           JSON.stringify({
-            id: domain.id,
+            id: id,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -564,9 +473,9 @@ export default {
           this.error()
         })
     },
-    deactivateDomain(domain) {
+    deactivateDomain(id) {
       axios
-        .delete(`/active-domains/${domain.id}`)
+        .delete(`/active-domains/${id}`)
         .then(response => {
           //
         })
@@ -580,7 +489,7 @@ export default {
       axios
         .delete(`/domains/${id}`)
         .then(response => {
-          this.domains = _.filter(this.domains, domain => domain.id !== id)
+          this.rows = _.reject(this.rows, domain => domain.id === id)
           this.deleteDomainModalOpen = false
           this.deleteDomainLoading = false
         })
@@ -589,20 +498,6 @@ export default {
           this.deleteDomainLoading = false
           this.deleteDomainModalOpen = false
         })
-    },
-    sort(col, dir) {
-      if (this.currentSort === col && this.currentSortDir === dir) {
-        this.currentSort = 'created_at'
-        this.currentSortDir = 'desc'
-      } else {
-        this.currentSort = col
-        this.currentSortDir = dir
-      }
-
-      this.reSort()
-    },
-    reSort() {
-      this.domains = _.orderBy(this.domains, [this.currentSort], [this.currentSortDir])
     },
     validDomain(domain) {
       let re = /(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]\.)+[a-zA-Z]{2,63}$)/

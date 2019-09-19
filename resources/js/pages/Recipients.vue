@@ -114,8 +114,8 @@
           <span v-if="props.row.fingerprint" class="flex">
             <Toggle
               v-model="rows[props.row.originalIndex].should_encrypt"
-              @on="turnOnEncryption(props.row)"
-              @off="turnOffEncryption(props.row)"
+              @on="turnOnEncryption(props.row.id)"
+              @off="turnOffEncryption(props.row.id)"
             />
             <icon
               name="fingerprint"
@@ -601,12 +601,12 @@ export default {
           }
         })
     },
-    turnOnEncryption(recipient) {
+    turnOnEncryption(id) {
       axios
         .post(
           `/encrypted-recipients`,
           JSON.stringify({
-            id: recipient.id,
+            id: id,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -619,9 +619,9 @@ export default {
           this.error()
         })
     },
-    turnOffEncryption(recipient) {
+    turnOffEncryption(id) {
       axios
-        .delete(`/encrypted-recipients/${recipient.id}`)
+        .delete(`/encrypted-recipients/${id}`)
         .then(response => {
           //
         })

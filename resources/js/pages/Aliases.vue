@@ -255,7 +255,7 @@
         >
           {{ props.row.emails_replied }}
         </span>
-        <span v-else-if="props.column.field === 'active'" class="flex items-center justify-center">
+        <span v-else-if="props.column.field === 'active'" class="flex items-center">
           <Toggle
             v-model="rows[props.row.originalIndex].active"
             @on="activateAlias(props.row.id)"
