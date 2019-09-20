@@ -221,12 +221,12 @@ table.vgt-table tr.clickable:hover {
 }
 
 .vgt-wrap__footer {
-  @apply p-4 text-grey-400 bg-white border border-grey-200;
+  @apply p-4 text-grey-400 bg-white;
 }
 
 .vgt-wrap__footer .footer__row-count__label,
 .vgt-wrap__footer .footer__row-count__select {
-  @apply inline-block align-middle;
+  @apply inline-block align-middle bg-white;
 }
 
 .vgt-wrap__footer .footer__row-count__label {
@@ -305,7 +305,7 @@ table.vgt-table tr.clickable:hover {
 }
 
 .vgt-wrap__footer .footer__navigation__page-info__current-entry {
-  @apply text-center w-6 inline-block my-0 mx-2 font-bold;
+  @apply text-center w-6 inline-block my-0 mx-2 font-bold border border-grey-200;
 }
 
 @media only screen and (max-width: 750px) {

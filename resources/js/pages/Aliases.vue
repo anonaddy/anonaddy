@@ -142,6 +142,13 @@
         enabled: true,
         initialSortBy: { field: 'created_at', type: 'desc' },
       }"
+      :pagination-options="{
+        enabled: true,
+        mode: 'pages',
+        perPage: 25,
+        perPageDropdown: [25, 50, 100],
+        rowsPerPageLabel: 'Aliases per page',
+      }"
       styleClass="vgt-table"
     >
       <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
