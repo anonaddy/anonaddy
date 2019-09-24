@@ -131,6 +131,7 @@
     <vue-good-table
       v-if="initialAliases.length"
       @on-search="debounceToolips"
+      @on-page-change="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{

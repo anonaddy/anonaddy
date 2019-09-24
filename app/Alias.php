@@ -66,9 +66,9 @@ class Alias extends Model
     /**
      * Get the custom domain for the email alias.
      */
-    public function domain()
+    public function customDomain()
     {
-        return $this->belongsTo(Domain::class);
+        return $this->belongsTo(Domain::class, 'domain_id');
     }
 
     /**
@@ -76,7 +76,7 @@ class Alias extends Model
      */
     public function recipients()
     {
-        return $this->BelongsToMany(Recipient::class, 'alias_recipients')->withPivot('id')->using(AliasRecipient::class);
+        return $this->belongsToMany(Recipient::class, 'alias_recipients')->withPivot('id')->using(AliasRecipient::class);
     }
 
     /**
@@ -93,6 +93,11 @@ class Alias extends Model
     public function verifiedRecipientsOrDefault()
     {
         if ($this->verifiedRecipients()->count() === 0) {
+            // If the alias is for a custom domain that has a default recipient set.
+            if (isset($this->customDomain->defaultRecipient)) {
+                return $this->customDomain->defaultRecipient();
+            }
+
             return $this->user->defaultRecipient();
         }
 

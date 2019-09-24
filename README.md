@@ -19,16 +19,13 @@ I made the code open-source to show everyone what was going on behind the scenes
 
 I use this service myself for the vast majority of sites I'm signed up to.
 
-
 #### **Do you store emails?**
 
 No I definitely do not store/save any emails that pass through the server.
 
-
 #### **Can I use my own domain?**
 
 Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add an MX record to your domain so that our server can handle incoming emails.
-
 
 #### **Why should I use this instead of a similar service?**
 
@@ -46,7 +43,6 @@ Here are a few reasons I can think of:
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
 
-
 #### **How do I add my own GPG/OpenPGP key for encryption?**
 
 On the recipients page you simply need to click "Add public key" and paste in your **public** key data. Now all emails forwarded to you will be encrypted with your key. You should also replace the subject line of forwarded messages in your account settings as this cannot be encrypted.
@@ -63,7 +59,6 @@ You can add this key to your own keyring so that you can verify emails have come
 
 The fingerprint of the mailer@anonaddy.me key is "26A987650243B28802524E2F809FD0D502E2F695" you can find the key on [https://keys.openpgp.org](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695).
 
-
 #### **What if I don't want anyone to link ownership of my aliases together?**
 
 If you're concerned that your aliases are all linked by your username e.g. @johndoe.anonaddy.com, then you have a couple of options:
@@ -71,21 +66,17 @@ If you're concerned that your aliases are all linked by your username e.g. @john
 1. You can generate UUID aliases instead, these are all under the root domain and cannot be linked to a user.
 2. You can add additional usernames and separate your aliases under your these. e.g. you could have one username for personal stuff, another for work, another for hobbies etc.
 
-
 #### **Where is the server located?**
 
 The server is located in Amsterdam, Netherlands with [Greenhost.net](https://greenhost.net/). Greenhost focuses greatly on privacy and security and their servers run entirely on Dutch wind energy.
-
 
 #### **What if I don't trust you?**
 
 It's good to keep your guard up when online so you should never trust anyone 100%. I'll try my best to be as honest and transparent as I can but if you still aren't convinced you can always just fire up your own server and self-host this application. You'll need to know about server administration and PHP. I'll be adding more details on how to do this soon.
 
-
 #### **What is the maximum number of recipients I can add to an alias?**
 
 The limit is currently set to 10 which should suffice in the vast majority of situations.
-
 
 #### **What happens when I delete my account?**
 
@@ -100,7 +91,6 @@ When you delete your account the following happens:
 
 The reason aliases with a custom domain are soft deleted (a deleted_at column is filled in the database) is to ensure that nobody else can register your same domain in the future and then sign up to our site and receive emails for aliases you have previously used.
 
-
 #### **Does this work with any email provider?**
 
 Yes this will work with any provider, althought I can't guarantee it won't land in spam initially.
@@ -110,16 +100,28 @@ Yes this will work with any provider, althought I can't guarantee it won't land 
 
 No, your real email will not be shown, the email will look as if it has come from us instead. Just make sure not to include anything that might identify you when composing the reply, i.e. your full name.
 
-
 #### **Can emails have attachments?**
 
 Yes you can add attachments to emails forwarded and replies. Attachments count towards your bandwidth.
-
 
 #### **What is the max email size limit?**
 
 The max email size is currently set to 10MB (including attachments).
 
+#### **What happens if I have a subscription but then cancel it?**
+
+If you cancel your subscription it will remain active until the end of your current billing cycle, you will still be able to use Pro features until the billing cycle ends.
+
+A few days before your billing cycle ends you will receive an email letting you know the steps you need to take to prevent the loss of any emails. Shortly after ending the following will happen:
+
+* Any custom domains will be **deactivated**
+* Any additional usernames will be **deactivated**
+* If you have any more than **2 recipients** they will be **deleted**
+* Pro account settings will be reverted to default values
+* Any aliases using Pro only domains will be **deactivated**
+* If you have any more than 20 UUID aliases they will be **deactivated**
+
+You will not be able to activate any of the above again until you resubscribe.
 
 #### **How do you prevent spammers?**
 
@@ -137,7 +139,6 @@ The following is in place to help prevent spam:
 
 The server is running a local DNS caching server to improve the speed of queries. DNS.WATCH resolvers are used as a fallback.
 
-
 #### **Is there a limit to how many emails I can forward?**
 
 Not unless you are really going to town. Each user is throttled to 200 emails per hour through the server.
@@ -154,26 +155,21 @@ I don't use rolling 30 day total as the only way to do this would be to log the 
 
 Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or deleted).
 
-
 #### **What happens if I go over my bandwidth limit in a given month?**
 
 If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month.
-
 
 #### **I'm not receiving any emails, what's wrong?**
 
 Please make sure to add mailer@anonaddy.me to your address book and check your spam folder. Make sure to mark emails from us as safe if they turn up in spam. If you still aren't receiving emails contact me.
 
-
 #### **How do I know this site won't disappear next month?**
 
 I am very passionite about this project. I use it myself everyday and will be keeping it running indefinitely.
 
-
 #### **Is the application tested?**
 
 Yes it has over 100 automated PHPUnit tests written.
-
 
 #### **How do I host this myself?**
 
@@ -182,7 +178,6 @@ You will need to set up your own server with Postfix so that you can pipe the re
 #### **Who's behind AnonAddy?**
 
 My name is Will Browning, I'm a web developer from the UK and an advocate for online privacy and open-source software. You can find me on [Twitter](https://twitter.com/willbrowningme) although I don't tweet that much!
-
 
 #### **I couldn't find an answer to my question, how can I contact you?**
 

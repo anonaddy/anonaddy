@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain;
+use App\Recipient;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -212,5 +213,80 @@ class DomainsTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertEmpty($this->user->domains);
+    }
+
+    /** @test */
+    public function user_can_update_domain_default_recipient()
+    {
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id,
+            'domain_verified_at' => now()
+        ]);
+
+        $newDefaultRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('PATCH', '/domains/'.$domain->id.'/default-recipient', [
+            'default_recipient' => $newDefaultRecipient->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('domains', [
+            'id' => $domain->id,
+            'default_recipient_id' => $newDefaultRecipient->id
+        ]);
+
+        $this->assertEquals($newDefaultRecipient->email, $domain->refresh()->defaultRecipient->email);
+    }
+
+    /** @test */
+    public function user_cannot_update_domain_default_recipient_with_unverified_recipient()
+    {
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id,
+            'domain_verified_at' => now()
+        ]);
+
+        $newDefaultRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email_verified_at' => null
+        ]);
+
+        $response = $this->json('PATCH', '/domains/'.$domain->id.'/default-recipient', [
+            'default_recipient' => $newDefaultRecipient->id
+        ]);
+
+        $response->assertStatus(404);
+        $this->assertDatabaseMissing('domains', [
+            'id' => $domain->id,
+            'default_recipient_id' => $newDefaultRecipient->id
+        ]);
+    }
+
+    /** @test */
+    public function user_can_remove_domain_default_recipient()
+    {
+        $defaultRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id,
+            'default_recipient_id' => $defaultRecipient->id,
+            'domain_verified_at' => now(),
+        ]);
+
+        $response = $this->json('PATCH', '/domains/'.$domain->id.'/default-recipient', [
+            'default_recipient' => ''
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('domains', [
+            'id' => $domain->id,
+            'default_recipient_id' => null
+        ]);
+
+        $this->assertNull($domain->refresh()->defaultRecipient);
     }
 }

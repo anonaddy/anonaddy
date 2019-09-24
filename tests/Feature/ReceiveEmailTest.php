@@ -934,4 +934,55 @@ class ReceiveEmailTest extends TestCase
             return $mail->hasTo($this->user->email);
         });
     }
+
+    /** @test */
+    public function it_can_forward_email_for_custom_domain_with_default_recipient()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id,
+            'default_recipient_id' => $recipient->id,
+            'domain' => 'example.com',
+            'domain_verified_at' => now()
+        ]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_custom_domain.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@example.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [''],
+                '--domain' => ['example.com'],
+                '--size' => '871'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'domain_id' => $domain->id,
+            'email' => 'ebay@example.com',
+            'local_part' => 'ebay',
+            'domain' => 'example.com',
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '871'
+        ]);
+        $this->assertEquals(1, $this->user->aliases()->count());
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient) {
+            return $mail->hasTo($recipient->email);
+        });
+    }
 }

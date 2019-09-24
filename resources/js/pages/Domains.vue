@@ -114,6 +114,23 @@
             />
           </div>
         </span>
+        <span v-else-if="props.column.field === 'default_recipient'">
+          <div v-if="props.row.default_recipient">
+            {{ props.row.default_recipient.email | truncate(30) }}
+            <icon
+              name="edit"
+              class="ml-2 inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              @click.native="openDomainDefaultRecipientModal(props.row)"
+            />
+          </div>
+          <div class="flex justify-center" v-else>
+            <icon
+              name="plus"
+              class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              @click.native="openDomainDefaultRecipientModal(props.row)"
+            />
+          </div>
+        </span>
         <span v-else-if="props.column.field === 'aliases_count'">
           {{ props.row.aliases.length }}
         </span>
@@ -225,6 +242,54 @@
       </div>
     </Modal>
 
+    <Modal :open="domainDefaultRecipientModalOpen" @close="closeDomainDefaultRecipientModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Update Default Recipient
+        </h2>
+        <p class="my-4 text-grey-700">
+          Select the default recipient for this domain. This overrides the default recipient in your
+          account settings. Leave it empty if you would like to use the default recipient in your
+          account settings.
+        </p>
+        <multiselect
+          v-model="defaultRecipient"
+          :options="recipientOptions"
+          :multiple="false"
+          :close-on-select="true"
+          :clear-on-select="false"
+          :searchable="false"
+          :allow-empty="true"
+          placeholder="Select recipient"
+          label="email"
+          track-by="email"
+          :preselect-first="false"
+          :show-labels="false"
+        >
+        </multiselect>
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="editDefaultRecipient()"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            :class="editDefaultRecipientLoading ? 'cursor-not-allowed' : ''"
+            :disabled="editDefaultRecipientLoading"
+          >
+            Update Default Recipient
+            <loader v-if="editDefaultRecipientLoading" />
+          </button>
+          <button
+            @click="closeDomainDefaultRecipientModal()"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+
     <Modal :open="deleteDomainModalOpen" @close="closeDeleteModal">
       <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
         <h2
@@ -263,6 +328,7 @@
 import Modal from './../components/Modal.vue'
 import Toggle from './../components/Toggle.vue'
 import tippy from 'tippy.js'
+import Multiselect from 'vue-multiselect'
 
 export default {
   props: {
@@ -274,10 +340,15 @@ export default {
       type: String,
       required: true,
     },
+    recipientOptions: {
+      type: Array,
+      required: true,
+    },
   },
   components: {
     Modal,
     Toggle,
+    Multiselect,
   },
   mounted() {
     this.addTooltips()
@@ -294,6 +365,10 @@ export default {
       deleteDomainLoading: false,
       deleteDomainModalOpen: false,
       recheckRecordsLoading: false,
+      domainDefaultRecipientModalOpen: false,
+      defaultRecipientDomainToEdit: {},
+      defaultRecipient: {},
+      editDefaultRecipientLoading: false,
       errors: {},
       columns: [
         {
@@ -309,6 +384,12 @@ export default {
           label: 'Description',
           field: 'description',
           width: '500px',
+        },
+        {
+          label: 'Default Recipient',
+          field: 'default_recipient',
+          sortable: false,
+          globalSearchDisabled: true,
         },
         {
           label: 'Alias Count',
@@ -428,6 +509,16 @@ export default {
       this.deleteDomainModalOpen = false
       this.domainIdToDelete = null
     },
+    openDomainDefaultRecipientModal(domain) {
+      this.domainDefaultRecipientModalOpen = true
+      this.defaultRecipientDomainToEdit = domain
+      this.defaultRecipient = domain.default_recipient
+    },
+    closeDomainDefaultRecipientModal() {
+      this.domainDefaultRecipientModalOpen = false
+      this.defaultRecipientDomainToEdit = {}
+      this.defaultRecipient = {}
+    },
     editDomain(domain) {
       if (this.domainDescriptionToEdit.length > 100) {
         return this.error('Description cannot be more than 100 characters')
@@ -452,6 +543,35 @@ export default {
         .catch(error => {
           this.domainIdToEdit = ''
           this.domainDescriptionToEdit = ''
+          this.error()
+        })
+    },
+    editDefaultRecipient() {
+      this.editDefaultRecipientLoading = true
+
+      axios
+        .patch(
+          `/domains/${this.defaultRecipientDomainToEdit.id}/default-recipient`,
+          JSON.stringify({
+            default_recipient: this.defaultRecipient ? this.defaultRecipient.id : '',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          let domain = _.find(this.rows, ['id', this.defaultRecipientDomainToEdit.id])
+          domain.default_recipient = this.defaultRecipient
+
+          this.domainDefaultRecipientModalOpen = false
+          this.editDefaultRecipientLoading = false
+          this.defaultRecipient = {}
+          this.success("Domain's default recipient updated")
+        })
+        .catch(error => {
+          this.domainDefaultRecipientModalOpen = false
+          this.editDefaultRecipientLoading = false
+          this.defaultRecipient = {}
           this.error()
         })
     },

@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::post('/domains', 'DomainController@store')->name('domains.store');
     Route::patch('/domains/{id}', 'DomainController@update')->name('domains.update');
     Route::delete('/domains/{id}', 'DomainController@destroy')->name('domains.destroy');
+    Route::patch('/domains/{id}/default-recipient', 'DomainDefaultRecipientController@update')->name('domains.default_recipient');
 
     Route::get('/domains/{id}/recheck', 'DomainVerificationController@recheck')->name('domain_verification.recheck');
 

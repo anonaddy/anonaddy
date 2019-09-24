@@ -166,6 +166,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's verified domains.
+     */
+    public function verifiedDomains()
+    {
+        return $this->domains()->whereNotNull('domain_verified_at');
+    }
+
+    /**
      * Get all of the alias recipient pivot rows for the user.
      */
     public function aliasRecipients()

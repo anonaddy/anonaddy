@@ -3,7 +3,9 @@
     <nav class="bg-indigo-900 py-4 shadow">
         <div class="container flex items-center justify-between flex-wrap">
             <div class="flex items-center flex-shrink-0 text-white mr-6">
-                <img class="w-32" alt="AnonAddy Logo" src="/svg/logo.svg">
+                <a href="{{ route('aliases.index') }}">
+                    <img class="h-6" alt="AnonAddy Logo" src="/svg/icon-logo.svg">
+                </a>
             </div>
             <div class="block md:hidden">
                 <button @click="mobileNavActive = !mobileNavActive" class="flex items-center px-3 py-2 border rounded text-indigo-200 border-indigo-400 hover:text-white hover:border-white focus:outline-none">

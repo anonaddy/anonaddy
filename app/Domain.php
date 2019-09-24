@@ -33,7 +33,8 @@ class Domain extends Model
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
-        'active' => 'boolean'
+        'active' => 'boolean',
+        'default_recipient_id' => 'string',
     ];
 
     /**
@@ -58,6 +59,23 @@ class Domain extends Model
     public function aliases()
     {
         return $this->hasMany(Alias::class);
+    }
+
+    /**
+     * Get the domains's default recipient.
+     */
+    public function defaultRecipient()
+    {
+        return $this->hasOne(Recipient::class, 'id', 'default_recipient_id');
+    }
+
+    /**
+     * Set the domains's default recipient.
+     */
+    public function setDefaultRecipientAttribute($recipient)
+    {
+        $this->attributes['default_recipient_id'] = $recipient->id;
+        $this->setRelation('defaultRecipient', $recipient);
     }
 
     /**
