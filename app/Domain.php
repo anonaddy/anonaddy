@@ -14,6 +14,8 @@ class Domain extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $encrypted = [
         'description'
     ];

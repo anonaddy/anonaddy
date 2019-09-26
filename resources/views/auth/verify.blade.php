@@ -23,12 +23,16 @@
                             {{ __('Before proceeding, please check your email for a verification link.') }} This link will expire after 1 hour.
                         </p>
 
-                        <a class="bg-cyan-400 w-full text-center hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:shadow-outline no-underline mx-auto" href="{{ route('verification.resend') }}">
-                            {{ __('Resend verification email') }}
-                        </a>
+                        <form method="POST" action="{{ route('verification.resend') }}" class="w-full">
+                            @csrf
+
+                            <button type="submit" class="bg-cyan-400 w-full text-center hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:shadow-outline no-underline mx-auto">
+                                {{ __('Resend verification email') }}
+                            </button>
+                        </form>
 
                         <p class="text-sm text-grey-600 mt-4 text-center w-full">
-                            You can resend once every 5 minutes.
+                            You can resend once per minute.
                         </p>
                     </div>
                 </div>

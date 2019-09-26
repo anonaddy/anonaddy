@@ -13,6 +13,8 @@ class Alias extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $encrypted = [
         'description'
     ];

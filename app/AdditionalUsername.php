@@ -12,6 +12,8 @@ class AdditionalUsername extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $encrypted = [
         'description'
     ];

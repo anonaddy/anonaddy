@@ -11,6 +11,8 @@ class AliasRecipient extends Pivot
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     public $timestamps = false;
 
     protected $table = 'alias_recipients';

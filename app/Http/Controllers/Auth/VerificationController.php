@@ -39,7 +39,7 @@ class VerificationController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('signed')->only('verify');
-        $this->middleware('throttle:1,5')->only('resend');
+        $this->middleware('throttle:1,1')->only('resend');
         $this->middleware('throttle:60,1')->only('verify');
     }
 
@@ -59,7 +59,9 @@ class VerificationController extends Controller
 
             $recipient->markEmailAsVerified();
 
-            return redirect(route('recipients.index'))->with('verified', true);
+            return redirect(route('recipients.index'))
+                ->with('verified', true)
+                ->with(['status' => 'Recipient Email Address Verified Successfully']);
         } else {
             if ($request->route('id') != $request->user()->getKey()) {
                 throw new AuthorizationException;

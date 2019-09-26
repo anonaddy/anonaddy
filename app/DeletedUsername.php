@@ -11,6 +11,8 @@ class DeletedUsername extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     public $timestamps = false;
 
     protected $encrypted = [

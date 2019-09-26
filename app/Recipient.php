@@ -15,6 +15,8 @@ class Recipient extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $encrypted = [
         'email',
         'fingerprint'
@@ -100,5 +102,15 @@ class Recipient extends Model
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail);
+    }
+
+    /**
+     * Get the email address that should be used for verification.
+     *
+     * @return string
+     */
+    public function getEmailForVerification()
+    {
+        return $this->email;
     }
 }

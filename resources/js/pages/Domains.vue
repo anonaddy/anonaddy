@@ -495,7 +495,7 @@ export default {
         .catch(error => {
           this.recheckRecordsLoading = false
           if (error.response.status === 429) {
-            this.error('You can only recheck the records once a minute')
+            this.error('You can only recheck the records once per minute')
           } else {
             this.error()
           }

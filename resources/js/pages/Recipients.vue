@@ -485,7 +485,15 @@ export default {
       this.resendVerificationLoading = true
 
       axios
-        .get(`/recipients/${id}/email/resend`)
+        .post(
+          '/recipients/email/resend',
+          JSON.stringify({
+            recipient_id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
         .then(({ data }) => {
           this.resendVerificationLoading = false
           this.success('Verification email resent')
@@ -493,7 +501,7 @@ export default {
         .catch(error => {
           this.resendVerificationLoading = false
           if (error.response.status === 429) {
-            this.error('You can only resend the email once every 5 minutes')
+            this.error('You can only resend the email once per minute')
           } else {
             this.error()
           }

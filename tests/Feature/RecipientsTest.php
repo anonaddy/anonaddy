@@ -197,7 +197,9 @@ class RecipientsTest extends TestCase
             'email_verified_at' => null
         ]);
 
-        $response = $this->get('/recipients/'.$recipient->id.'/email/resend');
+        $response = $this->json('POST', '/recipients/email/resend', [
+            'recipient_id' => $recipient->id
+        ]);
 
         $response->assertStatus(200);
 
@@ -219,7 +221,9 @@ class RecipientsTest extends TestCase
             'email_verified_at' => null
         ]);
 
-        $response = $this->get('/recipients/'.$recipient->id.'/email/resend');
+        $response = $this->json('POST', '/recipients/email/resend', [
+            'recipient_id' => $recipient->id
+        ]);
 
         $response->assertStatus(200);
 
@@ -228,7 +232,9 @@ class RecipientsTest extends TestCase
             VerifyEmail::class
         );
 
-        $response2 = $this->get('/recipients/'.$recipient->id.'/email/resend');
+        $response2 = $this->json('POST', '/recipients/email/resend', [
+            'recipient_id' => $recipient->id
+        ]);
 
         $response2->assertStatus(429);
     }

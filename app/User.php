@@ -14,6 +14,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     /**
      * The attributes that are mass assignable.
      *
