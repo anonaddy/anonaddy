@@ -160,7 +160,7 @@ If you get close to your limit you'll be sent an email letting you know. If you 
 
 Please make sure to add mailer@anonaddy.me to your address book and check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
 
-Please also check that the senders domain is not in the [disposable-email-domains](https://github.com/ivolo/disposable-email-domains) list mentioned above, as these are blocked.
+Please also check that the sender's domain is not in the [disposable-email-domains](https://github.com/ivolo/disposable-email-domains) list mentioned above, as these are blocked.
 
 If an alias has been previously deleted and you try to send email to it, the emails will bounce with an error message - "554 5.7.1 Recipient address rejected: Access denied".
 

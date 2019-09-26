@@ -234,6 +234,12 @@
             aliasRecipientsToEdit.length ? aliasRecipientsToEdit.length : '1'
           }}</span>
           <span
+            v-else-if="has(props.row.custom_domain, 'default_recipient.email')"
+            class="py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
+            :data-tippy-content="props.row.custom_domain.default_recipient.email"
+            >domain's default</span
+          >
+          <span
             v-else
             class="py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
             :data-tippy-content="defaultRecipient.email"
@@ -802,10 +808,12 @@ export default {
     sortRecipients(x, y) {
       return x.length < y.length ? -1 : x.length > y.length ? 1 : 0
     },
+    has(object, path) {
+      return _.has(object, path)
+    },
     clipboardSuccess() {
       this.success('Copied to clipboard')
     },
-
     clipboardError() {
       this.error('Could not copy to clipboard')
     },
