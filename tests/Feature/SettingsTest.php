@@ -204,11 +204,10 @@ class SettingsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $this->assertDatabaseHas('aliases', [
+        $this->assertDatabaseMissing('aliases', [
             'id' => $aliasWithCustomDomain->id,
             'user_id' => $this->user->id,
-            'domain_id' => $domain->id,
-            'deleted_at' => now()
+            'domain_id' => $domain->id
         ]);
 
         $this->assertDatabaseMissing('recipients', [

@@ -83,18 +83,15 @@ The limit is currently set to 10 which should suffice in the vast majority of si
 When you delete your account the following happens:
 
 * All of your recipients are deleted from the database
-* All of your aliases are deleted from the database (aliases with a custom domain are soft deleted - see why below)
+* All of your aliases are deleted from the database
 * All of your custom domains are deleted from the database
 * Your user details are deleted from the database
-* Your username and any additional usernames you added are encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
+* Your username and any additional usernames that you created are encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
 * Any subscription information is deleted from the database
-
-The reason aliases with a custom domain are soft deleted (a deleted_at column is filled in the database) is to ensure that nobody else can register your same domain in the future and then sign up to our site and receive emails for aliases you have previously used.
 
 #### **Does this work with any email provider?**
 
 Yes this will work with any provider, althought I can't guarantee it won't land in spam initially.
-
 
 #### **Will people see my real email if I reply to a forwarded one?**
 
@@ -161,7 +158,17 @@ If you get close to your limit you'll be sent an email letting you know. If you 
 
 #### **I'm not receiving any emails, what's wrong?**
 
-Please make sure to add mailer@anonaddy.me to your address book and check your spam folder. Make sure to mark emails from us as safe if they turn up in spam. If you still aren't receiving emails contact me.
+Please make sure to add mailer@anonaddy.me to your address book and check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
+
+Please also check that the senders domain is not in the [disposable-email-domains](https://github.com/ivolo/disposable-email-domains) list mentioned above, as these are blocked.
+
+If an alias has been previously deleted and you try to send email to it, the emails will bounce with an error message - "554 5.7.1 Recipient address rejected: Access denied".
+
+Check that you have not deactivated the alias, custom domain or additional username. When any of these are deactivated, emails will be silently discarded, they will not bounce or return any error message.
+
+The sender of the email may be failing SPF, DMARC or DNS blacklist checks resulting in the email being rejected. The sender should also have correct reverse DNS setup and use a FQDN as their hostname.
+
+If you still aren't receiving emails please contact me.
 
 #### **How do I know this site won't disappear next month?**
 
