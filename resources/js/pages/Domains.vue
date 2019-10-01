@@ -383,7 +383,6 @@ export default {
         {
           label: 'Description',
           field: 'description',
-          width: '500px',
         },
         {
           label: 'Default Recipient',

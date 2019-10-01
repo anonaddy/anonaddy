@@ -65,22 +65,28 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
 });
 
 
-Route::middleware(['auth', '2fa'])->group(function () {
-    Route::get('/settings', 'SettingController@show')->name('settings.show');
-    Route::post('/settings/account', 'SettingController@destroy')->name('account.destroy');
+Route::group([
+    'middleware' => ['auth', '2fa'],
+    'prefix' => 'settings'
+], function () {
+    Route::get('/', 'SettingController@show')->name('settings.show');
+    Route::post('/account', 'SettingController@destroy')->name('account.destroy');
 
-    Route::post('/settings/default-recipient', 'DefaultRecipientController@update')->name('settings.default_recipient');
-    Route::post('/settings/edit-default-recipient', 'DefaultRecipientController@edit')->name('settings.edit_default_recipient');
+    Route::post('/default-recipient', 'DefaultRecipientController@update')->name('settings.default_recipient');
+    Route::post('/edit-default-recipient', 'DefaultRecipientController@edit')->name('settings.edit_default_recipient');
 
-    Route::post('/settings/from-name', 'FromNameController@update')->name('settings.from_name');
+    Route::post('/from-name', 'FromNameController@update')->name('settings.from_name');
 
-    Route::post('/settings/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');
+    Route::post('/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');
 
-    Route::post('/settings/banner-location', 'BannerLocationController@update')->name('settings.banner_location');
+    Route::post('/banner-location', 'BannerLocationController@update')->name('settings.banner_location');
 
-    Route::post('/settings/password', 'PasswordController@update')->name('settings.password');
+    Route::post('/password', 'PasswordController@update')->name('settings.password');
 
-    Route::post('/settings/2fa/enable', 'TwoFactorAuthController@store')->name('settings.2fa_enable');
-    Route::post('/settings/2fa/regenerate', 'TwoFactorAuthController@update')->name('settings.2fa_regenerate');
-    Route::post('/settings/2fa/disable', 'TwoFactorAuthController@destroy')->name('settings.2fa_disable');
+    Route::post('/2fa/enable', 'TwoFactorAuthController@store')->name('settings.2fa_enable');
+    Route::post('/2fa/regenerate', 'TwoFactorAuthController@update')->name('settings.2fa_regenerate');
+    Route::post('/2fa/disable', 'TwoFactorAuthController@destroy')->name('settings.2fa_disable');
+
+    Route::post('/api-token', 'Api\ApiTokenController@update')->name('api_token.update');
+    Route::delete('/api-token', 'Api\ApiTokenController@destroy')->name('api_token.destroy');
 });

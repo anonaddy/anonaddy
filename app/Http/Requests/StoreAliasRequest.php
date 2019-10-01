@@ -29,7 +29,8 @@ class StoreAliasRequest extends FormRequest
                 'required',
                 'string',
                 Rule::in(config('anonaddy.all_domains'))
-            ]
+            ],
+            'description' => 'nullable|max:100'
         ];
     }
 }

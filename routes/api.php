@@ -10,3 +10,10 @@
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::group([
+  'middleware' => ['verified'],
+  'prefix' => 'v1'
+], function () {
+    Route::post('/aliases', 'Api\AliasApiController@store');
+});

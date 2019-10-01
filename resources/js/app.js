@@ -24,6 +24,8 @@ Vue.use(VueGoodTablePlugin)
 Vue.component('loader', require('./components/Loader.vue').default)
 Vue.component('dropdown', require('./components/DropdownNav.vue').default)
 Vue.component('icon', require('./components/Icon.vue').default)
+Vue.component('api-token', require('./components/ApiToken.vue').default)
+
 Vue.component('aliases', require('./pages/Aliases.vue').default)
 Vue.component('recipients', require('./pages/Recipients.vue').default)
 Vue.component('domains', require('./pages/Domains.vue').default)

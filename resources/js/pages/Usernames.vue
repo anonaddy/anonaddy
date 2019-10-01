@@ -163,7 +163,8 @@
         </h2>
         <p class="mt-4 text-grey-700">
           Please choose additional usernames carefully as you can only add a maximum of
-          {{ usernameCount }}.
+          {{ usernameCount }}. You cannot login with these usernames, only the one you originally
+          signed up with.
         </p>
         <div class="mt-6">
           <p v-show="errors.newUsername" class="mb-3 text-red-500">

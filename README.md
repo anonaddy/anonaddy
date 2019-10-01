@@ -19,6 +19,17 @@ I made the code open-source to show everyone what was going on behind the scenes
 
 I use this service myself for the vast majority of sites I'm signed up to.
 
+#### **Why should I use AnonAddy?**
+
+There are a number of reasons you should consider using this service:
+
+* Protect your real email address from spam by simply deactivating/deleting aliases that receive unsolicited emails
+* Identify who has sold your data by using a different email address for every site
+* Protect your identity in the event of a data breach by making it difficult for hackers to cross-reference your accounts
+* Prevent inbox snooping by encrypting all inbound emails using GPG/OpenPGP encryption
+* Update where emails are forwarded without having to go through and change your email address for each site individually
+* Reply to forwarded emails anonymously without revealing your true email address
+
 #### **Do you store emails?**
 
 No I definitely do not store/save any emails that pass through the server.
@@ -38,7 +49,7 @@ Here are a few reasons I can think of:
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
-* Multiple domains to choose for aliases (currently anonaddy.com and anonaddy.me)
+* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another for Pro plan users)
 * Ability to generate UUID aliases
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly

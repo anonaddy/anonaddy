@@ -430,6 +430,19 @@
 
         <div class="mb-4">
             <h2 class="text-3xl font-bold">
+                API
+            </h2>
+            <p class="text-grey-500">Manage your API Token (the API is currently a work in progress)</p>
+        </div>
+
+        <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
+
+            <api-token initial-token="{{ $user->api_token }}" />
+
+        </div>
+
+        <div class="mb-4">
+            <h2 class="text-3xl font-bold">
                 Danger Zone
             </h2>
             <p class="text-grey-500">Irreversible and destructive actions</p>
