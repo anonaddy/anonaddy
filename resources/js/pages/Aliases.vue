@@ -351,12 +351,13 @@
           Other aliases e.g. alias@{{ subdomain }} are created automatically when they receive their
           first email.
         </p>
-        <label for="banner_location" class="block text-grey-700 text-sm my-2">
+        <label for="alias_domain" class="block text-grey-700 text-sm my-2">
           Alias Domain:
         </label>
         <div class="block relative w-full">
           <select
             v-model="generateAliasDomain"
+            id="alias_domain"
             class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
             required
           >

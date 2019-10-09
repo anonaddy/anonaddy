@@ -12,7 +12,7 @@
 */
 
 Route::group([
-  'middleware' => ['verified'],
+  'middleware' => ['cors', 'verified'],
   'prefix' => 'v1'
 ], function () {
     Route::post('/aliases', 'Api\AliasApiController@store');
