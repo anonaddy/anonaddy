@@ -21,7 +21,7 @@
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 <body class="bg-grey-50 antialiased text-grey-900">
-    <div id="app">
+    <div id="app" v-cloak>
 
         @include('nav.nav')
 
