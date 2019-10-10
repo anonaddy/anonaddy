@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-6">
     <h3 class="font-bold text-xl">{{ token ? 'Rotate' : 'Generate' }} API Token</h3>
 
     <div class="my-4 w-24 border-b-2 border-grey-200"></div>
@@ -17,7 +17,7 @@
       :class="loading ? 'cursor-not-allowed' : ''"
       :disabled="loading"
     >
-      {{ token ? 'Rotate' : 'Generate' }} Token
+      {{ token ? 'Rotate' : 'Generate New' }} Token
       <loader v-if="loading" />
     </button>
 
@@ -32,12 +32,7 @@
         To revoke the current API token simply click the button below.
       </p>
 
-      <button
-        @click="revoke"
-        class="text-red-500 font-bold focus:outline-none"
-        :class="revokeLoading ? 'cursor-not-allowed' : ''"
-        :disabled="revokeLoading"
-      >
+      <button @click="revokeModalOpen = true" class="text-red-500 font-bold focus:outline-none">
         Revoke Token
       </button>
     </div>
@@ -75,6 +70,37 @@
         </div>
       </div>
     </Modal>
+
+    <Modal :open="revokeModalOpen" @close="closeRevokeModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Revoke API Token
+        </h2>
+        <p class="my-4 text-grey-700">
+          Any browser extension, application or script using this API token will no longer be able
+          to access the AnonAddy API. This action cannot be undone.
+        </p>
+        <div class="mt-6">
+          <button
+            @click="revoke"
+            class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none"
+            :class="revokeLoading ? 'cursor-not-allowed' : ''"
+            :disabled="revokeLoading"
+          >
+            Revoke Token
+            <loader v-if="revokeLoading" />
+          </button>
+          <button
+            @click="closeRevokeModal"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -96,6 +122,7 @@ export default {
       loading: false,
       revokeLoading: false,
       modalOpen: false,
+      revokeModalOpen: false,
       token: this.initialToken,
     }
   },
@@ -125,17 +152,22 @@ export default {
           headers: { 'Content-Type': 'application/json' },
         })
         .then(response => {
+          this.revokeModalOpen = false
           this.revokeLoading = false
           this.token = ''
           this.success('Token Revoked Successfully!')
         })
         .catch(error => {
+          this.revokeModalOpen = false
           this.revokeLoading = false
           this.error()
         })
     },
     closeModal() {
       this.modalOpen = false
+    },
+    closeRevokeModal() {
+      this.revokeModalOpen = false
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')
