@@ -31,6 +31,11 @@ Vue.component('recipients', require('./pages/Recipients.vue').default)
 Vue.component('domains', require('./pages/Domains.vue').default)
 Vue.component('usernames', require('./pages/Usernames.vue').default)
 
+Vue.component(
+  'passport-personal-access-tokens',
+  require('./components/passport/PersonalAccessTokens.vue').default
+)
+
 Vue.filter('formatDate', value => {
   return dayjs(value).format('Do MMM YYYY')
 })

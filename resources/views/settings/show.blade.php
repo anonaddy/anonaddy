@@ -432,22 +432,12 @@
             <h2 class="text-3xl font-bold">
                 API
             </h2>
-            <p class="text-grey-500">Manage your API Token</p>
+            <p class="text-grey-500">Manage your API Access Tokens</p>
         </div>
 
         <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
 
-            <h3 class="font-bold text-xl">
-                Information
-            </h3>
-
-            <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
-
-            <p class="mt-6">
-                Your API token can be used with the <a href="https://github.com/anonaddy/browser-extension" target="_blank" rel="nofollow noopener noreferrer" class="text-indigo-700">open-source</a> AnonAddy browser extension on <a href="https://addons.mozilla.org/en-GB/firefox/addon/anonaddy/" target="_blank" rel="nofollow noopener noreferrer" class="text-indigo-700">Firefox</a> or <a href="https://chrome.google.com/webstore/detail/anonaddy/iadbdpnoknmbdeolbapdackdcogdmjpe" target="_blank" rel="nofollow noopener noreferrer" class="text-indigo-700">Chrome / Brave</a> to generate UUID aliases. Simply paste the token generated below into the browser extension to get started. Your API token is secret and should be treated like your password.
-            </p>
-
-            <api-token initial-token="{{ $user->api_token }}" />
+            <passport-personal-access-tokens />
 
         </div>
 

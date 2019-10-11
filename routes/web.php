@@ -86,7 +86,4 @@ Route::group([
     Route::post('/2fa/enable', 'TwoFactorAuthController@store')->name('settings.2fa_enable');
     Route::post('/2fa/regenerate', 'TwoFactorAuthController@update')->name('settings.2fa_regenerate');
     Route::post('/2fa/disable', 'TwoFactorAuthController@destroy')->name('settings.2fa_disable');
-
-    Route::post('/api-token', 'Api\ApiTokenController@update')->name('api_token.update');
-    Route::delete('/api-token', 'Api\ApiTokenController@destroy')->name('api_token.destroy');
 });

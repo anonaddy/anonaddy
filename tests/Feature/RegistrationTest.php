@@ -50,7 +50,6 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_can_verify_email_successfully()
     {
-        $this->withoutExceptionHandling();
         $user = factory(User::class)->create();
         $user->email_verified_at = null;
         $user->save();

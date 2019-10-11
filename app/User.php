@@ -7,10 +7,11 @@ use App\Traits\HasUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasUuid, HasEncryptedAttributes;
+    use Notifiable, HasUuid, HasEncryptedAttributes, HasApiTokens;
 
     public $incrementing = false;
 
@@ -48,7 +49,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $hidden = [
         'password',
-        'api_token',
         'remember_token',
         'two_factor_secret',
         'two_factor_backup_code'
