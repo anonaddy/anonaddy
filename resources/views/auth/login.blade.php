@@ -4,8 +4,6 @@
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">
         <div class="w-full max-w-md">
 
-            @include('shared.status')
-
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
                 <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
             </div>
@@ -20,6 +18,12 @@
                         </h1>
 
                         <div class="mx-auto mt-6 w-24 border-b-2 border-grey-200"></div>
+
+                        @if (session('status'))
+                            <div class="text-sm border-t-8 rounded text-green-700 border-green-600 bg-green-100 px-3 py-4 mt-4" role="alert">
+                                {{ session('status') }}
+                            </div>
+                        @endif
 
                         <div class="mt-8 flex flex-wrap mb-6">
                             <label for="username" class="block text-grey-700 text-sm mb-2">

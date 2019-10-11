@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Recipient;
+use App\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
@@ -37,10 +39,10 @@ class VerificationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except('verify');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:1,1')->only('resend');
-        $this->middleware('throttle:60,1')->only('verify');
+        $this->middleware('throttle:6,1')->only('verify');
     }
 
     /**
@@ -52,30 +54,36 @@ class VerificationController extends Controller
      */
     public function verify(Request $request)
     {
-        if ($recipient = $request->user()->recipients()->find($request->route('id'))) {
-            if ($recipient->hasVerifiedEmail()) {
-                return redirect($this->redirectPath());
-            }
+        $verifiable = User::find($request->route('id')) ?? Recipient::find($request->route('id'));
 
-            $recipient->markEmailAsVerified();
-
-            return redirect(route('recipients.index'))
-                ->with('verified', true)
-                ->with(['status' => 'Recipient Email Address Verified Successfully']);
-        } else {
-            if ($request->route('id') != $request->user()->getKey()) {
-                throw new AuthorizationException;
-            }
-
-            if ($request->user()->hasVerifiedEmail()) {
-                return redirect($this->redirectPath());
-            }
-
-            if ($request->user()->markEmailAsVerified()) {
-                event(new Verified($request->user()));
-            }
-
-            return redirect($this->redirectPath())->with('verified', true);
+        if (is_null($verifiable)) {
+            throw new AuthorizationException;
         }
+
+        if (! hash_equals((string) $request->route('id'), (string) $verifiable->getKey())) {
+            throw new AuthorizationException;
+        }
+
+        if (! hash_equals((string) $request->route('hash'), sha1($verifiable->getEmailForVerification()))) {
+            throw new AuthorizationException;
+        }
+
+        if ($verifiable->hasVerifiedEmail()) {
+            return redirect($this->redirectPath());
+        }
+
+        if ($verifiable->markEmailAsVerified() && $verifiable instanceof User) {
+            event(new Verified($verifiable));
+        }
+
+        if ($request->user() !== null) {
+            $redirect = $verifiable instanceof User ? $this->redirectPath() : route('recipients.index');
+        } else {
+            $redirect = 'login';
+        }
+
+        return redirect($redirect)
+            ->with('verified', true)
+            ->with(['status' => 'Email Address Verified Successfully']);
     }
 }

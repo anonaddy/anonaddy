@@ -9,7 +9,9 @@ use App\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class RecipientsTest extends TestCase
@@ -207,6 +209,34 @@ class RecipientsTest extends TestCase
             $recipient,
             VerifyEmail::class
         );
+    }
+
+    /** @test */
+    public function user_can_verify_recipient_email_successfully()
+    {
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email_verified_at' => null
+        ]);
+
+        $this->assertNull($recipient->refresh()->email_verified_at);
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            [
+                'id' => $recipient->getKey(),
+                'hash' => sha1($recipient->getEmailForVerification()),
+            ]
+        );
+
+        $response = $this->get($verificationUrl);
+
+        $response
+            ->assertRedirect('/recipients')
+            ->assertSessionHas('verified');
+
+        $this->assertNotNull($recipient->refresh()->email_verified_at);
     }
 
     /** @test */

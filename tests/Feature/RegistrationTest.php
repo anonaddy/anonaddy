@@ -6,7 +6,12 @@ use App\AdditionalUsername;
 use App\DeletedUsername;
 use App\Recipient;
 use App\User;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -16,6 +21,8 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_can_register_successfully()
     {
+        Notification::fake();
+
         $response = $this->post('/register', [
             'username' => 'johndoe',
             'email' => 'johndoe@example.com',
@@ -31,6 +38,41 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => 'johndoe'
         ]);
+
+        $user = User::where('username', 'johndoe')->first();
+
+        Notification::assertSentTo(
+            $user,
+            VerifyEmail::class
+        );
+    }
+
+    /** @test */
+    public function user_can_verify_email_successfully()
+    {
+        $this->withoutExceptionHandling();
+        $user = factory(User::class)->create();
+        $user->email_verified_at = null;
+        $user->save();
+
+        $this->assertNull($user->refresh()->email_verified_at);
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            [
+                'id' => $user->getKey(),
+                'hash' => sha1($user->getEmailForVerification()),
+            ]
+        );
+
+        $response = $this->actingAs($user)->get($verificationUrl);
+
+        $response
+            ->assertRedirect('/')
+            ->assertSessionHas('verified');
+
+        $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
     /** @test */
