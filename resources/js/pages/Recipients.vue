@@ -228,7 +228,6 @@
           </p>
           <textarea
             v-model="recipientKey"
-            type="email"
             class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
             :class="errors.recipientKey ? 'border-red-500' : ''"
             placeholder="Begins with '-----BEGIN PGP PUBLIC KEY BLOCK-----'"

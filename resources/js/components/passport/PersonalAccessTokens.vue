@@ -59,22 +59,22 @@
           You have not created any personal access tokens.
         </p>
 
-        <div class="table w-full" v-if="tokens.length > 0">
+        <div class="table w-full text-sm md:text-base" v-if="tokens.length > 0">
           <div class="table-row">
-            <div class="table-cell p-4 font-semibold">Name</div>
-            <div class="table-cell p-4 font-semibold">Created</div>
-            <div class="table-cell p-4 font-semibold">Expires</div>
-            <div class="table-cell p-4"></div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Expires</div>
+            <div class="table-cell p-1 md:p-4"></div>
           </div>
           <div
             v-for="token in tokens"
             :key="token.id"
             class="table-row even:bg-grey-50 odd:bg-white"
           >
-            <div class="table-cell p-4">{{ token.name }}</div>
-            <div class="table-cell p-4">{{ token.created_at | timeAgo }}</div>
-            <div class="table-cell p-4">{{ token.expires_at | timeAgo }}</div>
-            <div class="table-cell p-4 text-right">
+            <div class="table-cell p-1 md:p-4">{{ token.name }}</div>
+            <div class="table-cell p-1 md:p-4">{{ token.created_at | timeAgo }}</div>
+            <div class="table-cell p-1 md:p-4">{{ token.expires_at | timeAgo }}</div>
+            <div class="table-cell p-1 md:p-4 text-right">
               <a
                 class="text-red-500 font-bold cursor-pointer focus:outline-none"
                 @click="showRevokeModal(token)"
@@ -88,7 +88,7 @@
     </div>
 
     <Modal :open="createTokenModalOpen" @close="closeCreateTokenModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+      <div v-if="!accessToken" class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
@@ -134,10 +134,7 @@
           </button>
         </div>
       </div>
-    </Modal>
-
-    <Modal :open="accessTokenModalOpen" @close="closeAccessTokenModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+      <div v-else class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
@@ -147,16 +144,13 @@
           This is your new personal access token. This is the only time the token will ever be
           displayed, so please make a note of it in a safe place (e.g. password manager)!
         </p>
-        <pre class="hidden md:flex p-3 text-grey-900 bg-white border rounded">
-            <code class="break-all whitespace-normal text-xs">{{ accessToken }}</code>
-        </pre>
-        <div
-          class="md:hidden text-sm border-t-8 rounded text-yellow-800 border-yellow-600 bg-yellow-100 px-3 py-4"
-          role="alert"
+        <textarea
+          v-model="accessToken"
+          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-sm"
+          rows="10"
+          disabled
         >
-          The token is too long to display on a small device, click the button below to copy it to
-          your clipboard.
-        </div>
+        </textarea>
         <div class="mt-6">
           <button
             class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
@@ -167,7 +161,7 @@
             Copy To Clipboard
           </button>
           <button
-            @click="closeAccessTokenModal"
+            @click="closeCreateTokenModal"
             class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Close
@@ -220,7 +214,6 @@ export default {
     return {
       accessToken: null,
       createTokenModalOpen: false,
-      accessTokenModalOpen: false,
       revokeTokenModalOpen: false,
       tokens: [],
       tokenToRevoke: null,
@@ -255,8 +248,7 @@ export default {
           this.form.errors = []
 
           this.tokens.push(response.data.token)
-
-          this.showAccessToken(response.data.accessToken)
+          this.accessToken = response.data.accessToken
         })
         .catch(error => {
           this.loading = false
@@ -266,11 +258,6 @@ export default {
             this.error()
           }
         })
-    },
-    showAccessToken(accessToken) {
-      this.createTokenModalOpen = false
-      this.accessToken = accessToken
-      this.accessTokenModalOpen = true
     },
     showRevokeModal(token) {
       this.tokenToRevoke = token
@@ -287,13 +274,11 @@ export default {
       })
     },
     openCreateTokenModal() {
+      this.accessToken = null
       this.createTokenModalOpen = true
     },
     closeCreateTokenModal() {
       this.createTokenModalOpen = false
-    },
-    closeAccessTokenModal() {
-      this.accessTokenModalOpen = false
     },
     closeRevokeTokenModal() {
       this.revokeTokenModalOpen = false
