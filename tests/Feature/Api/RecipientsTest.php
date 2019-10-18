@@ -1,102 +1,62 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
-use App\Alias;
-use App\AliasRecipient;
 use App\Recipient;
-use App\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class RecipientsTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $user;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->actingAs($this->user);
+        parent::setUpPassport();
     }
 
     /** @test */
-    public function user_can_view_recipients_from_the_recipients_page()
+    public function user_can_get_all_recipients()
     {
-        $recipients = factory(Recipient::class, 5)->create([
+        // Arrange
+        factory(Recipient::class, 3)->create([
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->get('/recipients');
+        // Act
+        $response = $this->get('/api/v1/recipients');
 
+        // Assert
         $response->assertSuccessful();
-        $this->assertCount(5, $response->data('recipients'));
-        $recipients->assertEquals($response->data('recipients'));
+        $this->assertCount(3, $response->json()['data']);
     }
 
     /** @test */
-    public function latest_recipients_are_listed_first()
+    public function user_can_get_individual_recipient()
     {
-        $a = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
-        ]);
-        $b = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
-        ]);
-        $c = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
-        ]);
-
-        $response = $this->get('/recipients');
-
-        $response->assertSuccessful();
-        $this->assertCount(3, $response->data('recipients'));
-        $this->assertTrue($response->data('recipients')[0]->is($b));
-        $this->assertTrue($response->data('recipients')[1]->is($c));
-        $this->assertTrue($response->data('recipients')[2]->is($a));
-    }
-
-    /** @test */
-    public function recipients_are_listed_with_aliases_count()
-    {
+        // Arrange
         $recipient = factory(Recipient::class)->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class, 3)->create(['user_id' => $this->user->id])
-        ->each(function ($alias) use ($recipient) {
-            AliasRecipient::create([
-                'alias' => $alias,
-                'recipient' => $recipient
-            ]);
-        });
+        // Act
+        $response = $this->get('/api/v1/recipients/'.$recipient->id);
 
-        $response = $this->get('/recipients');
-
+        // Assert
         $response->assertSuccessful();
-        $this->assertCount(1, $response->data('recipients'));
-        $this->assertCount(3, $response->data('recipients')[0]['aliases']);
+        $this->assertCount(1, $response->json());
+        $this->assertEquals($recipient->email, $response->json()['data']['email']);
     }
 
     /** @test */
     public function user_can_create_new_recipient()
     {
-        $response = $this->json('POST', '/recipients', [
+        $response = $this->json('POST', '/api/v1/recipients', [
             'email' => 'johndoe@example.com'
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $this->assertEquals('johndoe@example.com', $response->getData()->data->email);
     }
 
@@ -108,7 +68,7 @@ class RecipientsTest extends TestCase
             'email' => 'johndoe@example.com'
         ]);
 
-        $response = $this->json('POST', '/recipients', [
+        $response = $this->json('POST', '/api/v1/recipients', [
             'email' => 'johndoe@example.com'
         ]);
 
@@ -125,7 +85,7 @@ class RecipientsTest extends TestCase
             'email' => 'johndoe@example.com'
         ]);
 
-        $response = $this->json('POST', '/recipients', [
+        $response = $this->json('POST', '/api/v1/recipients', [
             'email' => 'JOHNdoe@example.com'
         ]);
 
@@ -139,7 +99,7 @@ class RecipientsTest extends TestCase
     {
         $this->user->recipients()->save($this->user->defaultRecipient);
 
-        $response = $this->json('POST', '/recipients', [
+        $response = $this->json('POST', '/api/v1/recipients', [
             'email' => $this->user->email
         ]);
 
@@ -151,7 +111,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function new_recipient_must_have_valid_email()
     {
-        $response = $this->json('POST', '/recipients', [
+        $response = $this->json('POST', '/api/v1/recipients', [
             'email' => 'johndoe@example.'
         ]);
 
@@ -167,7 +127,7 @@ class RecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('DELETE', '/recipients/'.$recipient->id);
+        $response = $this->json('DELETE', '/api/v1/recipients/'.$recipient->id);
 
         $response->assertStatus(204);
         $this->assertEmpty($this->user->recipients);
@@ -180,93 +140,11 @@ class RecipientsTest extends TestCase
 
         $defaultRecipient = $this->user->defaultRecipient;
 
-        $response = $this->json('DELETE', '/recipients/'.$defaultRecipient->id);
+        $response = $this->json('DELETE', '/api/v1/recipients/'.$defaultRecipient->id);
 
         $response->assertStatus(403);
         $this->assertCount(1, $this->user->recipients);
         $this->assertEquals($defaultRecipient->id, $this->user->defaultRecipient->id);
-    }
-
-    /** @test */
-    public function user_can_resend_recipient_verification_email()
-    {
-        Notification::fake();
-
-        Notification::assertNothingSent();
-
-        $recipient = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'email_verified_at' => null
-        ]);
-
-        $response = $this->json('POST', '/recipients/email/resend', [
-            'recipient_id' => $recipient->id
-        ]);
-
-        $response->assertStatus(200);
-
-        Notification::assertSentTo(
-            $recipient,
-            VerifyEmail::class
-        );
-    }
-
-    /** @test */
-    public function user_can_verify_recipient_email_successfully()
-    {
-        $recipient = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'email_verified_at' => null
-        ]);
-
-        $this->assertNull($recipient->refresh()->email_verified_at);
-
-        $verificationUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
-            [
-                'id' => $recipient->getKey(),
-                'hash' => sha1($recipient->getEmailForVerification()),
-            ]
-        );
-
-        $response = $this->get($verificationUrl);
-
-        $response
-            ->assertRedirect('/recipients')
-            ->assertSessionHas('verified');
-
-        $this->assertNotNull($recipient->refresh()->email_verified_at);
-    }
-
-    /** @test */
-    public function user_must_wait_before_resending_recipient_verification_email()
-    {
-        Notification::fake();
-
-        Notification::assertNothingSent();
-
-        $recipient = factory(Recipient::class)->create([
-            'user_id' => $this->user->id,
-            'email_verified_at' => null
-        ]);
-
-        $response = $this->json('POST', '/recipients/email/resend', [
-            'recipient_id' => $recipient->id
-        ]);
-
-        $response->assertStatus(200);
-
-        Notification::assertSentTo(
-            $recipient,
-            VerifyEmail::class
-        );
-
-        $response2 = $this->json('POST', '/recipients/email/resend', [
-            'recipient_id' => $recipient->id
-        ]);
-
-        $response2->assertStatus(429);
     }
 
     /** @test */
@@ -279,7 +157,7 @@ class RecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('PATCH', '/recipient-keys/'.$recipient->id, [
+        $response = $this->json('PATCH', '/api/v1/recipient-keys/'.$recipient->id, [
             'key_data' => file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc'))
         ]);
 
@@ -294,7 +172,7 @@ class RecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('PATCH', '/recipient-keys/'.$recipient->id, [
+        $response = $this->json('PATCH', '/api/v1/recipient-keys/'.$recipient->id, [
             'key_data' => 'Invalid Key Data'
         ]);
 
@@ -310,7 +188,7 @@ class RecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('PATCH', '/recipient-keys/'.$recipient->id, [
+        $response = $this->json('PATCH', '/api/v1/recipient-keys/'.$recipient->id, [
             'key_data' => file_get_contents(base_path('tests/keys/InvalidAnonAddyPublicKey.asc'))
         ]);
 
@@ -330,7 +208,7 @@ class RecipientsTest extends TestCase
             'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
         ]);
 
-        $response = $this->json('DELETE', '/recipient-keys/'.$recipient->id);
+        $response = $this->json('DELETE', '/api/v1/recipient-keys/'.$recipient->id);
 
         $response->assertStatus(204);
         $this->assertNull($this->user->recipients[0]->fingerprint);
@@ -346,7 +224,7 @@ class RecipientsTest extends TestCase
             'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
         ]);
 
-        $response = $this->json('POST', '/encrypted-recipients/', [
+        $response = $this->json('POST', '/api/v1/encrypted-recipients/', [
             'id' => $recipient->id
         ]);
 
@@ -363,7 +241,7 @@ class RecipientsTest extends TestCase
             'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
         ]);
 
-        $response = $this->json('DELETE', '/encrypted-recipients/'.$recipient->id);
+        $response = $this->json('DELETE', '/api/v1/encrypted-recipients/'.$recipient->id);
 
         $response->assertStatus(200);
         $this->assertEquals(false, $response->getData()->data->should_encrypt);

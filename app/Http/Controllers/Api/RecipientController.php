@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRecipientRequest;
 use App\Http\Resources\RecipientResource;
 
@@ -9,18 +10,14 @@ class RecipientController extends Controller
 {
     public function index()
     {
-        $recipients = user()->recipients()->with('aliases')->latest()->get();
+        return RecipientResource::collection(user()->recipients()->with('aliases')->latest()->get());
+    }
 
-        $count = $recipients->count();
+    public function show($id)
+    {
+        $recipient = user()->recipients()->findOrFail($id);
 
-        $recipients->each(function ($item, $key) use ($count) {
-            $item['key'] = $count - $key;
-        });
-
-        return view('recipients.index', [
-            'recipients' => $recipients,
-            'aliasesUsingDefault' => user()->aliasesUsingDefault
-        ]);
+        return new RecipientResource($recipient->load('aliases'));
     }
 
     public function store(StoreRecipientRequest $request)
@@ -29,7 +26,7 @@ class RecipientController extends Controller
 
         $recipient->sendEmailVerificationNotification();
 
-        return new RecipientResource($recipient->fresh());
+        return new RecipientResource($recipient->refresh()->load('aliases'));
     }
 
     public function destroy($id)

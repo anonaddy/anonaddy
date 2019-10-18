@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
@@ -11,16 +12,14 @@ class AliasController extends Controller
 {
     public function index()
     {
-        return view('aliases.index', [
-            'defaultRecipient' => user()->defaultRecipient,
-            'aliases' => user()->aliases()->with(['recipients', 'customDomain.defaultRecipient'])->latest()->get(),
-            'recipients' => user()->verifiedRecipients,
-            'totalForwarded' => user()->totalEmailsForwarded(),
-            'totalBlocked' => user()->totalEmailsBlocked(),
-            'totalReplies' => user()->totalEmailsReplied(),
-            'domain' => user()->username.'.'.config('anonaddy.domain'),
-            'bandwidthMb' => user()->bandwidth_mb
-        ]);
+        return AliasResource::collection(user()->aliases()->with('recipients')->latest()->get());
+    }
+
+    public function show($id)
+    {
+        $alias = user()->aliases()->findOrFail($id);
+
+        return new AliasResource($alias->load('recipients'));
     }
 
     public function store(StoreAliasRequest $request)
@@ -33,12 +32,13 @@ class AliasController extends Controller
 
         $alias = user()->aliases()->create([
             'id' => $uuid,
-            'email' => $uuid.'@'.$request->domain,
+            'email' => $uuid . '@' . $request->domain,
             'local_part' => $uuid,
-            'domain' => $request->domain
+            'domain' => $request->domain,
+            'description' => $request->description
         ]);
 
-        return new AliasResource($alias->fresh());
+        return new AliasResource($alias->refresh()->load('recipients'));
     }
 
     public function update(UpdateAliasRequest $request, $id)
@@ -47,7 +47,7 @@ class AliasController extends Controller
 
         $alias->update(['description' => $request->description]);
 
-        return new AliasResource($alias);
+        return new AliasResource($alias->refresh()->load('recipients'));
     }
 
     public function destroy($id)

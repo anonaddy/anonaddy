@@ -15,7 +15,7 @@
         class="text-indigo-700"
         >open-source</a
       >
-      AnonAddy browser extension on
+      browser extension on
       <a
         href="https://addons.mozilla.org/en-GB/firefox/addon/anonaddy/"
         target="_blank"
@@ -50,8 +50,8 @@
       <div class="my-4 w-24 border-b-2 border-grey-200"></div>
 
       <p class="my-6">
-        Tokens you have generated that can be used to access the AnonAddy API. To revoke an access
-        token simply click the delete button next to it.
+        Tokens you have generated that can be used to access the API. To revoke an access token
+        simply click the delete button next to it.
       </p>
 
       <div>
@@ -114,7 +114,7 @@
             id="create-token-name"
             class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
             :class="form.errors.length > 0 ? 'border-red-500' : ''"
-            placeholder="e.g. Browser extension"
+            placeholder="e.g. Firefox extension"
             autofocus
           />
           <button
@@ -179,7 +179,7 @@
         </h2>
         <p class="my-4 text-grey-700">
           Any browser extension, application or script using this API access token will no longer be
-          able to access the AnonAddy API. This action cannot be undone.
+          able to access the API. This action cannot be undone.
         </p>
         <div class="mt-6">
           <button

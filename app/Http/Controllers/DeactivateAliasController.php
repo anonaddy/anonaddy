@@ -12,6 +12,7 @@ class DeactivateAliasController extends Controller
     public function __construct()
     {
         $this->middleware('signed');
+        $this->middleware('throttle:6,1');
     }
 
     public function deactivate($id)

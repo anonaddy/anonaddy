@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDomainRequest;
 use App\Http\Requests\UpdateDomainRequest;
 use App\Http\Resources\DomainResource;
@@ -10,9 +11,14 @@ class DomainController extends Controller
 {
     public function index()
     {
-        return view('domains.index', [
-            'domains' => user()->domains()->with(['aliases', 'defaultRecipient'])->latest()->get()
-        ]);
+        return DomainResource::collection(user()->domains()->with(['aliases', 'defaultRecipient'])->latest()->get());
+    }
+
+    public function show($id)
+    {
+        $domain = user()->domains()->findOrFail($id);
+
+        return new DomainResource($domain->load(['aliases', 'defaultRecipient']));
     }
 
     public function store(StoreDomainRequest $request)
@@ -21,7 +27,7 @@ class DomainController extends Controller
 
         $domain->checkVerification();
 
-        return new DomainResource($domain->fresh());
+        return new DomainResource($domain->refresh()->load(['aliases', 'defaultRecipient']));
     }
 
     public function update(UpdateDomainRequest $request, $id)
@@ -30,7 +36,7 @@ class DomainController extends Controller
 
         $domain->update(['description' => $request->description]);
 
-        return new DomainResource($domain);
+        return new DomainResource($domain->refresh()->load(['aliases', 'defaultRecipient']));
     }
 
     public function destroy($id)

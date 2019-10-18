@@ -13,53 +13,21 @@
 
 Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
 
-Route::post('/login/2fa', 'TwoFactorAuthController@authenticateTwoFactor')->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
+Route::post('/login/2fa', 'Auth\TwoFactorAuthController@authenticateTwoFactor')->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
 
-Route::get('/login/backup-code', 'BackupCodeController@index')->name('login.backup_code.index')->middleware('auth');
-Route::post('/login/backup-code', 'BackupCodeController@login')->name('login.backup_code.login')->middleware('auth');
-
+Route::get('/login/backup-code', 'Auth\BackupCodeController@index')->name('login.backup_code.index');
+Route::post('/login/backup-code', 'Auth\BackupCodeController@login')->name('login.backup_code.login');
 
 Route::middleware(['auth', 'verified', '2fa'])->group(function () {
-    Route::get('/', 'AliasController@index')->name('aliases.index');
-    Route::post('/aliases', 'AliasController@store')->name('aliases.store');
-    Route::patch('/aliases/{id}', 'AliasController@update')->name('aliases.update');
-    Route::delete('/aliases/{id}', 'AliasController@destroy')->name('aliases.destroy');
+    Route::get('/', 'ShowAliasController@index')->name('aliases.index');
 
-    Route::post('/active-aliases', 'ActiveAliasController@store')->name('active_aliases.store');
-    Route::delete('/active-aliases/{id}', 'ActiveAliasController@destroy')->name('active_aliases.destroy');
+    Route::get('/recipients', 'ShowRecipientController@index')->name('recipients.index');
+    Route::post('/recipients/email/resend', 'RecipientVerificationController@resend');
 
-    Route::get('/recipients', 'RecipientController@index')->name('recipients.index');
-    Route::post('/recipients', 'RecipientController@store')->name('recipients.store');
-    Route::delete('/recipients/{id}', 'RecipientController@destroy')->name('recipients.destroy');
+    Route::get('/domains', 'ShowDomainController@index')->name('domains.index');
+    Route::get('/domains/{id}/recheck', 'DomainVerificationController@recheck');
 
-    Route::post('/recipients/email/resend', 'RecipientVerificationController@resend')->name('recipient_verification.resend');
-
-    Route::patch('/recipient-keys/{id}', 'RecipientKeyController@update')->name('recipient_keys.update');
-    Route::delete('/recipient-keys/{id}', 'RecipientKeyController@destroy')->name('recipient_keys.destroy');
-
-    Route::post('/encrypted-recipients', 'EncryptedRecipientController@store')->name('encrypted_recipients.store');
-    Route::delete('/encrypted-recipients/{id}', 'EncryptedRecipientController@destroy')->name('encrypted_recipients.destroy');
-
-    Route::post('/alias-recipients', 'AliasRecipientController@store')->name('alias_recipients.store');
-
-    Route::get('/domains', 'DomainController@index')->name('domains.index');
-    Route::post('/domains', 'DomainController@store')->name('domains.store');
-    Route::patch('/domains/{id}', 'DomainController@update')->name('domains.update');
-    Route::delete('/domains/{id}', 'DomainController@destroy')->name('domains.destroy');
-    Route::patch('/domains/{id}/default-recipient', 'DomainDefaultRecipientController@update')->name('domains.default_recipient');
-
-    Route::get('/domains/{id}/recheck', 'DomainVerificationController@recheck')->name('domain_verification.recheck');
-
-    Route::post('/active-domains', 'ActiveDomainController@store')->name('active_domains.store');
-    Route::delete('/active-domains/{id}', 'ActiveDomainController@destroy')->name('active_domains.destroy');
-
-    Route::get('/usernames', 'AdditionalUsernameController@index')->name('usernames.index');
-    Route::post('/usernames', 'AdditionalUsernameController@store')->name('usernames.store');
-    Route::patch('/usernames/{id}', 'AdditionalUsernameController@update')->name('usernames.update');
-    Route::delete('/usernames/{id}', 'AdditionalUsernameController@destroy')->name('usernames.destroy');
-
-    Route::post('/active-usernames', 'ActiveAdditionalUsernameController@store')->name('active_usernames.store');
-    Route::delete('/active-usernames/{id}', 'ActiveAdditionalUsernameController@destroy')->name('active_usernames.destroy');
+    Route::get('/usernames', 'ShowAdditionalUsernameController@index')->name('usernames.index');
 
     Route::get('/deactivate/{alias}', 'DeactivateAliasController@deactivate')->name('deactivate');
 });

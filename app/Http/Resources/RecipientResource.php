@@ -15,7 +15,7 @@ class RecipientResource extends JsonResource
             'should_encrypt' => $this->should_encrypt,
             'fingerprint' => $this->fingerprint,
             'email_verified_at' => $this->email_verified_at ? $this->email_verified_at->toDateTimeString() : null,
-            'aliases' => $this->aliases,
+            'aliases' => AliasResource::collection($this->whenLoaded('aliases')),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

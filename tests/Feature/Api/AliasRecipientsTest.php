@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use App\Alias;
 use App\AliasRecipient;
 use App\Recipient;
-use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,14 +12,10 @@ class AliasRecipientsTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $user;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->actingAs($this->user);
+        parent::setUpPassport();
     }
 
     /** @test */
@@ -34,7 +29,7 @@ class AliasRecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('POST', '/alias-recipients', [
+        $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
             'recipient_ids' => [$recipient->id]
         ]);
@@ -63,7 +58,7 @@ class AliasRecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('POST', '/alias-recipients', [
+        $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
             'recipient_ids' => [$recipient1->id, $recipient2->id, $recipient3->id]
         ]);
@@ -96,7 +91,7 @@ class AliasRecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('POST', '/alias-recipients', [
+        $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
             'recipient_ids' => [$recipient2->id, $recipient3->id]
         ]);
@@ -117,7 +112,7 @@ class AliasRecipientsTest extends TestCase
             'email_verified_at' => null
         ]);
 
-        $response = $this->json('POST', '/alias-recipients', [
+        $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
             'recipient_ids' => [$unverifiedRecipient->id]
         ]);
@@ -137,7 +132,7 @@ class AliasRecipientsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('POST', '/alias-recipients', [
+        $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
             'recipient_ids' => $recipients->pluck('id')
         ]);

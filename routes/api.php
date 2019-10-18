@@ -15,5 +15,44 @@ Route::group([
   'middleware' => ['verified'],
   'prefix' => 'v1'
 ], function () {
-    Route::post('/aliases', 'Api\AliasApiController@store');
+    Route::get('/aliases', 'Api\AliasController@index');
+    Route::get('/aliases/{id}', 'Api\AliasController@show');
+    Route::post('/aliases', 'Api\AliasController@store');
+    Route::patch('/aliases/{id}', 'Api\AliasController@update');
+    Route::delete('/aliases/{id}', 'Api\AliasController@destroy');
+
+    Route::post('/active-aliases', 'Api\ActiveAliasController@store');
+    Route::delete('/active-aliases/{id}', 'Api\ActiveAliasController@destroy');
+
+    Route::post('/alias-recipients', 'Api\AliasRecipientController@store');
+
+    Route::get('/recipients', 'Api\RecipientController@index');
+    Route::get('/recipients/{id}', 'Api\RecipientController@show');
+    Route::post('/recipients', 'Api\RecipientController@store');
+    Route::delete('/recipients/{id}', 'Api\RecipientController@destroy');
+
+    Route::patch('/recipient-keys/{id}', 'Api\RecipientKeyController@update');
+    Route::delete('/recipient-keys/{id}', 'Api\RecipientKeyController@destroy');
+
+    Route::post('/encrypted-recipients', 'Api\EncryptedRecipientController@store');
+    Route::delete('/encrypted-recipients/{id}', 'Api\EncryptedRecipientController@destroy');
+
+    Route::get('/domains', 'Api\DomainController@index');
+    Route::get('/domains/{id}', 'Api\DomainController@show');
+    Route::post('/domains', 'Api\DomainController@store');
+    Route::patch('/domains/{id}', 'Api\DomainController@update');
+    Route::delete('/domains/{id}', 'Api\DomainController@destroy');
+    Route::patch('/domains/{id}/default-recipient', 'Api\DomainDefaultRecipientController@update');
+
+    Route::post('/active-domains', 'Api\ActiveDomainController@store');
+    Route::delete('/active-domains/{id}', 'Api\ActiveDomainController@destroy');
+
+    Route::get('/usernames', 'Api\AdditionalUsernameController@index');
+    Route::get('/usernames/{id}', 'Api\AdditionalUsernameController@show');
+    Route::post('/usernames', 'Api\AdditionalUsernameController@store');
+    Route::patch('/usernames/{id}', 'Api\AdditionalUsernameController@update');
+    Route::delete('/usernames/{id}', 'Api\AdditionalUsernameController@destroy');
+
+    Route::post('/active-usernames', 'Api\ActiveAdditionalUsernameController@store');
+    Route::delete('/active-usernames/{id}', 'Api\ActiveAdditionalUsernameController@destroy');
 });

@@ -1,75 +1,63 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use App\Domain;
 use App\Recipient;
-use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class DomainsTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $user;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->actingAs($this->user);
+        parent::setUpPassport();
     }
 
     /** @test */
-    public function user_can_view_domains_from_the_domains_page()
+    public function user_can_get_all_domains()
     {
-        $domains = factory(Domain::class, 3)->create([
+        // Arrange
+        factory(Domain::class, 3)->create([
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->get('/domains');
+        // Act
+        $response = $this->get('/api/v1/domains');
 
+        // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('domains'));
-        $domains->assertEquals($response->data('domains'));
+        $this->assertCount(3, $response->json()['data']);
     }
 
     /** @test */
-    public function latest_domains_are_listed_first()
+    public function user_can_get_individual_domain()
     {
-        $a = factory(Domain::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
-        ]);
-        $b = factory(Domain::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
-        ]);
-        $c = factory(Domain::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+        // Arrange
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id
         ]);
 
-        $response = $this->get('/domains');
+        // Act
+        $response = $this->get('/api/v1/domains/'.$domain->id);
 
+        // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('domains'));
-        $this->assertTrue($response->data('domains')[0]->is($b));
-        $this->assertTrue($response->data('domains')[1]->is($c));
-        $this->assertTrue($response->data('domains')[2]->is($a));
+        $this->assertCount(1, $response->json());
+        $this->assertEquals($domain->domain, $response->json()['data']['domain']);
     }
 
     /** @test */
     public function user_can_create_new_domain()
     {
-        $response = $this->json('POST', '/domains', [
+        $response = $this->json('POST', '/api/v1/domains', [
             'domain' => 'example.com'
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $this->assertEquals('example.com', $response->getData()->data->domain);
     }
 
@@ -81,7 +69,7 @@ class DomainsTest extends TestCase
             'domain' => 'example.com'
         ]);
 
-        $response = $this->json('POST', '/domains', [
+        $response = $this->json('POST', '/api/v1/domains', [
             'domain' => 'example.com'
         ]);
 
@@ -93,7 +81,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function new_domain_must_be_a_valid_fqdn()
     {
-        $response = $this->json('POST', '/domains', [
+        $response = $this->json('POST', '/api/v1/domains', [
             'domain' => 'example.'
         ]);
 
@@ -105,7 +93,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function new_domain_must_not_include_protocol()
     {
-        $response = $this->json('POST', '/domains', [
+        $response = $this->json('POST', '/api/v1/domains', [
             'domain' => 'https://example.com'
         ]);
 
@@ -117,7 +105,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function new_domain_must_not_be_local()
     {
-        $response = $this->json('POST', '/domains', [
+        $response = $this->json('POST', '/api/v1/domains', [
             'domain' => config('anonaddy.domain')
         ]);
 
@@ -129,32 +117,13 @@ class DomainsTest extends TestCase
     /** @test */
     public function new_domain_must_not_be_local_subdomain()
     {
-        $response = $this->json('POST', '/domains', [
+        $response = $this->json('POST', '/api/v1/domains', [
             'domain' => 'subdomain'.config('anonaddy.domain')
         ]);
 
         $response
             ->assertStatus(422)
             ->assertJsonValidationErrors('domain');
-    }
-
-    /** @test */
-    public function user_can_verify_domain_records()
-    {
-        $domain = factory(Domain::class)->create([
-            'user_id' => $this->user->id,
-            'domain' => 'anonaddy.me'
-        ]);
-
-        $response = $this->get('/domains/'.$domain->id.'/recheck');
-
-        $response->assertStatus(200);
-
-        $this->assertDatabaseHas('domains', [
-            'user_id' => $this->user->id,
-            'domain' => 'anonaddy.me',
-            'domain_verified_at' => now()
-        ]);
     }
 
     /** @test */
@@ -165,7 +134,7 @@ class DomainsTest extends TestCase
             'active' => false
         ]);
 
-        $response = $this->json('POST', '/active-domains/', [
+        $response = $this->json('POST', '/api/v1/active-domains/', [
             'id' => $domain->id
         ]);
 
@@ -181,7 +150,7 @@ class DomainsTest extends TestCase
             'active' => true
         ]);
 
-        $response = $this->json('DELETE', '/active-domains/'.$domain->id);
+        $response = $this->json('DELETE', '/api/v1/active-domains/'.$domain->id);
 
         $response->assertStatus(200);
         $this->assertEquals(false, $response->getData()->data->active);
@@ -194,7 +163,7 @@ class DomainsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('PATCH', '/domains/'.$domain->id, [
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
             'description' => 'The new description'
         ]);
 
@@ -209,7 +178,7 @@ class DomainsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('DELETE', '/domains/'.$domain->id);
+        $response = $this->json('DELETE', '/api/v1/domains/'.$domain->id);
 
         $response->assertStatus(204);
         $this->assertEmpty($this->user->domains);
@@ -227,7 +196,7 @@ class DomainsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('PATCH', '/domains/'.$domain->id.'/default-recipient', [
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id.'/default-recipient', [
             'default_recipient' => $newDefaultRecipient->id
         ]);
 
@@ -253,7 +222,7 @@ class DomainsTest extends TestCase
             'email_verified_at' => null
         ]);
 
-        $response = $this->json('PATCH', '/domains/'.$domain->id.'/default-recipient', [
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id.'/default-recipient', [
             'default_recipient' => $newDefaultRecipient->id
         ]);
 
@@ -277,7 +246,7 @@ class DomainsTest extends TestCase
             'domain_verified_at' => now(),
         ]);
 
-        $response = $this->json('PATCH', '/domains/'.$domain->id.'/default-recipient', [
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id.'/default-recipient', [
             'default_recipient' => ''
         ]);
 

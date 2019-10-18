@@ -212,7 +212,7 @@
           Just include the domain/subdomain e.g. example.com without any http protocol.
         </p>
         <div class="mt-6">
-          <p v-show="errors.newDomain" class="mb-3 text-red-500">
+          <p v-show="errors.newDomain" class="mb-3 text-red-500 text-sm">
             {{ errors.newDomain }}
           </p>
           <input
@@ -452,7 +452,7 @@ export default {
 
       axios
         .post(
-          '/domains',
+          '/api/v1/domains',
           JSON.stringify({
             domain: this.newDomain,
           }),
@@ -525,7 +525,7 @@ export default {
 
       axios
         .patch(
-          `/domains/${domain.id}`,
+          `/api/v1/domains/${domain.id}`,
           JSON.stringify({
             description: this.domainDescriptionToEdit,
           }),
@@ -550,7 +550,7 @@ export default {
 
       axios
         .patch(
-          `/domains/${this.defaultRecipientDomainToEdit.id}/default-recipient`,
+          `/api/v1/domains/${this.defaultRecipientDomainToEdit.id}/default-recipient`,
           JSON.stringify({
             default_recipient: this.defaultRecipient ? this.defaultRecipient.id : '',
           }),
@@ -577,7 +577,7 @@ export default {
     activateDomain(id) {
       axios
         .post(
-          `/active-domains`,
+          `/api/v1/active-domains`,
           JSON.stringify({
             id: id,
           }),
@@ -594,7 +594,7 @@ export default {
     },
     deactivateDomain(id) {
       axios
-        .delete(`/active-domains/${id}`)
+        .delete(`/api/v1/active-domains/${id}`)
         .then(response => {
           //
         })
@@ -606,7 +606,7 @@ export default {
       this.deleteDomainLoading = true
 
       axios
-        .delete(`/domains/${id}`)
+        .delete(`/api/v1/domains/${id}`)
         .then(response => {
           this.rows = _.reject(this.rows, domain => domain.id === id)
           this.deleteDomainModalOpen = false

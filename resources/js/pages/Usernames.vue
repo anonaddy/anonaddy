@@ -167,7 +167,7 @@
           signed up with.
         </p>
         <div class="mt-6">
-          <p v-show="errors.newUsername" class="mb-3 text-red-500">
+          <p v-show="errors.newUsername" class="mb-3 text-red-500 text-sm">
             {{ errors.newUsername }}
           </p>
           <input
@@ -335,7 +335,7 @@ export default {
 
       axios
         .post(
-          '/usernames',
+          '/api/v1/usernames',
           JSON.stringify({
             username: this.newUsername,
           }),
@@ -377,7 +377,7 @@ export default {
 
       axios
         .patch(
-          `/usernames/${username.id}`,
+          `/api/v1/usernames/${username.id}`,
           JSON.stringify({
             description: this.usernameDescriptionToEdit,
           }),
@@ -400,7 +400,7 @@ export default {
     activateUsername(id) {
       axios
         .post(
-          `/active-usernames`,
+          `/api/v1/active-usernames`,
           JSON.stringify({
             id: id,
           }),
@@ -417,7 +417,7 @@ export default {
     },
     deactivateUsername(id) {
       axios
-        .delete(`/active-usernames/${id}`)
+        .delete(`/api/v1/active-usernames/${id}`)
         .then(response => {
           //
         })
@@ -429,7 +429,7 @@ export default {
       this.deleteUsernameLoading = true
 
       axios
-        .delete(`/usernames/${id}`)
+        .delete(`/api/v1/usernames/${id}`)
         .then(response => {
           this.rows = _.reject(this.rows, username => username.id === id)
           this.deleteUsernameModalOpen = false

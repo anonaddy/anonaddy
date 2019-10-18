@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FALaravel\Support\Authenticator;
@@ -10,6 +11,7 @@ class BackupCodeController extends Controller
 {
     public function __construct()
     {
+        $this->middleware('auth');
         $this->middleware('throttle:3,1')->only('login');
     }
 

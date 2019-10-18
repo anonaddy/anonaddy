@@ -183,7 +183,7 @@
           click "Resend email" to get a new one.
         </p>
         <div class="mt-6">
-          <p v-show="errors.newRecipient" class="mb-3 text-red-500">
+          <p v-show="errors.newRecipient" class="mb-3 text-red-500 text-sm">
             {{ errors.newRecipient }}
           </p>
           <input
@@ -223,7 +223,7 @@
         <p class="mt-4 text-grey-700">Enter your <b>PUBLIC</b> key data in the text area below.</p>
         <p class="mt-4 text-grey-700">Make sure to remove <b>Comment:</b> and <b>Version:</b></p>
         <div class="mt-6">
-          <p v-show="errors.recipientKey" class="mb-3 text-red-500">
+          <p v-show="errors.recipientKey" class="mb-3 text-red-500 text-sm">
             {{ errors.recipientKey }}
           </p>
           <textarea
@@ -455,7 +455,7 @@ export default {
 
       axios
         .post(
-          '/recipients',
+          '/api/v1/recipients',
           JSON.stringify({
             email: this.newRecipient,
           }),
@@ -518,9 +518,9 @@ export default {
       this.deleteRecipientLoading = true
 
       axios
-        .delete(`/recipients/${id}`)
+        .delete(`/api/v1/recipients/${id}`)
         .then(response => {
-          this.recipients = _.reject(this.rows, recipient => recipient.id === id)
+          this.rows = _.reject(this.rows, recipient => recipient.id === id)
           this.deleteRecipientModalOpen = false
           this.deleteRecipientLoading = false
         })
@@ -542,7 +542,7 @@ export default {
       this.deleteRecipientKeyLoading = true
 
       axios
-        .delete(`/recipient-keys/${id}`)
+        .delete(`/api/v1/recipient-keys/${id}`)
         .then(response => {
           let recipient = _.find(this.rows, ['id', this.recipientKeyIdToDelete])
           recipient.should_encrypt = false
@@ -576,7 +576,7 @@ export default {
 
       axios
         .patch(
-          `/recipient-keys/${this.recipientToAddKey.id}`,
+          `/api/v1/recipient-keys/${this.recipientToAddKey.id}`,
           JSON.stringify({
             key_data: this.recipientKey,
           }),
@@ -611,7 +611,7 @@ export default {
     turnOnEncryption(id) {
       axios
         .post(
-          `/encrypted-recipients`,
+          `/api/v1/encrypted-recipients`,
           JSON.stringify({
             id: id,
           }),
@@ -628,7 +628,7 @@ export default {
     },
     turnOffEncryption(id) {
       axios
-        .delete(`/encrypted-recipients/${id}`)
+        .delete(`/api/v1/encrypted-recipients/${id}`)
         .then(response => {
           //
         })

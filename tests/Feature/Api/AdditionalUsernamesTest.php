@@ -1,75 +1,64 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Api;
 
 use App\AdditionalUsername;
 use App\DeletedUsername;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class AdditionalUsernamesTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $user;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->actingAs($this->user);
+        parent::setUpPassport();
     }
 
     /** @test */
-    public function user_can_view_usernames_from_the_usernames_page()
+    public function user_can_get_all_additional_usernames()
     {
-        $usernames = factory(AdditionalUsername::class, 3)->create([
+        // Arrange
+        factory(AdditionalUsername::class, 3)->create([
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->get('/usernames');
+        // Act
+        $response = $this->get('/api/v1/usernames');
 
+        // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('usernames'));
-        $usernames->assertEquals($response->data('usernames'));
+        $this->assertCount(3, $response->json()['data']);
     }
 
     /** @test */
-    public function latest_usernames_are_listed_first()
+    public function user_can_get_individual_additional_username()
     {
-        $a = factory(AdditionalUsername::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
-        ]);
-        $b = factory(AdditionalUsername::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
-        ]);
-        $c = factory(AdditionalUsername::class)->create([
-            'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+        // Arrange
+        $username = factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id
         ]);
 
-        $response = $this->get('/usernames');
+        // Act
+        $response = $this->get('/api/v1/usernames/'.$username->id);
 
+        // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('usernames'));
-        $this->assertTrue($response->data('usernames')[0]->is($b));
-        $this->assertTrue($response->data('usernames')[1]->is($c));
-        $this->assertTrue($response->data('usernames')[2]->is($a));
+        $this->assertCount(1, $response->json());
+        $this->assertEquals($username->username, $response->json()['data']['username']);
     }
 
     /** @test */
     public function user_can_create_additional_username()
     {
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => 'janedoe'
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $this->assertEquals('janedoe', $response->getData()->data->username);
         $this->assertEquals(1, $this->user->username_count);
     }
@@ -77,19 +66,19 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_not_exceed_additional_username_limit()
     {
-        $this->json('POST', '/usernames', [
+        $this->json('POST', '/api/v1/usernames', [
             'username' => 'username1'
         ]);
 
-        $this->json('POST', '/usernames', [
+        $this->json('POST', '/api/v1/usernames', [
             'username' => 'username2'
         ]);
 
-        $this->json('POST', '/usernames', [
+        $this->json('POST', '/api/v1/usernames', [
             'username' => 'username3'
         ]);
 
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => 'janedoe'
         ]);
 
@@ -106,7 +95,7 @@ class AdditionalUsernamesTest extends TestCase
             'username' => 'janedoe'
         ]);
 
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => 'janedoe'
         ]);
 
@@ -122,7 +111,7 @@ class AdditionalUsernamesTest extends TestCase
             'username' => 'janedoe'
         ]);
 
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => 'janedoe'
         ]);
 
@@ -136,7 +125,7 @@ class AdditionalUsernamesTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => $user->username
         ]);
 
@@ -148,7 +137,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function additional_username_must_be_alpha_numeric()
     {
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => 'username01_'
         ]);
 
@@ -160,7 +149,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function additional_username_must_be_less_than_max_length()
     {
-        $response = $this->json('POST', '/usernames', [
+        $response = $this->json('POST', '/api/v1/usernames', [
             'username' => 'abcdefghijklmnopqrstu'
         ]);
 
@@ -177,7 +166,7 @@ class AdditionalUsernamesTest extends TestCase
             'active' => false
         ]);
 
-        $response = $this->json('POST', '/active-usernames/', [
+        $response = $this->json('POST', '/api/v1/active-usernames/', [
             'id' => $username->id
         ]);
 
@@ -193,7 +182,7 @@ class AdditionalUsernamesTest extends TestCase
             'active' => true
         ]);
 
-        $response = $this->json('DELETE', '/active-usernames/'.$username->id);
+        $response = $this->json('DELETE', '/api/v1/active-usernames/'.$username->id);
 
         $response->assertStatus(200);
         $this->assertEquals(false, $response->getData()->data->active);
@@ -206,7 +195,7 @@ class AdditionalUsernamesTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('PATCH', '/usernames/'.$username->id, [
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
             'description' => 'The new description'
         ]);
 
@@ -221,7 +210,7 @@ class AdditionalUsernamesTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
-        $response = $this->json('DELETE', '/usernames/'.$username->id);
+        $response = $this->json('DELETE', '/api/v1/usernames/'.$username->id);
 
         $response->assertStatus(204);
         $this->assertEmpty($this->user->additionalUsernames);

@@ -354,7 +354,7 @@
         <label for="alias_domain" class="block text-grey-700 text-sm my-2">
           Alias Domain:
         </label>
-        <div class="block relative w-full">
+        <div class="block relative w-full mb-4">
           <select
             v-model="generateAliasDomain"
             id="alias_domain"
@@ -379,6 +379,21 @@
             </svg>
           </div>
         </div>
+        <label for="alias_description" class="block text-grey-700 text-sm my-2">
+          Description:
+        </label>
+        <p v-show="errors.generateAliasDescription" class="mb-3 text-red-500 text-sm">
+          {{ errors.generateAliasDescription }}
+        </p>
+        <input
+          v-model="generateAliasDescription"
+          id="alias_description"
+          type="text"
+          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+          :class="errors.generateAliasDescription ? 'border-red-500' : ''"
+          placeholder="Enter description (optional)..."
+          autofocus
+        />
 
         <div class="mt-6">
           <button
@@ -455,7 +470,8 @@
           Delete alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to delete this alias? This action cannot be undone.
+          Are you sure you want to delete this alias? This action cannot be undone. Once deleted,
+          this alias will <b>not be able to be used again</b> and will bounce any emails sent to it.
         </p>
         <div class="mt-6">
           <button
@@ -554,6 +570,7 @@ export default {
       generateAliasModalOpen: false,
       generateAliasLoading: false,
       generateAliasDomain: this.domain,
+      generateAliasDescription: '',
       recipientsAliasToEdit: {},
       aliasRecipientsToEdit: [],
       columns: [
@@ -615,6 +632,7 @@ export default {
         },
       ],
       rows: this.initialAliases,
+      errors: {},
     }
   },
   watch: {
@@ -661,7 +679,7 @@ export default {
       this.deleteAliasLoading = true
 
       axios
-        .delete(`/aliases/${id}`)
+        .delete(`/api/v1/aliases/${id}`)
         .then(response => {
           this.rows = _.reject(this.rows, alias => alias.id === id)
           this.deleteAliasModalOpen = false
@@ -688,7 +706,7 @@ export default {
 
       axios
         .post(
-          '/alias-recipients',
+          '/api/v1/alias-recipients',
           JSON.stringify({
             alias_id: this.recipientsAliasToEdit.id,
             recipient_ids: _.map(this.aliasRecipientsToEdit, recipient => recipient.id),
@@ -716,13 +734,20 @@ export default {
         })
     },
     generateNewAlias() {
+      this.errors = {}
+
+      if (this.generateAliasDescription.length > 100) {
+        return (this.errors.generateAliasDescription = 'Description cannot exceed 100 characters')
+      }
+
       this.generateAliasLoading = true
 
       axios
         .post(
-          '/aliases',
+          '/api/v1/aliases',
           JSON.stringify({
             domain: this.generateAliasDomain,
+            description: this.generateAliasDescription,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -730,6 +755,7 @@ export default {
         )
         .then(({ data }) => {
           this.generateAliasLoading = false
+          this.generateAliasDescription = ''
           this.rows.push(data.data)
           this.generateAliasModalOpen = false
           this.success('New alias generated successfully')
@@ -750,7 +776,7 @@ export default {
 
       axios
         .patch(
-          `/aliases/${alias.id}`,
+          `/api/v1/aliases/${alias.id}`,
           JSON.stringify({
             description: this.aliasDescriptionToEdit,
           }),
@@ -773,7 +799,7 @@ export default {
     activateAlias(id) {
       axios
         .post(
-          `/active-aliases`,
+          `/api/v1/active-aliases`,
           JSON.stringify({
             id: id,
           }),
@@ -790,7 +816,7 @@ export default {
     },
     deactivateAlias(id) {
       axios
-        .delete(`/active-aliases/${id}`)
+        .delete(`/api/v1/active-aliases/${id}`)
         .then(response => {
           //
         })
