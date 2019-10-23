@@ -23,6 +23,6 @@ class EncryptedRecipientController extends Controller
 
         $recipient->update(['should_encrypt' => false]);
 
-        return new RecipientResource($recipient);
+        return response('', 204);
     }
 }

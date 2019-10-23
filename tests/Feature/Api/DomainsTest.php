@@ -152,8 +152,8 @@ class DomainsTest extends TestCase
 
         $response = $this->json('DELETE', '/api/v1/active-domains/'.$domain->id);
 
-        $response->assertStatus(200);
-        $this->assertEquals(false, $response->getData()->data->active);
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->domains[0]->active);
     }
 
     /** @test */

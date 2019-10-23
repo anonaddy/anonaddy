@@ -23,6 +23,6 @@ class ActiveAdditionalUsernameController extends Controller
 
         $username->deactivate();
 
-        return new AdditionalUsernameResource($username);
+        return response('', 204);
     }
 }

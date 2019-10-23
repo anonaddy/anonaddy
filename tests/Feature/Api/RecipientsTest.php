@@ -243,7 +243,7 @@ class RecipientsTest extends TestCase
 
         $response = $this->json('DELETE', '/api/v1/encrypted-recipients/'.$recipient->id);
 
-        $response->assertStatus(200);
-        $this->assertEquals(false, $response->getData()->data->should_encrypt);
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->recipients[0]->should_encrypt);
     }
 }

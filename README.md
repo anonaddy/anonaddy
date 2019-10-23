@@ -54,6 +54,10 @@ Here are a few reasons I can think of:
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
 
+#### **Is there a browser extension?**
+
+Yes there is an [open-source](https://github.com/anonaddy/browser-extension) browser extension available to download for [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/anonaddy/) and [Chrome](https://chrome.google.com/webstore/detail/anonaddy/iadbdpnoknmbdeolbapdackdcogdmjpe) (also available on other chromium based browsers such as Brave and Vivaldi). You can use the extension to generate UUID aliases remotely.
+
 #### **How do I add my own GPG/OpenPGP key for encryption?**
 
 On the recipients page you simply need to click "Add public key" and paste in your **public** key data. Now all emails forwarded to you will be encrypted with your key. You should also replace the subject line of forwarded messages in your account settings as this cannot be encrypted.
@@ -165,6 +169,10 @@ Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or
 #### **What happens if I go over my bandwidth limit in a given month?**
 
 If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month.
+
+#### **Can I login using an additional username?**
+
+You can add up to 3 additional usernames as a Pro user for a total of 4 (including the one you signed up with). You can currently only login with the one that you originally signed up with.
 
 #### **I'm not receiving any emails, what's wrong?**
 

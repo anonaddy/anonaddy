@@ -23,6 +23,6 @@ class ActiveDomainController extends Controller
 
         $domain->deactivate();
 
-        return new DomainResource($domain);
+        return response('', 204);
     }
 }

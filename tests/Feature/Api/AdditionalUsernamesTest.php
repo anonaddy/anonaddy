@@ -184,8 +184,8 @@ class AdditionalUsernamesTest extends TestCase
 
         $response = $this->json('DELETE', '/api/v1/active-usernames/'.$username->id);
 
-        $response->assertStatus(200);
-        $this->assertEquals(false, $response->getData()->data->active);
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->additionalUsernames[0]->active);
     }
 
     /** @test */

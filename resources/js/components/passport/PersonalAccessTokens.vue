@@ -32,7 +32,8 @@
         >Chrome / Brave</a
       >
       to generate UUID aliases. Simply paste the token generated below into the browser extension to
-      get started. Your API Access tokens are secret and should be treated like your password.
+      get started. Your API access tokens are secret and should be treated like your password. For
+      more information please see the <a href="/docs" class="text-indigo-700">API documentation</a>.
     </p>
 
     <button

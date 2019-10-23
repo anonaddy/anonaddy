@@ -23,6 +23,6 @@ class ActiveAliasController extends Controller
 
         $alias->deactivate();
 
-        return new AliasResource($alias);
+        return response('', 204);
     }
 }
