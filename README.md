@@ -192,7 +192,7 @@ I am very passionite about this project. I use it myself everyday and will be ke
 
 #### **Is the application tested?**
 
-Yes it has over 100 automated PHPUnit tests written.
+Yes it has over 130 automated PHPUnit tests written.
 
 #### **How do I host this myself?**
 

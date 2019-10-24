@@ -11,6 +11,7 @@ use App\Notifications\NearBandwidthLimit;
 use App\Recipient;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -891,6 +892,50 @@ class ReceiveEmailTest extends TestCase
         ]);
 
         Notification::assertSentTo(
+            $this->user,
+            NearBandwidthLimit::class
+        );
+    }
+
+    /** @test */
+    public function it_does_not_send_near_bandwidth_limit_notification_more_than_once_per_day()
+    {
+        Notification::fake();
+
+        Notification::assertNothingSent();
+
+        Cache::put("user:{$this->user->username}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
+
+        $this->user->update(['bandwidth' => 9485760]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [''],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1000'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertEquals(1, $this->user->aliases()->count());
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '9486760'
+        ]);
+
+        Notification::assertNotSentTo(
             $this->user,
             NearBandwidthLimit::class
         );

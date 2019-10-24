@@ -11,6 +11,7 @@ use App\Mail\ReplyToEmail;
 use App\Notifications\NearBandwidthLimit;
 use App\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
@@ -231,8 +232,10 @@ class ReceiveEmail extends Command
             exit(1);
         }
 
-        if ($user->nearBandwidthLimit()) {
+        if ($user->nearBandwidthLimit() && ! Cache::has("user:{$user->username}:near-bandwidth")) {
             $user->notify(new NearBandwidthLimit());
+
+            Cache::put("user:{$user->username}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
         }
     }
 
