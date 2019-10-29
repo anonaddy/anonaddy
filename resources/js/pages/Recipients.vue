@@ -555,7 +555,11 @@ export default {
           this.deleteRecipientKeyLoading = false
         })
         .catch(error => {
-          this.error()
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
           this.deleteRecipientKeyLoading = false
           this.deleteRecipientKeyModalOpen = false
         })

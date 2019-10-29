@@ -37,12 +37,30 @@ class RecipientKeyController extends Controller
     {
         $recipient = user()->recipients()->findOrFail($id);
 
-        if (!$this->gnupg->deletekey($recipient->fingerprint)) {
+        $key = $this->gnupg->keyinfo($recipient->fingerprint);
+
+        if (! isset($key[0]['uids'][0]['email'])) {
             return response('Key could not be deleted', 404);
         }
 
-        // Remove the key from all recipients using that same fingerprint.
-        Recipient::all()
+        $recipientEmails = user()->verifiedRecipients()
+            ->get()
+            ->map(function ($item) {
+                return $item->email;
+            })
+            ->toArray();
+
+        // Check that the user can delete the key.
+        if (in_array(strtolower($key[0]['uids'][0]['email']), $recipientEmails)) {
+            if (!$this->gnupg->deletekey($recipient->fingerprint)) {
+                return response('Key could not be deleted', 404);
+            }
+        }
+
+        // Remove the key from all user recipients using that same fingerprint.
+        user()
+            ->recipients()
+            ->get()
             ->where('fingerprint', $recipient->fingerprint)
             ->each(function ($recipient) {
                 $recipient->update([
