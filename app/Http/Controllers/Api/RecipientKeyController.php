@@ -41,10 +41,15 @@ class RecipientKeyController extends Controller
             return response('Key could not be deleted', 404);
         }
 
-        $recipient->update([
-            'should_encrypt' => false,
-            'fingerprint' => null
-        ]);
+        // Remove the key from all recipients using that same fingerprint.
+        Recipient::all()
+            ->where('fingerprint', $recipient->fingerprint)
+            ->each(function ($recipient) {
+                $recipient->update([
+                    'should_encrypt' => false,
+                    'fingerprint' => null
+                ]);
+            });
 
         return response('', 204);
     }

@@ -128,7 +128,7 @@
             <icon
               name="delete"
               class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current"
-              @click.native="openDeleteRecipientKeyModal(props.row.id)"
+              @click.native="openDeleteRecipientKeyModal(props.row)"
               data-tippy-content="Remove public key"
             />
           </span>
@@ -263,12 +263,13 @@
           Remove recipient public key
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to remove the public key for this recipient?
+          Are you sure you want to remove the public key for this recipient? It will also be removed
+          from any other recipients using the same key.
         </p>
         <div class="mt-6">
           <button
             type="button"
-            @click="deleteRecipientKey(recipientKeyIdToDelete)"
+            @click="deleteRecipientKey(recipientKeyToDelete)"
             class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
             :class="deleteRecipientKeyLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteRecipientKeyLoading"
@@ -361,7 +362,7 @@ export default {
       addRecipientLoading: false,
       addRecipientModalOpen: false,
       recipientIdToDelete: null,
-      recipientKeyIdToDelete: null,
+      recipientKeyToDelete: null,
       deleteRecipientLoading: false,
       deleteRecipientModalOpen: false,
       deleteRecipientKeyLoading: false,
@@ -530,23 +531,26 @@ export default {
           this.deleteRecipientModalOpen = false
         })
     },
-    openDeleteRecipientKeyModal(id) {
+    openDeleteRecipientKeyModal(recipient) {
       this.deleteRecipientKeyModalOpen = true
-      this.recipientKeyIdToDelete = id
+      this.recipientKeyToDelete = recipient
     },
     closeDeleteRecipientKeyModal() {
       this.deleteRecipientKeyModalOpen = false
       this.recipientKeyIdToDelete = null
     },
-    deleteRecipientKey(id) {
+    deleteRecipientKey(recipient) {
       this.deleteRecipientKeyLoading = true
 
       axios
-        .delete(`/api/v1/recipient-keys/${id}`)
+        .delete(`/api/v1/recipient-keys/${recipient.id}`)
         .then(response => {
-          let recipient = _.find(this.rows, ['id', this.recipientKeyIdToDelete])
-          recipient.should_encrypt = false
-          recipient.fingerprint = null
+          let recipients = _.filter(this.rows, ['fingerprint', recipient.fingerprint])
+
+          _.forEach(recipients, function(recipient) {
+            recipient.should_encrypt = false
+            recipient.fingerprint = null
+          })
           this.deleteRecipientKeyModalOpen = false
           this.deleteRecipientKeyLoading = false
         })
