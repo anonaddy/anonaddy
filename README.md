@@ -4,6 +4,12 @@ This is the source code for self-hosting AnonAddy.
 
 ## FAQ
 
+#### **Why is it called AnonAddy?**
+
+AnonAddy is short for "Anonymous Email Address". The word "Addy" is internet slang for email address, e.g.
+
+> "My email addy is being spammed. I should've kept it private."
+
 #### **Why did you make this site?**
 
 I made this service after trying a few other options that do a similar thing. I was really interested in how they worked and loved the thought of protecting my real email addresses from spam.
@@ -166,6 +172,10 @@ I don't use rolling 30 day total as the only way to do this would be to log the 
 
 Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or deleted).
 
+#### **How many emails can I receive before I go over my bandwidth limit?**
+
+The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails and the Pro plan's 500MB would be almost 7,000 emails.
+
 #### **What happens if I go over my bandwidth limit in a given month?**
 
 If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month.
@@ -204,7 +214,7 @@ My name is Will Browning, I'm a web developer from the UK and an advocate for on
 
 #### **I couldn't find an answer to my question, how can I contact you?**
 
-For any other questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com) ([70E400B5064061EB84181DABEDADE14D67325B36](https://keys.openpgp.org/search?q=70E400B5064061EB84181DABEDADE14D67325B36))
+For any other questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com) ([5FCAFD8A67D2A783CFF4D0E31AC6D923E6FB4EF7](https://keys.openpgp.org/search?q=5FCAFD8A67D2A783CFF4D0E31AC6D923E6FB4EF7))
 
 ## Self Hosting
 

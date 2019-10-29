@@ -21,7 +21,7 @@ class RecipientKeyController extends Controller
 
         $info = $this->gnupg->import($request->key_data);
 
-        if (!$info || !$info['imported']) {
+        if (!$info || !$info['fingerprint']) {
             return response('Key could not be imported', 404);
         }
 
