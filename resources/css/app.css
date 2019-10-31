@@ -15,19 +15,19 @@ html {
 /* Add custom components here... */
 
 /* purgecss start ignore */
-.notification-wrapper .vue-notification {
+.vue-notification-wrapper .vue-notification {
   @apply text-sm mb-4 mr-4 mt-0 ml-0;
 }
 
-.notification-wrapper .vue-notification.success {
+.vue-notification-wrapper .vue-notification.success {
   @apply bg-green-100 border-green-600 text-green-800;
 }
 
-.notification-wrapper .vue-notification.error {
+.vue-notification-wrapper .vue-notification.error {
   @apply bg-red-100 border-red-600 text-red-800;
 }
 
-.notification-wrapper .vue-notification.warn {
+.vue-notification-wrapper .vue-notification.warn {
   @apply bg-yellow-100 border-yellow-600 text-yellow-800;
 }
 

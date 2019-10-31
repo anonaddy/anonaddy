@@ -13,7 +13,7 @@
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.0",
-        "laravel/passport": "^7.5",
+        "laravel/passport": "^8.0",
         "laravel/tinker": "^1.0",
         "mews/captcha": "^3.0.0",
         "php-mime-mail-parser/php-mime-mail-parser": "^5.0",
