@@ -149,7 +149,7 @@
           v-model="accessToken"
           class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-sm"
           rows="10"
-          disabled
+          readonly
         >
         </textarea>
         <div class="mt-6">
