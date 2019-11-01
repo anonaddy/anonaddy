@@ -220,7 +220,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getBandwidthLimitMb()
     {
         return round($this->getBandwidthLimit() / 1024 / 1024, 2);
-        ;
     }
 
     public function nearBandwidthLimit()
