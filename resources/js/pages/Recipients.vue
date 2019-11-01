@@ -160,9 +160,10 @@
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <icon
+            v-if="!isDefault(props.row.id)"
             name="trash"
             class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
-            @click.native="openDeleteModal(props.row.id)"
+            @click.native="openDeleteModal(props.row)"
           />
         </span>
       </template>
@@ -298,7 +299,7 @@
         <div class="mt-6">
           <button
             type="button"
-            @click="deleteRecipient(recipientIdToDelete)"
+            @click="deleteRecipient(recipientToDelete)"
             class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
             :class="deleteRecipientLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteRecipientLoading"
@@ -361,7 +362,7 @@ export default {
       search: '',
       addRecipientLoading: false,
       addRecipientModalOpen: false,
-      recipientIdToDelete: null,
+      recipientToDelete: null,
       recipientKeyToDelete: null,
       deleteRecipientLoading: false,
       deleteRecipientModalOpen: false,
@@ -507,21 +508,28 @@ export default {
           }
         })
     },
-    openDeleteModal(id) {
+    openDeleteModal(recipient) {
       this.deleteRecipientModalOpen = true
-      this.recipientIdToDelete = id
+      this.recipientToDelete = recipient
     },
     closeDeleteModal() {
       this.deleteRecipientModalOpen = false
-      this.recipientIdToDelete = null
+      this.recipientToDelete = null
     },
-    deleteRecipient(id) {
+    deleteRecipient(recipient) {
       this.deleteRecipientLoading = true
 
       axios
-        .delete(`/api/v1/recipients/${id}`)
+        .delete(`/api/v1/recipients/${recipient.id}`)
         .then(response => {
-          this.rows = _.reject(this.rows, recipient => recipient.id === id)
+          let recipients = _.filter(this.rows, ['fingerprint', recipient.fingerprint])
+
+          _.forEach(recipients, function(recipient) {
+            recipient.should_encrypt = false
+            recipient.fingerprint = null
+          })
+
+          this.rows = _.reject(this.rows, row => row.id === recipient.id)
           this.deleteRecipientModalOpen = false
           this.deleteRecipientLoading = false
         })

@@ -48,8 +48,7 @@ class Recipient extends Model
 
         Recipient::deleting(function ($recipient) {
             if ($recipient->fingerprint) {
-                $gnupg = new \gnupg();
-                $gnupg->deletekey($recipient->fingerprint);
+                $recipient->user->deleteKeyFromKeyring($recipient->fingerprint);
             }
 
             $recipient->aliases()->detach();

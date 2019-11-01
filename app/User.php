@@ -255,4 +255,35 @@ class User extends Authenticatable implements MustVerifyEmail
                 })
                 ->contains($email);
     }
+
+    public function deleteKeyFromKeyring($fingerprint): void
+    {
+        $gnupg = new \gnupg();
+
+        $key = $gnupg->keyinfo($fingerprint);
+
+        // Check that the user has a verified recipient matching the keys email.
+        collect($key[0]['uids'])
+            ->filter(function ($uid) {
+                return ! $uid['invalid'];
+            })
+            ->pluck('email')
+            ->each(function ($email) use ($gnupg, $fingerprint) {
+                if ($this->isVerifiedRecipient($email)) {
+                    $gnupg->deletekey($fingerprint);
+                }
+            });
+
+        // Remove the key from all user recipients using that same fingerprint.
+        $this
+            ->recipients()
+            ->get()
+            ->where('fingerprint', $fingerprint)
+            ->each(function ($recipient) {
+                $recipient->update([
+                    'should_encrypt' => false,
+                    'fingerprint' => null
+                ]);
+            });
+    }
 }
