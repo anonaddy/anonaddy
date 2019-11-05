@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\AdditionalUsername;
 use App\DeletedUsername;
+use App\Recipient;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -216,5 +217,77 @@ class AdditionalUsernamesTest extends TestCase
         $this->assertEmpty($this->user->additionalUsernames);
 
         $this->assertEquals(DeletedUsername::first()->username, $username->username);
+    }
+
+    /** @test */
+    public function user_can_update_additional_username_default_recipient()
+    {
+        $additionalUsername = factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $newDefaultRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$additionalUsername->id.'/default-recipient', [
+            'default_recipient' => $newDefaultRecipient->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('additional_usernames', [
+            'id' => $additionalUsername->id,
+            'default_recipient_id' => $newDefaultRecipient->id
+        ]);
+
+        $this->assertEquals($newDefaultRecipient->email, $additionalUsername->refresh()->defaultRecipient->email);
+    }
+
+    /** @test */
+    public function user_cannot_update_additional_username_default_recipient_with_unverified_recipient()
+    {
+        $additionalUsername = factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $newDefaultRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email_verified_at' => null
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$additionalUsername->id.'/default-recipient', [
+            'default_recipient' => $newDefaultRecipient->id
+        ]);
+
+        $response->assertStatus(404);
+        $this->assertDatabaseMissing('additional_usernames', [
+            'id' => $additionalUsername->id,
+            'default_recipient_id' => $newDefaultRecipient->id
+        ]);
+    }
+
+    /** @test */
+    public function user_can_remove_additional_username_default_recipient()
+    {
+        $defaultRecipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $additionalUsername = factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id,
+            'default_recipient_id' => $defaultRecipient->id
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$additionalUsername->id.'/default-recipient', [
+            'default_recipient' => ''
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('additional_usernames', [
+            'id' => $additionalUsername->id,
+            'default_recipient_id' => null
+        ]);
+
+        $this->assertNull($additionalUsername->refresh()->defaultRecipient);
     }
 }

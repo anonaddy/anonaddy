@@ -93,6 +93,7 @@ class ReceiveEmail extends Command
                     // Check if this is an additional username.
                     if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
                         $user = $additionalUsername->user;
+                        $aliasable = $additionalUsername;
                     } else {
                         $user = User::where('username', $subdomain)->first();
                     }
@@ -102,6 +103,7 @@ class ReceiveEmail extends Command
                     // Check if this is a custom domain.
                     if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
                         $user = $customDomain->user;
+                        $aliasable = $customDomain;
                     }
 
                     // Check if this is a uuid generated alias.
@@ -125,7 +127,7 @@ class ReceiveEmail extends Command
                 if ($recipient['extension'] === sha1(config('anonaddy.secret').$displayTo)) {
                     $this->handleReply($user, $recipient, $displayTo);
                 } else {
-                    $this->handleForward($user, $recipient, $customDomain->id ?? null);
+                    $this->handleForward($user, $recipient, $aliasable ?? null);
                 }
             }
         } catch (\Exception $e) {
@@ -166,13 +168,14 @@ class ReceiveEmail extends Command
         }
     }
 
-    protected function handleForward($user, $recipient, $customDomainId)
+    protected function handleForward($user, $recipient, $aliasable)
     {
         $alias = $user->aliases()->firstOrNew([
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
-            'domain_id' => $customDomainId
+            'aliasable_id' => $aliasable->id ?? null,
+            'aliasable_type' => $aliasable ? 'App\\'.class_basename($aliasable) : null
         ]);
 
         if (!isset($alias->id)) {

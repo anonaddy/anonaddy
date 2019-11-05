@@ -234,10 +234,11 @@
             aliasRecipientsToEdit.length ? aliasRecipientsToEdit.length : '1'
           }}</span>
           <span
-            v-else-if="has(props.row.custom_domain, 'default_recipient.email')"
+            v-else-if="has(props.row.aliasable, 'default_recipient.email')"
             class="py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
-            :data-tippy-content="props.row.custom_domain.default_recipient.email"
-            >domain's default</span
+            :data-tippy-content="props.row.aliasable.default_recipient.email"
+            >{{ props.row.aliasable_type === 'App\\Domain' ? 'domain' : 'username' }}'s
+            default</span
           >
           <span
             v-else

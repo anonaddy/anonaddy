@@ -52,6 +52,7 @@ Route::group([
     Route::post('/usernames', 'Api\AdditionalUsernameController@store');
     Route::patch('/usernames/{id}', 'Api\AdditionalUsernameController@update');
     Route::delete('/usernames/{id}', 'Api\AdditionalUsernameController@destroy');
+    Route::patch('/usernames/{id}/default-recipient', 'Api\AdditionalUsernameDefaultRecipientController@update');
 
     Route::post('/active-usernames', 'Api\ActiveAdditionalUsernameController@store');
     Route::delete('/active-usernames/{id}', 'Api\ActiveAdditionalUsernameController@destroy');

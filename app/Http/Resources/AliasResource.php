@@ -11,7 +11,8 @@ class AliasResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'domain_id' => $this->domain_id,
+            'aliasable_id' => $this->aliasable_id,
+            'aliasable_type' => $this->aliasable_type,
             'local_part' => $this->local_part,
             'extension' => $this->extension,
             'domain' => $this->domain,

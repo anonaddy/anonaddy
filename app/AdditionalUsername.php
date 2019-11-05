@@ -32,7 +32,8 @@ class AdditionalUsername extends Model
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
-        'active' => 'boolean'
+        'active' => 'boolean',
+        'default_recipient_id' => 'string'
     ];
 
     public static function boot()
@@ -58,6 +59,30 @@ class AdditionalUsername extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get all of the additional usernames's aliases.
+     */
+    public function aliases()
+    {
+        return $this->morphMany(Alias::class, 'aliasable');
+    }
+
+    /**
+     * Get the additional usernames's default recipient.
+     */
+    public function defaultRecipient()
+    {
+        return $this->hasOne(Recipient::class, 'id', 'default_recipient_id');
+    }
+    /**
+     * Set the additional usernames's default recipient.
+     */
+    public function setDefaultRecipientAttribute($recipient)
+    {
+        $this->attributes['default_recipient_id'] = $recipient->id;
+        $this->setRelation('defaultRecipient', $recipient);
     }
 
     /**

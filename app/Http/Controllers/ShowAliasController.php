@@ -8,7 +8,7 @@ class ShowAliasController extends Controller
     {
         return view('aliases.index', [
             'defaultRecipient' => user()->defaultRecipient,
-            'aliases' => user()->aliases()->with(['recipients', 'customDomain.defaultRecipient'])->latest()->get(),
+            'aliases' => user()->aliases()->with(['recipients', 'aliasable.defaultRecipient'])->latest()->get(),
             'recipients' => user()->verifiedRecipients,
             'totalForwarded' => user()->totalEmailsForwarded(),
             'totalBlocked' => user()->totalEmailsBlocked(),

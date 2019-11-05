@@ -60,7 +60,7 @@ class Domain extends Model
      */
     public function aliases()
     {
-        return $this->hasMany(Alias::class);
+        return $this->morphMany(Alias::class, 'aliasable');
     }
 
     /**

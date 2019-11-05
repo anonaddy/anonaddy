@@ -176,11 +176,18 @@ class SettingsTest extends TestCase
 
         $aliasWithCustomDomain = factory(Alias::class)->create([
             'user_id' => $this->user->id,
-            'domain_id' => $domain->id
+            'aliasable_id' => $domain->id,
+            'aliasable_type' => 'App\Domain'
         ]);
 
         $additionalUsername = factory(AdditionalUsername::class)->create([
             'user_id' => $this->user->id
+        ]);
+
+        $aliasWithAdditionalUsername = factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'aliasable_id' => $additionalUsername->id,
+            'aliasable_type' => 'App\AdditionaUsername'
         ]);
 
         $response = $this->post('/settings/account', [
@@ -207,7 +214,15 @@ class SettingsTest extends TestCase
         $this->assertDatabaseMissing('aliases', [
             'id' => $aliasWithCustomDomain->id,
             'user_id' => $this->user->id,
-            'domain_id' => $domain->id
+            'aliasable_id' => $domain->id,
+            'aliasable_type' => 'App\Domain'
+        ]);
+
+        $this->assertDatabaseMissing('aliases', [
+            'id' => $aliasWithAdditionalUsername->id,
+            'user_id' => $this->user->id,
+            'aliasable_id' => $additionalUsername->id,
+            'aliasable_type' => 'App\AdditionalUsername'
         ]);
 
         $this->assertDatabaseMissing('recipients', [

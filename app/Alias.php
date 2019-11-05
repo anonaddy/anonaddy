@@ -26,7 +26,8 @@ class Alias extends Model
         'email',
         'local_part',
         'domain',
-        'domain_id'
+        'aliasable_id',
+        'aliasable_type'
     ];
 
     protected $dates = [
@@ -38,7 +39,8 @@ class Alias extends Model
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
-        'domain_id' => 'string',
+        'aliasable_id' => 'string',
+        'aliasable_type' => 'string',
         'active' => 'boolean'
     ];
 
@@ -66,11 +68,11 @@ class Alias extends Model
     }
 
     /**
-     * Get the custom domain for the email alias.
+     * Get the owning aliasable model.
      */
-    public function customDomain()
+    public function aliasable()
     {
-        return $this->belongsTo(Domain::class, 'domain_id');
+        return $this->morphTo();
     }
 
     /**
@@ -95,9 +97,9 @@ class Alias extends Model
     public function verifiedRecipientsOrDefault()
     {
         if ($this->verifiedRecipients()->count() === 0) {
-            // If the alias is for a custom domain that has a default recipient set.
-            if (isset($this->customDomain->defaultRecipient)) {
-                return $this->customDomain->defaultRecipient();
+            // If the alias is for a custom domain or additional username that has a default recipient set.
+            if (isset($this->aliasable->defaultRecipient)) {
+                return $this->aliasable->defaultRecipient();
             }
 
             return $this->user->defaultRecipient();
