@@ -194,6 +194,14 @@ Check that you have not deactivated the alias, custom domain or additional usern
 
 The sender of the email may be failing SPF, DMARC or DNS blacklist checks resulting in the email being rejected. The sender should also have correct reverse DNS setup and use a FQDN as their hostname.
 
+If you are forwarding emails to an icloud.com email address some users are having issues with a small number of emails bouncing (often those from Facebook).
+
+For some reason Apple seems to think these emails are spam and returns this error message:
+
+> Diagnostic-Code: smtp; 550 5.7.1 [CS01] Message rejected due to local policy.
+
+I have contacted Apple multiple times about this but they have not yet responded.
+
 If you still aren't receiving emails please contact me.
 
 #### **How do I know this site won't disappear next month?**
