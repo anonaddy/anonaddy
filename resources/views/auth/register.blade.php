@@ -57,7 +57,7 @@
                                 {{ __('Confirm Email') }}:
                             </label>
 
-                            <input id="email-confirm" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline" name="email_confirmation" placeholder="johndoe@example.com" required>
+                            <input id="email-confirm" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline" name="email_confirmation" value="{{ old('email_confirmation') }}" placeholder="johndoe@example.com" required>
                         </div>
 
                         <div class="flex flex-wrap mb-6">
