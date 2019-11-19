@@ -55,7 +55,7 @@ Here are a few reasons I can think of:
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
-* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another for Pro plan users)
+* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another for paid plan users)
 * Ability to generate UUID aliases
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
@@ -128,15 +128,15 @@ The max email size is currently set to 10MB (including attachments).
 
 #### **What happens if I have a subscription but then cancel it?**
 
-If you cancel your subscription it will remain active until the end of your current billing cycle, you will still be able to use Pro features until the billing cycle ends.
+If you cancel your subscription it will remain active until the end of your current billing cycle, you will still be able to use your paid plan features until the billing cycle ends.
 
 A few days before your billing cycle ends you will receive an email letting you know the steps you need to take to prevent the loss of any emails. Shortly after ending the following will happen:
 
 * Any custom domains will be **deactivated**
 * Any additional usernames will be **deactivated**
 * If you have any more than **2 recipients** they will be **deleted**
-* Pro account settings will be reverted to default values
-* Any aliases using Pro only domains will be **deactivated**
+* Paid account settings will be reverted to default values
+* Any aliases using paid plan only domains will be **deactivated**
 * If you have any more than 20 UUID aliases they will be **deactivated**
 
 You will not be able to activate any of the above again until you resubscribe.
@@ -162,7 +162,7 @@ Not unless you are really going to town. Each user is throttled to 200 emails pe
 
 #### **Is there a limit to how many aliases I can create?**
 
-Currently you are limited to creating 10 new aliases per hour on the free plan and 50 per hour on the pro plan. If you try to create more than this the emails will be deferred until you are back below the limit.
+Currently you are limited to creating 10 new aliases per hour on the free plan, 20 per hour on the Lite plan and 50 per hour on the Pro plan. If you try to create more than this the emails will be deferred until you are back below the limit.
 
 #### **How is my bandwidth calculated?**
 
@@ -174,7 +174,7 @@ Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or
 
 #### **How many emails can I receive before I go over my bandwidth limit?**
 
-The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails and the Pro plan's 500MB would be almost 7,000 emails.
+The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails, the Lite plan's 50MB would be almost 700 emails and the Pro plan's 500MB would be almost 7,000 emails.
 
 #### **What happens if I go over my bandwidth limit in a given month?**
 
@@ -182,7 +182,7 @@ If you get close to your limit you'll be sent an email letting you know. If you 
 
 #### **Can I login using an additional username?**
 
-You can add up to 3 additional usernames as a Pro user for a total of 4 (including the one you signed up with). You can currently only login with the one that you originally signed up with.
+You can add 1 additional username as a Lite user and up to 3 additional usernames as a Pro user for totals of 2 and 4 respectively (including the one you signed up with). You can currently only login with the one that you originally signed up with.
 
 #### **I'm not receiving any emails, what's wrong?**
 
