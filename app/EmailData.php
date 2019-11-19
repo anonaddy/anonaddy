@@ -10,6 +10,9 @@ class EmailData
     {
         $this->sender = $parser->getAddresses('from')[0]['address'];
         $this->display_from = base64_encode($parser->getAddresses('from')[0]['display']);
+        if (isset($parser->getAddresses('reply-to')[0])) {
+            $this->reply_to_address = $parser->getAddresses('reply-to')[0]['address'];
+        }
         $this->subject = base64_encode($parser->getHeader('subject'));
         $this->text = base64_encode($parser->getMessageBody('text'));
         $this->html = base64_encode($parser->getMessageBody('html'));

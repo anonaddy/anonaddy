@@ -274,6 +274,27 @@ class ReceiveEmail extends Command
     {
         $parser = new Parser;
 
+        // Fix some edge cases in from name e.g. "\" John Doe \"" <johndoe@example.com>
+        $parser->addMiddleware(function ($mimePart, $next) {
+            $part = $mimePart->getPart();
+
+            if (isset($part['headers']['from'])) {
+                $value = $part['headers']['from'];
+                $value = (is_array($value)) ? $value[0] : $value;
+
+                try {
+                    mailparse_rfc822_parse_addresses($value);
+                } catch (\Exception $e) {
+                    report($e);
+
+                    $part['headers']['from'] = str_replace("\\\"", "", $part['headers']['from']);
+                    $mimePart->setPart($part);
+                }
+            }
+
+            return $next($mimePart);
+        });
+
         if ($file == 'stream') {
             $fd = fopen('php://stdin', 'r');
             $this->rawEmail = '';
