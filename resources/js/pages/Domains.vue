@@ -203,7 +203,7 @@
           Add new domain
         </h2>
         <p class="mt-4 text-grey-700">
-          Make sure you add the following MX record to your domain.<br /><br />
+          Make sure you add the following MX record to your domain first.<br /><br />
           Host: <b>@</b><br />
           Value: <b>{{ hostname }}</b
           ><br />

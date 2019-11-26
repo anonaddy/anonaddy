@@ -30,6 +30,8 @@
                                 </div>
                             </div>
 
+                            <p class="text-xs mt-1 text-grey-600">This will be your unique subdomain for your aliases<br> e.g. alias@<b>johndoe</b>.{{ config('anonaddy.domain') }}</p>
+
 
                             @if ($errors->has('username'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -40,10 +42,12 @@
 
                         <div class="flex flex-wrap mb-6">
                             <label for="email" class="block text-grey-700 text-sm mb-2">
-                                Default Recipient Email::
+                                Your Real Email Address:
                             </label>
 
                             <input id="email" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>
+
+                            <p class="text-xs mt-1 text-grey-600">This is your recipient where emails will be forwarded</p>
 
                             @if ($errors->has('email'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -54,7 +58,7 @@
 
                         <div class="flex flex-wrap mb-6">
                             <label for="email-confirm" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Confirm Email') }}:
+                                Confirm Email Address:
                             </label>
 
                             <input id="email-confirm" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline" name="email_confirmation" value="{{ old('email_confirmation') }}" placeholder="johndoe@example.com" required>

@@ -317,7 +317,7 @@
 
                     <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
-                    <p class="mt-6">The from name is shown when you reply anonymously to a forwarded email. If set to empty then a default from name will be used for each alias e.g. "ebay{{ '@'.$user->username }}.{{ config('anonaddy.domain') }} via AnonAddy".</p>
+                    <p class="mt-6">The from name is shown when you reply anonymously to a forwarded email. If set to empty then the email alias will be used as the from name e.g. "ebay{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}".</p>
 
                     <div class="mt-6 flex flex-wrap mb-4">
                         <label for="from_name" class="block text-grey-700 text-sm mb-2">

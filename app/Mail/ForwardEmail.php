@@ -66,7 +66,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $replyToEmail = $this->alias->local_part.'+'.sha1(config('anonaddy.secret').$replyToDisplay).'@'.$this->alias->domain;
 
         $email =  $this
-            ->from(config('mail.from.address'), base64_decode($this->displayFrom)." '".$this->sender."' via ".config('app.name'))
+            ->from(config('mail.from.address'), base64_decode($this->displayFrom)." '".$this->sender."'")
             ->replyTo($replyToEmail, $replyToDisplay)
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->text('emails.forward.text')->with([

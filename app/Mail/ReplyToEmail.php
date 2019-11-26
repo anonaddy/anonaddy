@@ -43,7 +43,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $fromName = $this->user->from_name ? $this->user->from_name : $this->alias->email.' via '.config('app.name');
+        $fromName = $this->user->from_name ? $this->user->from_name : $this->alias->email;
         $fromAddress = $this->alias->isUuid() ? $this->alias->email : config('mail.from.address');
         $returnPath = $this->alias->isUuid() ? $this->alias->email : config('anonaddy.return_path');
 
