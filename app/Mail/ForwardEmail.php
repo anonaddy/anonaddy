@@ -100,8 +100,8 @@ class ForwardEmail extends Mailable implements ShouldQueue
         foreach ($this->emailAttachments as $attachment) {
             $email->attachData(
                 base64_decode($attachment['stream']),
-                $attachment['file_name'],
-                ['mime' => $attachment['mime']]
+                base64_decode($attachment['file_name']),
+                ['mime' => base64_decode($attachment['mime'])]
             );
         }
 

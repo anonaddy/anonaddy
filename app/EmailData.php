@@ -21,8 +21,8 @@ class EmailData
         foreach ($parser->getAttachments() as $attachment) {
             $this->attachments[] = [
               'stream' => base64_encode(stream_get_contents($attachment->getStream())),
-              'file_name' => $attachment->getFileName(),
-              'mime' => $attachment->getContentType()
+              'file_name' => base64_encode($attachment->getFileName()),
+              'mime' => base64_encode($attachment->getContentType())
           ];
         }
     }
