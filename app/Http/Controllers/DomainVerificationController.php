@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\DomainResource;
-
 class DomainVerificationController extends Controller
 {
     public function __construct()
@@ -19,8 +17,6 @@ class DomainVerificationController extends Controller
             return response('Domain already verified', 404);
         }
 
-        $domain->checkVerification();
-
-        return new DomainResource($domain->fresh());
+        return $domain->checkVerification();
     }
 }

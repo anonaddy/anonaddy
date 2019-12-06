@@ -125,4 +125,14 @@ class Alias extends Model
     {
         $this->update(['active' => true]);
     }
+
+    public function isUuid()
+    {
+        return $this->id === $this->local_part;
+    }
+
+    public function isCustomDomain()
+    {
+        return $this->aliasable_type === 'App\Domain';
+    }
 }

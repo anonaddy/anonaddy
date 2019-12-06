@@ -484,11 +484,11 @@ export default {
         .then(({ data }) => {
           this.recheckRecordsLoading = false
 
-          if (data.data.domain_verified_at === null) {
-            this.warn('MX record not found, please try again later')
-          } else {
-            this.success('Domain verified successfully')
+          if (data.success === true) {
+            this.success(data.message)
             domain.domain_verified_at = data.data.domain_verified_at
+          } else {
+            this.warn(data.message)
           }
         })
         .catch(error => {

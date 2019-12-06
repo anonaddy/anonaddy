@@ -55,18 +55,19 @@ class ForwardEmail extends Mailable implements ShouldQueue
     }
 
     /**
-     * Build the message.4
+     * Build the message.
      *
      * @return $this
      */
     public function build()
     {
         $replyToDisplay = $this->replyToAddress ?? $this->sender;
-
         $replyToEmail = $this->alias->local_part.'+'.sha1(config('anonaddy.secret').$replyToDisplay).'@'.$this->alias->domain;
 
+        $fromEmail = $this->alias->isUuid() ? $this->alias->email : config('mail.from.address');
+
         $email =  $this
-            ->from(config('mail.from.address'), base64_decode($this->displayFrom)." '".$this->sender."'")
+            ->from($fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
             ->replyTo($replyToEmail, $replyToDisplay)
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->text('emails.forward.text')->with([
@@ -81,10 +82,12 @@ class ForwardEmail extends Mailable implements ShouldQueue
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
-                        ->addTextHeader('List-Unsubscribe', '<' . $this->deactivateUrl . '>, <mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '>');
+                        ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>');
 
                 $message->getHeaders()
                         ->addTextHeader('Return-Path', config('anonaddy.return_path'));
+
+                $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
                 if ($this->fingerprint) {
                     $message->attachSigner($this->openpgpsigner);

@@ -9,7 +9,7 @@
                 <div class="flex items-center mb-2">
                     <span class="rounded-full bg-yellow-400 uppercase px-2 py-1 text-xs font-bold mr-2">Important</span>
                     <div>
-                        2FA enabled successfully, please <b>make a copy of your backup code below</b>. If you lose your 2FA device you can use this backup code to disable 2FA on your account. <b>This is the only time this code will be displayed, so be sure not to lose it!</b>
+                        2FA enabled successfully. Please <b>make a copy of your backup code below</b>. If you lose your 2FA device you can use this backup code to disable 2FA on your account. <b>This is the only time this code will be displayed, so be sure not to lose it!</b>
                     </div>
                 </div>
                 <pre class="flex p-3 text-grey-900 bg-white border rounded">

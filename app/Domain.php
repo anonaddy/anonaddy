@@ -2,11 +2,10 @@
 
 namespace App;
 
+use App\Http\Resources\DomainResource;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use Spatie\Dns\Dns;
 
 class Domain extends Model
 {
@@ -125,10 +124,30 @@ class Domain extends Model
      */
     public function checkVerification()
     {
-        $dns = new Dns($this->domain, config('anonaddy.dns_resolver'));
+        $records = collect(dns_get_record($this->domain . '.', DNS_MX));
 
-        if (Str::contains($dns->getRecords('MX'), 'MX 10 ' . config('anonaddy.hostname') . '.')) {
-            $this->markDomainAsVerified();
+        $lowestPriority = $records->groupBy('pri')->sortKeys()->first();
+
+        if ($lowestPriority->count() !== 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please make sure you do not have any other MX records with the same priority.'
+            ]);
         }
+
+        // Check the target for the lowest priority record is correct.
+        if ($lowestPriority->first()['target'] === 'mail.anonaddy.me') {
+            $this->markDomainAsVerified();
+            return response()->json([
+                'success' => true,
+                'message' => 'MX Record successfully verified.',
+                'data' => new DomainResource($this->fresh())
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Record not found. This could be due to DNS caching, please try again later.'
+        ]);
     }
 }

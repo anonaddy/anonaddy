@@ -44,18 +44,19 @@ class ReplyToEmail extends Mailable implements ShouldQueue
     public function build()
     {
         $fromName = $this->user->from_name ? $this->user->from_name : $this->alias->email;
-        $fromAddress = $this->alias->isUuid() ? $this->alias->email : config('mail.from.address');
-        $returnPath = $this->alias->isUuid() ? $this->alias->email : config('anonaddy.return_path');
+        $fromEmail = $this->alias->isUuid() ? $this->alias->email : config('mail.from.address');
 
         $email =  $this
-            ->from($fromAddress, $fromName)
+            ->from($fromEmail, $fromName)
             ->subject(base64_decode($this->emailSubject))
             ->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText)
             ])
-            ->withSwiftMessage(function ($message) use ($returnPath) {
+            ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
-                        ->addTextHeader('Return-Path', $returnPath);
+                        ->addTextHeader('Return-Path', config('anonaddy.return_path'));
+
+                $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
             });
 
         if (! $this->alias->isUuid()) {
