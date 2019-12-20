@@ -39,6 +39,11 @@ class RecipientKeyController extends Controller
 
         user()->deleteKeyFromKeyring($recipient->fingerprint);
 
+        $recipient->update([
+            'should_encrypt' => false,
+            'fingerprint' => null
+        ]);
+
         return response('', 204);
     }
 }

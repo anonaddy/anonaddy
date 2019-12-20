@@ -6,6 +6,7 @@ use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Alias extends Model
 {
@@ -134,5 +135,14 @@ class Alias extends Model
     public function isCustomDomain()
     {
         return $this->aliasable_type === 'App\Domain';
+    }
+
+    public function parentDomain()
+    {
+        return collect(config('anonaddy.all_domains'))
+            ->filter(function ($name) {
+                return Str::endsWith($this->domain, $name);
+            })
+            ->first();
     }
 }

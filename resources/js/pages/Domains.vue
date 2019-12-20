@@ -141,22 +141,20 @@
             @off="deactivateDomain(props.row.id)"
           />
         </span>
-        <span v-else-if="props.column.field === 'domain_verified_at'">
+        <span v-else-if="props.column.field === 'domain_sending_verified_at'">
           <span
             name="check"
-            v-if="props.row.domain_verified_at"
+            v-if="props.row.domain_sending_verified_at"
             class="py-1 px-2 bg-green-200 text-green-900 rounded-full text-sm"
           >
             verified
           </span>
           <button
             v-else
-            @click="recheckRecords(rows[props.row.originalIndex])"
+            @click="openCheckRecordsModal(rows[props.row.originalIndex])"
             class="focus:outline-none text-sm"
-            :class="recheckRecordsLoading ? 'cursor-not-allowed' : ''"
-            :disabled="recheckRecordsLoading"
           >
-            Recheck domain
+            Check Records
           </button>
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
@@ -176,41 +174,48 @@
         </h1>
         <div class="mx-auto mb-6 w-24 border-b-2 border-grey-200"></div>
         <p class="mb-4">
-          To get started all you have to do is add an MX record to your domain and then add the
-          domain here by clicking the button above.
+          To get started all you have to do is add a TXT record to your domain to verify ownership
+          and then add the domain here by clicking the button above.
         </p>
         <p class="mb-4">
-          The new record needs to have the following values:
+          The TXT record needs to have the following values:
         </p>
         <p class="mb-4">
+          Type: <b>TXT</b><br />
           Host: <b>@</b><br />
-          Value: <b>{{ hostname }}</b
+          Value: <b>{{ aaVerify }}</b
           ><br />
-          Priority: <b>10</b><br />
-          TTL: <b>3600</b>
         </p>
         <p>
-          Once the DNS changes propagate you will be able to recieve emails at your own domain.
+          Once the DNS changes propagate and you have verified ownership of the domain you will need
+          to add a few more records to be able to recieve emails at your own domain.
         </p>
       </div>
     </div>
 
-    <Modal :open="addDomainModalOpen" @close="addDomainModalOpen = false">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
+    <Modal :open="addDomainModalOpen" @close="closeCheckRecordsModal">
+      <div v-if="!domainToCheck" class="max-w-2xl w-full bg-white rounded-lg shadow-2xl p-6">
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
           Add new domain
         </h2>
-        <p class="mt-4 text-grey-700">
-          Make sure you add the following MX record to your domain first.<br /><br />
-          Host: <b>@</b><br />
-          Value: <b>{{ hostname }}</b
-          ><br />
-          Priority: <b>10</b><br />
-          TTL: <b>3600</b><br /><br />
-          Just include the domain/subdomain e.g. example.com without any http protocol.
+        <p class="mt-4 mb-2 text-grey-700">
+          To verify ownership of the domain, please add the following TXT record and then click Add
+          Domain below.
         </p>
+        <div class="table w-full">
+          <div class="table-row">
+            <div class="table-cell py-2 font-semibold">Type</div>
+            <div class="table-cell p-2 font-semibold">Host</div>
+            <div class="table-cell py-2 font-semibold">Value/Points to</div>
+          </div>
+          <div class="table-row">
+            <div class="table-cell py-2">TXT</div>
+            <div class="table-cell p-2">@</div>
+            <div class="table-cell py-2 break-all">aa-verify={{ aaVerify }}</div>
+          </div>
+        </div>
         <div class="mt-6">
           <p v-show="errors.newDomain" class="mb-3 text-red-500 text-sm">
             {{ errors.newDomain }}
@@ -234,6 +239,66 @@
           </button>
           <button
             @click="addDomainModalOpen = false"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      <div v-else class="max-w-2xl w-full bg-white rounded-lg shadow-2xl p-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Check DNS records
+        </h2>
+        <p class="mt-4 mb-2 text-grey-700">
+          Please set the following DNS records for your custom domain. If you have more than one MX
+          record then the MX record below should have the lowest priority (e.g. 10).
+        </p>
+        <div class="table w-full">
+          <div class="table-row">
+            <div class="table-cell py-2 font-semibold">Type</div>
+            <div class="table-cell py-2 px-4 font-semibold">Host</div>
+            <div class="table-cell py-2 font-semibold">Value/Points to</div>
+          </div>
+          <div class="table-row">
+            <div class="table-cell py-2">MX</div>
+            <div class="table-cell py-2 px-4">@</div>
+            <div class="table-cell py-2 break-words">{{ hostname }}</div>
+          </div>
+          <div class="table-row">
+            <div class="table-cell py-2">TXT</div>
+            <div class="table-cell py-2 px-4">@</div>
+            <div class="table-cell py-2 break-words">v=spf1 include:spf.{{ domainName }} -all</div>
+          </div>
+          <div class="table-row">
+            <div class="table-cell py-2">CNAME</div>
+            <div class="table-cell py-2 px-4">dk1._domainkey</div>
+            <div class="table-cell py-2 break-words">dk1._domainkey.{{ domainName }}</div>
+          </div>
+          <div class="table-row">
+            <div class="table-cell py-2">CNAME</div>
+            <div class="table-cell py-2 px-4">dk2._domainkey</div>
+            <div class="table-cell py-2 break-words">dk2._domainkey.{{ domainName }}</div>
+          </div>
+          <div class="table-row">
+            <div class="table-cell py-2">TXT</div>
+            <div class="table-cell py-2 px-4">@</div>
+            <div class="table-cell py-2 break-words">v=DMARC1; p=quarantine; adkim=s</div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <button
+            @click="checkRecords(domainToCheck)"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            :class="checkRecordsLoading ? 'cursor-not-allowed' : ''"
+            :disabled="checkRecordsLoading"
+          >
+            Check Records
+            <loader v-if="checkRecordsLoading" />
+          </button>
+          <button
+            @click="closeCheckRecordsModal"
             class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Cancel
@@ -336,12 +401,20 @@ export default {
       type: Array,
       required: true,
     },
+    domainName: {
+      type: String,
+      required: true,
+    },
     hostname: {
       type: String,
       required: true,
     },
     recipientOptions: {
       type: Array,
+      required: true,
+    },
+    aaVerify: {
+      type: String,
       required: true,
     },
   },
@@ -360,11 +433,12 @@ export default {
       addDomainLoading: false,
       addDomainModalOpen: false,
       domainIdToDelete: null,
-      domainIdToEdit: '',
+      domainIdToEdit: null,
       domainDescriptionToEdit: '',
+      domainToCheck: null,
       deleteDomainLoading: false,
       deleteDomainModalOpen: false,
-      recheckRecordsLoading: false,
+      checkRecordsLoading: false,
       domainDefaultRecipientModalOpen: false,
       defaultRecipientDomainToEdit: {},
       defaultRecipient: {},
@@ -403,8 +477,8 @@ export default {
           globalSearchDisabled: true,
         },
         {
-          label: 'Verified',
-          field: 'domain_verified_at',
+          label: 'Verified for Sending',
+          field: 'domain_sending_verified_at',
           globalSearchDisabled: true,
         },
         {
@@ -464,37 +538,46 @@ export default {
           this.addDomainLoading = false
           this.rows.push(data.data)
           this.newDomain = ''
-          this.addDomainModalOpen = false
+
+          this.domainToCheck = data.data
+
           this.success('Custom domain added')
         })
         .catch(error => {
           this.addDomainLoading = false
           if (error.response.status === 422) {
             this.error(error.response.data.errors.domain[0])
+          } else if (error.response.status === 429) {
+            this.error('Please wait a little while before checking the records again')
+          } else if (error.response.status === 404) {
+            this.warn(
+              'Verification TXT record not found, this could be due to DNS caching, please try again shortly.'
+            )
           } else {
             this.error()
           }
         })
     },
-    recheckRecords(domain) {
-      this.recheckRecordsLoading = true
+    checkRecords(domain) {
+      this.checkRecordsLoading = true
 
       axios
-        .get(`/domains/${domain.id}/recheck`)
+        .get(`/domains/${domain.id}/check-sending`)
         .then(({ data }) => {
-          this.recheckRecordsLoading = false
+          this.checkRecordsLoading = false
 
           if (data.success === true) {
+            this.closeCheckRecordsModal()
             this.success(data.message)
-            domain.domain_verified_at = data.data.domain_verified_at
+            domain.domain_sending_verified_at = data.data.domain_sending_verified_at
           } else {
             this.warn(data.message)
           }
         })
         .catch(error => {
-          this.recheckRecordsLoading = false
+          this.checkRecordsLoading = false
           if (error.response.status === 429) {
-            this.error('You can only recheck the records once per minute')
+            this.error('Please wait a little while before checking the records again')
           } else {
             this.error()
           }
@@ -518,6 +601,14 @@ export default {
       this.defaultRecipientDomainToEdit = {}
       this.defaultRecipient = {}
     },
+    openCheckRecordsModal(domain) {
+      this.domainToCheck = domain
+      this.addDomainModalOpen = true
+    },
+    closeCheckRecordsModal() {
+      this.domainToCheck = null
+      this.addDomainModalOpen = false
+    },
     editDomain(domain) {
       if (this.domainDescriptionToEdit.length > 100) {
         return this.error('Description cannot be more than 100 characters')
@@ -535,12 +626,12 @@ export default {
         )
         .then(response => {
           domain.description = this.domainDescriptionToEdit
-          this.domainIdToEdit = ''
+          this.domainIdToEdit = null
           this.domainDescriptionToEdit = ''
           this.success('Domain description updated')
         })
         .catch(error => {
-          this.domainIdToEdit = ''
+          this.domainIdToEdit = null
           this.domainDescriptionToEdit = ''
           this.error()
         })

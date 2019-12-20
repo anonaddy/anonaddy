@@ -228,8 +228,8 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 
 #### Prerequisites
 
-* Postfix (3.0.0+) (plus postfix-mysql for database queries)
-* PHP (7.2+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension plus the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails
+* Postfix (3.0.0+) (plus postfix-mysql for database queries and postfix-pcre)
+* PHP (7.3+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
 * Port 25 unblocked and open
 * Redis (4.x+) for throttling and queues
 * FQDN as hostname e.g. mail.anonaddy.me

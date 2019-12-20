@@ -275,15 +275,17 @@ class User extends Authenticatable implements MustVerifyEmail
             });
 
         // Remove the key from all user recipients using that same fingerprint.
-        $this
-            ->recipients()
-            ->get()
-            ->where('fingerprint', $fingerprint)
-            ->each(function ($recipient) {
-                $recipient->update([
-                    'should_encrypt' => false,
-                    'fingerprint' => null
-                ]);
-            });
+        if (! $gnupg->keyinfo($fingerprint)) {
+            $this
+                ->recipients()
+                ->get()
+                ->where('fingerprint', $fingerprint)
+                ->each(function ($recipient) {
+                    $recipient->update([
+                        'should_encrypt' => false,
+                        'fingerprint' => null
+                    ]);
+                });
+        }
     }
 }

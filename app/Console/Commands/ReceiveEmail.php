@@ -287,7 +287,7 @@ class ReceiveEmail extends Command
                 } catch (\Exception $e) {
                     report($e);
 
-                    $part['headers']['from'] = str_replace("\\\"", "", $part['headers']['from']);
+                    $part['headers']['from'] = str_replace("\\", "", $part['headers']['from']);
                     $mimePart->setPart($part);
                 }
             }

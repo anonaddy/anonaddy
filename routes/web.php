@@ -25,7 +25,7 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::post('/recipients/email/resend', 'RecipientVerificationController@resend');
 
     Route::get('/domains', 'ShowDomainController@index')->name('domains.index');
-    Route::get('/domains/{id}/recheck', 'DomainVerificationController@recheck');
+    Route::get('/domains/{id}/check-sending', 'DomainVerificationController@checkSending');
 
     Route::get('/usernames', 'ShowAdditionalUsernameController@index')->name('usernames.index');
 

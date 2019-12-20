@@ -22,7 +22,8 @@ abstract class TestCase extends BaseTestCase
         config([
             'anonaddy.limit' => 1000,
             'anonaddy.domain' => 'anonaddy.com',
-            'anonaddy.all_domains' => ['anonaddy.com','anonaddy.me']
+            'anonaddy.all_domains' => ['anonaddy.com','anonaddy.me'],
+            'anonaddy.dkim_signing_key' => file_get_contents(base_path('tests/keys/TestDkimSigningKey'))
         ]);
 
         //$this->withoutExceptionHandling();

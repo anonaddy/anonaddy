@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Recipient;
 use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
+use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -69,7 +70,8 @@ class RegisterController extends Controller
                 'email:rfc,dns',
                 'max:254',
                 'confirmed',
-                new RegisterUniqueRecipient
+                new RegisterUniqueRecipient,
+                new NotLocalRecipient
             ],
             'password' => ['required', 'min:8'],
         ], [

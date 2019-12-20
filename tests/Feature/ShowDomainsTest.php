@@ -62,21 +62,21 @@ class DomainsTest extends TestCase
     }
 
     /** @test */
-    public function user_can_verify_domain_records()
+    public function user_can_verify_domain_sending_records()
     {
         $domain = factory(Domain::class)->create([
             'user_id' => $this->user->id,
-            'domain' => 'anonaddy.me'
+            'domain' => 'example.com'
         ]);
 
-        $response = $this->get('/domains/'.$domain->id.'/recheck');
+        $response = $this->get('/domains/'.$domain->id.'/check-sending');
 
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('domains', [
             'user_id' => $this->user->id,
-            'domain' => 'anonaddy.me',
-            'domain_verified_at' => now()
+            'domain' => 'example.com',
+            'domain_sending_verified_at' => $response->json('data')['domain_sending_verified_at']
         ]);
     }
 }

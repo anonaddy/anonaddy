@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
+use Swift_Signers_DKIMSigner;
 
 class ForwardEmail extends Mailable implements ShouldQueue
 {
@@ -28,6 +29,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $bannerLocation;
     protected $fingerprint;
     protected $openpgpsigner;
+    protected $dkimSigner;
 
     /**
      * Create a new message instance.
@@ -64,7 +66,23 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $replyToDisplay = $this->replyToAddress ?? $this->sender;
         $replyToEmail = $this->alias->local_part.'+'.sha1(config('anonaddy.secret').$replyToDisplay).'@'.$this->alias->domain;
 
-        $fromEmail = $this->alias->isUuid() ? $this->alias->email : config('mail.from.address');
+        if ($this->alias->isCustomDomain()) {
+            if ($this->alias->aliasable->isVerifiedForSending()) {
+                $fromEmail = $this->alias->email;
+                $returnPath = $this->alias->email;
+
+                $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
+                $this->dkimSigner->ignoreHeader('List-Unsubscribe');
+                $this->dkimSigner->ignoreHeader('Return-Path');
+                $this->dkimSigner->setBodyCanon('relaxed');
+            } else {
+                $fromEmail = config('mail.from.address');
+                $returnPath = config('anonaddy.return_path');
+            }
+        } else {
+            $fromEmail = $this->alias->email;
+            $returnPath = 'mailer@'.$this->alias->parentDomain();
+        }
 
         $email =  $this
             ->from($fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
@@ -80,17 +98,21 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 'fromEmail' => $this->sender,
                 'replacedSubject' => $this->user->email_subject ? ' with subject "' . base64_decode($this->emailSubject) . '"' : null
             ])
-            ->withSwiftMessage(function ($message) {
+            ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->getHeaders()
                         ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>');
 
                 $message->getHeaders()
-                        ->addTextHeader('Return-Path', config('anonaddy.return_path'));
+                        ->addTextHeader('Return-Path', $returnPath);
 
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
                 if ($this->fingerprint) {
                     $message->attachSigner($this->openpgpsigner);
+                }
+
+                if ($this->dkimSigner) {
+                    $message->attachSigner($this->dkimSigner);
                 }
             });
 

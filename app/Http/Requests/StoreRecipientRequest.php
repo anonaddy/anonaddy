@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\NotLocalRecipient;
 use App\Rules\UniqueRecipient;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,7 +31,8 @@ class StoreRecipientRequest extends FormRequest
                 'string',
                 'max:254',
                 'email:rfc,dns',
-                new UniqueRecipient
+                new UniqueRecipient,
+                new NotLocalRecipient
             ]
         ];
     }

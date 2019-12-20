@@ -17,6 +17,7 @@ class DomainResource extends JsonResource
             'default_recipient' => new RecipientResource($this->whenLoaded('defaultRecipient')),
             'active' => $this->active,
             'domain_verified_at' => $this->domain_verified_at ? $this->domain_verified_at->toDateTimeString() : null,
+            'domain_sending_verified_at' => $this->domain_sending_verified_at ? $this->domain_sending_verified_at->toDateTimeString() : null,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

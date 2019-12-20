@@ -159,6 +159,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | DKIM Signing Key Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the path to the private DKIM signing key to be used to sign emails for
+    | custom domains. The custom domains must have the correct selector records
+    |
+    */
+
+    'dkim_signing_key' => ! is_null(env('ANONADDY_DKIM_SIGNING_KEY')) ? file_get_contents(env('ANONADDY_DKIM_SIGNING_KEY')) : null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | DKIM Signing Key Selector
+    |--------------------------------------------------------------------------
+    |
+    | This is the selector for the current DKIM signing key e.g. default
+    |
+    */
+
+    'dkim_selector' => env('ANONADDY_DKIM_SELECTOR'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Username Blacklist
     |--------------------------------------------------------------------------
     |

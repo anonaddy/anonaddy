@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Swift_Signers_DKIMSigner;
 
 class ReplyToEmail extends Mailable implements ShouldQueue
 {
@@ -20,6 +21,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
     protected $emailText;
     protected $emailHtml;
     protected $emailAttachments;
+    protected $dkimSigner;
 
     /**
      * Create a new message instance.
@@ -44,7 +46,23 @@ class ReplyToEmail extends Mailable implements ShouldQueue
     public function build()
     {
         $fromName = $this->user->from_name ? $this->user->from_name : $this->alias->email;
-        $fromEmail = $this->alias->isUuid() ? $this->alias->email : config('mail.from.address');
+
+        if ($this->alias->isCustomDomain()) {
+            if ($this->alias->aliasable->isVerifiedForSending()) {
+                $fromEmail = $this->alias->email;
+                $returnPath = $this->alias->email;
+
+                $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
+                $this->dkimSigner->ignoreHeader('Return-Path');
+                $this->dkimSigner->setBodyCanon('relaxed');
+            } else {
+                $fromEmail = config('mail.from.address');
+                $returnPath = config('anonaddy.return_path');
+            }
+        } else {
+            $fromEmail = $this->alias->email;
+            $returnPath = 'mailer@'.$this->alias->parentDomain();
+        }
 
         $email =  $this
             ->from($fromEmail, $fromName)
@@ -52,11 +70,15 @@ class ReplyToEmail extends Mailable implements ShouldQueue
             ->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText)
             ])
-            ->withSwiftMessage(function ($message) {
+            ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->getHeaders()
                         ->addTextHeader('Return-Path', config('anonaddy.return_path'));
 
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+
+                if ($this->dkimSigner) {
+                    $message->attachSigner($this->dkimSigner);
+                }
             });
 
         if (! $this->alias->isUuid()) {

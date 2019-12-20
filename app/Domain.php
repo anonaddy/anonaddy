@@ -6,6 +6,7 @@ use App\Http\Resources\DomainResource;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 
 class Domain extends Model
 {
@@ -28,7 +29,8 @@ class Domain extends Model
     protected $dates = [
         'created_at',
         'updated_at',
-        'domain_verified_at'
+        'domain_verified_at',
+        'domain_sending_verified_at'
     ];
 
     protected $casts = [
@@ -106,6 +108,16 @@ class Domain extends Model
     }
 
     /**
+     * Determine if the domain is verified for sending.
+     *
+     * @return bool
+     */
+    public function isVerifiedForSending()
+    {
+        return ! is_null($this->domain_sending_verified_at);
+    }
+
+    /**
      * Mark this domain as verified.
      *
      * @return bool
@@ -118,36 +130,87 @@ class Domain extends Model
     }
 
     /**
-     * Checks if the domain has the correct records.
+     * Mark this domain as verified for sending.
      *
-     * @return void
+     * @return bool
+     */
+    public function markDomainAsVerifiedForSending()
+    {
+        return $this->forceFill([
+            'domain_sending_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    /**
+     * Checks if the domain has the correct records.
      */
     public function checkVerification()
     {
-        $records = collect(dns_get_record($this->domain . '.', DNS_MX));
+        return collect(dns_get_record($this->domain . '.', DNS_TXT))
+            ->contains(function ($r) {
+                return $r['txt'] === 'aa-verify=' . sha1(config('anonaddy.secret') . user()->id) || App::environment('testing');
+            });
+    }
 
-        $lowestPriority = $records->groupBy('pri')->sortKeys()->first();
+    /**
+     * Checks if the domain has the correct records for sending.
+     */
+    public function checkVerificationForSending()
+    {
+        $spf = collect(dns_get_record($this->domain . '.', DNS_TXT))
+            ->contains(function ($r) {
+                return preg_match("/^(v=spf1).*(include:spf\." . config('anonaddy.domain') . ").*(-|~)all$/", $r['txt']);
+            });
 
-        if ($lowestPriority->count() !== 1) {
+        if (!$spf) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please make sure you do not have any other MX records with the same priority.'
+                'message' => 'SPF record not found. This could be due to DNS caching, please try again later.'
             ]);
         }
 
-        // Check the target for the lowest priority record is correct.
-        if ($lowestPriority->first()['target'] === 'mail.anonaddy.me') {
-            $this->markDomainAsVerified();
+        $dmarc = collect(dns_get_record('_dmarc.' . $this->domain . '.', DNS_TXT))
+            ->contains(function ($r) {
+                return preg_match("/^(v=DMARC1).*(p=quarantine|reject).*/", $r['txt']);
+            });
+
+        if (!$dmarc) {
             return response()->json([
-                'success' => true,
-                'message' => 'MX Record successfully verified.',
-                'data' => new DomainResource($this->fresh())
+                'success' => false,
+                'message' => 'DMARC record not found. This could be due to DNS caching, please try again later.'
             ]);
         }
+
+        $dk1 = collect(dns_get_record('dk1._domainkey.' . $this->domain . '.', DNS_CNAME))
+            ->contains(function ($r) {
+                return $r['target'] === 'dk1._domainkey.' . config('anonaddy.domain');
+            });
+
+        if (!$dk1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'CNAME dk1._domainkey record not found. This could be due to DNS caching, please try again later.'
+            ]);
+        }
+
+        $dk2 = collect(dns_get_record('dk2._domainkey.' . $this->domain . '.', DNS_CNAME))
+            ->contains(function ($r) {
+                return $r['target'] === 'dk2._domainkey.' . config('anonaddy.domain');
+            });
+
+        if (!$dk2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'CNAME dk2._domainkey record not found. This could be due to DNS caching, please try again later.'
+            ]);
+        }
+
+        $this->markDomainAsVerifiedForSending();
 
         return response()->json([
-            'success' => false,
-            'message' => 'Record not found. This could be due to DNS caching, please try again later.'
+            'success' => true,
+            'message' => 'Records successfully verified for sending.',
+            'data' => new DomainResource($this->fresh())
         ]);
     }
 }
