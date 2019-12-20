@@ -54,7 +54,6 @@ class ReplyToEmail extends Mailable implements ShouldQueue
 
                 $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
                 $this->dkimSigner->ignoreHeader('Return-Path');
-                $this->dkimSigner->setBodyCanon('relaxed');
             } else {
                 $fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');

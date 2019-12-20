@@ -74,7 +74,6 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
                 $this->dkimSigner->ignoreHeader('List-Unsubscribe');
                 $this->dkimSigner->ignoreHeader('Return-Path');
-                $this->dkimSigner->setBodyCanon('relaxed');
             } else {
                 $fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
@@ -109,9 +108,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
                 if ($this->fingerprint) {
                     $message->attachSigner($this->openpgpsigner);
-                }
-
-                if ($this->dkimSigner) {
+                } elseif ($this->dkimSigner) { // TODO fix issue with failing DKIM signature if message is encrypted
                     $message->attachSigner($this->dkimSigner);
                 }
             });
