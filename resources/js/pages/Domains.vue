@@ -55,14 +55,14 @@
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="props.row.created_at | formatDate"
+          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
           >{{ props.row.created_at | timeAgo }}
         </span>
         <span v-else-if="props.column.field == 'domain'">
           <span
             class="tooltip cursor-pointer outline-none"
             data-tippy-content="Click to copy"
-            v-clipboard="() => props.row.domain"
+            v-clipboard="() => rows[props.row.originalIndex].domain"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
             >{{ props.row.domain | truncate(30) }}</span
@@ -95,9 +95,11 @@
             />
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="tooltip outline-none" :data-tippy-content="props.row.description">{{
-              props.row.description | truncate(60)
-            }}</span>
+            <span
+              class="tooltip outline-none"
+              :data-tippy-content="rows[props.row.originalIndex].description"
+              >{{ props.row.description | truncate(60) }}</span
+            >
             <icon
               name="edit"
               class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer ml-2"
@@ -283,7 +285,7 @@
           </div>
           <div class="table-row">
             <div class="table-cell py-2">TXT</div>
-            <div class="table-cell py-2 px-4">@</div>
+            <div class="table-cell py-2 px-4">_dmarc</div>
             <div class="table-cell py-2 break-words">v=DMARC1; p=quarantine; adkim=s</div>
           </div>
         </div>

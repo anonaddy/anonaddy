@@ -55,14 +55,14 @@
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="props.row.created_at | formatDate"
+          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
           >{{ props.row.created_at | timeAgo }}
         </span>
         <span v-else-if="props.column.field == 'username'">
           <span
             class="tooltip cursor-pointer outline-none"
             data-tippy-content="Click to copy"
-            v-clipboard="() => props.row.username"
+            v-clipboard="() => rows[props.row.originalIndex].username"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
             >{{ props.row.username | truncate(30) }}</span

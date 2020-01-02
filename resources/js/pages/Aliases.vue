@@ -159,14 +159,14 @@
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="props.row.created_at | formatDate"
+          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
           >{{ props.row.created_at | timeAgo }}
         </span>
         <span v-else-if="props.column.field == 'email'" class="block">
           <span
             class="text-grey-400 tooltip cursor-pointer outline-none"
             data-tippy-content="Click to copy"
-            v-clipboard="() => getAliasEmail(props.row)"
+            v-clipboard="() => getAliasEmail(rows[props.row.originalIndex])"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
             ><span class="font-semibold text-indigo-800">{{
