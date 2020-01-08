@@ -322,8 +322,8 @@
           Option 2: Generate a unique random alias
         </h3>
         <p class="mb-4">
-          You can click the button above to generate a random UUID alias that will look something
-          like this:
+          You can click the button above to generate a random alias that will look something like
+          this:
         </p>
         <p class="mb-4">
           <b>86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</b>
@@ -340,15 +340,9 @@
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
-          Generate new UUID alias
+          Generate new alias
         </h2>
         <p class="mt-4 text-grey-700">
-          This will generate a new unique alias in the form of
-          <span class="text-sm block mt-2 font-semibold"
-            >86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</span
-          >
-        </p>
-        <p class="mt-2 text-grey-700">
           Other aliases e.g. alias@{{ subdomain }} are created automatically when they receive their
           first email.
         </p>
@@ -380,6 +374,37 @@
             </svg>
           </div>
         </div>
+
+        <label for="alias_domain" class="block text-grey-700 text-sm mt-4 mb-2">
+          Alias Format:
+        </label>
+        <div class="block relative w-full mb-4">
+          <select
+            v-model="generateAliasIsUuid"
+            id="alias_domain"
+            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
+            required
+          >
+            <option :value="true">UUID</option>
+            <option :value="false" :disabled="subscription === 'free'"
+              >Random Words {{ subscription === 'free' ? '(Subscribe To Unlock)' : '' }}</option
+            >
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+          >
+            <svg
+              class="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+              />
+            </svg>
+          </div>
+        </div>
+
         <label for="alias_description" class="block text-grey-700 text-sm my-2">
           Description:
         </label>
@@ -572,6 +597,7 @@ export default {
       generateAliasLoading: false,
       generateAliasDomain: this.domain,
       generateAliasDescription: '',
+      generateAliasIsUuid: true,
       recipientsAliasToEdit: {},
       aliasRecipientsToEdit: [],
       columns: [
@@ -749,6 +775,7 @@ export default {
           JSON.stringify({
             domain: this.generateAliasDomain,
             description: this.generateAliasDescription,
+            uuid: this.generateAliasIsUuid,
           }),
           {
             headers: { 'Content-Type': 'application/json' },

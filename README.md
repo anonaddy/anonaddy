@@ -56,7 +56,7 @@ Here are a few reasons I can think of:
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
 * Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another for paid plan users)
-* Ability to generate UUID aliases
+* Ability to generate UUID and random word aliases
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
 
@@ -84,7 +84,7 @@ The fingerprint of the mailer@anonaddy.me key is "26A987650243B28802524E2F809FD0
 
 If you're concerned that your aliases are all linked by your username e.g. @johndoe.anonaddy.com, then you have a couple of options:
 
-1. You can generate UUID aliases instead, these are all under the root domain and cannot be linked to a user.
+1. You can generate UUID or random word aliases instead, these are all under the root domain and cannot be linked to a user.
 2. You can add additional usernames and separate your aliases under your these. e.g. you could have one username for personal stuff, another for work, another for hobbies etc.
 
 #### **Where is the server located?**
@@ -104,7 +104,8 @@ The limit is currently set to 10 which should suffice in the vast majority of si
 When you delete your account the following happens:
 
 * All of your recipients are deleted from the database
-* All of your aliases are deleted from the database
+* All of your aliases that use a shared domain e.g. @anonaddy.me are soft deleted from the database (this is to prevent any chance of another user generating the same alias in the future)
+* All of your other aliases are deleted from the database
 * All of your custom domains are deleted from the database
 * Your user details are deleted from the database
 * Your username and any additional usernames that you created are encrypted and added to a table in the database. This is to prevent anybody signing up with the same username in the future.
@@ -137,7 +138,7 @@ A few days before your billing cycle ends you will receive an email letting you 
 * If you have any more than **2 recipients** they will be **deleted**
 * Paid account settings will be reverted to default values
 * Any aliases using paid plan only domains will be **deactivated**
-* If you have any more than 20 UUID aliases they will be **deactivated**
+* If you have any more than 20 aliases using a shared domain they will be **deactivated**
 
 You will not be able to activate any of the above again until you resubscribe.
 

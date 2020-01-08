@@ -28,15 +28,27 @@ class AliasController extends Controller
             return response('', 429);
         }
 
-        $uuid = Uuid::uuid4();
+        if ($request->uuid === false) {
+            $localPart = user()->generateRandomWordLocalPart();
 
-        $alias = user()->aliases()->create([
-            'id' => $uuid,
-            'email' => $uuid . '@' . $request->domain,
-            'local_part' => $uuid,
-            'domain' => $request->domain,
-            'description' => $request->description
-        ]);
+            $data = [
+                'email' => $localPart . '@' . $request->domain,
+                'local_part' => $localPart,
+            ];
+        } else {
+            $uuid = Uuid::uuid4();
+
+            $data = [
+                'id' => $uuid,
+                'email' => $uuid . '@' . $request->domain,
+                'local_part' => $uuid,
+            ];
+        }
+
+        $data['domain'] = $request->domain;
+        $data['description'] = $request->description;
+
+        $alias = user()->aliases()->create($data);
 
         return new AliasResource($alias->refresh()->load('recipients'));
     }

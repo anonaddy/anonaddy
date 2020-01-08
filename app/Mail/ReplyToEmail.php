@@ -80,7 +80,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
                 }
             });
 
-        if (! $this->alias->isUuid()) {
+        if ($this->alias->isCustomDomain() && !$this->dkimSigner) {
             $email->replyTo($this->alias->email, $fromName);
         }
 

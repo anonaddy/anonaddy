@@ -40,6 +40,15 @@ class Domain extends Model
         'default_recipient_id' => 'string',
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        Domain::deleting(function ($domain) {
+            $domain->aliases()->delete();
+        });
+    }
+
     /**
      * Set the domain's name.
      */

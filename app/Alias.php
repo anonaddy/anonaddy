@@ -132,6 +132,11 @@ class Alias extends Model
         return $this->id === $this->local_part;
     }
 
+    public function hasSharedDomain()
+    {
+        return in_array($this->domain, config('anonaddy.all_domains'));
+    }
+
     public function isCustomDomain()
     {
         return $this->aliasable_type === 'App\Domain';

@@ -288,4 +288,11 @@ class User extends Authenticatable implements MustVerifyEmail
                 });
         }
     }
+
+    public function generateRandomWordLocalPart()
+    {
+        return collect(config('anonaddy.wordlist'))
+            ->random(2)
+            ->implode('.').mt_rand(0, 999);
+    }
 }

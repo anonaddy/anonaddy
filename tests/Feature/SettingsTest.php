@@ -161,6 +161,13 @@ class SettingsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
+        $uuidAlias = factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'domain' => 'anonaddy.me'
+        ]);
+        $uuidAlias->update(['local_part' => $uuidAlias->id]);
+
+
         $recipient = factory(Recipient::class)->create([
             'user_id' => $this->user->id
         ]);
@@ -209,6 +216,12 @@ class SettingsTest extends TestCase
         $this->assertDatabaseMissing('aliases', [
             'id' => $alias->id,
             'user_id' => $this->user->id
+        ]);
+
+        $this->assertDatabaseHas('aliases', [
+            'id' => $uuidAlias->id,
+            'user_id' => $this->user->id,
+            'deleted_at' => now()
         ]);
 
         $this->assertDatabaseMissing('aliases', [

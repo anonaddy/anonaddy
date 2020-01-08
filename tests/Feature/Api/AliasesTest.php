@@ -64,6 +64,21 @@ class AliasesTest extends TestCase
     }
 
     /** @test */
+    public function user_can_generate_new_random_word_alias()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'anonaddy.me',
+            'description' => 'the description',
+            'uuid' => false
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $this->assertNotEquals($this->user->aliases[0]->id, $response->getData()->data->local_part);
+        $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+    }
+
+    /** @test */
     public function user_can_update_alias_description()
     {
         $alias = factory(Alias::class)->create([

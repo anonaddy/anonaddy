@@ -36,7 +36,11 @@ class DeleteAccount implements ShouldQueue
         DeletedUsername::create(['username' => $this->user->username]);
 
         $this->user->aliasRecipients()->delete();
-        $this->user->aliases()->forceDelete();
+
+        // Soft delete any aliases at shared domains
+        $this->user->aliases()->whereIn('domain', config('anonaddy.all_domains'))->delete();
+        $this->user->aliases()->whereNotIn('domain', config('anonaddy.all_domains'))->forceDelete();
+
         $this->user->recipients()->get()->each->delete(); // In order to fire deleting model event.
         $this->user->domains()->delete();
         $this->user->additionalUsernames()->get()->each->delete(); // In order to fire deleting model event.

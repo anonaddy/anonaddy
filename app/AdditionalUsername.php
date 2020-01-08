@@ -41,6 +41,7 @@ class AdditionalUsername extends Model
         parent::boot();
 
         AdditionalUsername::deleting(function ($username) {
+            $username->aliases()->delete();
             DeletedUsername::create(['username' => $username->username]);
         });
     }

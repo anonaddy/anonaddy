@@ -365,8 +365,8 @@
           Delete domain
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to delete this domain? You will no longer be able to receive any
-          emails at this domain.
+          Are you sure you want to delete this domain? This will also delete all aliases associated
+          with this domain. You will no longer be able to receive any emails at this domain.
         </p>
         <div class="mt-6">
           <button
