@@ -344,6 +344,60 @@ class ReceiveEmailTest extends TestCase
     }
 
     /** @test */
+    public function it_can_forward_email_with_random_word_generated_alias()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $localPart = 'circus.waltz449';
+
+        config([
+            'anonaddy.admin_username' => 'random'
+        ]);
+
+        factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'email' => $localPart.'@anonaddy.me',
+            'local_part' => $localPart,
+            'domain' => 'anonaddy.me',
+        ]);
+
+        $defaultRecipient = $this->user->defaultRecipient;
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_with_random_words.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => [$localPart.'@anonaddy.me'],
+                '--local_part' => [$localPart],
+                '--extension' => [''],
+                '--domain' => ['anonaddy.me'],
+                '--size' => '892'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'local_part' => $localPart,
+            'domain' => 'anonaddy.me',
+            'email' => $localPart.'@anonaddy.me',
+            'emails_forwarded' => 1,
+            'emails_blocked' => 0
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'username' => 'johndoe',
+            'bandwidth' => '892'
+        ]);
+        $this->assertCount(1, $this->user->aliases);
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($defaultRecipient) {
+            return $mail->hasTo($defaultRecipient->email);
+        });
+    }
+
+    /** @test */
     public function it_can_forward_email_with_existing_alias_and_receipients()
     {
         Mail::fake();

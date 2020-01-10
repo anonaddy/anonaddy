@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\AdditionalUsername;
+use App\Domain;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
+use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
 class AliasController extends Controller
@@ -44,6 +47,27 @@ class AliasController extends Controller
                 'local_part' => $uuid,
             ];
         }
+
+        // TODO update
+        // Check if domain is for additional username or custom domain
+        $parentDomain = collect(config('anonaddy.all_domains'))
+                    ->filter(function ($name) use ($request) {
+                        return Str::endsWith($request->domain, $name);
+                    })
+                    ->first();
+
+        $subdomain = substr($request->domain, 0, strrpos($request->domain, '.'.$parentDomain));
+
+        if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
+            $aliasable = $additionalUsername;
+        } elseif ($customDomain = Domain::where('domain', $request->domain)->first()) {
+            $aliasable = $customDomain;
+        } else {
+            $aliasable = null;
+        }
+
+        $data['aliasable_id'] = $aliasable->id ?? null;
+        $data['aliasable_type'] = $aliasable ? 'App\\'.class_basename($aliasable) : null;
 
         $data['domain'] = $request->domain;
         $data['description'] = $request->description;

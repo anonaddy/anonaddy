@@ -295,4 +295,22 @@ class User extends Authenticatable implements MustVerifyEmail
             ->random(2)
             ->implode('.').mt_rand(0, 999);
     }
+
+    public function domainOptions()
+    {
+        $customDomains = $this->domains()->pluck('domain')->toArray();
+
+        return $this->additionalUsernames()
+            ->pluck('username')
+            ->push($this->username)
+            ->flatMap(function ($username) {
+                return collect(config('anonaddy.all_domains'))->map(function ($domain) use ($username) {
+                    return $username.'.'.$domain;
+                });
+            })
+            ->concat($customDomains)
+            ->concat(config('anonaddy.all_domains'))
+            ->reverse()
+            ->values();
+    }
 }

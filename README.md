@@ -8,7 +8,7 @@ This is the source code for self-hosting AnonAddy.
 
 AnonAddy is short for "Anonymous Email Address". The word "Addy" is internet slang for email address, e.g.
 
-> "My email addy is being spammed. I should've kept it private."
+> "My addy is being spammed. I should've kept it private."
 
 #### **Why did you make this site?**
 
@@ -42,7 +42,7 @@ No I definitely do not store/save any emails that pass through the server.
 
 #### **Can I use my own domain?**
 
-Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add an MX record to your domain so that our server can handle incoming emails.
+Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add a TXT record to verify your ownership of the domain. Then you will need to add an MX record to your domain so that our server can handle incoming emails. You can then add a few other records to enable sending from your domain too.
 
 #### **Why should I use this instead of a similar service?**
 
@@ -56,13 +56,13 @@ Here are a few reasons I can think of:
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
 * Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another for paid plan users)
-* Ability to generate UUID and random word aliases
+* Ability to generate UUID and random word aliases at shared domains
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
 
 #### **Is there a browser extension?**
 
-Yes there is an [open-source](https://github.com/anonaddy/browser-extension) browser extension available to download for [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/anonaddy/) and [Chrome](https://chrome.google.com/webstore/detail/anonaddy/iadbdpnoknmbdeolbapdackdcogdmjpe) (also available on other chromium based browsers such as Brave and Vivaldi). You can use the extension to generate UUID aliases remotely.
+Yes there is an [open-source](https://github.com/anonaddy/browser-extension) browser extension available to download for [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/anonaddy/) and [Chrome](https://chrome.google.com/webstore/detail/anonaddy/iadbdpnoknmbdeolbapdackdcogdmjpe) (also available on other chromium based browsers such as Brave and Vivaldi). You can use the extension to generate new aliases remotely.
 
 #### **How do I add my own GPG/OpenPGP key for encryption?**
 
@@ -84,7 +84,7 @@ The fingerprint of the mailer@anonaddy.me key is "26A987650243B28802524E2F809FD0
 
 If you're concerned that your aliases are all linked by your username e.g. @johndoe.anonaddy.com, then you have a couple of options:
 
-1. You can generate UUID or random word aliases instead, these are all under the root domain and cannot be linked to a user.
+1. You can generate UUID or random word aliases instead, these are all under a shared domain and cannot be linked to a user.
 2. You can add additional usernames and separate your aliases under your these. e.g. you could have one username for personal stuff, another for work, another for hobbies etc.
 
 #### **Where is the server located?**
@@ -115,6 +115,16 @@ When you delete your account the following happens:
 
 Yes this will work with any provider, althought I can't guarantee it won't land in spam initially.
 
+#### **How do I reply to a forwarded email?**
+
+Each forwarded email has a Reply-To: header set. This header will look something like this:
+
+Reply-To: "sender@example.com" <alias+59fhbf7f1ea374c9182ac0f269m3192501fep210@johndoe.anonaddy.com>
+
+Where sender@example.com is the address of the person who sent you the email and the part between the '<' '>' is the alias (alias@johndoe.anonaddy.com in this case) that forwarded the email along with a "hash" added as an extension after the "+". In order to reply successfully you must keep this entire email address and display name intact, do not remove the "sender@example.com" display name part.
+
+To check if a reply has worked properly check in your dashboard if the reply count has been incremented for that alias.
+
 #### **Will people see my real email if I reply to a forwarded one?**
 
 No, your real email will not be shown, the email will look as if it has come from us instead. Just make sure not to include anything that might identify you when composing the reply, i.e. your full name.
@@ -138,7 +148,7 @@ A few days before your billing cycle ends you will receive an email letting you 
 * If you have any more than **2 recipients** they will be **deleted**
 * Paid account settings will be reverted to default values
 * Any aliases using paid plan only domains will be **deactivated**
-* If you have any more than 20 aliases using a shared domain they will be **deactivated**
+* If you have any more than 20 aliases using a shared domain e.g. anonaddy.me they will be **deactivated**
 
 You will not be able to activate any of the above again until you resubscribe.
 
@@ -161,7 +171,7 @@ The server is running a local DNS caching server to improve the speed of queries
 
 Not unless you are really going to town. Each user is throttled to 200 emails per hour through the server.
 
-#### **Is there a limit to how many aliases I can create?**
+#### **Is there a limit to how many aliases I can create per hour?**
 
 Currently you are limited to creating 10 new aliases per hour on the free plan, 20 per hour on the Lite plan and 50 per hour on the Pro plan. If you try to create more than this the emails will be deferred until you are back below the limit.
 
@@ -179,7 +189,7 @@ The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,0
 
 #### **What happens if I go over my bandwidth limit in a given month?**
 
-If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month.
+If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month or you upgrade your plan.
 
 #### **Can I login using an additional username?**
 
@@ -187,15 +197,15 @@ You can add 1 additional username as a Lite user and up to 3 additional username
 
 #### **I'm not receiving any emails, what's wrong?**
 
-Please make sure to add mailer@anonaddy.me to your address book and check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
+Please make sure to add mailer@anonaddy.me and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
 
-If an alias has been previously deleted and you try to send email to it, the emails will bounce with an error message - "554 5.7.1 Recipient address rejected: Access denied".
+If an alias has been previously deleted and you try to send email to it, the emails will be rejected with an error message - "554 5.7.1 Recipient address rejected: Access denied".
 
-Check that you have not deactivated the alias, custom domain or additional username. When any of these are deactivated, emails will be silently discarded, they will not bounce or return any error message.
+Check that you have not deactivated the alias, custom domain or additional username. When any of these are deactivated, emails will be silently discarded, they will not be rejected or return any error message.
 
 The sender of the email may be failing SPF, DMARC or DNS blacklist checks resulting in the email being rejected. The sender should also have correct reverse DNS setup and use a FQDN as their hostname.
 
-If you are forwarding emails to an icloud.com email address some users are having issues with a small number of emails bouncing (often those from Facebook).
+If you are forwarding emails to an icloud.com email address some users are having issues with a small number of emails being rejected (often those from Facebook).
 
 For some reason Apple seems to think these emails are spam and returns this error message:
 
@@ -223,7 +233,7 @@ My name is Will Browning, I'm a web developer from the UK and an advocate for on
 
 #### **I couldn't find an answer to my question, how can I contact you?**
 
-For any other questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com) ([5FCAFD8A67D2A783CFF4D0E31AC6D923E6FB4EF7](https://keys.openpgp.org/search?q=5FCAFD8A67D2A783CFF4D0E31AC6D923E6FB4EF7))
+For any other questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com) ([GPG Key](https://anonaddy.com/anonaddy-contact-public-key.asc))
 
 ## Self Hosting
 

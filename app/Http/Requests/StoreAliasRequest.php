@@ -28,7 +28,7 @@ class StoreAliasRequest extends FormRequest
             'domain' => [
                 'required',
                 'string',
-                Rule::in(config('anonaddy.all_domains'))
+                Rule::in($this->user()->domainOptions())
             ],
             'description' => 'nullable|max:100',
             'uuid' => 'nullable|boolean'

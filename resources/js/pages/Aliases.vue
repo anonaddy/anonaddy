@@ -343,8 +343,8 @@
           Generate new alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Other aliases e.g. alias@{{ subdomain }} are created automatically when they receive their
-          first email.
+          Other aliases e.g. alias@{{ subdomain }} can also be created automatically when they
+          receive their first email.
         </p>
         <label for="alias_domain" class="block text-grey-700 text-sm my-2">
           Alias Domain:
@@ -356,9 +356,12 @@
             class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
             required
           >
-            <option v-for="domainOption in allDomains" :key="domainOption" :value="domainOption">{{
-              domainOption
-            }}</option>
+            <option
+              v-for="domainOption in domainOptions"
+              :key="domainOption"
+              :value="domainOption"
+              >{{ domainOption }}</option
+            >
           </select>
           <div
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -386,9 +389,7 @@
             required
           >
             <option :value="true">UUID</option>
-            <option :value="false" :disabled="subscription === 'free'"
-              >Random Words {{ subscription === 'free' ? '(Subscribe To Unlock)' : '' }}</option
-            >
+            <option :value="false">Random Words</option>
           </select>
           <div
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -570,7 +571,7 @@ export default {
       type: String,
       required: true,
     },
-    allDomains: {
+    domainOptions: {
       type: Array,
       required: true,
     },

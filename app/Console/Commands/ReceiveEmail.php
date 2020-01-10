@@ -106,11 +106,15 @@ class ReceiveEmail extends Command
                         $aliasable = $customDomain;
                     }
 
-                    // Check if this is a uuid generated alias.
+                    // check if this is a uuid generated alias
                     if ($alias = Alias::find($recipient['local_part'])) {
                         $user = $alias->user;
-                    } elseif ($recipient['domain'] === $parentDomain && !empty(config('anonaddy.admin_username'))) {
-                        $user = User::where('username', config('anonaddy.admin_username'))->first();
+                    } elseif ($recipient['domain'] === $parentDomain) {
+                        if ($alias = Alias::where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first()) {
+                            $user = $alias->user;
+                        } elseif (!empty(config('anonaddy.admin_username'))) {
+                            $user = User::where('username', config('anonaddy.admin_username'))->first();
+                        }
                     }
                 }
 
