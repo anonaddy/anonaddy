@@ -185,7 +185,7 @@
         <p class="mb-4">
           Type: <b>TXT</b><br />
           Host: <b>@</b><br />
-          Value: <b>{{ aaVerify }}</b
+          Value: <b>aa-verify={{ aaVerify }}</b
           ><br />
         </p>
         <p>

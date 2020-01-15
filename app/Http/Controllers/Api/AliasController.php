@@ -48,7 +48,6 @@ class AliasController extends Controller
             ];
         }
 
-        // TODO update
         // Check if domain is for additional username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))
                     ->filter(function ($name) use ($request) {

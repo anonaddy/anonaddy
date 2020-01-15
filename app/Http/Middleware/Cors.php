@@ -19,7 +19,7 @@ class Cors
             return $next($request);
         }
 
-        if (! in_array($request->getMethod(), ['POST', 'OPTIONS'])) {
+        if (! in_array($request->getMethod(), ['GET', 'POST', 'OPTIONS'])) {
             return response('Forbidden cors method', 403);
         }
 

@@ -56,4 +56,6 @@ Route::group([
 
     Route::post('/active-usernames', 'Api\ActiveAdditionalUsernameController@store');
     Route::delete('/active-usernames/{id}', 'Api\ActiveAdditionalUsernameController@destroy');
+
+    Route::get('/domain-options', 'Api\DomainOptionController@index');
 });

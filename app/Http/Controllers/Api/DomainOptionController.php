@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+
+class DomainOptionController extends Controller
+{
+    public function index()
+    {
+        return response()->json([
+            'data' => user()->domainOptions()
+        ]);
+    }
+}
