@@ -498,7 +498,7 @@
         </h2>
         <p class="mt-4 text-grey-700">
           Are you sure you want to delete this alias? This action cannot be undone. Once deleted,
-          this alias will <b>not be able to be used again</b> and will bounce any emails sent to it.
+          this alias will <b>not be able to be used again</b> and will reject any emails sent to it.
         </p>
         <div class="mt-6">
           <button

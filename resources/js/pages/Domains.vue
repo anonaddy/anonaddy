@@ -276,12 +276,12 @@
           <div class="table-row">
             <div class="table-cell py-2">CNAME</div>
             <div class="table-cell py-2 px-4">dk1._domainkey</div>
-            <div class="table-cell py-2 break-words">dk1._domainkey.{{ domainName }}</div>
+            <div class="table-cell py-2 break-words">dk1._domainkey.{{ domainName }}.</div>
           </div>
           <div class="table-row">
             <div class="table-cell py-2">CNAME</div>
             <div class="table-cell py-2 px-4">dk2._domainkey</div>
-            <div class="table-cell py-2 break-words">dk2._domainkey.{{ domainName }}</div>
+            <div class="table-cell py-2 break-words">dk2._domainkey.{{ domainName }}.</div>
           </div>
           <div class="table-row">
             <div class="table-cell py-2">TXT</div>

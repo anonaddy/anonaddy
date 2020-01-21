@@ -119,7 +119,7 @@ Yes this will work with any provider, althought I can't guarantee it won't land 
 
 Each forwarded email has a Reply-To: header set. This header will look something like this:
 
-Reply-To: "sender@example.com" <alias+59fhbf7f1ea374c9182ac0f269m3192501fep210@johndoe.anonaddy.com>
+Reply-To: "sender@example.com" <<alias+59fhbf7f1ea374c9182ac0f269m3192501fep210@johndoe.anonaddy.com>>
 
 Where sender@example.com is the address of the person who sent you the email and the part between the '<' '>' is the alias (alias@johndoe.anonaddy.com in this case) that forwarded the email along with a "hash" added as an extension after the "+". In order to reply successfully you must keep this entire email address and display name intact, do not remove the "sender@example.com" display name part.
 

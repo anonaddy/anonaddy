@@ -289,8 +289,6 @@ class ReceiveEmail extends Command
                 try {
                     mailparse_rfc822_parse_addresses($value);
                 } catch (\Exception $e) {
-                    report($e);
-
                     $part['headers']['from'] = str_replace("\\", "", $part['headers']['from']);
                     $mimePart->setPart($part);
                 }
