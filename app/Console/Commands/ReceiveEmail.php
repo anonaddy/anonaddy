@@ -8,6 +8,7 @@ use App\Domain;
 use App\EmailData;
 use App\Mail\ForwardEmail;
 use App\Mail\ReplyToEmail;
+use App\Mail\SendFromEmail;
 use App\Notifications\NearBandwidthLimit;
 use App\User;
 use Illuminate\Console\Command;
@@ -130,6 +131,8 @@ class ReceiveEmail extends Command
                 // Check whether this email is a reply or a new email to be forwarded.
                 if ($recipient['extension'] === sha1(config('anonaddy.secret').$displayTo)) {
                     $this->handleReply($user, $recipient, $displayTo);
+                } elseif (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL)) {
+                    $this->handleSendFrom($user, $recipient, $aliasable ?? null);
                 } else {
                     $this->handleForward($user, $recipient, $aliasable ?? null);
                 }
@@ -169,6 +172,36 @@ class ReceiveEmail extends Command
                 $user->bandwidth += $this->size;
                 $user->save();
             }
+        }
+    }
+
+    protected function handleSendFrom($user, $recipient, $aliasable)
+    {
+        $alias = $user->aliases()->where([
+            'email' => $recipient['local_part'] . '@' . $recipient['domain'],
+            'local_part' => $recipient['local_part'],
+            'domain' => $recipient['domain'],
+            'aliasable_id' => $aliasable->id ?? null,
+            'aliasable_type' => $aliasable ? 'App\\'.class_basename($aliasable) : null
+        ])->first();
+
+        if (!$alias || !$user->isVerifiedRecipient($this->option('sender'))) {
+            exit(0);
+        }
+
+        $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
+
+        $emailData = new EmailData($this->parser);
+
+        $message = new SendFromEmail($user, $alias, $emailData);
+
+        Mail::to($sendTo)->queue($message);
+
+        if (!Mail::failures()) {
+            $alias->increment('emails_sent');
+
+            $user->bandwidth += $this->size;
+            $user->save();
         }
     }
 

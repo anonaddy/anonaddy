@@ -48,6 +48,26 @@ class RegistrationTest extends TestCase
     }
 
     /** @test */
+    public function user_cannot_register_with_invalid_characters()
+    {
+        Notification::fake();
+
+        $response = $this->post('/register', [
+            'username' => 'Ω',
+            'email' => 'johndoe@example.com',
+            'email_confirmation' => 'johndoe@example.com',
+            'password' => 'mypassword',
+            'terms' => true,
+        ]);
+
+        $response->assertSessionHasErrors(['username']);
+
+        $this->assertDatabaseMissing('users', [
+            'username' => 'Ω'
+        ]);
+    }
+
+    /** @test */
     public function user_can_verify_email_successfully()
     {
         $user = factory(User::class)->create();

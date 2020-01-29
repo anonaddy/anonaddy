@@ -268,7 +268,8 @@
           v-else-if="props.column.field == 'emails_replied'"
           class="font-semibold text-indigo-800"
         >
-          {{ props.row.emails_replied }}
+          {{ props.row.emails_replied }} <span class="text-grey-200">/</span>
+          {{ props.row.emails_sent }}
         </span>
         <span v-else-if="props.column.field === 'active'" class="flex items-center">
           <Toggle
@@ -640,7 +641,7 @@ export default {
           globalSearchDisabled: true,
         },
         {
-          label: 'Replies',
+          label: 'Replies / Sent',
           field: 'emails_replied',
           type: 'number',
           tdClass: 'text-center',

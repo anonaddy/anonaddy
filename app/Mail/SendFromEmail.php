@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Swift_Signers_DKIMSigner;
 
-class ReplyToEmail extends Mailable implements ShouldQueue
+class SendFromEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

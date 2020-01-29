@@ -298,7 +298,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function domainOptions()
     {
-        $customDomains = $this->domains()->pluck('domain')->toArray();
+        $customDomains = $this->verifiedDomains()->pluck('domain')->toArray();
 
         return $this->additionalUsernames()
             ->pluck('username')

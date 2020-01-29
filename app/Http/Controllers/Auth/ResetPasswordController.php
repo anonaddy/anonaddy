@@ -63,7 +63,7 @@ class ResetPasswordController extends Controller
     {
         return [
             'token' => 'required',
-            'username' => 'required|alpha_num|max:20',
+            'username' => 'required|regex:/^[a-zA-Z0-9]*$/|max:20',
             'password' => 'required|confirmed|min:8',
         ];
     }

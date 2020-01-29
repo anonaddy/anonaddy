@@ -63,7 +63,7 @@ class ForgotPasswordController extends Controller
      */
     protected function validateUsername(Request $request)
     {
-        $request->validate(['username' => 'required|alpha_num|max:20']);
+        $request->validate(['username' => 'required|regex:/^[a-zA-Z0-9]*$/|max:20']);
     }
 
     /**
