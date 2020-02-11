@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Api;
 
+use App\AdditionalUsername;
 use App\Alias;
+use App\Domain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -76,6 +78,31 @@ class AliasesTest extends TestCase
         $this->assertCount(1, $this->user->aliases);
         $this->assertNotEquals($this->user->aliases[0]->id, $response->getData()->data->local_part);
         $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+    }
+
+    /** @test */
+    public function user_can_generate_new_alias_with_correct_aliasable_type()
+    {
+        factory(AdditionalUsername::class)->create([
+            'user_id' => $this->user->id,
+            'username' => 'john'
+        ]);
+
+        $domain = factory(Domain::class)->create([
+            'user_id' => $this->user->id,
+            'domain' => 'john.xyz',
+            'domain_verified_at' => now()
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'john.xyz',
+            'description' => 'the description'
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $this->assertEquals('App\Domain', $response->getData()->data->aliasable_type);
+        $this->assertEquals($domain->id, $this->user->aliases[0]->aliasable_id);
     }
 
     /** @test */

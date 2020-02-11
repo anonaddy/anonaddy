@@ -177,17 +177,21 @@ class ReceiveEmail extends Command
 
     protected function handleSendFrom($user, $recipient, $aliasable)
     {
-        $alias = $user->aliases()->where([
+        $alias = $user->aliases()->firstOrNew([
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
             'aliasable_id' => $aliasable->id ?? null,
             'aliasable_type' => $aliasable ? 'App\\'.class_basename($aliasable) : null
-        ])->first();
+        ]);
 
-        if (!$alias || !$user->isVerifiedRecipient($this->option('sender'))) {
+        // this is a new alias but at a shared domain or the sender is not a verified recipient
+        if ((!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) || !$user->isVerifiedRecipient($this->option('sender'))) {
             exit(0);
         }
+
+        $alias->save();
+        $alias->refresh();
 
         $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
 
@@ -251,7 +255,7 @@ class ReceiveEmail extends Command
         $emailData = new EmailData($this->parser);
 
         $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
-            $message = new ForwardEmail($alias, $emailData, $recipient->should_encrypt ? $recipient->fingerprint : null);
+            $message = new ForwardEmail($alias, $emailData, $recipient);
 
             Mail::to($recipient->email)->queue($message);
         });

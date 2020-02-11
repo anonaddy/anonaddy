@@ -425,13 +425,14 @@ EOT;
             }
         }
 
-        if (count($fingerprints) === 1) {
+        // Return first available to encrypt
+        if (count($fingerprints) >= 1) {
             return $fingerprints[0];
         }
 
-        if (count($fingerprints) > 1) {
+        /* if (count($fingerprints) > 1) {
             throw new Swift_SwiftException(sprintf('Found more than one active key for %s use addRecipient() or addSignature()', $identifier));
-        }
+        } */
 
         throw new Swift_SwiftException(sprintf('Unable to find an active key to %s for %s,try importing keys first', $purpose, $identifier));
     }

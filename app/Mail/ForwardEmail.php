@@ -5,12 +5,15 @@ namespace App\Mail;
 use App\Alias;
 use App\EmailData;
 use App\Helpers\OpenPGPSigner;
+use App\Notifications\GpgKeyExpired;
+use App\Recipient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 use Swift_Signers_DKIMSigner;
+use Swift_SwiftException;
 
 class ForwardEmail extends Mailable implements ShouldQueue
 {
@@ -36,8 +39,10 @@ class ForwardEmail extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Alias $alias, EmailData $emailData, $fingerprint = null)
+    public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient)
     {
+        $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
+
         $this->user = $alias->user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
@@ -51,8 +56,17 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->bannerLocation = $this->alias->user->banner_location;
 
         if ($this->fingerprint = $fingerprint) {
-            $this->openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
-            $this->openpgpsigner->addRecipient($fingerprint);
+            try {
+                $this->openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
+                $this->openpgpsigner->addRecipient($fingerprint);
+            } catch (Swift_SwiftException $e) {
+                info($e->getMessage());
+                $this->openpgpsigner = null;
+
+                $recipient->update(['should_encrypt' => false]);
+
+                $recipient->notify(new GpgKeyExpired);
+            }
         }
     }
 
@@ -106,7 +120,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
-                if ($this->fingerprint) {
+                if ($this->openpgpsigner) {
                     $message->attachSigner($this->openpgpsigner);
                 } elseif ($this->dkimSigner) { // TODO fix issue with failing DKIM signature if message is encrypted
                     $message->attachSigner($this->dkimSigner);

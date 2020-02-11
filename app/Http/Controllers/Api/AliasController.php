@@ -55,14 +55,19 @@ class AliasController extends Controller
                     })
                     ->first();
 
-        $subdomain = substr($request->domain, 0, strrpos($request->domain, '.'.$parentDomain));
+        $aliasable = null;
 
-        if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
-            $aliasable = $additionalUsername;
-        } elseif ($customDomain = Domain::where('domain', $request->domain)->first()) {
-            $aliasable = $customDomain;
+        // This is an AnonAddy domain.
+        if ($parentDomain) {
+            $subdomain = substr($request->domain, 0, strrpos($request->domain, '.'.$parentDomain));
+
+            if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
+                $aliasable = $additionalUsername;
+            }
         } else {
-            $aliasable = null;
+            if ($customDomain = Domain::where('domain', $request->domain)->first()) {
+                $aliasable = $customDomain;
+            }
         }
 
         $data['aliasable_id'] = $aliasable->id ?? null;

@@ -291,7 +291,7 @@ Update the permissions of this file:
 
 ```bash
 chmod o= /etc/postfix/mysql-recipient-access.cf
-chgrp postifx /etc/postfix/mysql-recipient-access.cf
+chgrp postfix /etc/postfix/mysql-recipient-access.cf
 ```
 
 Either from the command line or from an SQL client, run the following code to create the stored procedure.
@@ -322,7 +322,7 @@ Making sure to replace `your_database_name` with the name of your own database a
 Make a test call for the stored procedure as your database user to ensure everything is working as expected.
 
 ```sql
-CALL block_alias('email@example.com')
+CALL block_alias('email@example.com');
 ```
 
 Next we need to edit `/etc/postifx/main.cf` to include the above file. So find `smtpd_recipient_restrictions` and add the following line:
