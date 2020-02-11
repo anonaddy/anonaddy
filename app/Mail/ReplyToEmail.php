@@ -66,6 +66,9 @@ class ReplyToEmail extends Mailable implements ShouldQueue
         $email =  $this
             ->from($fromEmail, $fromName)
             ->subject(base64_decode($this->emailSubject))
+            ->text('emails.reply.text')->with([
+                'text' => base64_decode($this->emailText)
+            ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->getHeaders()
                         ->addTextHeader('Return-Path', config('anonaddy.return_path'));
@@ -81,11 +84,12 @@ class ReplyToEmail extends Mailable implements ShouldQueue
             $email->replyTo($this->alias->email, $fromName);
         }
 
-        if ($this->emailText) {
+        // TODO fix issue with replies that are already encrypted.
+        /* if ($this->emailText) {
             $email->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText)
             ]);
-        }
+        } */
 
         if ($this->emailHtml) {
             $email->view('emails.reply.html')->with([
