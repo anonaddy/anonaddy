@@ -31,7 +31,7 @@ class StoreAliasRequest extends FormRequest
                 Rule::in($this->user()->domainOptions())
             ],
             'description' => 'nullable|max:100',
-            'uuid' => 'nullable|boolean'
+            'format' => 'nullable|in:uuid,random_words'
         ];
     }
 }

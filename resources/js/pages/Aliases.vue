@@ -384,13 +384,17 @@
         </label>
         <div class="block relative w-full mb-4">
           <select
-            v-model="generateAliasIsUuid"
+            v-model="generateAliasFormat"
             id="alias_domain"
             class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
             required
           >
-            <option :value="true">UUID</option>
-            <option :value="false">Random Words</option>
+            <option
+              v-for="formatOption in aliasFormatOptions"
+              :key="formatOption.value"
+              :value="formatOption.value"
+              >{{ formatOption.label }}</option
+            >
           </select>
           <div
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -599,7 +603,17 @@ export default {
       generateAliasLoading: false,
       generateAliasDomain: this.domain,
       generateAliasDescription: '',
-      generateAliasIsUuid: true,
+      generateAliasFormat: 'uuid',
+      aliasFormatOptions: [
+        {
+          value: 'uuid',
+          label: 'UUID',
+        },
+        {
+          value: 'random_words',
+          label: 'Random Words',
+        },
+      ],
       recipientsAliasToEdit: {},
       aliasRecipientsToEdit: [],
       columns: [
@@ -777,7 +791,7 @@ export default {
           JSON.stringify({
             domain: this.generateAliasDomain,
             description: this.generateAliasDescription,
-            uuid: this.generateAliasIsUuid,
+            format: this.generateAliasFormat,
           }),
           {
             headers: { 'Content-Type': 'application/json' },

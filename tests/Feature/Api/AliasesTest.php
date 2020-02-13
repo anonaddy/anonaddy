@@ -71,7 +71,7 @@ class AliasesTest extends TestCase
         $response = $this->json('POST', '/api/v1/aliases', [
             'domain' => 'anonaddy.me',
             'description' => 'the description',
-            'uuid' => false
+            'format' => 'random_words'
         ]);
 
         $response->assertStatus(201);

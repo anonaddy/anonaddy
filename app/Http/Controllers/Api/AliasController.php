@@ -31,7 +31,7 @@ class AliasController extends Controller
             return response('', 429);
         }
 
-        if ($request->uuid === false) {
+        if ($request->input('format', 'uuid') === 'random_words') {
             $localPart = user()->generateRandomWordLocalPart();
 
             $data = [
