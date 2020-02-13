@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Alias;
 use App\Mail\ReplyToEmail;
+use App\Recipient;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -37,7 +38,7 @@ class ReplyToEmailTest extends TestCase
             'domain' => 'johndoe.'.config('anonaddy.domain'),
         ]);
 
-        $extension = sha1(config('anonaddy.secret').'contact@ebay.com');
+        $extension = 'contact=ebay.com';
 
         $this->artisan(
             'anonaddy:receive-email',
@@ -68,6 +69,55 @@ class ReplyToEmailTest extends TestCase
     }
 
     /** @test */
+    public function it_cannot_reply_using_unverified_recipient()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $alias = factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $recipient = factory(Recipient::class)->create([
+            'user_id' => $this->user->id,
+            'email_verified_at' => null
+        ]);
+
+        $extension = 'contact=ebay.com';
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_reply.eml'),
+                '--sender' => $recipient->email,
+                '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [$extension],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1000'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => $alias->email,
+            'local_part' => $alias->local_part,
+            'domain' => $alias->domain,
+            'emails_forwarded' => 0,
+            'emails_blocked' => 0,
+            'emails_replied' => 0
+        ]);
+        $this->assertEquals(1, $this->user->aliases()->count());
+
+        Mail::assertNotQueued(ReplyToEmail::class, function ($mail) {
+            return $mail->hasTo('contact@ebay.com');
+        });
+    }
+
+    /** @test */
     public function it_can_reply_to_multiple_emails_from_file()
     {
         Mail::fake();
@@ -81,8 +131,8 @@ class ReplyToEmailTest extends TestCase
             'domain' => 'johndoe.'.config('anonaddy.domain'),
         ]);
 
-        $extension1 = sha1(config('anonaddy.secret').'contact@ebay.com');
-        $extension2 = sha1(config('anonaddy.secret').'support@ebay.com');
+        $extension1 = 'contact=ebay.com';
+        $extension2 = 'support=ebay.com';
 
         $this->artisan(
             'anonaddy:receive-email',

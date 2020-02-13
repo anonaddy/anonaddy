@@ -119,11 +119,35 @@ Yes this will work with any provider, althought I can't guarantee it won't land 
 
 Each forwarded email has a Reply-To: header set. This header will look something like this:
 
-Reply-To: "sender@example.com" <<alias+59fhbf7f1ea374c9182ac0f269m3192501fep210@johndoe.anonaddy.com>>
+Reply-To: <<span class="break-words"><alias+hello=example.com@johndoe.anonaddy.com></span>>
 
-Where sender@example.com is the address of the person who sent you the email and the part between the '<' '>' is the alias (alias@johndoe.anonaddy.com in this case) that forwarded the email along with a "hash" added as an extension after the "+". In order to reply successfully you must keep this entire email address and display name intact, do not remove the "sender@example.com" display name part.
+Where hello@example.com is the address of the person who sent you the email and alias@johndoe.anonaddy.com is the alias that forwarded you the email.
+
+Almost all mail clients respect the Reply-To: header, so all you need to do is click reply and it should automatically fill the To: field with the correct address.
+
+Some users have reported that Gmail's web mail has not been using the Reply-To header. If this is the case then you will have to manually copy the value of the Reply-To header and use this instead.
 
 To check if a reply has worked properly check in your dashboard if the reply count has been incremented for that alias.
+
+#### **How do I send email from an alias?**
+
+This works in the same way as replying to an email.
+
+Let's say that you have the alias **first@johndoe.anonaddy.com** and you want to send an email to **hello@example.com**.
+
+All you need to do is enter the following in the To: field.
+
+<span class="break-words"><first+hello=example.com@johndoe.anonaddy.com></span>
+
+> **Note**: you must send the email from a verified recipient on your account.
+
+Then send the email exactly as you would any other. To check that the email has sent successfully, look in your dashboard at the sent count column and see if it has been incremented for that alias.
+
+This works exactly the same for UUID/Random Word aliases, additional usernames and custom domains.
+
+You can even use the send from feature to create an alias on the fly that does not yet exist. This only works for standard aliases or those at custom domains that behave as a catch-all.
+
+You must generate aliases that use shared domains (e.g. circus.waltz449@anonaddy.me) beforehand in order to be able to send from them.
 
 #### **Will people see my real email if I reply to a forwarded one?**
 

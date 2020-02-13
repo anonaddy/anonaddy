@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Swift_Signers_DKIMSigner;
 use Swift_SwiftException;
 
@@ -77,8 +78,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $replyToDisplay = $this->replyToAddress ?? $this->sender;
-        $replyToEmail = $this->alias->local_part.'+'.sha1(config('anonaddy.secret').$replyToDisplay).'@'.$this->alias->domain;
+        $replyToEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->sender) . '@' . $this->alias->domain;
 
         if ($this->alias->isCustomDomain()) {
             if ($this->alias->aliasable->isVerifiedForSending()) {
@@ -99,7 +99,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
         $email =  $this
             ->from($fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
-            ->replyTo($replyToEmail, $replyToDisplay)
+            ->replyTo($replyToEmail)
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->text('emails.forward.text')->with([
                 'text' => base64_decode($this->emailText)

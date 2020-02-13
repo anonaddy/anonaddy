@@ -212,6 +212,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->aliases()->withTrashed()->sum('emails_replied');
     }
 
+    public function totalEmailsSent()
+    {
+        return $this->aliases()->withTrashed()->sum('emails_sent');
+    }
+
     public function getBandwidthLimit()
     {
         return config('anonaddy.bandwidth_limit');

@@ -128,11 +128,13 @@ class ReceiveEmail extends Command
 
                 $this->checkRateLimit($user);
 
-                // Check whether this email is a reply or a new email to be forwarded.
-                if ($recipient['extension'] === sha1(config('anonaddy.secret').$displayTo)) {
-                    $this->handleReply($user, $recipient, $displayTo);
-                } elseif (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL)) {
-                    $this->handleSendFrom($user, $recipient, $aliasable ?? null);
+                // Check whether this email is a reply/send from or a new email to be forwarded.
+                if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL)) {
+                    if ($this->parser->getHeader('In-Reply-To')) {
+                        $this->handleReply($user, $recipient);
+                    } else {
+                        $this->handleSendFrom($user, $recipient, $aliasable ?? null);
+                    }
                 } else {
                     $this->handleForward($user, $recipient, $aliasable ?? null);
                 }
@@ -155,23 +157,23 @@ class ReceiveEmail extends Command
         }
     }
 
-    protected function handleReply($user, $recipient, $displayTo)
+    protected function handleReply($user, $recipient)
     {
         $alias = $user->aliases()->where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first();
 
-        if (!is_null($alias) && filter_var($displayTo, FILTER_VALIDATE_EMAIL)) {
+        if ($alias && $user->isVerifiedRecipient($this->option('sender'))) {
+            $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
+
             $emailData = new EmailData($this->parser);
 
             $message = new ReplyToEmail($user, $alias, $emailData);
 
-            Mail::to($displayTo)->queue($message);
+            Mail::to($sendTo)->queue($message);
 
-            if (!Mail::failures()) {
-                $alias->increment('emails_replied');
+            $alias->increment('emails_replied');
 
-                $user->bandwidth += $this->size;
-                $user->save();
-            }
+            $user->bandwidth += $this->size;
+            $user->save();
         }
     }
 
@@ -185,7 +187,7 @@ class ReceiveEmail extends Command
             'aliasable_type' => $aliasable ? 'App\\'.class_basename($aliasable) : null
         ]);
 
-        // this is a new alias but at a shared domain or the sender is not a verified recipient
+        // This is a new alias but at a shared domain or the sender is not a verified recipient.
         if ((!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) || !$user->isVerifiedRecipient($this->option('sender'))) {
             exit(0);
         }
