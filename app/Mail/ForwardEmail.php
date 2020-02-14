@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Alias;
 use App\EmailData;
+use App\Helpers\AlreadyEncryptedSigner;
 use App\Helpers\OpenPGPSigner;
 use App\Notifications\GpgKeyExpired;
 use App\Recipient;
@@ -34,6 +35,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $fingerprint;
     protected $openpgpsigner;
     protected $dkimSigner;
+    protected $encryptedParts;
 
     /**
      * Create a new message instance.
@@ -42,7 +44,8 @@ class ForwardEmail extends Mailable implements ShouldQueue
      */
     public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient)
     {
-        $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
+        $this->encryptedParts = $emailData->encryptedParts ?? null;
+        $fingerprint = $recipient->should_encrypt && !$this->encryptedParts ? $recipient->fingerprint : null;
 
         $this->user = $alias->user;
         $this->alias = $alias;
@@ -119,6 +122,12 @@ class ForwardEmail extends Mailable implements ShouldQueue
                         ->addTextHeader('Return-Path', $returnPath);
 
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+
+                if ($this->encryptedParts) {
+                    $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
+
+                    $message->attachSigner($alreadyEncryptedSigner);
+                }
 
                 if ($this->openpgpsigner) {
                     $message->attachSigner($this->openpgpsigner);

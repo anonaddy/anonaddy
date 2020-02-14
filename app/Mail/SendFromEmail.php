@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Alias;
 use App\EmailData;
+use App\Helpers\AlreadyEncryptedSigner;
 use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,6 +23,7 @@ class SendFromEmail extends Mailable implements ShouldQueue
     protected $emailHtml;
     protected $emailAttachments;
     protected $dkimSigner;
+    protected $encryptedParts;
 
     /**
      * Create a new message instance.
@@ -36,6 +38,7 @@ class SendFromEmail extends Mailable implements ShouldQueue
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
+        $this->encryptedParts = $emailData->encryptedParts ?? null;
     }
 
     /**
@@ -74,6 +77,12 @@ class SendFromEmail extends Mailable implements ShouldQueue
                         ->addTextHeader('Return-Path', config('anonaddy.return_path'));
 
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+
+                if ($this->encryptedParts) {
+                    $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
+
+                    $message->attachSigner($alreadyEncryptedSigner);
+                }
 
                 if ($this->dkimSigner) {
                     $message->attachSigner($this->dkimSigner);

@@ -149,6 +149,12 @@ You can even use the send from feature to create an alias on the fly that does n
 
 You must generate aliases that use shared domains (e.g. circus.waltz449@anonaddy.me) beforehand in order to be able to send from them.
 
+If you need to send an email to an address with an extension e.g. **hello+whatever@example.com** then it's exactly the same method:
+
+<span class="break-words"><first+hello+whatever=example.com@johndoe.anonaddy.com></span>
+
+Just enter the extension too!
+
 #### **Will people see my real email if I reply to a forwarded one?**
 
 No, your real email will not be shown, the email will look as if it has come from us instead. Just make sure not to include anything that might identify you when composing the reply, i.e. your full name.

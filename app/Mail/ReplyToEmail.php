@@ -22,6 +22,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
     protected $emailHtml;
     protected $emailAttachments;
     protected $dkimSigner;
+    protected $encryptedParts;
 
     /**
      * Create a new message instance.
@@ -36,6 +37,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
+        $this->encryptedParts = $emailData->encryptedParts ?? null;
     }
 
     /**
@@ -75,6 +77,12 @@ class ReplyToEmail extends Mailable implements ShouldQueue
 
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
+                if ($this->encryptedParts) {
+                    $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
+
+                    $message->attachSigner($alreadyEncryptedSigner);
+                }
+
                 if ($this->dkimSigner) {
                     $message->attachSigner($this->dkimSigner);
                 }
@@ -83,13 +91,6 @@ class ReplyToEmail extends Mailable implements ShouldQueue
         if ($this->alias->isCustomDomain() && !$this->dkimSigner) {
             $email->replyTo($this->alias->email, $fromName);
         }
-
-        // TODO fix issue with replies that are already encrypted.
-        /* if ($this->emailText) {
-            $email->text('emails.reply.text')->with([
-                'text' => base64_decode($this->emailText)
-            ]);
-        } */
 
         if ($this->emailHtml) {
             $email->view('emails.reply.html')->with([

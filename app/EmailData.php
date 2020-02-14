@@ -18,12 +18,16 @@ class EmailData
         $this->html = base64_encode($parser->getMessageBody('html'));
         $this->attachments = [];
 
-        foreach ($parser->getAttachments() as $attachment) {
-            $this->attachments[] = [
-              'stream' => base64_encode(stream_get_contents($attachment->getStream())),
-              'file_name' => base64_encode($attachment->getFileName()),
-              'mime' => base64_encode($attachment->getContentType())
-          ];
+        if ($parser->getParts()[1]['content-type'] === 'multipart/encrypted') {
+            $this->encryptedParts = $parser->getAttachments();
+        } else {
+            foreach ($parser->getAttachments() as $attachment) {
+                $this->attachments[] = [
+                  'stream' => base64_encode(stream_get_contents($attachment->getStream())),
+                  'file_name' => base64_encode($attachment->getFileName()),
+                  'mime' => base64_encode($attachment->getContentType())
+              ];
+            }
         }
     }
 }
