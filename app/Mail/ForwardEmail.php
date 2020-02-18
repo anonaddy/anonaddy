@@ -44,9 +44,6 @@ class ForwardEmail extends Mailable implements ShouldQueue
      */
     public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient)
     {
-        $this->encryptedParts = $emailData->encryptedParts ?? null;
-        $fingerprint = $recipient->should_encrypt && !$this->encryptedParts ? $recipient->fingerprint : null;
-
         $this->user = $alias->user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
@@ -57,7 +54,12 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
-        $this->bannerLocation = $this->alias->user->banner_location;
+
+        $this->encryptedParts = $emailData->encryptedParts ?? null;
+
+        $fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
+
+        $this->bannerLocation = $this->isAlreadyEncrypted() ? 'off' : $this->alias->user->banner_location;
 
         if ($this->fingerprint = $fingerprint) {
             try {
@@ -131,7 +133,9 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
                 if ($this->openpgpsigner) {
                     $message->attachSigner($this->openpgpsigner);
-                } elseif ($this->dkimSigner) { // TODO fix issue with failing DKIM signature if message is encrypted
+                }
+
+                if ($this->dkimSigner) {
                     $message->attachSigner($this->dkimSigner);
                 }
             });
@@ -151,5 +155,10 @@ class ForwardEmail extends Mailable implements ShouldQueue
         }
 
         return $email;
+    }
+
+    private function isAlreadyEncrypted()
+    {
+        return $this->encryptedParts || preg_match('/^-----BEGIN PGP MESSAGE-----([A-Za-z0-9+=\/\n]+)-----END PGP MESSAGE-----$/', base64_decode($this->emailText));
     }
 }

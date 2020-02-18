@@ -216,21 +216,16 @@ class OpenPGPSigner implements Swift_Signers_BodySigner
         $signature = $this->pgpSignString($signedBody, $this->signingKey);
 
         //Swiftmailer is automatically changing content type and this is the hack to prevent it
-        $body = <<<EOT
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-
---{$message->getBoundary()}
-$signedBody
---{$message->getBoundary()}
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
-$signature
-
---{$message->getBoundary()}--
-EOT;
-
+        // Fixes DKIM signature incorrect body hash for custom domains
+        $body = "This is an OpenPGP/MIME signed message (RFC 4880 and 3156)\r\n\r\n";
+        $body .= "--{$message->getBoundary()}\r\n";
+        $body .= $signedBody."\r\n";
+        $body .= "--{$message->getBoundary()}\r\n";
+        $body .= "Content-Type: application/pgp-signature; name=\"signature.asc\"\r\n";
+        $body .= "Content-Description: OpenPGP digital signature\r\n";
+        $body .= "Content-Disposition: attachment; filename=\"signature.asc\"\r\n\r\n";
+        $body .= $signature."\r\n\r\n";
+        $body .= "--{$message->getBoundary()}--";
 
         $message->setBody($body);
 
@@ -261,24 +256,18 @@ EOT;
                 'boundary' => $message->getBoundary()
             ]);
 
-            $body = <<<EOT
-This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
-
---{$message->getBoundary()}
-Content-Type: application/pgp-encrypted
-Content-Description: PGP/MIME version identification
-
-Version: 1
-
---{$message->getBoundary()}
-Content-Type: application/octet-stream; name="encrypted.asc"
-Content-Description: OpenPGP encrypted message
-Content-Disposition: inline; filename="encrypted.asc"
-
-$encryptedBody
-
---{$message->getBoundary()}--
-EOT;
+            // Fixes DKIM signature incorrect body hash for custom domains
+            $body = "This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)\r\n\r\n";
+            $body .= "--{$message->getBoundary()}\r\n";
+            $body .= "Content-Type: application/pgp-encrypted\r\n";
+            $body .= "Content-Description: PGP/MIME version identification\r\n\r\n";
+            $body .= "Version: 1\r\n\r\n";
+            $body .= "--{$message->getBoundary()}\r\n";
+            $body .= "Content-Type: application/octet-stream; name=\"encrypted.asc\"\r\n";
+            $body .= "Content-Description: OpenPGP encrypted message\r\n";
+            $body .= "Content-Disposition: inline; filename=\"encrypted.asc\"\r\n\r\n";
+            $body .= $encryptedBody."\r\n\r\n";
+            $body .= "--{$message->getBoundary()}--";
 
             $message->setBody($body);
         }
