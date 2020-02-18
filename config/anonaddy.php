@@ -167,7 +167,7 @@ return [
     |
     */
 
-    'dkim_signing_key' => ! is_null(env('ANONADDY_DKIM_SIGNING_KEY')) ? file_get_contents(env('ANONADDY_DKIM_SIGNING_KEY')) : null,
+    'dkim_signing_key' => env('ANONADDY_DKIM_SIGNING_KEY') ? file_get_contents(env('ANONADDY_DKIM_SIGNING_KEY')) : null,
 
     /*
     |--------------------------------------------------------------------------
