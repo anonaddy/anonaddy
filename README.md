@@ -18,7 +18,7 @@ I also wanted to address some issues with other services such as:
 
 * Proprietary closed source code
 * Adverts, analytics and trackers used on the sites
-* No option to encrypt emails using a GPG/OpenPGP key
+* No option to encrypt email using a GPG/OpenPGP key
 * No option for multiple recipients
 
 I made the code open-source to show everyone what was going on behind the scenes and to allow others to help improve the application.
@@ -29,26 +29,26 @@ I use this service myself for the vast majority of sites I'm signed up to.
 
 There are a number of reasons you should consider using this service:
 
-* Protect your real email address from spam by simply deactivating/deleting aliases that receive unsolicited emails
+* Protect your real email address from spam by simply deactivating/deleting aliases that receive unsolicited email
 * Identify who has sold your data by using a different email address for every site
 * Protect your identity in the event of a data breach by making it difficult for hackers to cross-reference your accounts
-* Prevent inbox snooping by encrypting all inbound emails using GPG/OpenPGP encryption
-* Update where emails are forwarded without having to go through and change your email address for each site individually
-* Reply to forwarded emails anonymously without revealing your true email address
+* Prevent inbox snooping by encrypting all inbound email using GPG/OpenPGP encryption
+* Update where email are forwarded without having to go through and change your email address for each site individually
+* Reply to forwarded email anonymously without revealing your true email address
 
-#### **Do you store emails?**
+#### **Do you store email?**
 
-No I definitely do not store/save any emails that pass through the server.
+No I definitely do not store/save any email that pass through the server.
 
 #### **Can I use my own domain?**
 
-Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add a TXT record to verify your ownership of the domain. Then you will need to add an MX record to your domain so that our server can handle incoming emails. You can then add a few other records to enable sending from your domain too.
+Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add a TXT record to verify your ownership of the domain. Then you will need to add an MX record to your domain so that our server can handle incoming email. You can then add a few other records to enable sending from your domain too.
 
 #### **Why should I use this instead of a similar service?**
 
 Here are a few reasons I can think of:
 
-* Bring your own GPG/OpenPGP key to encrypt your forwarded emails (and the option to replace subjects)
+* Bring your own GPG/OpenPGP key to encrypt your forwarded email (and the option to replace subjects)
 * No adverts
 * No analytics or trackers (just server access logs)
 * No third party content (excluding stripe.js on the subscription page)
@@ -66,17 +66,17 @@ Yes there is an [open-source](https://github.com/anonaddy/browser-extension) bro
 
 #### **How do I add my own GPG/OpenPGP key for encryption?**
 
-On the recipients page you simply need to click "Add public key" and paste in your **public** key data. Now all emails forwarded to you will be encrypted with your key. You should also replace the subject line of forwarded messages in your account settings as this cannot be encrypted.
+On the recipients page you simply need to click "Add public key" and paste in your **public** key data. Now all email forwarded to you will be encrypted with your key. You should also replace the subject line of forwarded messages in your account settings as this cannot be encrypted.
 
 #### **Are attachments encrypted too?**
 
 Yes attachments are part of the email body and are also encrypted if you have it enabled.
 
-#### **Are forwarded emails signed when encryption is enabled?**
+#### **Are forwarded email signed when encryption is enabled?**
 
-Yes when you have encryption enabled all forwarded emails are signed using our mailer@anonaddy.me private key.
+Yes when you have encryption enabled all forwarded email are signed using our mailer@anonaddy.me private key.
 
-You can add this key to your own keyring so that you can verify emails have come from us.
+You can add this key to your own keyring so that you can verify email have come from us.
 
 The fingerprint of the mailer@anonaddy.me key is "26A987650243B28802524E2F809FD0D502E2F695" you can find the key on [https://keys.openpgp.org](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695).
 
@@ -159,9 +159,9 @@ Just enter the extension too!
 
 No, your real email will not be shown, the email will look as if it has come from us instead. Just make sure not to include anything that might identify you when composing the reply, i.e. your full name.
 
-#### **Can emails have attachments?**
+#### **Can email have attachments?**
 
-Yes you can add attachments to emails forwarded and replies. Attachments count towards your bandwidth.
+Yes you can add attachments to email forwarded and replies. Attachments count towards your bandwidth.
 
 #### **What is the max email size limit?**
 
@@ -171,7 +171,7 @@ The max email size is currently set to 10MB (including attachments).
 
 If you cancel your subscription it will remain active until the end of your current billing cycle, you will still be able to use your paid plan features until the billing cycle ends.
 
-A few days before your billing cycle ends you will receive an email letting you know the steps you need to take to prevent the loss of any emails. Shortly after ending the following will happen:
+A few days before your billing cycle ends you will receive an email letting you know the steps you need to take to prevent the loss of any email. Shortly after ending the following will happen:
 
 * Any custom domains will be **deactivated**
 * Any additional usernames will be **deactivated**
@@ -189,7 +189,7 @@ The following is in place to help prevent spam:
 * SpamAssassin - score threshold of 5.0
 * DNS blacklist checks - spamhaus.org
 * SPF, DKIM - to check the SPF record on the sender's domain
-* DMARC - to check for email spoofing and reject emails that fail
+* DMARC - to check for email spoofing and reject email that fail
 * FQDN - the sender must be using a valid fully qualified domain name
 * PTR record check - if the sender has no valid PTR record it is rejected
 
@@ -197,13 +197,13 @@ The following is in place to help prevent spam:
 
 The server is running a local DNS caching server to improve the speed of queries. DNS.WATCH resolvers are used as a fallback.
 
-#### **Is there a limit to how many emails I can forward?**
+#### **Is there a limit to how many email I can forward?**
 
-Not unless you are really going to town. Each user is throttled to 200 emails per hour through the server.
+Not unless you are really going to town. Each user is throttled to 200 email per hour through the server.
 
 #### **Is there a limit to how many aliases I can create per hour?**
 
-Currently you are limited to creating 10 new aliases per hour on the free plan, 20 per hour on the Lite plan and 50 per hour on the Pro plan. If you try to create more than this the emails will be deferred until you are back below the limit.
+Currently you are limited to creating 10 new aliases per hour on the free plan, 20 per hour on the Lite plan and 50 per hour on the Pro plan. If you try to create more than this the email will be deferred until you are back below the limit.
 
 #### **How is my bandwidth calculated?**
 
@@ -211,39 +211,39 @@ Each time a new email is received Postfix calculates its size in bytes. A column
 
 I don't use rolling 30 day total as the only way to do this would be to log the date and size of every single email received.
 
-Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or deleted).
+Blocked email do not count towards your bandwidth (e.g. an alias is inactive or deleted).
 
-#### **How many emails can I receive before I go over my bandwidth limit?**
+#### **How many email can I receive before I go over my bandwidth limit?**
 
-The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails, the Lite plan's 50MB would be almost 700 emails and the Pro plan's 500MB would be almost 7,000 emails.
+The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 email, the Lite plan's 50MB would be almost 700 email and the Pro plan's 500MB would be almost 7,000 email.
 
 #### **What happens if I go over my bandwidth limit in a given month?**
 
-If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month or you upgrade your plan.
+If you get close to your limit you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding email until your bandwidth resets the next month or you upgrade your plan.
 
 #### **Can I login using an additional username?**
 
 You can add 1 additional username as a Lite user and up to 3 additional usernames as a Pro user for totals of 2 and 4 respectively (including the one you signed up with). You can currently only login with the one that you originally signed up with.
 
-#### **I'm not receiving any emails, what's wrong?**
+#### **I'm not receiving any email, what's wrong?**
 
-Please make sure to add mailer@anonaddy.me and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
+Please make sure to add mailer@anonaddy.me and any other aliases you use to your address book and also to check your spam folder. Make sure to mark email from us as safe if they turn up in spam.
 
-If an alias has been previously deleted and you try to send email to it, the emails will be rejected with an error message - "554 5.7.1 Recipient address rejected: Access denied".
+If an alias has been previously deleted and you try to send email to it, the email will be rejected with an error message - "554 5.7.1 Recipient address rejected: Access denied".
 
-Check that you have not deactivated the alias, custom domain or additional username. When any of these are deactivated, emails will be silently discarded, they will not be rejected or return any error message.
+Check that you have not deactivated the alias, custom domain or additional username. When any of these are deactivated, email will be silently discarded, they will not be rejected or return any error message.
 
 The sender of the email may be failing SPF, DMARC or DNS blacklist checks resulting in the email being rejected. The sender should also have correct reverse DNS setup and use a FQDN as their hostname.
 
-If you are forwarding emails to an icloud.com email address some users are having issues with a small number of emails being rejected (often those from Facebook).
+If you are forwarding email to an icloud.com email address some users are having issues with a small number of email being rejected (often those from Facebook).
 
-For some reason Apple seems to think these emails are spam and returns this error message:
+For some reason Apple seems to think these email are spam and returns this error message:
 
 > Diagnostic-Code: smtp; 550 5.7.1 [CS01] Message rejected due to local policy.
 
 I have contacted Apple multiple times about this but they have not yet responded.
 
-If you still aren't receiving emails please contact me.
+If you still aren't receiving email please contact me.
 
 #### **How do I know this site won't disappear next month?**
 
@@ -270,7 +270,7 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 #### Prerequisites
 
 * Postfix (3.0.0+) (plus postfix-mysql for database queries and postfix-pcre)
-* PHP (7.3+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
+* PHP (7.3+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded email, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
 * Port 25 unblocked and open
 * Redis (4.x+) for throttling and queues
 * FQDN as hostname e.g. mail.anonaddy.me
@@ -303,7 +303,7 @@ Making sure to replace `youruser` with the username of the user who will run the
 
 This is what will pipe the email through to our applicaton so we can determine who the alias belongs to and who to forward the email to.
 
-In order for Postfix to REJECT or DISCARD emails sent to deleted or deactivated aliases you need to ceate a file called `/etc/postfix/mysql-recipient-access.cf`.
+In order for Postfix to REJECT or DISCARD email sent to deleted or deactivated aliases you need to ceate a file called `/etc/postfix/mysql-recipient-access.cf`.
 
 In this file enter the following:
 
@@ -364,7 +364,7 @@ smtpd_recipient_restrictions =
    ...
 ```
 
-Now incoming emails will be checked against your database to see if they are deactivated or have been deleted and respond with the appropriate action.
+Now incoming email will be checked against your database to see if they are deactivated or have been deleted and respond with the appropriate action.
 
 More instructions to follow soon...
 
