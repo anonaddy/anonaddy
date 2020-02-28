@@ -194,4 +194,25 @@ class UserTest extends TestCase
 
         $this->assertEquals(96.27, $this->user->bandwidth_mb);
     }
+
+    /** @test */
+    public function user_get_domain_options()
+    {
+        $username = $this->user->username;
+
+        $domainOptions = $this->user->domainOptions();
+
+        $expected = collect([
+            'anonaddy.me',
+            'anonaddy.com',
+            $username.'.anonaddy.me',
+            $username.'.anonaddy.com',
+        ]);
+
+        $this->assertCount($expected->count(), $domainOptions);
+
+        $expected->zip($domainOptions)->each(function ($itemPair) {
+            $this->assertEquals($itemPair[0], $itemPair[1]);
+        });
+    }
 }

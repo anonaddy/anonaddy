@@ -43,6 +43,8 @@ Route::group([
     Route::post('/default-recipient', 'DefaultRecipientController@update')->name('settings.default_recipient');
     Route::post('/edit-default-recipient', 'DefaultRecipientController@edit')->name('settings.edit_default_recipient');
 
+    Route::post('/default-alias-domain', 'DefaultAliasDomainController@update')->name('settings.default_alias_domain');
+
     Route::post('/from-name', 'FromNameController@update')->name('settings.from_name');
 
     Route::post('/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');

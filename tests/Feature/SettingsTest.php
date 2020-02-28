@@ -49,7 +49,7 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
-    public function user_can_not_update_to_unverified_default_recipient()
+    public function user_cannot_update_to_unverified_default_recipient()
     {
         $newDefaultRecipient = factory(Recipient::class)->create([
             'user_id' => $this->user->id,
@@ -64,6 +64,39 @@ class SettingsTest extends TestCase
 
         $response->assertStatus(404);
         $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
+    }
+
+    /** @test */
+    public function user_can_update_default_alias_domain()
+    {
+        $defaultAliasDomain = $this->user->username.'.anonaddy.me';
+
+        $response = $this->post('/settings/default-alias-domain', [
+            'domain' => $defaultAliasDomain
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'default_alias_domain' => $defaultAliasDomain
+        ]);
+    }
+
+    /** @test */
+    public function user_cannot_update_default_alias_domain_if_invalid()
+    {
+        $defaultAliasDomain = 'johndoe.anonaddy.me';
+
+        $response = $this->post('/settings/default-alias-domain', [
+            'domain' => $defaultAliasDomain
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['domain']);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'default_alias_domain' => null
+        ]);
     }
 
     /** @test */

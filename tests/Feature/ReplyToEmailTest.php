@@ -106,7 +106,7 @@ class ReplyToEmailTest extends TestCase
             'email' => $alias->email,
             'local_part' => $alias->local_part,
             'domain' => $alias->domain,
-            'emails_forwarded' => 0,
+            'emails_forwarded' => 1,
             'emails_blocked' => 0,
             'emails_replied' => 0
         ]);

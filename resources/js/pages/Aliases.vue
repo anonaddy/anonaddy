@@ -580,6 +580,10 @@ export default {
       type: Array,
       required: true,
     },
+    defaultAliasDomain: {
+      type: String,
+      required: true,
+    },
   },
   components: {
     Modal,
@@ -601,7 +605,7 @@ export default {
       editAliasRecipientsModalOpen: false,
       generateAliasModalOpen: false,
       generateAliasLoading: false,
-      generateAliasDomain: this.domain,
+      generateAliasDomain: this.defaultAliasDomain ? this.defaultAliasDomain : this.domain,
       generateAliasDescription: '',
       generateAliasFormat: 'uuid',
       aliasFormatOptions: [

@@ -129,7 +129,7 @@ class ReceiveEmail extends Command
                 $this->checkRateLimit($user);
 
                 // Check whether this email is a reply/send from or a new email to be forwarded.
-                if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL)) {
+                if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL) && $user->isVerifiedRecipient($this->option('sender'))) {
                     if ($this->parser->getHeader('In-Reply-To')) {
                         $this->handleReply($user, $recipient);
                     } else {
@@ -161,7 +161,7 @@ class ReceiveEmail extends Command
     {
         $alias = $user->aliases()->where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first();
 
-        if ($alias && $user->isVerifiedRecipient($this->option('sender'))) {
+        if ($alias) {
             $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
 
             $emailData = new EmailData($this->parser);
@@ -188,7 +188,7 @@ class ReceiveEmail extends Command
         ]);
 
         // This is a new alias but at a shared domain or the sender is not a verified recipient.
-        if ((!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) || !$user->isVerifiedRecipient($this->option('sender'))) {
+        if (!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) {
             exit(0);
         }
 
