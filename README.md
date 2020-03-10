@@ -227,7 +227,7 @@ You can add 1 additional username as a Lite user and up to 3 additional username
 
 #### **I'm not receiving any emails, what's wrong?**
 
-Please make sure to add mailer@anonaddy.me and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
+Please make sure to add mailer@anonaddy.me, mailer@anonaddy.com and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
 
 If an alias has been previously deleted and you try to send email to it, the emails will be rejected with an error message - "554 5.7.1 Recipient address rejected: Access denied".
 
@@ -242,6 +242,8 @@ For some reason Apple seems to think these emails are spam and returns this erro
 > Diagnostic-Code: smtp; 550 5.7.1 [CS01] Message rejected due to local policy.
 
 I have contacted Apple multiple times about this but they have not yet responded.
+
+If you are having issues with emails being rejected as "possibly spammy" by Google, iCloud or Microsoft then try adding a GPP key and **enabling encryption**. This will prevent the email's content being scanned and reduce the change of it being rejected.
 
 If you still aren't receiving emails please contact me.
 

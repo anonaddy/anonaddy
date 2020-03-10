@@ -258,7 +258,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->map(function ($recipient) {
                     return $recipient->email;
                 })
-                ->contains($email);
+                ->contains(strtolower($email));
     }
 
     public function deleteKeyFromKeyring($fingerprint): void

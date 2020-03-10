@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditDefaultRecipientRequest;
 use App\Http\Requests\UpdateDefaultRecipientRequest;
 
 class DefaultRecipientController extends Controller
