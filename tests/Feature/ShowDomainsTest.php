@@ -73,10 +73,6 @@ class DomainsTest extends TestCase
 
         $response->assertStatus(200);
 
-        $this->assertDatabaseHas('domains', [
-            'user_id' => $this->user->id,
-            'domain' => 'example.com',
-            'domain_sending_verified_at' => $response->json('data')['domain_sending_verified_at']
-        ]);
+        $this->assertEquals('SPF record not found. This could be due to DNS caching, please try again later.', $response->json('message'));
     }
 }
