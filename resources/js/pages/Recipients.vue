@@ -144,7 +144,7 @@
           <span
             name="check"
             v-if="props.row.email_verified_at"
-            class="py-1 px-2 bg-green-200 text-green-900 rounded-full text-sm"
+            class="py-1 px-2 bg-green-200 text-green-900 rounded-full text-xs"
           >
             verified
           </span>
