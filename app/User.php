@@ -256,7 +256,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->verifiedRecipients()
                 ->get()
                 ->map(function ($recipient) {
-                    return $recipient->email;
+                    return strtolower($recipient->email);
                 })
                 ->contains(strtolower($email));
     }
