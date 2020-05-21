@@ -269,7 +269,7 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 
 ## Self Hosting
 
-#### Prerequisites
+#### Software Requirements
 
 * Postfix (3.0.0+) (plus postfix-mysql for database queries and postfix-pcre)
 * PHP (7.3+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
@@ -283,92 +283,7 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 * Reverse DNS
 * SSL/TLS Encryption - you can install a free certificate from Let’s Encrypt.
 
-#### Postfix configuration
-
-In `/etc/postfix/master.cf` you need to make sure it has this at the top:
-
-```cf
-smtp       inet  n       -       -       -       -       smtpd
-        -o content_filter=anonaddy:dummy
-```
-
-This should be the only line for smtp.
-
-Then add these lines to the bottom of the file:
-
-```cf
-anonaddy unix - n n - - pipe
-  flags=F user=youruser argv=php /path/to/your/webapp/artisan anonaddy:receive-email --sender=${sender} --recipient=${recipient} --local_part=${user} --extension=${extension} --domain=${domain} --size=${size}
-```
-
-Making sure to replace `youruser` with the username of the user who will run the artisan command and also to update the /path to your installation.
-
-This is what will pipe the email through to our applicaton so we can determine who the alias belongs to and who to forward the email to.
-
-In order for Postfix to REJECT or DISCARD emails sent to deleted or deactivated aliases you need to ceate a file called `/etc/postfix/mysql-recipient-access.cf`.
-
-In this file enter the following:
-
-```
-user = your_database_user
-password = your-database-password
-hosts = 127.0.0.1
-dbname = your_database_name
-query = CALL block_alias('%s')
-```
-
-This query calls a stored procedure that we will create next, it passes the recipient's email address as the argument.
-
-Update the permissions of this file:
-
-```bash
-chmod o= /etc/postfix/mysql-recipient-access.cf
-chgrp postfix /etc/postfix/mysql-recipient-access.cf
-```
-
-Either from the command line or from an SQL client, run the following code to create the stored procedure.
-
-You will need to set appropriate permissions for your database user to allow them to execute the stored procedure.
-
-```sql
-DELIMITER $$
-
-USE `your_database_name`$$
-
-DROP PROCEDURE IF EXISTS `block_alias`$$
-
-CREATE DEFINER=`your_database_user`@`localhost` PROCEDURE `block_alias`(alias_email VARCHAR(254))
-BEGIN
-   UPDATE aliases SET
-    emails_blocked = emails_blocked + 1
-   WHERE email = alias_email AND active = 0 LIMIT 1;
-   SELECT IF(deleted_at IS NULL,'DISCARD','REJECT') AS alias_action
-   FROM aliases WHERE email = alias_email AND (active = 0 OR deleted_at IS NOT NULL) LIMIT 1;
- END$$
-
-DELIMITER ;
-```
-
-Making sure to replace `your_database_name` with the name of your own database and `your_database_user` with the name of your database user with permission to access your database.
-
-Make a test call for the stored procedure as your database user to ensure everything is working as expected.
-
-```sql
-CALL block_alias('email@example.com');
-```
-
-Next we need to edit `/etc/postifx/main.cf` to include the above file. So find `smtpd_recipient_restrictions` and add the following line:
-
-```
-smtpd_recipient_restrictions =
-   ...
-   check_recipient_access mysql:/etc/postfix/mysql-recipient-access.cf,
-   ...
-```
-
-Now incoming emails will be checked against your database to see if they are deactivated or have been deleted and respond with the appropriate action.
-
-More instructions to follow soon...
+For full details please see the [self-hosting instructions file](SELF-HOSTING.md).
 
 ## Thanks
 

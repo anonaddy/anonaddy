@@ -155,9 +155,13 @@ class Domain extends Model
      */
     public function checkVerification()
     {
+        if (App::environment('testing')) {
+            return true;
+        }
+
         return collect(dns_get_record($this->domain . '.', DNS_TXT))
             ->contains(function ($r) {
-                return $r['txt'] === 'aa-verify=' . sha1(config('anonaddy.secret') . user()->id) || App::environment('testing');
+                return $r['txt'] === 'aa-verify=' . sha1(config('anonaddy.secret') . user()->id);
             });
     }
 
