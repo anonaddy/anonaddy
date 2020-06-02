@@ -1,6 +1,10 @@
 <template>
   <portal to="modals">
-    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 flex justify-center"
+      :class="overflow ? 'overflow-auto' : 'items-center'"
+    >
       <transition
         @before-leave="backdropLeaving = true"
         @after-leave="backdropLeaving = false"
@@ -13,7 +17,11 @@
         appear
       >
         <div v-if="showBackdrop">
-          <div class="absolute inset-0 bg-black opacity-25" @click="close"></div>
+          <div
+            class="inset-0 bg-black opacity-25"
+            :class="overflow ? 'fixed pointer-events-none' : 'absolute'"
+            @click="close"
+          ></div>
         </div>
       </transition>
 
@@ -38,7 +46,17 @@
 
 <script>
 export default {
-  props: ['open'],
+  props: {
+    open: {
+      type: Boolean,
+      required: true,
+    },
+    overflow: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
   data() {
     return {
       showModal: false,

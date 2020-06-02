@@ -26,6 +26,9 @@
                     <a href="{{ route('usernames.index') }}" class="block mt-4 md:inline-block md:mt-0 hover:text-white mr-4 {{ Route::currentRouteNamed('usernames.index') ? 'text-white' : 'text-indigo-100' }}">
                         Usernames
                     </a>
+                    <a href="{{ route('rules.index') }}" class="block mt-4 md:inline-block md:mt-0 hover:text-white mr-4 {{ Route::currentRouteNamed('rules.index') ? 'text-white' : 'text-indigo-100' }}">
+                        Rules
+                    </a>
 
                     <a href="{{ route('settings.show') }}" class="block md:hidden mt-4 hover:text-white mr-4 {{ Route::currentRouteNamed('settings.show') ? 'text-white' : 'text-indigo-100' }}">
                         Settings

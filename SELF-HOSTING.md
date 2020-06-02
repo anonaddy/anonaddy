@@ -455,13 +455,17 @@ Set a couple of variables:
 
 ```bash
 MODULE_NAME="mailparse"
-MODULE_VERSION="3.0.4"
+MODULE_VERSION="3.1.0"
 ```
 
 ```bash
 cd ~
 
+# download using pecl
 pecl download $MODULE_NAME
+
+# or you can use wget if pecl is not found
+wget https://pecl.php.net/get/$MODULE_NAME-$MODULE_VERSION.tgz
 
 tar -zxvf $MODULE_NAME-$MODULE_VERSION.tgz
 

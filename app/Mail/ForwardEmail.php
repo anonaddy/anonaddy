@@ -8,6 +8,7 @@ use App\Helpers\AlreadyEncryptedSigner;
 use App\Helpers\OpenPGPSigner;
 use App\Notifications\GpgKeyExpired;
 use App\Recipient;
+use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -19,8 +20,9 @@ use Swift_SwiftException;
 
 class ForwardEmail extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, CheckUserRules;
 
+    protected $email;
     protected $user;
     protected $alias;
     protected $sender;
@@ -36,6 +38,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $openpgpsigner;
     protected $dkimSigner;
     protected $encryptedParts;
+    protected $fromEmail;
 
     /**
      * Create a new message instance.
@@ -87,23 +90,23 @@ class ForwardEmail extends Mailable implements ShouldQueue
 
         if ($this->alias->isCustomDomain()) {
             if ($this->alias->aliasable->isVerifiedForSending()) {
-                $fromEmail = $this->alias->email;
+                $this->fromEmail = $this->alias->email;
                 $returnPath = $this->alias->email;
 
                 $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
                 $this->dkimSigner->ignoreHeader('List-Unsubscribe');
                 $this->dkimSigner->ignoreHeader('Return-Path');
             } else {
-                $fromEmail = config('mail.from.address');
+                $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
             }
         } else {
-            $fromEmail = $this->alias->email;
+            $this->fromEmail = $this->alias->email;
             $returnPath = 'mailer@'.$this->alias->parentDomain();
         }
 
-        $email =  $this
-            ->from($fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
+        $this->email =  $this
+            ->from($this->fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
             ->replyTo($replyToEmail)
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->text('emails.forward.text')->with([
@@ -141,20 +144,22 @@ class ForwardEmail extends Mailable implements ShouldQueue
             });
 
         if ($this->emailHtml) {
-            $email->view('emails.forward.html')->with([
+            $this->email->view('emails.forward.html')->with([
                 'html' => base64_decode($this->emailHtml)
             ]);
         }
 
         foreach ($this->emailAttachments as $attachment) {
-            $email->attachData(
+            $this->email->attachData(
                 base64_decode($attachment['stream']),
                 base64_decode($attachment['file_name']),
                 ['mime' => base64_decode($attachment['mime'])]
             );
         }
 
-        return $email;
+        $this->checkRules();
+
+        return $this->email;
     }
 
     private function isAlreadyEncrypted()

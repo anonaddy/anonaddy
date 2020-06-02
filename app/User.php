@@ -153,6 +153,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's rules.
+     */
+    public function rules()
+    {
+        return $this->hasMany(Rule::class);
+    }
+
+    /**
+     * Get all of the user's active rules.
+     */
+    public function activeRules()
+    {
+        return $this->rules()->where('active', true);
+    }
+
+    /**
+     * Get all of the user's active rules in the correct order.
+     */
+    public function activeRulesOrdered()
+    {
+        return $this->rules()->where('active', true)->orderBy('order');
+    }
+
+    /**
      * Get all of the user's additional usernames.
      */
     public function additionalUsernames()

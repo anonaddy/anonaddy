@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::get('/usernames', 'ShowAdditionalUsernameController@index')->name('usernames.index');
 
     Route::get('/deactivate/{alias}', 'DeactivateAliasController@deactivate')->name('deactivate');
+
+    Route::get('/rules', 'ShowRuleController@index')->name('rules.index');
 });
 
 

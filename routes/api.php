@@ -57,5 +57,15 @@ Route::group([
     Route::post('/active-usernames', 'Api\ActiveAdditionalUsernameController@store');
     Route::delete('/active-usernames/{id}', 'Api\ActiveAdditionalUsernameController@destroy');
 
+    Route::get('/rules', 'Api\RuleController@index');
+    Route::get('/rules/{id}', 'Api\RuleController@show');
+    Route::post('/rules', 'Api\RuleController@store');
+    Route::patch('/rules/{id}', 'Api\RuleController@update');
+    Route::delete('/rules/{id}', 'Api\RuleController@destroy');
+    Route::post('/reorder-rules', 'Api\ReorderRuleController@store');
+
+    Route::post('/active-rules', 'Api\ActiveRuleController@store');
+    Route::delete('/active-rules/{id}', 'Api\ActiveRuleController@destroy');
+
     Route::get('/domain-options', 'Api\DomainOptionController@index');
 });
