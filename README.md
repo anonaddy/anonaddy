@@ -129,6 +129,10 @@ Some users have reported that Gmail's web mail has not been using the Reply-To h
 
 To check if a reply has worked properly check in your dashboard if the reply count has been incremented for that alias.
 
+#### **Does AnonAddy strip out the banner information when I reply to an email?**
+
+At the moment the site does not automatically strip out the "This email was sent to..." text from forwarded emails when you reply to them. You need to either remove this from the quoted text manually or set the banner information to "off" in your account settings.
+
 #### **How do I send email from an alias?**
 
 This works in the same way as replying to an email.

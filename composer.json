@@ -12,23 +12,25 @@
         "bacon/bacon-qr-code": "^2.0",
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
-        "laravel/framework": "^6.0",
-        "laravel/passport": "^8.0",
-        "laravel/tinker": "^1.0",
+        "fruitcake/laravel-cors": "^2.0",
+        "laravel/framework": "^7.0",
+        "laravel/passport": "^9.0",
+        "laravel/tinker": "^2.0",
+        "laravel/ui": "^2.0",
         "mews/captcha": "^3.0.0",
-        "php-mime-mail-parser/php-mime-mail-parser": "^5.0",
+        "php-mime-mail-parser/php-mime-mail-parser": "^6.0",
         "pragmarx/google2fa-laravel": "^1.3",
         "predis/predis": "^1.1",
-        "ramsey/uuid": "^3.8"
+        "ramsey/uuid": "^4.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
-        "facade/ignition": "^1.4",
+        "facade/ignition": "^2.0",
         "friendsofphp/php-cs-fixer": "^2.14",
         "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.0"
+        "nunomaduro/collision": "^4.1",
+        "phpunit/phpunit": "^8.5"
     },
     "config": {
         "optimize-autoloader": true,
