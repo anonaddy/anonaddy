@@ -246,7 +246,9 @@ class RulesTest extends TestCase
 
         $parser = $this->getParser(base_path('tests/emails/email.eml'));
 
-        $emailData = new EmailData($parser);
+        $size = 1500;
+
+        $emailData = new EmailData($parser, $size);
 
         $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
 
@@ -322,7 +324,9 @@ class RulesTest extends TestCase
 
         $parser = $this->getParser(base_path('tests/emails/email.eml'));
 
-        $emailData = new EmailData($parser);
+        $size = 1000;
+
+        $emailData = new EmailData($parser, $size);
 
         $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
 

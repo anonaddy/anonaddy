@@ -6,7 +6,7 @@ use PhpMimeMailParser\Parser;
 
 class EmailData
 {
-    public function __construct(Parser $parser)
+    public function __construct(Parser $parser, $size)
     {
         $this->sender = $parser->getAddresses('from')[0]['address'];
         $this->display_from = base64_encode($parser->getAddresses('from')[0]['display']);
@@ -17,6 +17,7 @@ class EmailData
         $this->text = base64_encode($parser->getMessageBody('text'));
         $this->html = base64_encode($parser->getMessageBody('html'));
         $this->attachments = [];
+        $this->size = $size;
 
         if ($parser->getParts()[1]['content-type'] === 'multipart/encrypted') {
             $this->encryptedParts = $parser->getAttachments();

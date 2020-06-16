@@ -52,15 +52,6 @@ class SendFromEmailTest extends TestCase
             ]
         )->assertExitCode(0);
 
-        $this->assertDatabaseHas('aliases', [
-            'email' => $alias->email,
-            'local_part' => $alias->local_part,
-            'domain' => $alias->domain,
-            'emails_forwarded' => 0,
-            'emails_blocked' => 0,
-            'emails_replied' => 0,
-            'emails_sent' => 1
-        ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(SendFromEmail::class, function ($mail) {
@@ -75,7 +66,7 @@ class SendFromEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $alias = factory(Alias::class)->create([
+        factory(Alias::class)->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
@@ -101,15 +92,6 @@ class SendFromEmailTest extends TestCase
             ]
         )->assertExitCode(0);
 
-        $this->assertDatabaseHas('aliases', [
-            'email' => $alias->email,
-            'local_part' => $alias->local_part,
-            'domain' => $alias->domain,
-            'emails_forwarded' => 0,
-            'emails_blocked' => 0,
-            'emails_replied' => 0,
-            'emails_sent' => 2
-        ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(SendFromEmail::class, function ($mail) {
@@ -154,7 +136,6 @@ class SendFromEmailTest extends TestCase
             'emails_forwarded' => 0,
             'emails_blocked' => 0,
             'emails_replied' => 0,
-            'emails_sent' => 1
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 

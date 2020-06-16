@@ -55,15 +55,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1000'
-        ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
@@ -96,15 +90,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1000'
-        ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
@@ -135,15 +123,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'attachment@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'attachment',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1000'
-        ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
@@ -174,29 +156,21 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertDatabaseHas('aliases', [
             'email' => 'amazon@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'amazon',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertDatabaseHas('aliases', [
             'email' => 'paypal@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'paypal',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertEquals(3, $this->user->aliases()->count());
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1217'
-        ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
@@ -227,14 +201,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '789'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -273,14 +242,9 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '559'
-        ]);
+
         $this->assertCount(1, $this->user->aliases);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($defaultRecipient) {
@@ -328,14 +292,9 @@ class ReceiveEmailTest extends TestCase
             'local_part' => $uuid,
             'domain' => 'anonaddy.me',
             'email' => $uuid.'@anonaddy.me',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '892'
-        ]);
+
         $this->assertCount(1, $this->user->aliases);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($defaultRecipient) {
@@ -382,14 +341,9 @@ class ReceiveEmailTest extends TestCase
             'local_part' => $localPart,
             'domain' => 'anonaddy.me',
             'email' => $localPart.'@anonaddy.me',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '892'
-        ]);
+
         $this->assertCount(1, $this->user->aliases);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($defaultRecipient) {
@@ -446,13 +400,7 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
-        ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '444'
         ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -497,13 +445,7 @@ class ReceiveEmailTest extends TestCase
         $this->assertDatabaseHas('aliases', [
             'extension' => '2.3',
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
-        ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '444'
         ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient) {
@@ -521,8 +463,6 @@ class ReceiveEmailTest extends TestCase
         Mail::fake();
 
         Mail::assertNothingSent();
-
-        $defaultRecipient = $this->user->defaultRecipient;
 
         factory(Recipient::class)->create([
             'user_id' => $this->user->id,
@@ -550,20 +490,14 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
-        ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '444'
         ]);
 
         $alias = $this->user->aliases()->where('email', 'ebay@johndoe.'.config('anonaddy.domain'))->first();
 
         $this->assertCount(1, $alias->recipients);
 
-        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($defaultRecipient, $verifiedRecipient) {
+        Mail::assertQueued(ForwardEmail::class, function ($mail) use ($verifiedRecipient) {
             return $mail->hasTo($verifiedRecipient->email);
         });
     }
@@ -595,12 +529,6 @@ class ReceiveEmailTest extends TestCase
         $this->assertDatabaseMissing('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'emails_blocked' => 0
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '0'
         ]);
 
         Mail::assertNotSent(ForwardEmail::class);
@@ -653,11 +581,6 @@ class ReceiveEmailTest extends TestCase
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
             'active' => false
-        ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '0'
         ]);
 
         Mail::assertNotSent(ForwardEmail::class);
@@ -718,11 +641,6 @@ class ReceiveEmailTest extends TestCase
             'domain' => 'johndoe.'.config('anonaddy.domain'),
             'active' => true
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1000'
-        ]);
 
         Mail::assertNotSent(ForwardEmail::class);
     }
@@ -770,11 +688,6 @@ class ReceiveEmailTest extends TestCase
             'domain' => 'johndoe.'.config('anonaddy.domain'),
             'active' => true
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '0'
-        ]);
 
         Mail::assertNotSent(ForwardEmail::class);
     }
@@ -805,14 +718,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@anonaddy.me',
             'local_part' => 'ebay',
             'domain' => 'anonaddy.me',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1346'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -852,14 +760,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '871'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -900,14 +803,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '871'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -946,14 +844,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@janedoe.anonaddy.com',
             'local_part' => 'ebay',
             'domain' => 'janedoe.anonaddy.com',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '638'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -987,15 +880,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '100944820'
-        ]);
 
         Notification::assertSentTo(
             $this->user,
@@ -1071,15 +958,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.anonaddy.me',
             'local_part' => 'ebay',
             'domain' => 'johndoe.anonaddy.me',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '1000'
-        ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
@@ -1123,14 +1004,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '871'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient) {
@@ -1174,14 +1050,9 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@janedoe.anonaddy.com',
             'local_part' => 'ebay',
             'domain' => 'janedoe.anonaddy.com',
-            'emails_forwarded' => 1,
             'emails_blocked' => 0
         ]);
-        $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => 'johndoe',
-            'bandwidth' => '559'
-        ]);
+
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient) {

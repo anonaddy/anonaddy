@@ -39,6 +39,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $dkimSigner;
     protected $encryptedParts;
     protected $fromEmail;
+    protected $size;
 
     /**
      * Create a new message instance.
@@ -57,6 +58,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
+        $this->size = $emailData->size;
 
         $this->encryptedParts = $emailData->encryptedParts ?? null;
 
@@ -112,13 +114,6 @@ class ForwardEmail extends Mailable implements ShouldQueue
             ->text('emails.forward.text')->with([
                 'text' => base64_decode($this->emailText)
             ])
-            ->with([
-                'location' => $this->bannerLocation,
-                'deactivateUrl' => $this->deactivateUrl,
-                'aliasEmail' => $this->alias->email,
-                'fromEmail' => $this->sender,
-                'replacedSubject' => $this->user->email_subject ? ' with subject "' . base64_decode($this->emailSubject) . '"' : null
-            ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->getHeaders()
                         ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>');
@@ -157,7 +152,25 @@ class ForwardEmail extends Mailable implements ShouldQueue
             );
         }
 
+        $this->replacedSubject = $this->user->email_subject ? ' with subject "' . base64_decode($this->emailSubject) . '"' : null;
+
         $this->checkRules();
+
+        $this->email->with([
+            'location' => $this->bannerLocation,
+            'deactivateUrl' => $this->deactivateUrl,
+            'aliasEmail' => $this->alias->email,
+            'fromEmail' => $this->sender,
+            'replacedSubject' => $this->replacedSubject,
+            'shouldBlock' => $this->size === 0
+        ]);
+
+        if ($this->size > 0) {
+            $this->alias->increment('emails_forwarded');
+
+            $this->user->bandwidth += $this->size;
+            $this->user->save();
+        }
 
         return $this->email;
     }

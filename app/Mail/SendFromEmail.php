@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Alias;
 use App\EmailData;
 use App\Helpers\AlreadyEncryptedSigner;
+use App\Traits\CheckUserRules;
 use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,16 +15,21 @@ use Swift_Signers_DKIMSigner;
 
 class SendFromEmail extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, CheckUserRules;
 
+    protected $email;
     protected $user;
     protected $alias;
+    protected $sender;
     protected $emailSubject;
     protected $emailText;
     protected $emailHtml;
     protected $emailAttachments;
     protected $dkimSigner;
     protected $encryptedParts;
+    protected $displayFrom;
+    protected $fromEmail;
+    protected $size;
 
     /**
      * Create a new message instance.
@@ -34,11 +40,14 @@ class SendFromEmail extends Mailable implements ShouldQueue
     {
         $this->user = $user;
         $this->alias = $alias;
+        $this->sender = $emailData->sender;
         $this->emailSubject = $emailData->subject;
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
+        $this->displayFrom = $user->from_name ?? null;
+        $this->size = $emailData->size;
     }
 
     /**
@@ -48,26 +57,24 @@ class SendFromEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $fromName = $this->user->from_name ?? null;
-
         if ($this->alias->isCustomDomain()) {
             if ($this->alias->aliasable->isVerifiedForSending()) {
-                $fromEmail = $this->alias->email;
+                $this->fromEmail = $this->alias->email;
                 $returnPath = $this->alias->email;
 
                 $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
                 $this->dkimSigner->ignoreHeader('Return-Path');
             } else {
-                $fromEmail = config('mail.from.address');
+                $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
             }
         } else {
-            $fromEmail = $this->alias->email;
+            $this->fromEmail = $this->alias->email;
             $returnPath = 'mailer@'.$this->alias->parentDomain();
         }
 
-        $email =  $this
-            ->from($fromEmail, $fromName)
+        $this->email =  $this
+            ->from($this->fromEmail, $this->displayFrom)
             ->subject(base64_decode($this->emailSubject))
             ->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText)
@@ -89,24 +96,37 @@ class SendFromEmail extends Mailable implements ShouldQueue
                 }
             });
 
-        if ($this->alias->isCustomDomain() && !$this->dkimSigner) {
-            $email->replyTo($this->alias->email, $fromName);
-        }
-
         if ($this->emailHtml) {
-            $email->view('emails.reply.html')->with([
+            $this->email->view('emails.reply.html')->with([
                 'html' => base64_decode($this->emailHtml)
             ]);
         }
 
         foreach ($this->emailAttachments as $attachment) {
-            $email->attachData(
+            $this->email->attachData(
                 base64_decode($attachment['stream']),
                 base64_decode($attachment['file_name']),
                 ['mime' => base64_decode($attachment['mime'])]
             );
         }
 
-        return $email;
+        $this->checkRules();
+
+        $this->email->with([
+            'shouldBlock' => $this->size === 0
+        ]);
+
+        if ($this->alias->isCustomDomain() && !$this->dkimSigner) {
+            $this->email->replyTo($this->alias->email, $this->displayFrom);
+        }
+
+        if ($this->size > 0) {
+            $this->alias->increment('emails_sent');
+
+            $this->user->bandwidth += $this->size;
+            $this->user->save();
+        }
+
+        return $this->email;
     }
 }

@@ -162,16 +162,11 @@ class ReceiveEmail extends Command
         if ($alias) {
             $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
 
-            $emailData = new EmailData($this->parser);
+            $emailData = new EmailData($this->parser, $this->size);
 
             $message = new ReplyToEmail($user, $alias, $emailData);
 
             Mail::to($sendTo)->queue($message);
-
-            $alias->increment('emails_replied');
-
-            $user->bandwidth += $this->size;
-            $user->save();
         }
     }
 
@@ -195,18 +190,11 @@ class ReceiveEmail extends Command
 
         $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
 
-        $emailData = new EmailData($this->parser);
+        $emailData = new EmailData($this->parser, $this->size);
 
         $message = new SendFromEmail($user, $alias, $emailData);
 
         Mail::to($sendTo)->queue($message);
-
-        if (!Mail::failures()) {
-            $alias->increment('emails_sent');
-
-            $user->bandwidth += $this->size;
-            $user->save();
-        }
     }
 
     protected function handleForward($user, $recipient, $aliasable)
@@ -252,20 +240,13 @@ class ReceiveEmail extends Command
             $alias->recipients()->sync($recipientIds);
         }
 
-        $emailData = new EmailData($this->parser);
+        $emailData = new EmailData($this->parser, $this->size);
 
         $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
             $message = new ForwardEmail($alias, $emailData, $recipient);
 
             Mail::to($recipient->email)->queue($message);
         });
-
-        if (!Mail::failures()) {
-            $alias->increment('emails_forwarded');
-
-            $user->bandwidth += $this->size;
-            $user->save();
-        }
     }
 
     protected function checkBandwidthLimit($user)

@@ -22,10 +22,18 @@ class RuleController extends Controller
 
     public function store(StoreRuleRequest $request)
     {
+        $conditions = collect($request->conditions)->map(function ($condition) {
+            return collect($condition)->only(['type', 'match', 'values']);
+        });
+
+        $actions = collect($request->actions)->map(function ($action) {
+            return collect($action)->only(['type', 'value']);
+        });
+
         $rule = user()->rules()->create([
             'name' => $request->name,
-            'conditions' => $request->conditions,
-            'actions' => $request->actions,
+            'conditions' => $conditions,
+            'actions' => $actions,
             'operator' => $request->operator
         ]);
 
@@ -36,10 +44,18 @@ class RuleController extends Controller
     {
         $rule = user()->rules()->findOrFail($id);
 
+        $conditions = collect($request->conditions)->map(function ($condition) {
+            return collect($condition)->only(['type', 'match', 'values']);
+        });
+
+        $actions = collect($request->actions)->map(function ($action) {
+            return collect($action)->only(['type', 'value']);
+        });
+
         $rule->update([
             'name' => $request->name,
-            'conditions' => $request->conditions,
-            'actions' => $request->actions,
+            'conditions' => $conditions,
+            'actions' => $actions,
             'operator' => $request->operator
         ]);
 

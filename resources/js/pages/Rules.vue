@@ -288,6 +288,7 @@
                     <div class="relative">
                       <select
                         v-model="createRuleObject.actions[key].type"
+                        @change="ruleActionChange(createRuleObject.actions[key])"
                         id="rule_action_types"
                         class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
                         required
@@ -315,7 +316,13 @@
                     </div>
                   </span>
 
-                  <span v-if="createRuleObject.actions[key].type === 'subject'" class="ml-4 flex">
+                  <span
+                    v-if="
+                      createRuleObject.actions[key].type === 'subject' ||
+                        createRuleObject.actions[key].type === 'displayFrom'
+                    "
+                    class="ml-4 flex"
+                  >
                     <div class="flex">
                       <input
                         v-model="createRuleObject.actions[key].value"
@@ -325,6 +332,37 @@
                         placeholder="Enter value"
                         autofocus
                       />
+                    </div>
+                  </span>
+
+                  <span
+                    v-else-if="createRuleObject.actions[key].type === 'banner'"
+                    class="ml-4 flex"
+                  >
+                    <div class="relative mr-4">
+                      <select
+                        v-model="createRuleObject.actions[key].value"
+                        id="create_rule_action_banner"
+                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        required
+                      >
+                        <option selected value="top">Top </option>
+                        <option selected value="bottom">Bottom </option>
+                        <option selected value="off">Off </option>
+                      </select>
+                      <div
+                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                      >
+                        <svg
+                          class="fill-current h-4 w-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </span>
                 </div>
@@ -582,6 +620,7 @@
                     <div class="relative">
                       <select
                         v-model="editRuleObject.actions[key].type"
+                        @change="ruleActionChange(editRuleObject.actions[key])"
                         id="rule_action_types"
                         class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
                         required
@@ -609,7 +648,13 @@
                     </div>
                   </span>
 
-                  <span v-if="editRuleObject.actions[key].type === 'subject'" class="ml-4 flex">
+                  <span
+                    v-if="
+                      editRuleObject.actions[key].type === 'subject' ||
+                        editRuleObject.actions[key].type === 'displayFrom'
+                    "
+                    class="ml-4 flex"
+                  >
                     <div class="flex">
                       <input
                         v-model="editRuleObject.actions[key].value"
@@ -619,6 +664,34 @@
                         placeholder="Enter value"
                         autofocus
                       />
+                    </div>
+                  </span>
+
+                  <span v-else-if="editRuleObject.actions[key].type === 'banner'" class="ml-4 flex">
+                    <div class="relative mr-4">
+                      <select
+                        v-model="editRuleObject.actions[key].value"
+                        id="edit_rule_action_banner"
+                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        required
+                      >
+                        <option value="top">Top </option>
+                        <option value="bottom">Bottom </option>
+                        <option value="off">Off </option>
+                      </select>
+                      <div
+                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                      >
+                        <svg
+                          class="fill-current h-4 w-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </span>
                 </div>
@@ -776,6 +849,22 @@ export default {
           value: 'subject',
           label: 'replace the subject with',
         },
+        {
+          value: 'displayFrom',
+          label: 'replace the "from name" with',
+        },
+        {
+          value: 'encryption',
+          label: 'turn PGP encryption off',
+        },
+        {
+          value: 'banner',
+          label: 'set the banner information location to',
+        },
+        {
+          value: 'block',
+          label: 'block the email',
+        },
       ],
       errors: {},
     }
@@ -863,7 +952,10 @@ export default {
         return (this.errors.ruleConditions = 'You must add some values for the condition')
       }
 
-      if (!this.createRuleObject.actions[0].value) {
+      if (
+        !this.createRuleObject.actions[0].value &&
+        this.createRuleObject.actions[0].value !== false
+      ) {
         return (this.errors.ruleActions = 'You must add a value for the action')
       }
 
@@ -909,7 +1001,7 @@ export default {
         return (this.errors.ruleConditions = 'You must add some values for the condition')
       }
 
-      if (!this.editRuleObject.actions[0].value) {
+      if (!this.editRuleObject.actions[0].value && this.editRuleObject.actions[0].value !== false) {
         return (this.errors.ruleActions = 'You must add a value for the action')
       }
 
@@ -942,8 +1034,11 @@ export default {
         })
         .catch(error => {
           this.editRuleLoading = false
-          this.editRuleObject = {}
-          this.error()
+          if (error.response.data) {
+            this.error(Object.entries(error.response.data.errors)[0][1][0])
+          } else {
+            this.error()
+          }
         })
     },
     activateRule(id) {
@@ -1064,6 +1159,17 @@ export default {
           },
         ],
         operator: 'AND',
+      }
+    },
+    ruleActionChange(action) {
+      if (action.type === 'subject' || action.type === 'displayFrom' || action.type === 'select') {
+        action.value = ''
+      } else if (action.type === 'encryption') {
+        action.value = false
+      } else if (action.type === 'banner') {
+        action.value = 'top'
+      } else if (action.type === 'block') {
+        action.value = true
       }
     },
     success(text = '') {

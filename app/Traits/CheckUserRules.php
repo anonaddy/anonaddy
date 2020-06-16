@@ -108,21 +108,31 @@ trait CheckUserRules
     {
         switch ($action['type']) {
             case 'subject':
+                $this->replacedSubject = ' with subject "' . base64_decode($this->emailSubject) . '"';
                 $this->email->subject = $action['value'];
                 break;
             case 'displayFrom':
+                $this->email->from = [];
                 $this->email->from($this->fromEmail, $action['value']);
                 break;
             case 'encryption':
                 if ($action['value'] == false) {
                     // detach the openpgpsigner from the email...
+                    if ($this->openpgpsigner) {
+                        $this->email->withSwiftMessage(function ($message) {
+                            $message->detachSigner($this->openpgpsigner);
+                        });
+                    }
                 }
                 break;
             case 'banner':
-                $this->email->location = $action['value'];
+                if (in_array($action['value'], ['top', 'bottom', 'off'])) {
+                    $this->email->bannerLocation = $action['value'];
+                }
                 break;
             case 'block':
                 $this->alias->increment('emails_blocked');
+                $this->size = 0;
                 exit(0);
                 break;
             case 'webhook':

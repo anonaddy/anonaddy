@@ -53,14 +53,6 @@ class ReplyToEmailTest extends TestCase
             ]
         )->assertExitCode(0);
 
-        $this->assertDatabaseHas('aliases', [
-            'email' => $alias->email,
-            'local_part' => $alias->local_part,
-            'domain' => $alias->domain,
-            'emails_forwarded' => 0,
-            'emails_blocked' => 0,
-            'emails_replied' => 1
-        ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ReplyToEmail::class, function ($mail) {
@@ -102,14 +94,6 @@ class ReplyToEmailTest extends TestCase
             ]
         )->assertExitCode(0);
 
-        $this->assertDatabaseHas('aliases', [
-            'email' => $alias->email,
-            'local_part' => $alias->local_part,
-            'domain' => $alias->domain,
-            'emails_forwarded' => 1,
-            'emails_blocked' => 0,
-            'emails_replied' => 0
-        ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertNotQueued(ReplyToEmail::class, function ($mail) {
@@ -150,14 +134,6 @@ class ReplyToEmailTest extends TestCase
             ]
         )->assertExitCode(0);
 
-        $this->assertDatabaseHas('aliases', [
-            'email' => $alias->email,
-            'local_part' => $alias->local_part,
-            'domain' => $alias->domain,
-            'emails_forwarded' => 0,
-            'emails_blocked' => 0,
-            'emails_replied' => 2
-        ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
         Mail::assertQueued(ReplyToEmail::class, function ($mail) {
