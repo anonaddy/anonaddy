@@ -35,6 +35,48 @@ class AliasesTest extends TestCase
     }
 
     /** @test */
+    public function user_can_get_all_aliases_including_deleted()
+    {
+        // Arrange
+        factory(Alias::class, 2)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'deleted_at' => now()
+        ]);
+
+        // Act
+        $response = $this->get('/api/v1/aliases?deleted=with');
+
+        // Assert
+        $response->assertSuccessful();
+        $this->assertCount(3, $response->json()['data']);
+    }
+
+    /** @test */
+    public function user_can_get_only_deleted_aliases()
+    {
+        // Arrange
+        factory(Alias::class, 2)->create([
+            'user_id' => $this->user->id,
+            'deleted_at' => now()
+        ]);
+
+        factory(Alias::class)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        // Act
+        $response = $this->get('/api/v1/aliases?deleted=only');
+
+        // Assert
+        $response->assertSuccessful();
+        $this->assertCount(2, $response->json()['data']);
+    }
+
+    /** @test */
     public function user_can_get_individual_alias()
     {
         // Arrange
@@ -131,6 +173,20 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertEmpty($this->user->aliases);
+    }
+
+    /** @test */
+    public function user_can_restore_deleted_alias()
+    {
+        $alias = factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'deleted_at' => now()
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/aliases/'.$alias->id.'/restore');
+
+        $response->assertStatus(200);
+        $this->assertFalse($this->user->aliases[0]->trashed());
     }
 
     /** @test */

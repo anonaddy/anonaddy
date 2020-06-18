@@ -10,7 +10,7 @@ class ActiveAliasController extends Controller
 {
     public function store(Request $request)
     {
-        $alias = user()->aliases()->findOrFail($request->id);
+        $alias = user()->aliases()->withTrashed()->findOrFail($request->id);
 
         $alias->activate();
 
@@ -19,7 +19,7 @@ class ActiveAliasController extends Controller
 
     public function destroy($id)
     {
-        $alias = user()->aliases()->findOrFail($id);
+        $alias = user()->aliases()->withTrashed()->findOrFail($id);
 
         $alias->deactivate();
 

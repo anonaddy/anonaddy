@@ -10,7 +10,7 @@ class AliasRecipientController extends Controller
 {
     public function store(StoreAliasRecipientRequest $request)
     {
-        $alias = user()->aliases()->findOrFail($request->alias_id);
+        $alias = user()->aliases()->withTrashed()->findOrFail($request->alias_id);
 
         $alias->recipients()->sync($request->recipient_ids);
 

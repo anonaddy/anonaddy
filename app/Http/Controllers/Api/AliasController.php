@@ -8,19 +8,30 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
 class AliasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return AliasResource::collection(user()->aliases()->with('recipients')->latest()->get());
+        $aliases = user()->aliases()->with('recipients')->latest();
+
+        if ($request->deleted === 'with') {
+            $aliases->withTrashed();
+        }
+
+        if ($request->deleted === 'only') {
+            $aliases->onlyTrashed();
+        }
+
+        return AliasResource::collection($aliases->get());
     }
 
     public function show($id)
     {
-        $alias = user()->aliases()->findOrFail($id);
+        $alias = user()->aliases()->withTrashed()->findOrFail($id);
 
         return new AliasResource($alias->load('recipients'));
     }
@@ -83,9 +94,18 @@ class AliasController extends Controller
 
     public function update(UpdateAliasRequest $request, $id)
     {
-        $alias = user()->aliases()->findOrFail($id);
+        $alias = user()->aliases()->withTrashed()->findOrFail($id);
 
         $alias->update(['description' => $request->description]);
+
+        return new AliasResource($alias->refresh()->load('recipients'));
+    }
+
+    public function restore($id)
+    {
+        $alias = user()->aliases()->withTrashed()->findOrFail($id);
+
+        $alias->restore();
 
         return new AliasResource($alias->refresh()->load('recipients'));
     }

@@ -118,13 +118,39 @@
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current pointer-events-none mr-2 flex items-center"
         />
       </div>
-      <div class="mt-4 md:mt-0">
-        <button
-          @click="generateAliasModalOpen = true"
-          class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
-        >
-          Generate New Alias
-        </button>
+      <div class="flex flex-wrap mt-4 md:mt-0">
+        <div class="block relative mr-4">
+          <select
+            v-model="showAliases"
+            class="block appearance-none w-full text-grey-700 bg-white p-3 pr-8 rounded shadow focus:shadow-outline"
+            required
+          >
+            <option value="without">Hide Deleted</option>
+            <option value="with">Show Deleted</option>
+            <option value="only">Deleted Only</option>
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+          >
+            <svg
+              class="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <button
+            @click="generateAliasModalOpen = true"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
+          >
+            Generate New Alias
+          </button>
+        </div>
       </div>
     </div>
 
@@ -279,8 +305,15 @@
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <icon
+            v-if="props.row.deleted_at"
+            name="undo"
+            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer outline-none"
+            @click.native="openRestoreModal(props.row.id)"
+          />
+          <icon
+            v-else
             name="trash"
-            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer outline-none"
             @click.native="openDeleteModal(props.row.id)"
           />
         </span>
@@ -493,6 +526,38 @@
       </div>
     </Modal>
 
+    <Modal :open="restoreAliasModalOpen" @close="closeRestoreModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Restore alias
+        </h2>
+        <p class="mt-4 text-grey-700">
+          Are you sure you want to restore this alias? Once restored, this alias will
+          <b>be able to receive emails again</b>.
+        </p>
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="restoreAlias(aliasIdToRestore)"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            :class="restoreAliasLoading ? 'cursor-not-allowed' : ''"
+            :disabled="restoreAliasLoading"
+          >
+            Restore alias
+            <loader v-if="restoreAliasLoading" />
+          </button>
+          <button
+            @click="closeRestoreModal"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+
     <Modal :open="deleteAliasModalOpen" @close="closeDeleteModal">
       <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
         <h2
@@ -501,8 +566,8 @@
           Delete alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to delete this alias? This action cannot be undone. Once deleted,
-          this alias will <b>not be able to be used again</b> and will reject any emails sent to it.
+          Are you sure you want to delete this alias? <b>You can restore this alias</b> if you later
+          change your mind. Once deleted, this alias will <b>reject any emails sent to it</b>.
         </p>
         <div class="mt-6">
           <button
@@ -595,11 +660,15 @@ export default {
   data() {
     return {
       search: '',
+      showAliases: 'without',
       aliasIdToEdit: '',
       aliasDescriptionToEdit: '',
       aliasIdToDelete: '',
+      aliasIdToRestore: '',
       deleteAliasLoading: false,
       deleteAliasModalOpen: false,
+      restoreAliasLoading: false,
+      restoreAliasModalOpen: false,
       editAliasRecipientsLoading: false,
       editAliasRecipientsModalOpen: false,
       generateAliasModalOpen: false,
@@ -688,6 +757,9 @@ export default {
     editAliasRecipientsModalOpen: _.debounce(function() {
       this.addTooltips()
     }, 50),
+    showAliases(value) {
+      this.updateAliases()
+    },
   },
   computed: {
     activeUuidAliases() {
@@ -721,6 +793,26 @@ export default {
       this.deleteAliasModalOpen = false
       this.aliasIdToDelete = ''
     },
+    openRestoreModal(id) {
+      this.restoreAliasModalOpen = true
+      this.aliasIdToRestore = id
+    },
+    closeRestoreModal() {
+      this.restoreAliasModalOpen = false
+      this.aliasIdToRestore = ''
+    },
+    updateAliases() {
+      axios
+        .get(`/api/v1/aliases?deleted=${this.showAliases}`, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => {
+          this.rows = response.data.data
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
     deleteAlias(id) {
       this.deleteAliasLoading = true
 
@@ -735,6 +827,25 @@ export default {
           this.error()
           this.deleteAliasModalOpen = false
           this.deleteAliasLoading = false
+        })
+    },
+    restoreAlias(id) {
+      this.restoreAliasLoading = true
+
+      axios
+        .patch(`/api/v1/aliases/${id}/restore`, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => {
+          this.updateAliases()
+          this.restoreAliasModalOpen = false
+          this.restoreAliasLoading = false
+          this.success('Alias restored successfully')
+        })
+        .catch(error => {
+          this.error()
+          this.restoreAliasModalOpen = false
+          this.restoreAliasLoading = false
         })
     },
     openAliasRecipientsModal(alias) {

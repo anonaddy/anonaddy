@@ -19,6 +19,7 @@ Route::group([
     Route::get('/aliases/{id}', 'Api\AliasController@show');
     Route::post('/aliases', 'Api\AliasController@store');
     Route::patch('/aliases/{id}', 'Api\AliasController@update');
+    Route::patch('/aliases/{id}/restore', 'Api\AliasController@restore');
     Route::delete('/aliases/{id}', 'Api\AliasController@destroy');
 
     Route::post('/active-aliases', 'Api\ActiveAliasController@store');
