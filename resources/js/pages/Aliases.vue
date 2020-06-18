@@ -648,6 +648,10 @@ export default {
       type: String,
       required: true,
     },
+    defaultAliasFormat: {
+      type: String,
+      required: true,
+    },
   },
   components: {
     Modal,
@@ -675,7 +679,7 @@ export default {
       generateAliasLoading: false,
       generateAliasDomain: this.defaultAliasDomain ? this.defaultAliasDomain : this.domain,
       generateAliasDescription: '',
-      generateAliasFormat: 'uuid',
+      generateAliasFormat: this.defaultAliasFormat ? this.defaultAliasFormat : 'uuid',
       aliasFormatOptions: [
         {
           value: 'uuid',

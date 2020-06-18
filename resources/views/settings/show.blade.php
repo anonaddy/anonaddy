@@ -157,10 +157,10 @@
 
                     <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
-                    <p class="mt-6">The default alias domain is the domain you'd like to be selected by default in the drop down options when generating a new alias on the site or the browser extension. This will save you needing to select your preferred domain from the dropdown  each time.</p>
+                    <p class="mt-6">The default alias domain is the domain you'd like to be selected by default in the drop down options when generating a new alias on the site or the browser extension. This will save you needing to select your preferred domain from the dropdown each time.</p>
 
                     <div class="mt-6 flex flex-wrap mb-4">
-                        <label for="default-recipient" class="block text-grey-700 text-sm mb-2">
+                        <label for="default-alias-domain" class="block text-grey-700 text-sm mb-2">
                             {{ __('Select Default Domain') }}:
                         </label>
 
@@ -186,6 +186,49 @@
 
                 <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
                     {{ __('Update Default Alias Domain') }}
+                </button>
+
+            </form>
+
+            <form method="POST" action="{{ route('settings.default_alias_format') }}" class="pt-16">
+                @csrf
+
+                <div class="mb-6">
+
+                    <h3 class="font-bold text-xl">
+                        Update Default Alias Format
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="mt-6">The default alias format is the format you'd like to be selected by default in the drop down options when generating a new alias on the site or the browser extension. This will save you needing to select your preferred format from the dropdown each time.</p>
+
+                    <div class="mt-6 flex flex-wrap mb-4">
+                        <label for="default-alias-format" class="block text-grey-700 text-sm mb-2">
+                            {{ __('Select Default Format') }}:
+                        </label>
+
+                        <div class="block relative w-full">
+                            <select id="default-alias-format" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="format" required>
+                                <option value="uuid" {{ $user->default_alias_format === 'uuid' ? 'selected' : '' }}>UUID</option>
+                                <option value="random_words" {{ $user->default_alias_format === 'random_words' ? 'selected' : '' }}>Random Words</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+
+                        @if ($errors->has('format'))
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('format') }}
+                            </p>
+                        @endif
+                    </div>
+
+                </div>
+
+                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                    {{ __('Update Default Alias Format') }}
                 </button>
 
             </form>

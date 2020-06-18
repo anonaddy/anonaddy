@@ -85,10 +85,8 @@ class SettingsTest extends TestCase
     /** @test */
     public function user_cannot_update_default_alias_domain_if_invalid()
     {
-        $defaultAliasDomain = 'johndoe.anonaddy.me';
-
         $response = $this->post('/settings/default-alias-domain', [
-            'domain' => $defaultAliasDomain
+            'domain' => 'johndoe.anonaddy.me'
         ]);
 
         $response->assertStatus(302);
@@ -96,6 +94,37 @@ class SettingsTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
             'default_alias_domain' => null
+        ]);
+    }
+
+    /** @test */
+    public function user_can_update_default_alias_format()
+    {
+        $defaultAliasFormat = 'random_words';
+
+        $response = $this->post('/settings/default-alias-format', [
+            'format' => $defaultAliasFormat
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'default_alias_format' => $defaultAliasFormat
+        ]);
+    }
+
+    /** @test */
+    public function user_cannot_update_default_alias_format_if_invalid()
+    {
+        $response = $this->post('/settings/default-alias-format', [
+            'format' => 'invalid_format'
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['format']);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'default_alias_format' => null
         ]);
     }
 

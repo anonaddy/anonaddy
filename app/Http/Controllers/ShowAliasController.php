@@ -16,7 +16,8 @@ class ShowAliasController extends Controller
             'domain' => user()->username.'.'.config('anonaddy.domain'),
             'bandwidthMb' => user()->bandwidth_mb,
             'domainOptions' => user()->domainOptions(),
-            'defaultAliasDomain' => user()->default_alias_domain
+            'defaultAliasDomain' => user()->default_alias_domain,
+            'defaultAliasFormat' => user()->default_alias_format
         ]);
     }
 }

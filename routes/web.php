@@ -47,6 +47,8 @@ Route::group([
 
     Route::post('/default-alias-domain', 'DefaultAliasDomainController@update')->name('settings.default_alias_domain');
 
+    Route::post('/default-alias-format', 'DefaultAliasFormatController@update')->name('settings.default_alias_format');
+
     Route::post('/from-name', 'FromNameController@update')->name('settings.from_name');
 
     Route::post('/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');

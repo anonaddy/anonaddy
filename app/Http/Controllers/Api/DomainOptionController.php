@@ -10,7 +10,8 @@ class DomainOptionController extends Controller
     {
         return response()->json([
             'data' => user()->domainOptions(),
-            'defaultAliasDomain' => user()->default_alias_domain
+            'defaultAliasDomain' => user()->default_alias_domain,
+            'defaultAliasFormat' => user()->default_alias_format
         ]);
     }
 }
