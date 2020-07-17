@@ -16,7 +16,7 @@
         "dayjs": "^1.8.28",
         "laravel-mix": "^4.1.4",
         "laravel-mix-purgecss": "^4.2.0",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.19",
         "portal-vue": "^2.1.7",
         "postcss-import": "^11.1.0",
         "postcss-nesting": "^5.0.0",
