@@ -727,7 +727,7 @@
             :class="editRuleLoading ? 'cursor-not-allowed' : ''"
             :disabled="editRuleLoading"
           >
-            Edit Rule
+            Save
             <loader v-if="editRuleLoading" />
           </button>
           <button

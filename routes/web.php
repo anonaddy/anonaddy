@@ -60,4 +60,6 @@ Route::group([
     Route::post('/2fa/enable', 'TwoFactorAuthController@store')->name('settings.2fa_enable');
     Route::post('/2fa/regenerate', 'TwoFactorAuthController@update')->name('settings.2fa_regenerate');
     Route::post('/2fa/disable', 'TwoFactorAuthController@destroy')->name('settings.2fa_disable');
+
+    Route::get('/aliases/export', 'AliasExportController@export')->name('aliases.export');
 });

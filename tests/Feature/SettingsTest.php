@@ -7,10 +7,12 @@ use App\Alias;
 use App\AliasRecipient;
 use App\DeletedUsername;
 use App\Domain;
+use App\Exports\AliasesExport;
 use App\Recipient;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
 class SettingsTest extends TestCase
@@ -343,5 +345,29 @@ class SettingsTest extends TestCase
             'id' => $this->user->id,
             'username' => $this->user->username,
         ]);
+    }
+
+    /**
+    * @test
+    */
+    public function user_can_download_aliases_export()
+    {
+        Excel::fake();
+
+        factory(Alias::class, 3)->create([
+            'user_id' => $this->user->id
+        ]);
+
+        factory(Alias::class)->create();
+
+        $this->actingAs($this->user)
+            ->get('/settings/aliases/export');
+
+        Excel::assertDownloaded('aliases-'.now()->toDateString().'.csv', function (AliasesExport $export) {
+            $this->assertCount(3, $export->collection());
+            return $export->collection()->contains(function ($alias) {
+                return $alias['user_id'] === $this->user->id;
+            });
+        });
     }
 }

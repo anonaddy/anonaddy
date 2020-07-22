@@ -530,6 +530,31 @@
 
         <div class="mb-4">
             <h2 class="text-3xl font-bold">
+                Data
+            </h2>
+            <p class="text-grey-500">Manage your account data</p>
+        </div>
+
+        <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
+
+            <div class="mb-6">
+                <h3 class="font-bold text-xl">
+                    Export Aliases
+                </h3>
+
+                <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                <p class="mt-6">You can click the button below to export all the data for your <b>{{ $user->aliases()->withTrashed()->count() }}</b> aliases as a .csv file.</p>
+            </div>
+
+            <a href="{{ route('aliases.export') }}" class="bg-cyan-400 block w-full text-center hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                Export Alias Data
+            </a>
+
+        </div>
+
+        <div class="mb-4">
+            <h2 class="text-3xl font-bold">
                 Danger Zone
             </h2>
             <p class="text-grey-500">Irreversible and destructive actions</p>
