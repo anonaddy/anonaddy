@@ -12,7 +12,7 @@ class AliasesExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return user()->aliases;
+        return user()->aliases()->withTrashed()->get();
     }
 
     public function headings(): array

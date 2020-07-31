@@ -358,13 +358,19 @@ class SettingsTest extends TestCase
             'user_id' => $this->user->id
         ]);
 
+        factory(Alias::class)->create([
+            'user_id' => $this->user->id,
+            'deleted_at' => now(),
+            'active' => false
+        ]);
+
         factory(Alias::class)->create();
 
         $this->actingAs($this->user)
             ->get('/settings/aliases/export');
 
         Excel::assertDownloaded('aliases-'.now()->toDateString().'.csv', function (AliasesExport $export) {
-            $this->assertCount(3, $export->collection());
+            $this->assertCount(4, $export->collection());
             return $export->collection()->contains(function ($alias) {
                 return $alias['user_id'] === $this->user->id;
             });

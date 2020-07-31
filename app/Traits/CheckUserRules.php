@@ -118,7 +118,7 @@ trait CheckUserRules
             case 'encryption':
                 if ($action['value'] == false) {
                     // detach the openpgpsigner from the email...
-                    if ($this->openpgpsigner) {
+                    if (isset($this->openpgpsigner)) {
                         $this->email->withSwiftMessage(function ($message) {
                             $message->detachSigner($this->openpgpsigner);
                         });
