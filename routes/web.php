@@ -57,9 +57,9 @@ Route::group([
 
     Route::post('/password', 'PasswordController@update')->name('settings.password');
 
-    Route::post('/2fa/enable', 'TwoFactorAuthController@store')->name('settings.2fa_enable');
-    Route::post('/2fa/regenerate', 'TwoFactorAuthController@update')->name('settings.2fa_regenerate');
-    Route::post('/2fa/disable', 'TwoFactorAuthController@destroy')->name('settings.2fa_disable');
+    Route::post('/2fa/enable', 'Auth\TwoFactorAuthController@store')->name('settings.2fa_enable');
+    Route::post('/2fa/regenerate', 'Auth\TwoFactorAuthController@update')->name('settings.2fa_regenerate');
+    Route::post('/2fa/disable', 'Auth\TwoFactorAuthController@destroy')->name('settings.2fa_disable');
 
     Route::get('/aliases/export', 'AliasExportController@export')->name('aliases.export');
 });

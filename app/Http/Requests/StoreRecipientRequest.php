@@ -30,7 +30,7 @@ class StoreRecipientRequest extends FormRequest
                 'required',
                 'string',
                 'max:254',
-                'email:rfc,dns',
+                'email:rfc',
                 new UniqueRecipient,
                 new NotLocalRecipient
             ]

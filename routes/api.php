@@ -69,4 +69,6 @@ Route::group([
     Route::delete('/active-rules/{id}', 'Api\ActiveRuleController@destroy');
 
     Route::get('/domain-options', 'Api\DomainOptionController@index');
+
+    Route::get('/account-details', 'Api\AccountDetailController@index');
 });
