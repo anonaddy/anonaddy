@@ -113,7 +113,7 @@ When you delete your account the following happens:
 
 #### **Does this work with any email provider?**
 
-Yes this will work with any provider, althought I can't guarantee it won't land in spam initially.
+Yes this will work with any provider, although I can't guarantee it won't land in spam initially.
 
 #### **How do I reply to a forwarded email?**
 

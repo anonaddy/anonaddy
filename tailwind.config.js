@@ -1,4 +1,7 @@
 module.exports = {
+  future: {
+    removeDeprecatedGapUtilities: true,
+  },
   theme: {
     colors: {
       white: '#FFF',
@@ -87,7 +90,7 @@ module.exports = {
         700: '#0E7817',
         800: '#07600E',
         900: '#014807',
-      }
+      },
     },
     container: {
       center: true,
@@ -96,5 +99,5 @@ module.exports = {
   },
   plugins: [
     // Some useful comment
-  ]
+  ],
 }

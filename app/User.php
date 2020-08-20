@@ -329,16 +329,18 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $customDomains = $this->verifiedDomains()->pluck('domain')->toArray();
 
+        $allDomains = config('anonaddy.all_domains')[0] ? config('anonaddy.all_domains') : [config('anonaddy.domain')];
+
         return $this->additionalUsernames()
             ->pluck('username')
             ->push($this->username)
-            ->flatMap(function ($username) {
-                return collect(config('anonaddy.all_domains'))->map(function ($domain) use ($username) {
+            ->flatMap(function ($username) use ($allDomains) {
+                return collect($allDomains)->map(function ($domain) use ($username) {
                     return $username.'.'.$domain;
                 });
             })
             ->concat($customDomains)
-            ->concat(config('anonaddy.all_domains'))
+            ->concat($allDomains)
             ->reverse()
             ->values();
     }
