@@ -215,4 +215,20 @@ class UserTest extends TestCase
             $this->assertEquals($itemPair[0], $itemPair[1]);
         });
     }
+
+    /** @test */
+    public function user_can_match_verified_recipient_with_extension()
+    {
+        $this->user->defaultRecipient->email = 'hello+anonaddy@example.com';
+        $this->user->defaultRecipient->save();
+        $this->assertTrue($this->user->isVerifiedRecipient('hello@example.com'));
+
+        $this->user->defaultRecipient->email = 'hello+anonaddy+another@example.net';
+        $this->user->defaultRecipient->save();
+        $this->assertTrue($this->user->isVerifiedRecipient('hello@example.net'));
+
+        $this->user->defaultRecipient->email = 'hello+anonaddy@example.net';
+        $this->user->defaultRecipient->save();
+        $this->assertTrue($this->user->isVerifiedRecipient('hello+anonaddy@example.net'));
+    }
 }

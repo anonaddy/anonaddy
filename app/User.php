@@ -7,6 +7,7 @@ use App\Traits\HasUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -279,8 +280,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this
                 ->verifiedRecipients()
                 ->get()
-                ->map(function ($recipient) {
-                    return strtolower($recipient->email);
+                ->map(function ($recipient) use ($email) {
+                    if (Str::contains($email, '+')) {
+                        return strtolower($recipient->email);
+                    }
+
+                    $withoutExtension = preg_replace('/\+[\s\S]+(?=@)/', '', $recipient->email);
+                    return strtolower($withoutExtension);
                 })
                 ->contains(strtolower($email));
     }
