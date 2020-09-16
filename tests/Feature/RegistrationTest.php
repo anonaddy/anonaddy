@@ -50,8 +50,6 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_invalid_characters()
     {
-        Notification::fake();
-
         $response = $this->post('/register', [
             'username' => 'Ω',
             'email' => 'johndoe@example.com',

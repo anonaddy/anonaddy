@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Notifications\UsernameReminder;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -71,5 +73,32 @@ class LoginTest extends TestCase
         $backupCodeLogin
             ->assertRedirect('/recipients')
             ->assertSessionHasNoErrors();
+    }
+
+    /** @test */
+    public function user_can_receive_username_reminder_email()
+    {
+        Notification::fake();
+
+        $this->post('/username/email', [
+            'email' => $this->user->email
+        ]);
+
+        Notification::assertSentTo(
+            $this->user,
+            UsernameReminder::class
+        );
+    }
+
+    /** @test */
+    public function username_reminder_email_not_sent_for_unkown_email()
+    {
+        Notification::fake();
+
+        $this->post('/username/email', [
+            'email' => 'doesnotexist@example.com'
+        ]);
+
+        Notification::assertNothingSent();
     }
 }

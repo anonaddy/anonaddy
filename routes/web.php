@@ -12,6 +12,8 @@
 */
 
 Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
+Route::get('/username/reminder', 'Auth\ForgotUsernameController@show')->name('username.reminder.show');
+Route::post('/username/email', 'Auth\ForgotUsernameController@sendReminderEmail')->name('username.email');
 
 Route::post('/login/2fa', 'Auth\TwoFactorAuthController@authenticateTwoFactor')->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
 

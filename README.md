@@ -186,6 +186,10 @@ A few days before your billing cycle ends you will receive an email letting you 
 
 You will not be able to activate any of the above again until you resubscribe.
 
+#### **If I subscribe will Stripe see my real email address?**
+
+No, Stripe will instead be given an alias. This alias will only be created if Stripe sends an email to it, for example if your card payment fails or if your card has expired.
+
 #### **How do you prevent spammers?**
 
 The following is in place to help prevent spam:
