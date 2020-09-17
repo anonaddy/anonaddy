@@ -41,8 +41,8 @@ class ForgotUsernameController extends Controller
 
         $recipient = Recipient::all()->where('email', $request->email)->first();
 
-        if (isset($recipient->user)) {
-            $recipient->user->sendUsernameReminderNotification();
+        if (isset($recipient)) {
+            $recipient->sendUsernameReminderNotification();
         }
 
         return back()->with('status', 'A reminder has been sent if that email exists.');

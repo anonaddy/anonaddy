@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Notifications\UsernameReminder;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -101,6 +102,16 @@ class Recipient extends Model
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail);
+    }
+
+    /**
+     * Send the username reminder notification.
+     *
+     * @return void
+     */
+    public function sendUsernameReminderNotification()
+    {
+        $this->notify(new UsernameReminder);
     }
 
     /**

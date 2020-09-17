@@ -80,12 +80,14 @@ class LoginTest extends TestCase
     {
         Notification::fake();
 
+        $recipient = $this->user->recipients[0];
+
         $this->post('/username/email', [
-            'email' => $this->user->email
+            'email' => $recipient->email
         ]);
 
         Notification::assertSentTo(
-            $this->user,
+            $recipient,
             UsernameReminder::class
         );
     }

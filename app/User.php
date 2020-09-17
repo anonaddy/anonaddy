@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Notifications\UsernameReminder;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -216,16 +215,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function aliasesUsingDefault()
     {
         return $this->aliases()->whereDoesntHave('recipients');
-    }
-
-    /**
-     * Send the username reminder notification.
-     *
-     * @return void
-     */
-    public function sendUsernameReminderNotification()
-    {
-        $this->notify(new UsernameReminder);
     }
 
     public function hasVerifiedDefaultRecipient()

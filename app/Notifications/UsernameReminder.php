@@ -12,16 +12,6 @@ class UsernameReminder extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
@@ -43,7 +33,7 @@ class UsernameReminder extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject("AnonAddy Username Reminder")
             ->markdown('mail.username_reminder', [
-                'username' => $notifiable->username
+                'username' => $notifiable->user->username
             ])
             ->withSwiftMessage(function ($message) {
                 $message->getHeaders()
