@@ -9,7 +9,7 @@
   >
     <span
       class="toggle-background inline-block rounded-full h-full w-full shadow-inner"
-      :class="this.value ? 'bg-cyan-500' : 'bg-grey-200'"
+      :class="this.value ? 'bg-cyan-500' : 'bg-grey-300'"
     ></span>
     <span
       class="toggle-indicator absolute bg-white rounded-full shadow w-4 h-4"
