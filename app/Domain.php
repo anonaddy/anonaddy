@@ -194,27 +194,15 @@ class Domain extends Model
             ]);
         }
 
-        $dk1 = collect(dns_get_record('dk1._domainkey.' . $this->domain . '.', DNS_CNAME))
+        $def = collect(dns_get_record('default._domainkey.' . $this->domain . '.', DNS_CNAME))
             ->contains(function ($r) {
-                return $r['target'] === 'dk1._domainkey.' . config('anonaddy.domain');
+                return $r['target'] === 'default._domainkey.' . config('anonaddy.domain');
             });
 
-        if (!$dk1) {
+        if (!$def) {
             return response()->json([
                 'success' => false,
-                'message' => 'CNAME dk1._domainkey record not found. This could be due to DNS caching, please try again later.'
-            ]);
-        }
-
-        $dk2 = collect(dns_get_record('dk2._domainkey.' . $this->domain . '.', DNS_CNAME))
-            ->contains(function ($r) {
-                return $r['target'] === 'dk2._domainkey.' . config('anonaddy.domain');
-            });
-
-        if (!$dk2) {
-            return response()->json([
-                'success' => false,
-                'message' => 'CNAME dk2._domainkey record not found. This could be due to DNS caching, please try again later.'
+                'message' => 'CNAME default._domainkey record not found. This could be due to DNS caching, please try again later.'
             ]);
         }
 
