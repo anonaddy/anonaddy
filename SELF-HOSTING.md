@@ -402,7 +402,7 @@ php-fpm7.4 -v
 Install some required extensions:
 
 ```bash
-sudo apt install php7.4-common php7.4-mysql php7.4-dev php7.4-mbstring php7.4-gd php7.4-imagick php7.4-opcache php7.4-soap php7.4-zip php7.4-cli php7.4-curl php-mailparse php-gnupg -y
+sudo apt install php7.4-common php7.4-mysql php7.4-dev php7.4-mbstring php7.4-gd php7.4-imagick php7.4-opcache php7.4-soap php7.4-zip php7.4-cli php7.4-curl php-mailparse php-gnupg php-redis -y
 ```
 
 ```bash
