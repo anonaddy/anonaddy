@@ -4,9 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Ramsey\Uuid\Uuid;
-use App\Recipient;
-use App\User;
-use App\Rules\NotBlacklisted;
+use App\Models\Recipient;
+use App\Models\User;
 use App\Rules\NotDeletedUsername;
 use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
@@ -27,7 +26,7 @@ class CreateUser extends Command
      *
      * @var string
      */
-    protected $description = 'Create directly an user';
+    protected $description = 'Creates a new user';
 
     /**
      * Create a new command instance.
