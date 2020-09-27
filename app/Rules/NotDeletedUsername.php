@@ -2,7 +2,7 @@
 
 namespace App\Rules;
 
-use App\DeletedUsername;
+use App\Models\DeletedUsername;
 use Illuminate\Contracts\Validation\Rule;
 
 class NotDeletedUsername implements Rule

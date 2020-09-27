@@ -2,11 +2,11 @@
 
 namespace App\Mail;
 
-use App\Alias;
-use App\EmailData;
 use App\Helpers\AlreadyEncryptedSigner;
+use App\Models\Alias;
+use App\Models\EmailData;
+use App\Models\User;
 use App\Traits\CheckUserRules;
-use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;

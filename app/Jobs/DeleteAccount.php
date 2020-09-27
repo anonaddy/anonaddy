@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\DeletedUsername;
-use App\User;
+use App\Models\DeletedUsername;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,6 +45,7 @@ class DeleteAccount implements ShouldQueue
         $this->user->domains()->delete();
         $this->user->additionalUsernames()->get()->each->delete(); // In order to fire deleting model event.
         $this->user->tokens()->delete();
+        $this->user->rules()->delete();
         $this->user->delete();
     }
 }

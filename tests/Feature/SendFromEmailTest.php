@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Alias;
 use App\Mail\SendFromEmail;
-use App\User;
+use App\Models\Alias;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -19,7 +19,7 @@ class SendFromEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create(['username' => 'johndoe']);
+        $this->user = User::factory()->create(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
@@ -30,7 +30,7 @@ class SendFromEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $alias = factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
@@ -66,7 +66,7 @@ class SendFromEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',

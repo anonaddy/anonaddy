@@ -2,12 +2,12 @@
 
 namespace App\Mail;
 
-use App\Alias;
-use App\EmailData;
 use App\Helpers\AlreadyEncryptedSigner;
 use App\Helpers\OpenPGPSigner;
+use App\Models\Alias;
+use App\Models\EmailData;
+use App\Models\Recipient;
 use App\Notifications\GpgKeyExpired;
-use App\Recipient;
 use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

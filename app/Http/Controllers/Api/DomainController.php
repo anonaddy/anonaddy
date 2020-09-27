@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Domain;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDomainRequest;
 use App\Http\Requests\UpdateDomainRequest;
 use App\Http\Resources\DomainResource;
+use App\Models\Domain;
 
 class DomainController extends Controller
 {

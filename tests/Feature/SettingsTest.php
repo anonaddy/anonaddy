@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\AdditionalUsername;
-use App\Alias;
-use App\AliasRecipient;
-use App\DeletedUsername;
-use App\Domain;
 use App\Exports\AliasesExport;
-use App\Recipient;
-use App\User;
+use App\Models\AdditionalUsername;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\DeletedUsername;
+use App\Models\Domain;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
@@ -25,7 +25,7 @@ class SettingsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->actingAs($this->user);
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
@@ -33,7 +33,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function user_can_update_default_recipient()
     {
-        $newDefaultRecipient = factory(Recipient::class)->create([
+        $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -53,7 +53,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function user_cannot_update_to_unverified_default_recipient()
     {
-        $newDefaultRecipient = factory(Recipient::class)->create([
+        $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -221,18 +221,18 @@ class SettingsTest extends TestCase
             $this->fail('Password does not match');
         }
 
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $uuidAlias = factory(Alias::class)->create([
+        $uuidAlias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'anonaddy.me'
         ]);
         $uuidAlias->update(['local_part' => $uuidAlias->id]);
 
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -241,24 +241,24 @@ class SettingsTest extends TestCase
             'recipient' => $recipient
         ]);
 
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $aliasWithCustomDomain = factory(Alias::class)->create([
+        $aliasWithCustomDomain = Alias::factory()->create([
             'user_id' => $this->user->id,
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Domain'
+            'aliasable_type' => 'App\Models\Domain'
         ]);
 
-        $additionalUsername = factory(AdditionalUsername::class)->create([
+        $additionalUsername = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $aliasWithAdditionalUsername = factory(Alias::class)->create([
+        $aliasWithAdditionalUsername = Alias::factory()->create([
             'user_id' => $this->user->id,
             'aliasable_id' => $additionalUsername->id,
-            'aliasable_type' => 'App\AdditionaUsername'
+            'aliasable_type' => 'App\Models\AdditionaUsername'
         ]);
 
         $response = $this->post('/settings/account', [
@@ -292,14 +292,14 @@ class SettingsTest extends TestCase
             'id' => $aliasWithCustomDomain->id,
             'user_id' => $this->user->id,
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Domain'
+            'aliasable_type' => 'App\Models\Domain'
         ]);
 
         $this->assertDatabaseMissing('aliases', [
             'id' => $aliasWithAdditionalUsername->id,
             'user_id' => $this->user->id,
             'aliasable_id' => $additionalUsername->id,
-            'aliasable_type' => 'App\AdditionalUsername'
+            'aliasable_type' => 'App\Models\AdditionalUsername'
         ]);
 
         $this->assertDatabaseMissing('recipients', [
@@ -354,17 +354,17 @@ class SettingsTest extends TestCase
     {
         Excel::fake();
 
-        factory(Alias::class, 3)->create([
+        Alias::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'deleted_at' => now(),
             'active' => false
         ]);
 
-        factory(Alias::class)->create();
+        Alias::factory()->create();
 
         $this->actingAs($this->user)
             ->get('/settings/aliases/export');

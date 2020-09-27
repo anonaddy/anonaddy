@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Api;
 
-use App\Alias;
-use App\EmailData;
 use App\Mail\ForwardEmail;
-use App\Rule;
+use App\Models\Alias;
+use App\Models\EmailData;
+use App\Models\Rule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
@@ -28,7 +28,7 @@ class RulesTest extends TestCase
     public function user_can_get_all_rules()
     {
         // Arrange
-        factory(Rule::class, 3)->create([
+        Rule::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -44,7 +44,7 @@ class RulesTest extends TestCase
     public function user_can_get_individual_rule()
     {
         // Arrange
-        $rule = factory(Rule::class)->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -127,7 +127,7 @@ class RulesTest extends TestCase
     /** @test */
     public function user_can_update_rule()
     {
-        $rule = factory(Rule::class)->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
             'operator' => 'AND'
         ]);
@@ -160,7 +160,7 @@ class RulesTest extends TestCase
     /** @test */
     public function user_can_delete_rule()
     {
-        $rule = factory(Rule::class)->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -173,7 +173,7 @@ class RulesTest extends TestCase
     /** @test */
     public function user_can_activate_rule()
     {
-        $rule = factory(Rule::class)->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
             'active' => false
         ]);
@@ -189,7 +189,7 @@ class RulesTest extends TestCase
     /** @test */
     public function user_can_deactivate_rule()
     {
-        $rule = factory(Rule::class)->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
             'active' => true
         ]);
@@ -203,7 +203,7 @@ class RulesTest extends TestCase
     /** @test */
     public function it_can_apply_user_rules()
     {
-        factory(Rule::class)->create([
+        Rule::factory()->create([
             'user_id' => $this->user->id,
             'conditions' => [
                 [
@@ -237,7 +237,7 @@ class RulesTest extends TestCase
             'operator' => 'AND',
         ]);
 
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
@@ -260,7 +260,7 @@ class RulesTest extends TestCase
     /** @test */
     public function it_can_apply_user_rules_in_correct_order()
     {
-        factory(Rule::class)->create([
+        Rule::factory()->create([
             'user_id' => $this->user->id,
             'conditions' => [
                 [
@@ -281,7 +281,7 @@ class RulesTest extends TestCase
             'order' => 1
         ]);
 
-        factory(Rule::class)->create([
+        Rule::factory()->create([
             'user_id' => $this->user->id,
             'conditions' => [
                 [
@@ -315,7 +315,7 @@ class RulesTest extends TestCase
             'operator' => 'AND',
         ]);
 
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
@@ -338,17 +338,17 @@ class RulesTest extends TestCase
     /** @test */
     public function user_can_reorder_rules()
     {
-        $ruleOne = factory(Rule::class)->create([
+        $ruleOne = Rule::factory()->create([
             'user_id' => $this->user->id,
             'order' => 2
         ]);
 
-        $ruleTwo = factory(Rule::class)->create([
+        $ruleTwo = Rule::factory()->create([
             'user_id' => $this->user->id,
             'order' => 0
         ]);
 
-        $ruleThree = factory(Rule::class)->create([
+        $ruleThree = Rule::factory()->create([
             'user_id' => $this->user->id,
             'order' => 1
         ]);

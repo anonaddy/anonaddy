@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReorderRuleRequest;
-use App\Rule;
+use App\Models\Rule;
 
 class ReorderRuleController extends Controller
 {

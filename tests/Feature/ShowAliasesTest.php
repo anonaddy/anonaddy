@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Alias;
-use App\AliasRecipient;
-use App\Recipient;
-use App\User;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ class AliasesTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->actingAs($this->user);
     }
 
@@ -28,7 +28,7 @@ class AliasesTest extends TestCase
     public function user_can_view_aliases_from_the_dashboard()
     {
         // Arrange
-        $aliases = factory(Alias::class, 3)->create([
+        $aliases = Alias::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -45,15 +45,15 @@ class AliasesTest extends TestCase
     public function latest_aliases_are_listed_first()
     {
         // Arrange
-        $a = factory(Alias::class)->create([
+        $a = Alias::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(15)
         ]);
-        $b = factory(Alias::class)->create([
+        $b = Alias::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(5)
         ]);
-        $c = factory(Alias::class)->create([
+        $c = Alias::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(10)
         ]);
@@ -72,11 +72,11 @@ class AliasesTest extends TestCase
     /** @test */
     public function deleted_aliases_are_not_listed()
     {
-        factory(Alias::class, 3)->create([
+        Alias::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class, 2)->create([
+        Alias::factory()->count(2)->create([
             'user_id' => $this->user->id,
             'deleted_at' => Carbon::now()->subDays(5)
         ]);
@@ -90,11 +90,11 @@ class AliasesTest extends TestCase
     /** @test */
     public function aliases_are_listed_with_recipients()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -113,15 +113,15 @@ class AliasesTest extends TestCase
     /** @test */
     public function aliases_are_listed_with_only_verified_recipient_options()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $unverifiedRecipient = factory(Recipient::class)->create([
+        $unverifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);

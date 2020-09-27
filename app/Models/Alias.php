@@ -1,16 +1,17 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Alias extends Model
 {
-    use SoftDeletes, HasUuid, HasEncryptedAttributes;
+    use SoftDeletes, HasUuid, HasEncryptedAttributes, HasFactory;
 
     public $incrementing = false;
 
@@ -139,7 +140,7 @@ class Alias extends Model
 
     public function isCustomDomain()
     {
-        return $this->aliasable_type === 'App\Domain';
+        return $this->aliasable_type === 'App\Models\Domain';
     }
 
     public function parentDomain()

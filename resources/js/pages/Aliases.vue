@@ -263,7 +263,9 @@
             v-else-if="has(props.row.aliasable, 'default_recipient.email')"
             class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
             :data-tippy-content="props.row.aliasable.default_recipient.email"
-            >{{ props.row.aliasable_type === 'App\\Domain' ? 'domain' : 'username' }}'s</span
+            >{{
+              props.row.aliasable_type === 'App\\Models\\Domain' ? 'domain' : 'username'
+            }}'s</span
           >
           <span
             v-else

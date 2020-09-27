@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Api;
 
-use App\Recipient;
+use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -20,7 +20,7 @@ class RecipientsTest extends TestCase
     public function user_can_get_all_recipients()
     {
         // Arrange
-        factory(Recipient::class, 3)->create([
+        Recipient::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -36,7 +36,7 @@ class RecipientsTest extends TestCase
     public function user_can_get_individual_recipient()
     {
         // Arrange
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -63,7 +63,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_not_create_the_same_recipient()
     {
-        factory(Recipient::class)->create([
+        Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'johndoe@example.com'
         ]);
@@ -80,7 +80,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_not_create_the_same_recipient_in_uppercase()
     {
-        factory(Recipient::class)->create([
+        Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'johndoe@example.com'
         ]);
@@ -123,7 +123,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_delete_recipient()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -153,7 +153,7 @@ class RecipientsTest extends TestCase
         $gnupg = new \gnupg();
         $gnupg->deletekey('26A987650243B28802524E2F809FD0D502E2F695');
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -168,7 +168,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function gpg_key_must_be_correct_format()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -184,7 +184,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function gpg_key_must_be_valid()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -202,7 +202,7 @@ class RecipientsTest extends TestCase
         $gnupg = new \gnupg();
         $gnupg->import(file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc')));
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'should_encrypt' => true,
             'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
@@ -218,7 +218,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_turn_on_encryption_for_recipient()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'should_encrypt' => false,
             'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
@@ -235,7 +235,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_turn_off_encryption_for_recipient()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'should_encrypt' => true,
             'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'

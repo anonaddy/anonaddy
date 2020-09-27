@@ -2,7 +2,7 @@
 
 namespace App\Rules;
 
-use App\Recipient;
+use App\Models\Recipient;
 use Illuminate\Contracts\Validation\Rule;
 
 class UniqueRecipient implements Rule

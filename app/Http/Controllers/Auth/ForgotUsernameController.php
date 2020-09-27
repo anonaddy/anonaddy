@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Recipient;
+use App\Models\Recipient;
 use Illuminate\Http\Request;
 
 class ForgotUsernameController extends Controller

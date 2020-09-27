@@ -1,11 +1,28 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
+use App\Models\DeletedUsername;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\DeletedUsername::class, function (Faker $faker) {
-    return [
-        'username' => $faker->userName,
-    ];
-});
+class DeletedUsernameFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = DeletedUsername::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'username' => $this->faker->userName,
+        ];
+    }
+}

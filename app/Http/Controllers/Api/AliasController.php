@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\AdditionalUsername;
-use App\Domain;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
+use App\Models\AdditionalUsername;
+use App\Models\Domain;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
@@ -82,7 +82,7 @@ class AliasController extends Controller
         }
 
         $data['aliasable_id'] = $aliasable->id ?? null;
-        $data['aliasable_type'] = $aliasable ? 'App\\'.class_basename($aliasable) : null;
+        $data['aliasable_type'] = $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null;
 
         $data['domain'] = $request->domain;
         $data['description'] = $request->description;

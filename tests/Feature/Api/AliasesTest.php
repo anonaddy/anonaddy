@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Api;
 
-use App\AdditionalUsername;
-use App\Alias;
-use App\Domain;
+use App\Models\AdditionalUsername;
+use App\Models\Alias;
+use App\Models\Domain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,7 +22,7 @@ class AliasesTest extends TestCase
     public function user_can_get_all_aliases()
     {
         // Arrange
-        factory(Alias::class, 3)->create([
+        Alias::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -38,11 +38,11 @@ class AliasesTest extends TestCase
     public function user_can_get_all_aliases_including_deleted()
     {
         // Arrange
-        factory(Alias::class, 2)->create([
+        Alias::factory()->count(2)->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'deleted_at' => now()
         ]);
@@ -59,12 +59,12 @@ class AliasesTest extends TestCase
     public function user_can_get_only_deleted_aliases()
     {
         // Arrange
-        factory(Alias::class, 2)->create([
+        Alias::factory()->count(2)->create([
             'user_id' => $this->user->id,
             'deleted_at' => now()
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -80,7 +80,7 @@ class AliasesTest extends TestCase
     public function user_can_get_individual_alias()
     {
         // Arrange
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -125,12 +125,12 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_generate_new_alias_with_correct_aliasable_type()
     {
-        factory(AdditionalUsername::class)->create([
+        AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'username' => 'john'
         ]);
 
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'john.xyz',
             'domain_verified_at' => now()
@@ -143,14 +143,14 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
-        $this->assertEquals('App\Domain', $response->getData()->data->aliasable_type);
+        $this->assertEquals('App\Models\Domain', $response->getData()->data->aliasable_type);
         $this->assertEquals($domain->id, $this->user->aliases[0]->aliasable_id);
     }
 
     /** @test */
     public function user_can_update_alias_description()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -165,7 +165,7 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_delete_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -178,7 +178,7 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_restore_deleted_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'deleted_at' => now()
         ]);
@@ -192,7 +192,7 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_activate_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'active' => false
         ]);
@@ -208,7 +208,7 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_deactivate_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'active' => true
         ]);

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Api;
 
-use App\Alias;
-use App\AliasRecipient;
-use App\Recipient;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,11 +21,11 @@ class AliasRecipientsTest extends TestCase
     /** @test */
     public function user_can_attach_recipient_to_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -42,19 +42,19 @@ class AliasRecipientsTest extends TestCase
     /** @test */
     public function user_can_attach_multiple_recipients_to_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient1 = factory(Recipient::class)->create([
+        $recipient1 = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient2 = factory(Recipient::class)->create([
+        $recipient2 = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient3 = factory(Recipient::class)->create([
+        $recipient3 = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -70,11 +70,11 @@ class AliasRecipientsTest extends TestCase
     /** @test */
     public function user_can_update_existing_recipients_for_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient1 = factory(Recipient::class)->create([
+        $recipient1 = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -83,11 +83,11 @@ class AliasRecipientsTest extends TestCase
             'recipient' => $recipient1
         ]);
 
-        $recipient2 = factory(Recipient::class)->create([
+        $recipient2 = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient3 = factory(Recipient::class)->create([
+        $recipient3 = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -103,11 +103,11 @@ class AliasRecipientsTest extends TestCase
     /** @test */
     public function user_cannot_attach_unverified_recipient_to_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $unverifiedRecipient = factory(Recipient::class)->create([
+        $unverifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -124,11 +124,11 @@ class AliasRecipientsTest extends TestCase
     /** @test */
     public function user_cannot_attach_more_than_allowed_recipients_to_alias()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipients = factory(Recipient::class, 11)->create([
+        $recipients = Recipient::factory()->count(11)->create([
             'user_id' => $this->user->id
         ]);
 

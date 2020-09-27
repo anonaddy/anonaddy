@@ -1,27 +1,44 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use Faker\Generator as Faker;
+use App\Models\Rule;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(App\Rule::class, function (Faker $faker) {
-    return [
-        'name' => $faker->userName,
-        'order' => $faker->randomNumber(1),
-        'conditions' => [
-            [
-                'type' => 'sender',
-                'match' => 'is exactly',
-                'values' => [
-                    'will@anonaddy.com'
+class RuleFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Rule::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->userName,
+            'order' => $this->faker->randomNumber(1),
+            'conditions' => [
+                [
+                    'type' => 'sender',
+                    'match' => 'is exactly',
+                    'values' => [
+                        'will@anonaddy.com'
+                    ]
+                ]
+            ],
+            'actions' => [
+                [
+                    'type' => 'subject',
+                    'value' => 'New Subject!'
                 ]
             ]
-        ],
-        'actions' => [
-            [
-                'type' => 'subject',
-                'value' => 'New Subject!'
-            ]
-        ]
-    ];
-});
+        ];
+    }
+}

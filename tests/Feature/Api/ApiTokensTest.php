@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Api;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Laravel\Passport\ClientRepository;
@@ -19,7 +19,7 @@ class ApiTokensTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         Passport::actingAs($this->user, []);
         $this->user->recipients()->save($this->user->defaultRecipient);
 

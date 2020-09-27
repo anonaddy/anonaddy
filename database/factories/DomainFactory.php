@@ -1,10 +1,29 @@
 <?php
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(App\Domain::class, function (Faker $faker) {
-    return [
-        'user_id' => $faker->uuid,
-        'domain' => $faker->domainName
-    ];
-});
+use App\Models\Domain;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class DomainFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Domain::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'user_id' => $this->faker->uuid,
+            'domain' => $this->faker->domainName.$this->faker->randomNumber(3)
+        ];
+    }
+}

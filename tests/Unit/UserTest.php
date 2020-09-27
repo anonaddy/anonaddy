@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Alias;
-use App\AliasRecipient;
-use App\Recipient;
-use App\User;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,14 +19,14 @@ class UserTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
     /** @test */
     public function user_can_get_aliases_from_relationship()
     {
-        $aliases = factory(Alias::class, 10)->create([
+        $aliases = Alias::factory()->count(10)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -36,11 +36,11 @@ class UserTest extends TestCase
     /** @test */
     public function user_can_only_get_their_own_aliases_from_relationship()
     {
-        $aliases = factory(Alias::class, 5)->create([
+        $aliases = Alias::factory()->count(5)->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class, 10)->create();
+        Alias::factory()->count(10)->create();
 
         $aliases->assertEquals($this->user->aliases);
     }
@@ -48,18 +48,18 @@ class UserTest extends TestCase
     /** @test */
     public function user_can_get_total_emails_forwarded()
     {
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_forwarded' => 5
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_forwarded' => 3,
             'deleted_at' => now()
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_forwarded' => 2,
             'active' => false
@@ -71,18 +71,18 @@ class UserTest extends TestCase
     /** @test */
     public function user_can_get_total_emails_blocked()
     {
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_blocked' => 3
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_blocked' => 4,
             'deleted_at' => now()
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_blocked' => 1,
             'active' => false
@@ -94,18 +94,18 @@ class UserTest extends TestCase
     /** @test */
     public function user_can_get_total_emails_replied()
     {
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_replied' => 2
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_replied' => 4,
             'deleted_at' => now()
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_replied' => 1,
             'active' => false
@@ -117,11 +117,11 @@ class UserTest extends TestCase
     /** @test */
     public function user_can_get_aliases_using_default_recipient()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $aliasNotUsingDefault = factory(Alias::class)->create([
+        $aliasNotUsingDefault = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -130,16 +130,16 @@ class UserTest extends TestCase
             'recipient' => $recipient
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'deleted_at' => now()
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'active' => false
         ]);

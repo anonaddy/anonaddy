@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Domain;
-use App\User;
+use App\Models\Domain;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -18,14 +18,14 @@ class DomainsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->actingAs($this->user);
     }
 
     /** @test */
     public function user_can_view_domains_from_the_domains_page()
     {
-        $domains = factory(Domain::class, 3)->create([
+        $domains = Domain::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -39,15 +39,15 @@ class DomainsTest extends TestCase
     /** @test */
     public function latest_domains_are_listed_first()
     {
-        $a = factory(Domain::class)->create([
+        $a = Domain::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(15)
         ]);
-        $b = factory(Domain::class)->create([
+        $b = Domain::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(5)
         ]);
-        $c = factory(Domain::class)->create([
+        $c = Domain::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(10)
         ]);
@@ -64,7 +64,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_verify_domain_sending_records()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'example.com'
         ]);

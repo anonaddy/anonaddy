@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DeletedUsername;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAdditionalUsernameRequest;
 use App\Http\Requests\UpdateAdditionalUsernameRequest;
 use App\Http\Resources\AdditionalUsernameResource;
+use App\Models\DeletedUsername;
 
 class AdditionalUsernameController extends Controller
 {

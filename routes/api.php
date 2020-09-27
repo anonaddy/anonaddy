@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -12,7 +14,7 @@
 */
 
 Route::group([
-  'middleware' => ['verified'],
+  'middleware' => ['auth:api', 'verified'],
   'prefix' => 'v1'
 ], function () {
     Route::get('/aliases', 'Api\AliasController@index');

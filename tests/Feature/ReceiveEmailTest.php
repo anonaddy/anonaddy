@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\AdditionalUsername;
-use App\Alias;
-use App\AliasRecipient;
-use App\Domain;
 use App\Mail\ForwardEmail;
+use App\Models\AdditionalUsername;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\Domain;
+use App\Models\Recipient;
+use App\Models\User;
 use App\Notifications\NearBandwidthLimit;
-use App\Recipient;
-use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
@@ -26,7 +26,7 @@ class ReceiveEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create(['username' => 'johndoe']);
+        $this->user = User::factory()->create(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
@@ -218,7 +218,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
@@ -265,7 +265,7 @@ class ReceiveEmailTest extends TestCase
             'anonaddy.admin_username' => 'random'
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'id' => $uuid,
             'user_id' => $this->user->id,
             'email' => $uuid.'@anonaddy.me',
@@ -315,7 +315,7 @@ class ReceiveEmailTest extends TestCase
             'anonaddy.admin_username' => 'random'
         ]);
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => $localPart.'@anonaddy.me',
             'local_part' => $localPart,
@@ -358,19 +358,19 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'one@example.com'
         ]);
 
-        $recipient2 = factory(Recipient::class)->create([
+        $recipient2 = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'two@example.com'
         ]);
@@ -419,12 +419,12 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'one@example.com'
         ]);
 
-        $recipient2 = factory(Recipient::class)->create([
+        $recipient2 = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'two@example.com'
         ]);
@@ -464,13 +464,13 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        factory(Recipient::class)->create([
+        Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'one@example.com',
             'email_verified_at' => null
         ]);
 
-        $verifiedRecipient = factory(Recipient::class)->create([
+        $verifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'two@example.com'
         ]);
@@ -541,7 +541,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
@@ -549,7 +549,7 @@ class ReceiveEmailTest extends TestCase
             'domain' => 'johndoe.'.config('anonaddy.domain')
         ]);
 
-        factory(Recipient::class)->create([
+        Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'will@anonaddy.com'
         ]);
@@ -593,7 +593,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
@@ -601,7 +601,7 @@ class ReceiveEmailTest extends TestCase
             'domain' => 'johndoe.'.config('anonaddy.domain')
         ]);
 
-        factory(Recipient::class)->create([
+        Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'will@anonaddy.com'
         ]);
@@ -652,7 +652,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
@@ -735,7 +735,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'example.com',
             'domain_verified_at' => now()
@@ -756,7 +756,7 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Domain',
+            'aliasable_type' => 'App\Models\Domain',
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
@@ -777,7 +777,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'example.com',
             'domain_verified_at' => now(),
@@ -799,7 +799,7 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Domain',
+            'aliasable_type' => 'App\Models\Domain',
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
@@ -820,7 +820,7 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $additionalUsername = factory(AdditionalUsername::class)->create([
+        $additionalUsername = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'username' => 'janedoe'
         ]);
@@ -840,7 +840,7 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'aliasable_id' => $additionalUsername->id,
-            'aliasable_type' => 'App\AdditionalUsername',
+            'aliasable_type' => 'App\Models\AdditionalUsername',
             'email' => 'ebay@janedoe.anonaddy.com',
             'local_part' => 'ebay',
             'domain' => 'janedoe.anonaddy.com',
@@ -974,11 +974,11 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'default_recipient_id' => $recipient->id,
             'domain' => 'example.com',
@@ -1000,7 +1000,7 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Domain',
+            'aliasable_type' => 'App\Models\Domain',
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
@@ -1021,11 +1021,11 @@ class ReceiveEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $additionalUsername = factory(AdditionalUsername::class)->create([
+        $additionalUsername = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'default_recipient_id' => $recipient->id,
             'username' => 'janedoe'
@@ -1046,7 +1046,7 @@ class ReceiveEmailTest extends TestCase
 
         $this->assertDatabaseHas('aliases', [
             'aliasable_id' => $additionalUsername->id,
-            'aliasable_type' => 'App\AdditionalUsername',
+            'aliasable_type' => 'App\Models\AdditionalUsername',
             'email' => 'ebay@janedoe.anonaddy.com',
             'local_part' => 'ebay',
             'domain' => 'janedoe.anonaddy.com',

@@ -2,19 +2,18 @@
 
 namespace App\Console\Commands;
 
-use App\AdditionalUsername;
-use App\Alias;
-use App\Domain;
-use App\EmailData;
 use App\Mail\ForwardEmail;
 use App\Mail\ReplyToEmail;
 use App\Mail\SendFromEmail;
+use App\Models\AdditionalUsername;
+use App\Models\Alias;
+use App\Models\Domain;
+use App\Models\EmailData;
+use App\Models\User;
 use App\Notifications\NearBandwidthLimit;
-use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
 
@@ -177,7 +176,7 @@ class ReceiveEmail extends Command
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
             'aliasable_id' => $aliasable->id ?? null,
-            'aliasable_type' => $aliasable ? 'App\\'.class_basename($aliasable) : null
+            'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null
         ]);
 
         // This is a new alias but at a shared domain or the sender is not a verified recipient.
@@ -204,7 +203,7 @@ class ReceiveEmail extends Command
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
             'aliasable_id' => $aliasable->id ?? null,
-            'aliasable_type' => $aliasable ? 'App\\'.class_basename($aliasable) : null
+            'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null
         ]);
 
         if (!isset($alias->id)) {
@@ -266,7 +265,7 @@ class ReceiveEmail extends Command
 
     protected function checkRateLimit($user)
     {
-        Redis::throttle("user:{$user->username}:limit:emails")
+        \Illuminate\Support\Facades\Redis::throttle("user:{$user->username}:limit:emails")
             ->allow(config('anonaddy.limit'))
             ->every(3600)
             ->then(

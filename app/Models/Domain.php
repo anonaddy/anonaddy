@@ -1,16 +1,17 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Http\Resources\DomainResource;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 
 class Domain extends Model
 {
-    use HasUuid, HasEncryptedAttributes;
+    use HasUuid, HasEncryptedAttributes, HasFactory;
 
     public $incrementing = false;
 

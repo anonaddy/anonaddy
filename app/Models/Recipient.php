@@ -1,18 +1,19 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Notifications\UsernameReminder;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Notifications\Notifiable;
 
 class Recipient extends Model
 {
-    use Notifiable, HasUuid, HasEncryptedAttributes;
+    use Notifiable, HasUuid, HasEncryptedAttributes, HasFactory;
 
     public $incrementing = false;
 

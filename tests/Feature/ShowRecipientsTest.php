@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Alias;
-use App\AliasRecipient;
-use App\Recipient;
-use App\User;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -24,14 +24,14 @@ class RecipientsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->actingAs($this->user);
     }
 
     /** @test */
     public function user_can_view_recipients_from_the_recipients_page()
     {
-        $recipients = factory(Recipient::class, 5)->create([
+        $recipients = Recipient::factory()->count(5)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -45,15 +45,15 @@ class RecipientsTest extends TestCase
     /** @test */
     public function latest_recipients_are_listed_first()
     {
-        $a = factory(Recipient::class)->create([
+        $a = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(15)
         ]);
-        $b = factory(Recipient::class)->create([
+        $b = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(5)
         ]);
-        $c = factory(Recipient::class)->create([
+        $c = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(10)
         ]);
@@ -70,11 +70,11 @@ class RecipientsTest extends TestCase
     /** @test */
     public function recipients_are_listed_with_aliases_count()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        factory(Alias::class, 3)->create(['user_id' => $this->user->id])
+        Alias::factory()->count(3)->create(['user_id' => $this->user->id])
         ->each(function ($alias) use ($recipient) {
             AliasRecipient::create([
                 'alias' => $alias,
@@ -96,7 +96,7 @@ class RecipientsTest extends TestCase
 
         Notification::assertNothingSent();
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -116,7 +116,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_verify_recipient_email_successfully()
     {
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -148,7 +148,7 @@ class RecipientsTest extends TestCase
 
         Notification::assertNothingSent();
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);

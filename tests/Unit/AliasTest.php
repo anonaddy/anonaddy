@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Alias;
-use App\AliasRecipient;
-use App\Recipient;
-use App\User;
+use App\Models\Alias;
+use App\Models\AliasRecipient;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,22 +19,22 @@ class AliasTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
     /** @test */
     public function alias_can_get_verified_recipients()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $verifiedRecipient = factory(Recipient::class)->create([
+        $verifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $unverifiedRecipient = factory(Recipient::class)->create([
+        $unverifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -57,11 +57,11 @@ class AliasTest extends TestCase
     /** @test */
     public function alias_can_set_default_recipient_email()
     {
-        factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'default@example.com'
         ]);
@@ -75,11 +75,11 @@ class AliasTest extends TestCase
     /** @test */
     public function alias_can_get_default_recipient_email()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'default@example.com'
         ]);
@@ -97,39 +97,39 @@ class AliasTest extends TestCase
     /** @test */
     public function alias_can_get_verified_recipients_or_default()
     {
-        $alias = factory(Alias::class)->create([
+        $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $recipientOne = factory(Recipient::class)->create([
+        $recipientOne = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'one@example.com',
             'should_encrypt' => true,
             'fingerprint' => 'ABCDE'
         ]);
 
-        $recipientTwo = factory(Recipient::class)->create([
+        $recipientTwo = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'two@example.com',
             'should_encrypt' => true,
             'fingerprint' => 'ABCDE'
         ]);
 
-        $recipientThree = factory(Recipient::class)->create([
+        $recipientThree = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'three@example.com',
             'should_encrypt' => false,
             'fingerprint' => 'ABCDE'
         ]);
 
-        $recipientFour = factory(Recipient::class)->create([
+        $recipientFour = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'four@example.com',
             'should_encrypt' => true,
             'fingerprint' => null
         ]);
 
-        $recipientFive = factory(Recipient::class)->create([
+        $recipientFive = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'five@example.com',
             'should_encrypt' => false,

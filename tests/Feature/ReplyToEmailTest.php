@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Alias;
 use App\Mail\ReplyToEmail;
-use App\Recipient;
-use App\User;
+use App\Models\Alias;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ class ReplyToEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create(['username' => 'johndoe']);
+        $this->user = User::factory()->create(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
@@ -31,7 +31,7 @@ class ReplyToEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $alias = factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
@@ -67,14 +67,14 @@ class ReplyToEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $alias = factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
         ]);
 
-        $recipient = factory(Recipient::class)->create([
+        $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -108,7 +108,7 @@ class ReplyToEmailTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $alias = factory(Alias::class)->create([
+        Alias::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',

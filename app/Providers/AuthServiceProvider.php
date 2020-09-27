@@ -13,7 +13,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -28,8 +28,6 @@ class AuthServiceProvider extends ServiceProvider
         Passport::routes(function ($router) {
             $router->forPersonalAccessTokens();
         }, ['middleware' => ['web', 'auth', '2fa']]);
-
-        Passport::personalAccessClientId(1);
 
         Passport::cookie('anonaddy_token');
     }

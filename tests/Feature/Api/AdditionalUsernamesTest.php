@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Api;
 
-use App\AdditionalUsername;
-use App\DeletedUsername;
-use App\Recipient;
-use App\User;
+use App\Models\AdditionalUsername;
+use App\Models\DeletedUsername;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,7 +23,7 @@ class AdditionalUsernamesTest extends TestCase
     public function user_can_get_all_additional_usernames()
     {
         // Arrange
-        factory(AdditionalUsername::class, 3)->create([
+        AdditionalUsername::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -39,7 +39,7 @@ class AdditionalUsernamesTest extends TestCase
     public function user_can_get_individual_additional_username()
     {
         // Arrange
-        $username = factory(AdditionalUsername::class)->create([
+        $username = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -91,7 +91,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_not_create_the_same_username()
     {
-        factory(AdditionalUsername::class)->create([
+        AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'username' => 'janedoe'
         ]);
@@ -108,7 +108,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_not_create_additional_username_that_has_been_deleted()
     {
-        factory(DeletedUsername::class)->create([
+        DeletedUsername::factory()->create([
             'username' => 'janedoe'
         ]);
 
@@ -124,7 +124,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function must_be_unique_across_users_and_additional_usernames_tables()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
         $response = $this->json('POST', '/api/v1/usernames', [
             'username' => $user->username
@@ -162,7 +162,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_activate_additional_username()
     {
-        $username = factory(AdditionalUsername::class)->create([
+        $username = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'active' => false
         ]);
@@ -178,7 +178,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_deactivate_additional_username()
     {
-        $username = factory(AdditionalUsername::class)->create([
+        $username = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'active' => true
         ]);
@@ -192,7 +192,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_update_additional_usernames_description()
     {
-        $username = factory(AdditionalUsername::class)->create([
+        $username = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -207,7 +207,7 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_delete_additional_username()
     {
-        $username = factory(AdditionalUsername::class)->create([
+        $username = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -222,11 +222,11 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_update_additional_username_default_recipient()
     {
-        $additionalUsername = factory(AdditionalUsername::class)->create([
+        $additionalUsername = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $newDefaultRecipient = factory(Recipient::class)->create([
+        $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -246,11 +246,11 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_cannot_update_additional_username_default_recipient_with_unverified_recipient()
     {
-        $additionalUsername = factory(AdditionalUsername::class)->create([
+        $additionalUsername = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $newDefaultRecipient = factory(Recipient::class)->create([
+        $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -269,11 +269,11 @@ class AdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_remove_additional_username_default_recipient()
     {
-        $defaultRecipient = factory(Recipient::class)->create([
+        $defaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $additionalUsername = factory(AdditionalUsername::class)->create([
+        $additionalUsername = AdditionalUsername::factory()->create([
             'user_id' => $this->user->id,
             'default_recipient_id' => $defaultRecipient->id
         ]);

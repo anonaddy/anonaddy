@@ -1,13 +1,14 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Traits\HasEncryptedAttributes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DeletedUsername extends Model
 {
-    use HasEncryptedAttributes;
+    use HasEncryptedAttributes, HasFactory;
 
     public $incrementing = false;
 

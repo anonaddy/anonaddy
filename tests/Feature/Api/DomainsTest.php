@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Api;
 
-use App\Domain;
-use App\Recipient;
+use App\Models\Domain;
+use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,7 +21,7 @@ class DomainsTest extends TestCase
     public function user_can_get_all_domains()
     {
         // Arrange
-        factory(Domain::class, 3)->create([
+        Domain::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -37,7 +37,7 @@ class DomainsTest extends TestCase
     public function user_can_get_individual_domain()
     {
         // Arrange
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -64,7 +64,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_not_create_the_same_domain()
     {
-        factory(Domain::class)->create([
+        Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'example.com'
         ]);
@@ -129,7 +129,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_activate_domain()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'active' => false
         ]);
@@ -145,7 +145,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_deactivate_domain()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'active' => true
         ]);
@@ -159,7 +159,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_update_domain_description()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -174,7 +174,7 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_delete_domain()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -187,12 +187,12 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_update_domain_default_recipient()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain_verified_at' => now()
         ]);
 
-        $newDefaultRecipient = factory(Recipient::class)->create([
+        $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
@@ -212,12 +212,12 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_cannot_update_domain_default_recipient_with_unverified_recipient()
     {
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain_verified_at' => now()
         ]);
 
-        $newDefaultRecipient = factory(Recipient::class)->create([
+        $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email_verified_at' => null
         ]);
@@ -236,11 +236,11 @@ class DomainsTest extends TestCase
     /** @test */
     public function user_can_remove_domain_default_recipient()
     {
-        $defaultRecipient = factory(Recipient::class)->create([
+        $defaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $domain = factory(Domain::class)->create([
+        $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'default_recipient_id' => $defaultRecipient->id,
             'domain_verified_at' => now(),

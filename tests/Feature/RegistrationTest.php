@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\AdditionalUsername;
-use App\DeletedUsername;
-use App\Recipient;
-use App\User;
+use App\Models\AdditionalUsername;
+use App\Models\DeletedUsername;
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -68,7 +68,7 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_can_verify_email_successfully()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->email_verified_at = null;
         $user->save();
 
@@ -129,9 +129,9 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_email()
     {
-        $user = factory(User::class)->create(['username' => 'johndoe']);
+        $user = User::factory()->create(['username' => 'johndoe']);
 
-        factory(Recipient::class)->create([
+        Recipient::factory()->create([
             'user_id' => $user->id,
             'email' => 'johndoe@example.com'
         ]);
@@ -150,7 +150,7 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_username()
     {
-        factory(User::class)->create(['username' => 'johndoe']);
+        User::factory()->create(['username' => 'johndoe']);
 
         $response = $this->post('/register', [
             'username' => 'johndoe',
@@ -166,7 +166,7 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_additional_username()
     {
-        factory(AdditionalUsername::class)->create(['username' => 'johndoe']);
+        AdditionalUsername::factory()->create(['username' => 'johndoe']);
 
         $response = $this->post('/register', [
             'username' => 'johndoe',

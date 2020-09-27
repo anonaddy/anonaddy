@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +43,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUpPassport(): void
     {
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         Passport::actingAs($this->user, []);
 
         $clientRepository = new ClientRepository();
