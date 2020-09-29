@@ -52,7 +52,7 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->alias = $alias;
         $this->sender = $emailData->sender;
         $this->displayFrom = $emailData->display_from;
-        $this->replyToAddress = $emailData->reply_to_address ?? null;
+        $this->replyToAddress = $emailData->reply_to_address ?? $this->sender;
         $this->emailSubject = $emailData->subject;
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
@@ -88,16 +88,18 @@ class ForwardEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $replyToEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->sender) . '@' . $this->alias->domain;
+        $replyToEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
 
         if ($this->alias->isCustomDomain()) {
             if ($this->alias->aliasable->isVerifiedForSending()) {
                 $this->fromEmail = $this->alias->email;
                 $returnPath = $this->alias->email;
 
-                $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
-                $this->dkimSigner->ignoreHeader('List-Unsubscribe');
-                $this->dkimSigner->ignoreHeader('Return-Path');
+                if (config('anonaddy.dkim_signing_key')) {
+                    $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
+                    $this->dkimSigner->ignoreHeader('List-Unsubscribe');
+                    $this->dkimSigner->ignoreHeader('Return-Path');
+                }
             } else {
                 $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');

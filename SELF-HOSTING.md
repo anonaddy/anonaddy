@@ -674,7 +674,7 @@ Make sure to update the database settings and the AnonAddy variables, you can us
 
 `APP_KEY` will be generted in the next step, this is used by Laravel for securely encrypting values.
 
-For more information on Laravel configuration please visit - https://laravel.com/docs/6.x/installation#configuration
+For more information on Laravel configuration please visit - https://laravel.com/docs/8.x/installation#configuration
 
 For the `ANONADDY_DKIM_SIGNING_KEY` you only need to fill in this variable if you plan to add any custom domains through the web application.
 
@@ -687,6 +687,10 @@ If you want to use the same key we already generated then you will need to add `
 ```
 sudo usermod -a -G opendkim johndoe
 ```
+
+Make sure to also run `sudo chmod g+r /path/to/dkim/private/key` so that your johndoe user has read permsissions for the file.
+
+You can test it by running `cat /path/to/dkim/private/key` as the johndoe user to see if it can be displayed.
 
 Then we will generate an app key, migrate the database, link the storage directory, restart the queue and install laravel passport.
 
@@ -860,6 +864,25 @@ Update `/etc/spamassassin/local.cf` and add this near the top:
 dns_available yes
 ```
 
+
+## Updating
+
+In order to update you can run the following commands:
+
+```bash
+git pull origin master
+
+composer update
+npm update
+php artisan migrate
+
+php artisan config:cache
+php artisan view:cache
+php artisan route:cache
+php artisan queue:restart
+```
+
+This should pull in any updates from the GitHub repository and update your dependencies. It will then run any migrations before finally clearing the cache and restarting the queue workers.
 
 ## Adding DNSSEC
 

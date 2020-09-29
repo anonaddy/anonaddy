@@ -62,8 +62,10 @@ class SendFromEmail extends Mailable implements ShouldQueue
                 $this->fromEmail = $this->alias->email;
                 $returnPath = $this->alias->email;
 
-                $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
-                $this->dkimSigner->ignoreHeader('Return-Path');
+                if (config('anonaddy.dkim_signing_key')) {
+                    $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
+                    $this->dkimSigner->ignoreHeader('Return-Path');
+                }
             } else {
                 $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');

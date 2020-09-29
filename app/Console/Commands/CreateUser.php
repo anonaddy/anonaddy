@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Ramsey\Uuid\Uuid;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Rules\NotDeletedUsername;
 use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Ramsey\Uuid\Uuid;
 
 class CreateUser extends Command
 {
@@ -90,7 +90,7 @@ class CreateUser extends Command
         ]);
 
         $this->info('Created user: '.$user->username.' with userid: '.$user->id);
-        $this->info('This user can now reset their password (default password is userid)');
+        $this->info('This user can now reset their password (the default password is their guserid)');
 
         return 0;
     }
