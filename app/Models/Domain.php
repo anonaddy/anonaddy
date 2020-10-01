@@ -46,7 +46,7 @@ class Domain extends Model
         parent::boot();
 
         Domain::deleting(function ($domain) {
-            $domain->aliases()->delete();
+            $domain->aliases()->withTrashed()->forceDelete();
         });
     }
 

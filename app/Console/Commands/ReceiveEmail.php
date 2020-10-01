@@ -175,9 +175,14 @@ class ReceiveEmail extends Command
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
-            'aliasable_id' => $aliasable->id ?? null,
-            'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null
+            'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
         ]);
+
+        $aliasableId = $aliasable->id ?? null;
+
+        if ($alias->aliasable_id !== $aliasableId) {
+            $alias->aliasable_id = $aliasableId;
+        }
 
         // This is a new alias but at a shared domain or the sender is not a verified recipient.
         if (!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) {
@@ -202,9 +207,14 @@ class ReceiveEmail extends Command
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
-            'aliasable_id' => $aliasable->id ?? null,
-            'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null
+            'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
         ]);
+
+        $aliasableId = $aliasable->id ?? null;
+
+        if ($alias->aliasable_id !== $aliasableId) {
+            $alias->aliasable_id = $aliasableId;
+        }
 
         if (!isset($alias->id)) {
             // This is a new alias.

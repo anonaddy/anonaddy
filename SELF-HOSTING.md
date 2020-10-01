@@ -688,7 +688,7 @@ If you want to use the same key we already generated then you will need to add `
 sudo usermod -a -G opendkim johndoe
 ```
 
-Make sure to also run `sudo chmod g+r /path/to/dkim/private/key` so that your johndoe user has read permsissions for the file.
+Make sure to also run `sudo chmod g+r /path/to/dkim/private/key` so that your johndoe user has read permissions for the file.
 
 You can test it by running `cat /path/to/dkim/private/key` as the johndoe user to see if it can be displayed.
 
@@ -704,7 +704,7 @@ php artisan view:cache
 php artisan route:cache
 php artisan queue:restart
 
-php artisan passport:install
+php artisan passport:install --uuids
 ```
 
 ## Installing Supervisor

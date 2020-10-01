@@ -771,6 +771,67 @@ class ReceiveEmailTest extends TestCase
     }
 
     /** @test */
+    public function it_can_update_incorrect_aliasable_id_for_custom_domain()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        Subscription::factory()->create(['user_id' => $this->user->id]);
+
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'domain' => 'example.com',
+            'domain_verified_at' => now()
+        ]);
+
+        $domain->delete();
+
+        Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'aliasable_id' => $domain->id,
+            'aliasable_type' => 'App\Models\Domain',
+            'email' => 'ebay@example.com',
+            'local_part' => 'ebay',
+            'domain' => 'example.com',
+        ]);
+
+        $newDomain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'domain' => 'example.com',
+            'domain_verified_at' => now()
+        ]);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_custom_domain.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@example.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [''],
+                '--domain' => ['example.com'],
+                '--size' => '871'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'aliasable_id' => $newDomain->id,
+            'aliasable_type' => 'App\Models\Domain',
+            'email' => 'ebay@example.com',
+            'local_part' => 'ebay',
+            'domain' => 'example.com',
+            'emails_blocked' => 0
+        ]);
+
+        $this->assertEquals(1, $this->user->aliases()->count());
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) {
+            return $mail->hasTo($this->user->email);
+        });
+    }
+
+    /** @test */
     public function it_can_forward_email_for_custom_domain_with_verified_sending()
     {
         Mail::fake();
