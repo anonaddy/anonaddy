@@ -74,6 +74,22 @@ class Recipient extends Model
     }
 
     /**
+     * Get all of the user's custom domains.
+     */
+    public function domainsUsingAsDefault()
+    {
+        return $this->hasMany(Domain::class, 'default_recipient_id', 'id');
+    }
+
+    /**
+     * Get all of the user's custom domains.
+     */
+    public function additionalUsernamesUsingAsDefault()
+    {
+        return $this->hasMany(AdditionalUsername::class, 'default_recipient_id', 'id');
+    }
+
+    /**
      * Determine if the recipient has a verified email address.
      *
      * @return bool

@@ -133,7 +133,7 @@
           </div>
         </span>
         <span v-else-if="props.column.field === 'aliases_count'">
-          {{ props.row.aliases.length }}
+          {{ props.row.aliases_count }}
         </span>
         <span v-else-if="props.column.field === 'active'" class="flex items-center">
           <Toggle

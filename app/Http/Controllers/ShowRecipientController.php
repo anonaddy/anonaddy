@@ -6,7 +6,27 @@ class ShowRecipientController extends Controller
 {
     public function index()
     {
-        $recipients = user()->recipients()->with('aliases')->latest()->get();
+        $recipients = user()->recipients()->with([
+            'aliases:alias_id,aliasable_id,email',
+            'domainsUsingAsDefault.aliases:id,aliasable_id,email',
+            'AdditionalUsernamesUsingAsDefault.aliases:id,aliasable_id,email'
+        ])->latest()->get();
+
+        $recipients->each(function ($recipient) {
+            if ($recipient->domainsUsingAsDefault) {
+                $domainAliases = $recipient->domainsUsingAsDefault->flatMap(function ($domain) {
+                    return $domain->aliases;
+                });
+                $recipient->setRelation('aliases', $recipient->aliases->concat($domainAliases)->unique('email'));
+            }
+
+            if ($recipient->AdditionalUsernamesUsingAsDefault) {
+                $AdditionalUsernameAliases = $recipient->AdditionalUsernamesUsingAsDefault->flatMap(function ($domain) {
+                    return $domain->aliases;
+                });
+                $recipient->setRelation('aliases', $recipient->aliases->concat($AdditionalUsernameAliases)->unique('email'));
+            }
+        });
 
         $count = $recipients->count();
 
@@ -16,7 +36,8 @@ class ShowRecipientController extends Controller
 
         return view('recipients.index', [
             'recipients' => $recipients,
-            'aliasesUsingDefault' => user()->aliasesUsingDefault
+            'aliasesUsingDefault' => user()->aliasesUsingDefault()->take(5)->get(),
+            'aliasesUsingDefaultCount' => user()->aliasesUsingDefault()->count(),
         ]);
     }
 }

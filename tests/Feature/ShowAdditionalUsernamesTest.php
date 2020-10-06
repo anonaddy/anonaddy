@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class AdditionalUsernamesTest extends TestCase
+class ShowAdditionalUsernamesTest extends TestCase
 {
     use RefreshDatabase;
 

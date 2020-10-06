@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class DomainsTest extends TestCase
+class ShowDomainsTest extends TestCase
 {
     use RefreshDatabase;
 

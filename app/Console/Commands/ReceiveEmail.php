@@ -74,45 +74,51 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $recipient) {
-                $parentDomain = collect(config('anonaddy.all_domains'))
+
+                // First determine if the alias already exists in the database
+                if ($alias = Alias::where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first()) {
+                    $user = $alias->user;
+
+                    if ($alias->aliasable_id) {
+                        $aliasable = $alias->aliasable;
+                    }
+                } else {
+                    // Does not exist, must be a standard, additional username or custom domain alias
+                    $parentDomain = collect(config('anonaddy.all_domains'))
                     ->filter(function ($name) use ($recipient) {
                         return Str::endsWith($recipient['domain'], $name);
                     })
                     ->first();
 
-                if ($parentDomain) {
-                    $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain));
+                    if (!empty($parentDomain)) {
+                        // It is standard or additional username alias
+                        $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.' . $parentDomain)); // e.g. johndoe
 
-                    if ($subdomain === 'unsubscribe') {
-                        $this->handleUnsubscribe($recipient);
-                        continue;
-                    }
-
-                    // Check if this is an additional username.
-                    if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
-                        $user = $additionalUsername->user;
-                        $aliasable = $additionalUsername;
-                    } else {
-                        $user = User::where('username', $subdomain)->first();
-                    }
-                }
-
-                if (!isset($user)) {
-                    // Check if this is a custom domain.
-                    if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
-                        $user = $customDomain->user;
-                        $aliasable = $customDomain;
-                    }
-
-                    // check if this is a uuid generated alias
-                    if ($alias = Alias::find($recipient['local_part'])) {
-                        $user = $alias->user;
-                    } elseif ($recipient['domain'] === $parentDomain) {
-                        if ($alias = Alias::where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first()) {
-                            $user = $alias->user;
-                        } elseif (!empty(config('anonaddy.admin_username'))) {
-                            $user = User::where('username', config('anonaddy.admin_username'))->first();
+                        if ($subdomain === 'unsubscribe') {
+                            $this->handleUnsubscribe($recipient);
+                            continue;
                         }
+
+                        // Check if this is an additional username or standard alias
+                        if (!empty($subdomain)) {
+                            $user = User::where('username', $subdomain)->first();
+
+                            if (!isset($user)) {
+                                $additionalUsername = AdditionalUsername::where('username', $subdomain)->first();
+                                $user = $additionalUsername->user;
+                                $aliasable = $additionalUsername;
+                            }
+                        }
+                    } else {
+                        // It is a custom domain
+                        if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
+                            $user = $customDomain->user;
+                            $aliasable = $customDomain;
+                        }
+                    }
+
+                    if (!isset($user) && !empty(config('anonaddy.admin_username'))) {
+                        $user = User::where('username', config('anonaddy.admin_username'))->first();
                     }
                 }
 
@@ -175,14 +181,9 @@ class ReceiveEmail extends Command
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
+            'aliasable_id' => $aliasable->id ?? null,
             'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
         ]);
-
-        $aliasableId = $aliasable->id ?? null;
-
-        if ($alias->aliasable_id !== $aliasableId) {
-            $alias->aliasable_id = $aliasableId;
-        }
 
         // This is a new alias but at a shared domain or the sender is not a verified recipient.
         if (!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) {
@@ -207,14 +208,9 @@ class ReceiveEmail extends Command
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
+            'aliasable_id' => $aliasable->id ?? null,
             'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
         ]);
-
-        $aliasableId = $aliasable->id ?? null;
-
-        if ($alias->aliasable_id !== $aliasableId) {
-            $alias->aliasable_id = $aliasableId;
-        }
 
         if (!isset($alias->id)) {
             // This is a new alias.

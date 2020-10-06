@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Domain;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -101,6 +102,36 @@ class RecipientsTest extends TestCase
 
         $response = $this->json('POST', '/api/v1/recipients', [
             'email' => $this->user->email
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('email');
+    }
+
+    /** @test */
+    public function user_can_not_create_recipient_with_local_domain()
+    {
+        $response = $this->json('POST', '/api/v1/recipients', [
+            'email' => 'johndoe@anonaddy.com'
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('email');
+    }
+
+    /** @test */
+    public function user_can_not_create_recipient_with_local_custom_domain()
+    {
+        Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'domain' => 'example.com',
+            'domain_verified_at' => now()
+        ]);
+
+        $response = $this->json('POST', '/api/v1/recipients', [
+            'email' => 'johndoe@example.com'
         ]);
 
         $response

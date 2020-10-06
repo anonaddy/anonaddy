@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
-class RecipientsTest extends TestCase
+class ShowRecipientsTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -31,6 +31,7 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_view_recipients_from_the_recipients_page()
     {
+        $this->withoutExceptionHandling();
         $recipients = Recipient::factory()->count(5)->create([
             'user_id' => $this->user->id
         ]);

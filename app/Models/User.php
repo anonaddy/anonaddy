@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -215,7 +216,15 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function aliasesUsingDefault()
     {
-        return $this->aliases()->whereDoesntHave('recipients');
+        return $this->aliases()->whereDoesntHave('recipients')->where(function (Builder $q) {
+            return $q->whereDoesntHaveMorph(
+                'aliasable',
+                ['App\Models\Domain', 'App\Models\AdditionalUsername'],
+                function (Builder $query) {
+                    $query->whereNotNull('default_recipient_id');
+                }
+            )->orWhereNull('aliasable_id');
+        });
     }
 
     public function hasVerifiedDefaultRecipient()

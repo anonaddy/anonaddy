@@ -102,9 +102,15 @@
           <span
             v-if="props.row.aliases.length"
             class="tooltip outline-none"
-            :data-tippy-content="aliasesTooltip(props.row.aliases)"
+            :data-tippy-content="aliasesTooltip(props.row.aliases, isDefault(props.row.id))"
             >{{ props.row.aliases[0].email | truncate(40) }}
-            <span v-if="props.row.aliases.length > 1" class="block text-grey-500 text-sm">
+            <span
+              v-if="isDefault(props.row.id) && aliasesUsingDefaultCount > 1"
+              class="block text-grey-500 text-sm"
+            >
+              + {{ aliasesUsingDefaultCount - 1 }}</span
+            >
+            <span v-else-if="props.row.aliases.length > 1" class="block text-grey-500 text-sm">
               + {{ props.row.aliases.length - 1 }}</span
             >
           </span>
@@ -338,6 +344,10 @@ export default {
       type: Array,
       required: true,
     },
+    aliasesUsingDefaultCount: {
+      type: Number,
+      required: true,
+    },
     domain: {
       type: String,
       required: true,
@@ -431,8 +441,13 @@ export default {
     debounceToolips: _.debounce(function() {
       this.addTooltips()
     }, 50),
-    aliasesTooltip(aliases) {
-      return _.reduce(aliases, (list, alias) => list + `${alias.email}<br>`, '')
+    aliasesTooltip(aliases, isDefault) {
+      let ellipses =
+        aliases.length > 5 || (isDefault && this.aliasesUsingDefaultCount > 5) ? '...' : ''
+
+      return (
+        _.reduce(_.take(aliases, 5), (list, alias) => list + `${alias.email}<br>`, '') + ellipses
+      )
     },
     isDefault(id) {
       return this.user.default_recipient_id === id

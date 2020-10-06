@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class AliasesTest extends TestCase
+class ShowAliasesTest extends TestCase
 {
     use RefreshDatabase;
 

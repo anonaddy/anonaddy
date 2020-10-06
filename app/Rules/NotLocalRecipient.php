@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\Domain;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Str;
 
@@ -28,7 +29,11 @@ class NotLocalRecipient implements Rule
     {
         $emailDomain = Str::afterLast($value, '@');
 
+        // Make sure the recipient domain is not added as a verified custom domain
+        $customDomains = Domain::whereNotNull('domain_verified_at')->pluck('domain');
+
         $count = collect(config('anonaddy.all_domains'))
+            ->concat($customDomains)
             ->filter(function ($domain) use ($emailDomain) {
                 return Str::endsWith(strtolower($emailDomain), $domain);
             })
@@ -44,6 +49,6 @@ class NotLocalRecipient implements Rule
      */
     public function message()
     {
-        return 'The recipient cannot be a local one or alias.';
+        return 'The recipient cannot use a local domain or be an alias.';
     }
 }
