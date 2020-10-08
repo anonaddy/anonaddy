@@ -564,7 +564,7 @@ user = anonaddy
 password = your-database-password
 hosts = 127.0.0.1
 dbname = anonaddy_database
-query = SELECT (SELECT 'DISCARD' FROM additional_usernames WHERE (CONCAT(username, '.example.com') = SUBSTRING_INDEX('%s','@',-1)) AND active = 0) AS usernames, (SELECT 'DISCARD' FROM domains WHERE domain = SUBSTRING_INDEX('%s','@',-1) AND active = 0) AS domains LIMIT 1;
+query = SELECT (SELECT 'DISCARD' FROM additional_usernames WHERE (CONCAT(username, '.example.com') = SUBSTRING_INDEX('%s','@',-1)) AND active = 0) AS usernames, (SELECT CASE WHEN NOT EXISTS(SELECT NULL FROM aliases WHERE email='%s') AND catch_all = 0 THEN 'REJECT' WHEN active=0 THEN 'DISCARD' ELSE NULL END FROM domains WHERE domain = SUBSTRING_INDEX('%s','@',-1)) AS domains LIMIT 1;
 ```
 
 This file is responsible for checking whether the alias is for an additional username/custom domain and if so then is that additional username/custom domain set as active. If it is not set as active then the email is discarded.

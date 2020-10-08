@@ -43,9 +43,18 @@ class AliasController extends Controller
         }
 
         if (isset($request->validated()['local_part'])) {
+            $localPart = $request->validated()['local_part'];
+
+            // Local part has extension
+            if (Str::contains($localPart, '+')) {
+                $extension = Str::after($localPart, '+');
+                $localPart = Str::before($localPart, '+');
+            }
+
             $data = [
-                'email' => $request->validated()['local_part'] . '@' . $request->domain,
-                'local_part' => $request->validated()['local_part'],
+                'email' => $localPart . '@' . $request->domain,
+                'local_part' => $localPart,
+                'extension' => $extension ?? null
             ];
         } else {
             if ($request->input('format', 'uuid') === 'random_words') {

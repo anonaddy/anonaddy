@@ -125,6 +125,23 @@ class AliasesTest extends TestCase
     }
 
     /** @test */
+    public function user_can_generate_new_alias_with_local_part_and_extension()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $this->user->username . '.anonaddy.com',
+            'format' => 'custom',
+            'description' => 'the description',
+            'local_part' => 'valid-local-part+extension'
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $this->assertEquals('valid-local-part', $response->getData()->data->local_part);
+        $this->assertEquals('extension', $response->getData()->data->extension);
+        $this->assertEquals('valid-local-part@'.$this->user->username . '.anonaddy.com', $this->user->aliases[0]->email);
+    }
+
+    /** @test */
     public function user_cannot_generate_new_alias_with_invalid_local_part()
     {
         $response = $this->json('POST', '/api/v1/aliases', [

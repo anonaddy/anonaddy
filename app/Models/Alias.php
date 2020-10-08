@@ -27,6 +27,7 @@ class Alias extends Model
         'description',
         'email',
         'local_part',
+        'extension',
         'domain',
         'aliasable_id',
         'aliasable_type'
