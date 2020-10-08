@@ -50,6 +50,9 @@ Route::group([
     Route::post('/active-domains', 'Api\ActiveDomainController@store');
     Route::delete('/active-domains/{id}', 'Api\ActiveDomainController@destroy');
 
+    Route::post('/catch-all-domains', 'Api\CatchAllDomainController@store');
+    Route::delete('/catch-all-domains/{id}', 'Api\CatchAllDomainController@destroy');
+
     Route::get('/usernames', 'Api\AdditionalUsernameController@index');
     Route::get('/usernames/{id}', 'Api\AdditionalUsernameController@show');
     Route::post('/usernames', 'Api\AdditionalUsernameController@store');

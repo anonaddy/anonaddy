@@ -143,6 +143,13 @@
             @off="deactivateDomain(props.row.id)"
           />
         </span>
+        <span v-else-if="props.column.field === 'catch_all'" class="flex items-center">
+          <Toggle
+            v-model="rows[props.row.originalIndex].catch_all"
+            @on="enableCatchAll(props.row.id)"
+            @off="disableCatchAll(props.row.id)"
+          />
+        </span>
         <span v-else-if="props.column.field === 'domain_sending_verified_at'">
           <span
             name="check"
@@ -474,6 +481,12 @@ export default {
           globalSearchDisabled: true,
         },
         {
+          label: 'Catch-All',
+          field: 'catch_all',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
           label: 'Verified for Sending',
           field: 'domain_sending_verified_at',
           globalSearchDisabled: true,
@@ -688,6 +701,42 @@ export default {
         })
         .catch(error => {
           this.error()
+        })
+    },
+    enableCatchAll(id) {
+      axios
+        .post(
+          `/api/v1/catch-all-domains`,
+          JSON.stringify({
+            id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
+        })
+    },
+    disableCatchAll(id) {
+      axios
+        .delete(`/api/v1/catch-all-domains/${id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
         })
     },
     deleteDomain(id) {

@@ -140,4 +140,30 @@ class AliasRecipientsTest extends TestCase
         $response->assertStatus(422);
         $this->assertCount(0, $alias->recipients);
     }
+
+    /** @test */
+    public function alias_recipient_record_is_deleted_if_recipient_is_deleted()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        AliasRecipient::create([
+            'alias' => $alias,
+            'recipient' => $recipient
+        ]);
+
+        $this->assertEquals($alias->recipients[0]->email, $recipient->email);
+
+        $recipient->delete();
+        $this->assertCount(0, AliasRecipient::all());
+        $this->assertDatabaseMissing('alias_recipients', [
+            'alias_id' => $alias->id,
+            'recipient_id' => $recipient->id
+        ]);
+    }
 }

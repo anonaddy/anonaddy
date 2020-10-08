@@ -157,6 +157,36 @@ class DomainsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_enable_catch_all_for_domain()
+    {
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'catch_all' => false
+        ]);
+
+        $response = $this->json('POST', '/api/v1/catch-all-domains/', [
+            'id' => $domain->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertTrue($response->getData()->data->catch_all);
+    }
+
+    /** @test */
+    public function user_can_disable_catch_all_for_domain()
+    {
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'catch_all' => true
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/catch-all-domains/'.$domain->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->domains[0]->catch_all);
+    }
+
+    /** @test */
     public function user_can_update_domain_description()
     {
         $domain = Domain::factory()->create([

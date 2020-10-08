@@ -42,22 +42,30 @@ class AliasController extends Controller
             return response('', 429);
         }
 
-        if ($request->input('format', 'uuid') === 'random_words') {
-            $localPart = user()->generateRandomWordLocalPart();
-
+        if (isset($request->validated()['local_part'])) {
             $data = [
-                'email' => $localPart . '@' . $request->domain,
-                'local_part' => $localPart,
+                'email' => $request->validated()['local_part'] . '@' . $request->domain,
+                'local_part' => $request->validated()['local_part'],
             ];
         } else {
-            $uuid = Uuid::uuid4();
+            if ($request->input('format', 'uuid') === 'random_words') {
+                $localPart = user()->generateRandomWordLocalPart();
 
-            $data = [
-                'id' => $uuid,
-                'email' => $uuid . '@' . $request->domain,
-                'local_part' => $uuid,
-            ];
+                $data = [
+                    'email' => $localPart . '@' . $request->domain,
+                    'local_part' => $localPart,
+                ];
+            } else {
+                $uuid = Uuid::uuid4();
+
+                $data = [
+                    'id' => $uuid,
+                    'email' => $uuid . '@' . $request->domain,
+                    'local_part' => $uuid,
+                ];
+            }
         }
+
 
         // Check if domain is for additional username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))

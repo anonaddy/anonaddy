@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ValidAliasLocalPart;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,30 @@ class StoreAliasRequest extends FormRequest
                 Rule::in($this->user()->domainOptions())
             ],
             'description' => 'nullable|max:100',
-            'format' => 'nullable|in:uuid,random_words'
+            'format' => 'nullable|in:uuid,random_words,custom'
+        ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->sometimes('local_part', [
+            'required',
+            'max:50',
+            Rule::unique('aliases')->where(function ($query) {
+                return $query->where('local_part', $this->validationData()['local_part'])
+                ->where('domain', $this->validationData()['domain']);
+            }),
+            new ValidAliasLocalPart
+        ], function () {
+            $format = $this->validationData()['format'] ?? 'uuid';
+            return $format === 'custom';
+        });
+    }
+
+    public function messages()
+    {
+        return [
+            'local_part.unique' => 'That alias already exists.',
         ];
     }
 }

@@ -24,7 +24,8 @@ class Domain extends Model
     protected $fillable = [
         'domain',
         'description',
-        'active'
+        'active',
+        'catch_all'
     ];
 
     protected $dates = [
@@ -38,6 +39,7 @@ class Domain extends Model
         'id' => 'string',
         'user_id' => 'string',
         'active' => 'boolean',
+        'catch_all' => 'boolean',
         'default_recipient_id' => 'string',
     ];
 
@@ -105,6 +107,22 @@ class Domain extends Model
     public function activate()
     {
         $this->update(['active' => true]);
+    }
+
+    /**
+     * Disable catch-all for the domain.
+     */
+    public function disableCatchAll()
+    {
+        $this->update(['catch_all' => false]);
+    }
+
+    /**
+     * Enable catch-all for the domain.
+     */
+    public function enableCatchAll()
+    {
+        $this->update(['catch_all' => true]);
     }
 
     /**

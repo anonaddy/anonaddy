@@ -445,6 +445,24 @@
           </div>
         </div>
 
+        <div v-if="generateAliasFormat === 'custom'">
+          <label for="alias_local_part" class="block text-grey-700 text-sm my-2">
+            Alias Local Part:
+          </label>
+          <p v-show="errors.generateAliasLocalPart" class="mb-3 text-red-500 text-sm">
+            {{ errors.generateAliasLocalPart }}
+          </p>
+          <input
+            v-model="generateAliasLocalPart"
+            id="alias_local_part"
+            type="text"
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+            :class="errors.generateAliasLocalPart ? 'border-red-500' : ''"
+            placeholder="Enter local part..."
+            autofocus
+          />
+        </div>
+
         <label for="alias_description" class="block text-grey-700 text-sm my-2">
           Description:
         </label>
@@ -680,6 +698,7 @@ export default {
       generateAliasModalOpen: false,
       generateAliasLoading: false,
       generateAliasDomain: this.defaultAliasDomain ? this.defaultAliasDomain : this.domain,
+      generateAliasLocalPart: '',
       generateAliasDescription: '',
       generateAliasFormat: this.defaultAliasFormat ? this.defaultAliasFormat : 'uuid',
       aliasFormatOptions: [
@@ -690,6 +709,10 @@ export default {
         {
           value: 'random_words',
           label: 'Random Words',
+        },
+        {
+          value: 'custom',
+          label: 'Custom',
         },
       ],
       recipientsAliasToEdit: {},
@@ -899,6 +922,14 @@ export default {
     generateNewAlias() {
       this.errors = {}
 
+      // Validate alias local part
+      if (
+        this.generateAliasFormat === 'custom' &&
+        !this.validLocalPart(this.generateAliasLocalPart)
+      ) {
+        return (this.errors.generateAliasLocalPart = 'Valid local part required')
+      }
+
       if (this.generateAliasDescription.length > 100) {
         return (this.errors.generateAliasDescription = 'Description cannot exceed 100 characters')
       }
@@ -910,6 +941,7 @@ export default {
           '/api/v1/aliases',
           JSON.stringify({
             domain: this.generateAliasDomain,
+            local_part: this.generateAliasLocalPart,
             description: this.generateAliasDescription,
             format: this.generateAliasFormat,
           }),
@@ -919,6 +951,7 @@ export default {
         )
         .then(({ data }) => {
           this.generateAliasLoading = false
+          this.generateAliasLocalPart = ''
           this.generateAliasDescription = ''
           this.rows.push(data.data)
           this.generateAliasModalOpen = false
@@ -1001,6 +1034,10 @@ export default {
     },
     has(object, path) {
       return _.has(object, path)
+    },
+    validLocalPart(part) {
+      let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))$/
+      return re.test(part)
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

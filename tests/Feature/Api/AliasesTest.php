@@ -98,13 +98,45 @@ class AliasesTest extends TestCase
     {
         $response = $this->json('POST', '/api/v1/aliases', [
             'domain' => 'anonaddy.me',
-            'description' => 'the description'
+            'description' => 'the description',
+            'local_part' => 'not-required-for-shared-alias'
         ]);
 
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
         $this->assertEquals($this->user->aliases[0]->id, $response->getData()->data->local_part);
         $this->assertEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+    }
+
+    /** @test */
+    public function user_can_generate_new_alias_with_local_part()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $this->user->username . '.anonaddy.com',
+            'format' => 'custom',
+            'description' => 'the description',
+            'local_part' => 'valid-local-part'
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $this->assertEquals('valid-local-part', $response->getData()->data->local_part);
+        $this->assertEquals('valid-local-part@'.$this->user->username . '.anonaddy.com', $this->user->aliases[0]->email);
+    }
+
+    /** @test */
+    public function user_cannot_generate_new_alias_with_invalid_local_part()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $this->user->username . '.anonaddy.com',
+            'format' => 'custom',
+            'description' => 'the description',
+            'local_part' => 'invalid-local-part.'
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertCount(0, $this->user->aliases);
+        $response->assertJsonValidationErrors('local_part');
     }
 
     /** @test */

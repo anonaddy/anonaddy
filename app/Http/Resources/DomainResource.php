@@ -16,6 +16,7 @@ class DomainResource extends JsonResource
             'aliases' => AliasResource::collection($this->whenLoaded('aliases')),
             'default_recipient' => new RecipientResource($this->whenLoaded('defaultRecipient')),
             'active' => $this->active,
+            'catch_all' => $this->catch_all,
             'domain_verified_at' => $this->domain_verified_at ? $this->domain_verified_at->toDateTimeString() : null,
             'domain_sending_verified_at' => $this->domain_sending_verified_at ? $this->domain_sending_verified_at->toDateTimeString() : null,
             'created_at' => $this->created_at->toDateTimeString(),
