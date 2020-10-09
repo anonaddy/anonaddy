@@ -129,7 +129,7 @@ Or use nano if you like.
 
 Replace the file contents with the following (replacing example.com with your own domain):
 
-```cf
+```
 smtpd_banner = $myhostname ESMTP
 biff = no
 
@@ -245,7 +245,7 @@ You should see mail.example.com if you don't edit `/etc/postfix/main.cf` and upd
 
 Open up `/etc/postfix/master.cf` and update this line at the top of the file:
 
-```cf
+```
 smtp       inet  n       -       -       -       -       smtpd
         -o content_filter=anonaddy:dummy
 ```
@@ -254,7 +254,7 @@ This should be the only line for smtp.
 
 Then add these lines to the bottom of the file:
 
-```cf
+```
 anonaddy unix - n n - - pipe
   flags=F user=johndoe argv=php /var/www/anonaddy/artisan anonaddy:receive-email --sender=${sender} --recipient=${recipient} --local_part=${user} --extension=${extension} --domain=${domain} --size=${size}
 ```
@@ -409,7 +409,7 @@ sudo apt install php7.4-common php7.4-mysql php7.4-dev php7.4-mbstring php7.4-gd
 sudo nano /etc/php/7.4/fpm/pool.d/www.conf
 ```
 
-```conf
+```
 user = johndoe
 group = johndoe
 listen.owner = johndoe
@@ -464,7 +464,7 @@ Follow the instructions in the linked blog post at the end of this section on ho
 
 The only differences are the following couple of points:
 
-```conf
+```
 Canonicalization   simple
 Mode               sv
 SubDomains         yes
@@ -739,7 +739,7 @@ sudo nano /etc/supervisor/conf.d/anonaddy.conf
 
 Enter the following inside (change user and command location if you need to):
 
-```conf
+```
 [program:anonaddy]
 process_name=%(program_name)s_%(process_num)02d
 command=php /var/www/anonaddy/artisan queue:work redis --sleep=3 --tries=3
@@ -803,7 +803,7 @@ sudo apt install spamass-milter
 
 Update `/etc/postfix/main.cf` and add the milter to smtpd_milters.
 
-```cf
+```
 # Milter configuration
 milter_default_action = accept
 milter_protocol = 6
@@ -876,12 +876,14 @@ This means you can query URIBL successfully now.
 
 Update `/etc/spamassassin/local.cf` and add this near the top:
 
-```cf
+```
 dns_available yes
 ```
 
 
 ## Updating
+
+Before updating, please check the release notes on [GitHub](https://github.com/anonaddy/anonaddy/releases) for any breaking changes.
 
 In order to update you can run the following commands:
 
