@@ -54,11 +54,11 @@ class DomainsTest extends TestCase
     public function user_can_create_new_domain()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'example.com'
+            'domain' => 'random.com'
         ]);
 
         $response->assertStatus(201);
-        $this->assertEquals('example.com', $response->getData()->data->domain);
+        $this->assertEquals('random.com', $response->getData()->data->domain);
     }
 
     /** @test */
@@ -66,11 +66,11 @@ class DomainsTest extends TestCase
     {
         Domain::factory()->create([
             'user_id' => $this->user->id,
-            'domain' => 'example.com'
+            'domain' => 'random.com'
         ]);
 
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'example.com'
+            'domain' => 'random.com'
         ]);
 
         $response
@@ -82,7 +82,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_be_a_valid_fqdn()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'example.'
+            'domain' => 'random.'
         ]);
 
         $response
@@ -94,7 +94,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_not_include_protocol()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'https://example.com'
+            'domain' => 'https://random.com'
         ]);
 
         $response

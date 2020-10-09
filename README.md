@@ -40,6 +40,14 @@ There are a number of reasons you should consider using this service:
 
 No I definitely do not store/save any emails that pass through the server.
 
+#### **What is a shared domain alias?**
+
+A shared domain alias is any alias that has a domain name that is also shared with other users. For example anyone can generate an alias with the @anonaddy.me domain. Aliases with shared domain names must be pre-generated and cannot be created on-the-fly like standard aliases.
+
+#### **What is a standard alias?**
+
+A standard alias is any alias that can be created on-the-fly. Automatic on-the-fly alias creation is only available for domains that are unique to you. For example, your unique username subdomain, any additional usernames or any custom domains. So if you signed up with the username "johndoe", any alias you create using @johndoe.anonaddy.com would be a standard alias (even if you've generated a UUID/Random Word one).
+
 #### **Can I use my own domain?**
 
 Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add a TXT record to verify your ownership of the domain. Then you will need to add an MX record to your domain so that our server can handle incoming emails. You can then add a few other records to enable sending from your domain too.
@@ -93,7 +101,7 @@ The server is located in Amsterdam, Netherlands with [Greenhost.net](https://gre
 
 #### **What if I don't trust you?**
 
-It's good to keep your guard up when online so you should never trust anyone 100%. I'll try my best to be as honest and transparent as I can but if you still aren't convinced you can always just fire up your own server and self-host this application. You'll need to know about server administration and PHP. I'll be adding more details on how to do this soon.
+It's good to keep your guard up when online so you should never trust anyone 100%. I'll try my best to be as honest and transparent as I can but if you still aren't convinced you can always just fire up your own server and self-host this application. You'll need to know about server administration and PHP. You can find more information here [https://github.com/anonaddy/anonaddy#self-hosting](https://github.com/anonaddy/anonaddy#self-hosting).
 
 #### **What is the maximum number of recipients I can add to an alias?**
 
@@ -141,7 +149,7 @@ Let's say that you have the alias **first@johndoe.anonaddy.com** and you want to
 
 All you need to do is enter the following in the To: field.
 
-<span class="break-words"><first+hello=example.com@johndoe.anonaddy.com></span>
+<<span class="break-words"><first+hello=example.com@johndoe.anonaddy.com></span>>
 
 > **Note**: you must send the email from a verified recipient on your account.
 
@@ -155,7 +163,7 @@ You must generate aliases that use shared domains (e.g. circus.waltz449@anonaddy
 
 If you need to send an email to an address with an extension e.g. **hello+whatever@example.com** then it's exactly the same method:
 
-<span class="break-words"><first+hello+whatever=example.com@johndoe.anonaddy.com></span>
+<<span class="break-words"><first+hello+whatever=example.com@johndoe.anonaddy.com></span>>
 
 Just enter the extension too!
 
@@ -203,7 +211,7 @@ The following is in place to help prevent spam:
 
 #### **What do you use to do DNS lookups on domain names?**
 
-The server is running a local DNS caching server to improve the speed of queries. DNS.WATCH resolvers are used as a fallback.
+The server is running a local DNS caching server to improve the speed of queries.
 
 #### **Is there a limit to how many emails I can forward?**
 
@@ -223,7 +231,7 @@ Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or
 
 #### **How many emails can I receive before I go over my bandwidth limit?**
 
-The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails, the Lite plan's 50MB would be almost 700 emails and the Pro plan's 500MB would be almost 7,000 emails.
+The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails and the Lite plan's 50MB would be almost 700 emails.
 
 #### **What happens if I go over my bandwidth limit in a given month?**
 
@@ -261,7 +269,7 @@ I am very passionite about this project. I use it myself everyday and will be ke
 
 #### **Is the application tested?**
 
-Yes it has over 130 automated PHPUnit tests written.
+Yes it has over 180 automated PHPUnit tests written.
 
 #### **How do I host this myself?**
 
