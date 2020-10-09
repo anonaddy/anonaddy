@@ -63,6 +63,9 @@ Route::group([
     Route::post('/active-usernames', 'Api\ActiveAdditionalUsernameController@store');
     Route::delete('/active-usernames/{id}', 'Api\ActiveAdditionalUsernameController@destroy');
 
+    Route::post('/catch-all-usernames', 'Api\CatchAllAdditionalUsernameController@store');
+    Route::delete('/catch-all-usernames/{id}', 'Api\CatchAllAdditionalUsernameController@destroy');
+
     Route::get('/rules', 'Api\RuleController@index');
     Route::get('/rules/{id}', 'Api\RuleController@show');
     Route::post('/rules', 'Api\RuleController@store');

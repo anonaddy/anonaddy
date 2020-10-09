@@ -16,6 +16,7 @@ class AdditionalUsernameResource extends JsonResource
             'aliases' => AliasResource::collection($this->whenLoaded('aliases')),
             'default_recipient' => new RecipientResource($this->whenLoaded('defaultRecipient')),
             'active' => $this->active,
+            'catch_all' => $this->catch_all,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

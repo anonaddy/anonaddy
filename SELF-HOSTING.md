@@ -547,27 +547,43 @@ exit
 
 Create a new file `/etc/postfix/mysql-virtual-alias-domains-and-subdomains.cf` and enter the following inside:
 
-```
+```sql
 user = anonaddy
 password = your-database-password
 hosts = 127.0.0.1
 dbname = anonaddy_database
-query = SELECT (SELECT 1 FROM users WHERE CONCAT(username, '.example.com') = '%s') AS users, (SELECT 1 FROM additional_usernames WHERE CONCAT(additional_usernames.username, '.example.com') = '%s') AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
+query = SELECT (SELECT 1 FROM users WHERE '%s' IN (CONCAT(username, '.example.com'))) AS users, (SELECT 1 FROM additional_usernames WHERE '%s' IN (CONCAT(additional_usernames.username, '.example.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
+```
+
+If you need to add multiple domains then just update the above query to:
+
+```sql
+query = SELECT (SELECT 1 FROM users WHERE '%s' IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))) AS users, (SELECT 1 FROM additional_usernames WHERE '%s' IN (CONCAT(additional_usernames.username, '.example.com'),CONCAT(additional_usernames.username, '.example2.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
 ```
 
 This file is responsible for determining whether the server should accept email for a certain domain/subdomain. If no results are found from the query then the email will not be accepted.
 
 Next create another new file `/etc/postfix/mysql-recipient-access-domains-and-additional-usernames.cf` and enter the following inside:
 
-```
+```sql
 user = anonaddy
 password = your-database-password
 hosts = 127.0.0.1
 dbname = anonaddy_database
-query = SELECT (SELECT 'DISCARD' FROM additional_usernames WHERE (CONCAT(username, '.example.com') = SUBSTRING_INDEX('%s','@',-1)) AND active = 0) AS usernames, (SELECT CASE WHEN NOT EXISTS(SELECT NULL FROM aliases WHERE email='%s') AND catch_all = 0 THEN 'REJECT' WHEN active=0 THEN 'DISCARD' ELSE NULL END FROM domains WHERE domain = SUBSTRING_INDEX('%s','@',-1)) AS domains LIMIT 1;
+query = SELECT (SELECT CASE WHEN NOT EXISTS(SELECT NULL FROM aliases WHERE email = '%s') AND additional_usernames.catch_all = 0 OR domains.catch_all = 0 THEN "REJECT" WHEN additional_usernames.active = 0 OR domains.active = 0 THEN "DISCARD" ELSE NULL END FROM additional_usernames, domains WHERE SUBSTRING_INDEX('%s', '@',-1) IN (CONCAT(additional_usernames.username, '.example.com')) OR domains.domain = SUBSTRING_INDEX('%s', '@',-1) LIMIT 1) AS result LIMIT 1;
 ```
 
-This file is responsible for checking whether the alias is for an additional username/custom domain and if so then is that additional username/custom domain set as active. If it is not set as active then the email is discarded.
+If you need to add multiple domains then just update the IN section to:
+
+```sql
+IN (CONCAT(additional_usernames.username, '.example.com'),CONCAT(additional_usernames.username, '.example2.com'))
+```
+
+etc.
+
+This file is responsible for checking whether the alias is for an additional username/custom domain and if so then is that additional username/custom domain set as active. If it is not set as active then the email is discarded. It also checks if the additional usename/custom domain has catch-all enabled and if not it checks if that alias already exists. If it does not already exist then the email is rejected.
+
+The reason these SQL queries are not all nicely formatted is because they have to be on one line.
 
 Now we need to create a stored procedure that can be called.
 

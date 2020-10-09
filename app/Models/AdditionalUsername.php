@@ -22,7 +22,8 @@ class AdditionalUsername extends Model
     protected $fillable = [
         'username',
         'description',
-        'active'
+        'active',
+        'catch_all',
     ];
 
     protected $dates = [
@@ -34,6 +35,7 @@ class AdditionalUsername extends Model
         'id' => 'string',
         'user_id' => 'string',
         'active' => 'boolean',
+        'catch_all' => 'boolean',
         'default_recipient_id' => 'string'
     ];
 
@@ -101,5 +103,21 @@ class AdditionalUsername extends Model
     public function activate()
     {
         $this->update(['active' => true]);
+    }
+
+    /**
+     * Disable catch-all for the username.
+     */
+    public function disableCatchAll()
+    {
+        $this->update(['catch_all' => false]);
+    }
+
+    /**
+     * Enable catch-all for the username.
+     */
+    public function enableCatchAll()
+    {
+        $this->update(['catch_all' => true]);
     }
 }

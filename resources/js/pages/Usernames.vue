@@ -142,6 +142,13 @@
             @off="deactivateUsername(props.row.id)"
           />
         </span>
+        <span v-else-if="props.column.field === 'catch_all'" class="flex items-center">
+          <Toggle
+            v-model="rows[props.row.originalIndex].catch_all"
+            @on="enableCatchAll(props.row.id)"
+            @off="disableCatchAll(props.row.id)"
+          />
+        </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <icon
             name="trash"
@@ -379,6 +386,12 @@ export default {
           globalSearchDisabled: true,
         },
         {
+          label: 'Catch-All',
+          field: 'catch_all',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
           label: '',
           field: 'actions',
           sortable: false,
@@ -550,6 +563,42 @@ export default {
         })
         .catch(error => {
           this.error()
+        })
+    },
+    enableCatchAll(id) {
+      axios
+        .post(
+          `/api/v1/catch-all-usernames`,
+          JSON.stringify({
+            id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
+        })
+    },
+    disableCatchAll(id) {
+      axios
+        .delete(`/api/v1/catch-all-usernames/${id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
         })
     },
     deleteUsername(id) {

@@ -190,6 +190,36 @@ class AdditionalUsernamesTest extends TestCase
     }
 
     /** @test */
+    public function user_can_enable_catch_all_for_additional_username()
+    {
+        $username = AdditionalUsername::factory()->create([
+            'user_id' => $this->user->id,
+            'catch_all' => false
+        ]);
+
+        $response = $this->json('POST', '/api/v1/catch-all-usernames/', [
+            'id' => $username->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertTrue($response->getData()->data->catch_all);
+    }
+
+    /** @test */
+    public function user_can_disable_catch_all_for_additional_username()
+    {
+        $username = AdditionalUsername::factory()->create([
+            'user_id' => $this->user->id,
+            'catch_all' => true
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/catch-all-usernames/'.$username->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->additionalUsernames[0]->catch_all);
+    }
+
+    /** @test */
     public function user_can_update_additional_usernames_description()
     {
         $username = AdditionalUsername::factory()->create([

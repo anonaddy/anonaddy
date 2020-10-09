@@ -177,7 +177,7 @@ class ReceiveEmail extends Command
 
     protected function handleSendFrom($user, $recipient, $aliasable)
     {
-        $alias = $user->aliases()->firstOrNew([
+        $alias = $user->aliases()->withTrashed()->firstOrNew([
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
@@ -204,7 +204,7 @@ class ReceiveEmail extends Command
 
     protected function handleForward($user, $recipient, $aliasable)
     {
-        $alias = $user->aliases()->firstOrNew([
+        $alias = $user->aliases()->withTrashed()->firstOrNew([
             'email' => $recipient['local_part'] . '@' . $recipient['domain'],
             'local_part' => $recipient['local_part'],
             'domain' => $recipient['domain'],
