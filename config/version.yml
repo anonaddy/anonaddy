@@ -1,0 +1,60 @@
+mode: absorb
+blade-directive: version
+current:
+  label: v
+  major: 0
+  minor: 5
+  patch: 0
+  prerelease: 2-g541a7df
+  buildmetadata: ''
+  commit: 541a7d
+  timestamp:
+    year: 2020
+    month: 10
+    day: 16
+    hour: 11
+    minute: 8
+    second: 24
+    timezone: UTC
+commit:
+  mode: absorb
+  length: 6
+  increment-by: 1
+git:
+  from: local
+  commit:
+    local: 'git rev-parse --verify HEAD'
+    remote: 'git ls-remote {$repository}'
+  branch: refs/heads/master
+  repository: ''
+  version:
+    local: 'git describe'
+    remote: 'git ls-remote {$repository} | grep tags/ | grep -v {} | cut -d / -f 3 | sort --version-sort | tail -1'
+    matcher: '/^(?P<label>[v|V]*[er]*[sion]*)[\.|\s]*(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/'
+  timestamp:
+    local: 'git show -s --format=%ci'
+    remote: 'git show -s --format=%ci origin/master'
+format:
+  regex:
+    optional_bracket: '\[(?P<prefix>.*?)(?P<spaces>\s*)(?P<delimiter>\?\=)(?P<optional>.*?)\]'
+  label: '{$label}'
+  major: '{$major}'
+  minor: '{$minor}'
+  patch: '{$patch}'
+  prerelease: '{$prerelease}'
+  buildmetadata: '{$buildmetadata}'
+  commit: '{$commit}'
+  release: 'v{$major}.{$minor}.{$patch}'
+  version: '{$major}.{$minor}.{$patch}'
+  version-only: 'version {$major}.{$minor}.{$patch}'
+  full: '{$version-only}[.?={$prerelease}][+?={$buildmetadata}] (commit {$commit})'
+  compact: 'v{$major}.{$minor}.{$patch}-{$commit}'
+  timestamp-year: '{$timestamp.year}'
+  timestamp-month: '{$timestamp.month}'
+  timestamp-day: '{$timestamp.day}'
+  timestamp-hour: '{$timestamp.hour}'
+  timestamp-minute: '{$timestamp.minute}'
+  timestamp-second: '{$timestamp.second}'
+  timestamp-timezone: '{$timestamp.timezone}'
+  timestamp-datetime: '{$timestamp.year}-{$timestamp.month}-{$timestamp.day} {$timestamp.hour}:{$timestamp.minute}:{$timestamp.second}'
+  timestamp-full: '{$timestamp.year}-{$timestamp.month}-{$timestamp.day} {$timestamp.hour}:{$timestamp.minute}:{$timestamp.second} {$timestamp.timezone}'

@@ -10,9 +10,9 @@ class ShowAliasController extends Controller
             ->aliases()
             ->withTrashed()
             ->toBase()
-            ->selectRaw("sum(emails_forwarded) as forwarded")
-            ->selectRaw("sum(emails_blocked) as blocked")
-            ->selectRaw("sum(emails_replied) as replies")
+            ->selectRaw("ifnull(sum(emails_forwarded),0) as forwarded")
+            ->selectRaw("ifnull(sum(emails_blocked),0) as blocked")
+            ->selectRaw("ifnull(sum(emails_replied),0) as replies")
             ->first();
 
         return view('aliases.index', [

@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'from_name',
         'email_subject',
         'banner_location',
+        'catch_all',
         'bandwidth',
         'default_recipient_id',
         'password',
@@ -65,6 +66,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'id' => 'string',
         'default_recipient_id' => 'string',
+        'catch_all' => 'boolean',
         'two_factor_enabled' => 'boolean'
     ];
 
@@ -225,6 +227,22 @@ class User extends Authenticatable implements MustVerifyEmail
                 }
             )->orWhereNull('aliasable_id');
         });
+    }
+
+    /**
+     * Disable catch-all for the user.
+     */
+    public function disableCatchAll()
+    {
+        $this->update(['catch_all' => false]);
+    }
+
+    /**
+     * Enable catch-all for the user.
+     */
+    public function enableCatchAll()
+    {
+        $this->update(['catch_all' => true]);
     }
 
     public function hasVerifiedDefaultRecipient()

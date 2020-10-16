@@ -6,19 +6,19 @@ Choosing a provider (that you trust), Vultr, Greenhost, OVH, Hetzner, Linode, Co
 
 With Vultr you may need to open a support ticket and request for them to unblock port 25.
 
-Before starting you will want to check the IP of your new server to make sure it is not on any blacklists - https://multirbl.valli.org/lookup/
+Before starting you will want to check the IP of your new server to make sure it is not on any blacklists - [https://multirbl.valli.org/lookup/](https://multirbl.valli.org/lookup/)
 
 If it is, destroy it and deploy a new one. You might notice that some providers such as Vultr have entire ranges of IPs listed.
 
-You should have a fresh 18.04 Ubuntu server. I'm assuming that you have taken proper steps to secure the server (no root login, key auth only, 2FA, automatic security updates etc.).
+You should have a fresh 20.04 Ubuntu server (or 18.04). I'm assuming that you have taken proper steps to secure the server (no root login, key auth only, 2FA, automatic security updates etc.).
 
 Add Fail2ban, a Firewall (e.g UFW), make sure that ports 25, 22 (or whatever your SSH port is if you've changed it) 443 and 80 are open.
 
-A good place to get started - https://github.com/imthenachoman/How-To-Secure-A-Linux-Server
+A good place to get started - [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
 
-https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/
+[https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/](https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/)
 
-https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers
+[https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers](https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers)
 
 I will be running all commands as a sudo user called `johndoe`. The domain used will be `example.com` and the hostname `mail.example.com`. I'll be using Vultr for this example (Note: if you also use Vultr for managing DNS records they do not currently support TSLA records required for DANE).
 
@@ -48,7 +48,7 @@ MX @ mail.example.com
 
 We want to direct it to our server's fully qualifed domain name (FQDN). Give it a priority of 10 (or just make sure it has the lowest priority if you have other MX records).
 
-If you want to use wildcard subdomains e.g. (alias@username.example.com) then you also need to add a wildcard MX record:
+If you want to be able to also use wildcard subdomains e.g. (alias@username.example.com) then you also need to add a wildcard MX record:
 
 ```
 MX * mail.example.com
@@ -63,7 +63,7 @@ A * <Your-IPv4-address>
 AAAA * <Your-IPv4-address>
 ```
 
-If you want to just use the example.com domain and not bother with subdomains then you can skip the wildcard MX, A, AAAA records above (you will still need to add one for unsubscribe.example.com though to handle deactivating aliases).
+If you want to just use the example.com domain and not bother with subdomains then you can skip the wildcard MX, A, AAAA records above (you will still need to add MX and A/AAAA for unsubscribe.example.com though to handle deactivating aliases).
 
 Next we will add an explicit A record for the hostname `mail.example.com` and for where the web app will be located `app.example.com`
 
@@ -91,6 +91,8 @@ In Vultr you can update your reverse DNS by clicking on your server, then going 
 
 Change it to `mail.example.com`. Don't forget to update this for IPv6 if you are using it too.
 
+You can check that it is set correctly by entering your IPv4 and IPv6 addresses here [https://mxtoolbox.com/ReverseLookup.aspx](https://mxtoolbox.com/ReverseLookup.aspx).
+
 ## Installing Postfix
 
 Now we're going to install our MTA (mail transfer agent) Postfix.
@@ -111,7 +113,7 @@ If you would like to check the version of Postfix that you are running you can d
 sudo postconf mail_version
 ```
 
-At the time of writing this I am running `mail_version = 3.3.0`.
+At the time of writing this I am running `mail_version = 3.4.13`.
 
 We'll install an extension we will need later so that Postfix can query our database.
 
@@ -211,10 +213,12 @@ smtpd_sender_restrictions =
    reject_unknown_sender_domain
    reject_unknown_reverse_client_hostname
 
+policyd-spf_time_limit = 3600
+
 smtpd_recipient_restrictions =
    permit_mynetworks,
    reject_unauth_destination,
-   check_recipient_access mysql:/etc/postfix/mysql-recipient-access.cf, mysql:/etc/postfix/mysql-recipient-access-domains-and-additional-usernames.cf,
+   check_recipient_access mysql:/etc/postfix/mysql-recipient-access.cf,
    check_policy_service unix:private/policyd-spf
    reject_rhsbl_helo dbl.spamhaus.org,
    reject_rhsbl_reverse_client dbl.spamhaus.org,
@@ -241,7 +245,7 @@ Make sure your hostname is correct in the Postfix config file.
 sudo postconf myhostname
 ```
 
-You should see mail.example.com if you don't edit `/etc/postfix/main.cf` and update the myhostname value.
+You'll see warnings that the mysql-... files do not exist. You should see mail.example.com if you don't edit `/etc/postfix/main.cf` and update the myhostname value.
 
 Open up `/etc/postfix/master.cf` and update this line at the top of the file:
 
@@ -265,7 +269,15 @@ This command will pipe the email through to our applicaton so that we can determ
 
 ## Installing Nginx
 
-We'll install the mainline version of Nginx.
+On Ubuntu 20.04 Nginx is included in the default repositories so we can simply run:
+
+```bash
+sudo apt update
+sudo apt install nginx
+sudo nginx -v
+```
+
+If you're on Ubuntu 18.04 you will need to add the following signing key and repo.
 
 Import the nginx signing key and the repository.
 
@@ -274,7 +286,7 @@ sudo apt-key adv --fetch-keys 'https://nginx.org/keys/nginx_signing.key'
 sudo sh -c "echo 'deb https://nginx.org/packages/mainline/ubuntu/ '$(lsb_release -cs)' nginx' > /etc/apt/sources.list.d/Nginx.list"
 ```
 
-Install and check the version.
+Then you can Install and check the version.
 
 ```bash
 sudo apt update
@@ -282,7 +294,7 @@ sudo apt install nginx
 sudo nginx -v
 ```
 
-At the time of writing this I have `nginx version: nginx/1.17.8`.
+At the time of writing this I have `nginx version: nginx/1.18.0`.
 
 Create the directory for where the application will be stored.
 
@@ -299,7 +311,7 @@ sudo mkdir /etc/nginx/ssl
 sudo openssl dhparam -out /etc/nginx/ssl/dhparam.pem 4096
 ```
 
-The above command wil take quite some time.
+The above command will take quite some time, so go grab a cup of tea/coffee!
 
 Next create the Nginx server block:
 
@@ -386,6 +398,8 @@ We won't restart nginx yet because it won't be able to find the SSL certificates
 
 We're going to install the latest version of PHP at the time of writing this - version 7.4
 
+If you are using Ubuntu 18.04 you will need to add the below repository, Ubuntu 20.04 can skip this step.
+
 ```bash
 sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php
@@ -434,11 +448,12 @@ git clone https://github.com/acmesh-official/acme.sh.git
 cd ./acme.sh
 ./acme.sh --install
 ```
-You should set up automatic DNS API integration for wildcard certs if you are using them, this will allow automatic renewal of certificates.
 
-https://github.com/acmesh-official/acme.sh#8-automatic-dns-api-integration
+You should set up automatic DNS API integration for wildcard certs if you are using them, this will allow automatic renewal of your certificates.
 
-For example instructions for Vultr are here - https://github.com/acmesh-official/acme.sh/wiki/dnsapi#82-use-vultr-dns-api-to-automatically-issue-cert
+[https://github.com/acmesh-official/acme.sh#8-automatic-dns-api-integration](https://github.com/acmesh-official/acme.sh#8-automatic-dns-api-integration)
+
+For example, instructions for Vultr are here - [https://github.com/acmesh-official/acme.sh/wiki/dnsapi#82-use-vultr-dns-api-to-automatically-issue-cert](https://github.com/acmesh-official/acme.sh/wiki/dnsapi#82-use-vultr-dns-api-to-automatically-issue-cert)
 
 I would run:
 
@@ -458,6 +473,8 @@ To install the certificate run:
 
 Make sure to change example.com to your domain.
 
+You can now type `exit` to go back to the `johndoe` user instead of `root`.
+
 ## SPF and DKIM
 
 Follow the instructions in the linked blog post at the end of this section on how to install OpenDKIM and then add an SPF record.
@@ -476,7 +493,7 @@ Also when editing `/etc/opendkim/signing.table` add this line too so that emails
 *@*.example.com    default._domainkey.example.com
 ```
 
-https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf
+[https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf](https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf)
 
 Once you've finished following the above post you should have SPF and DKIM set up for your domain.
 
@@ -484,21 +501,25 @@ Once you've finished following the above post you should have SPF and DKIM set u
 
 Next follow this blog post on how to install OpenDMARC.
 
-https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu
+[https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu](https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu)
 
-Then take a look at this one on how to add a DMARC record to your domain:
+Next add a new TXT record to your domain for DMARC with a host of `@` and value:
 
-https://www.linuxbabe.com/mail-server/create-dmarc-record
+```
+v=DMARC1; p=none; pct=100; rua=mailto:dmarc-reports@example.com
+```
 
-After following those posts you should now have a valid DMARC record for your domain.
+For further reading about DMARC records and the different options available see - [https://www.linuxbabe.com/mail-server/create-dmarc-record](https://www.linuxbabe.com/mail-server/create-dmarc-record)
+
+You should now have a valid DMARC record for your domain.
 
 ## Installing MariaDB
 
-At the time of writing this the latest stable release is v10.4. Make sure to check for any newer releases.
+At the time of writing this the latest stable release is v10.5. Make sure to check for any newer releases.
 
-Follow the instructions on this link to install MariaDB:
+Follow the instructions on this link to install MariaDB (make sure to change to 18.04 if you are using it):
 
-https://downloads.mariadb.org/mariadb/repositories/#distro=Ubuntu&distro_release=bionic--ubuntu_bionic&mirror=digitalocean-sfo&version=10.4
+[https://downloads.mariadb.org/mariadb/repositories/#distro=Ubuntu&distro_release=focal--ubuntu_focal&mirror=digital-pacific&version=10.5](https://downloads.mariadb.org/mariadb/repositories/#distro=Ubuntu&distro_release=focal--ubuntu_focal&mirror=digital-pacific&version=10.5)
 
 Make sure it is running correctly and check the version
 
@@ -507,9 +528,11 @@ sudo systemctl status mariadb
 sudo mysql -V
 ```
 
-At the time of writing this I am using "Ver 15.1 Distrib 10.4.12-MariaDB"
+At the time of writing this I am using "Ver 15.1 Distrib 10.5.6-MariaDB"
 
-Keep the default answers when running the below but set a secure MySQL root password and make a note of it somewhere e.g. password manager.
+Set a secure MySQL root password by running the command below and make a note of it somewhere e.g. password manager.
+
+Answer `no` for "Switch to unix_socket authentication" and `no` for "Change the root password?" as you have already set it in the first step. Answer `yes` (default) to the other questions.
 
 ```bash
 sudo mysql_secure_installation
@@ -538,7 +561,7 @@ Grant the user privileges for the new database.
 GRANT ALL PRIVILEGES ON anonaddy_database.* TO 'anonaddy'@'localhost' WITH GRANT OPTION;
 ```
 
-Flush privileges.
+Next flush privileges and exit the MariaDB shell.
 
 ```sql
 FLUSH PRIVILEGES;
@@ -563,91 +586,172 @@ query = SELECT (SELECT 1 FROM users WHERE '%s' IN (CONCAT(username, '.example.co
 
 This file is responsible for determining whether the server should accept email for a certain domain/subdomain. If no results are found from the query then the email will not be accepted.
 
-Next create another new file `/etc/postfix/mysql-recipient-access-domains-and-additional-usernames.cf` and enter the following inside:
-
-```sql
-user = anonaddy
-password = your-database-password
-hosts = 127.0.0.1
-dbname = anonaddy_database
-query = SELECT (SELECT CASE WHEN NOT EXISTS(SELECT NULL FROM aliases WHERE email = '%s') AND additional_usernames.catch_all = 0 OR domains.catch_all = 0 THEN "REJECT" WHEN additional_usernames.active = 0 OR domains.active = 0 THEN "DISCARD" ELSE NULL END FROM additional_usernames, domains WHERE SUBSTRING_INDEX('%s', '@',-1) IN (CONCAT(additional_usernames.username, '.example.com')) OR domains.domain = SUBSTRING_INDEX('%s', '@',-1) LIMIT 1) AS result LIMIT 1;
-```
-
-If you need to add multiple domains then just update the IN section to:
-
-```sql
-IN (CONCAT(additional_usernames.username, '.example.com'),CONCAT(additional_usernames.username, '.example2.com'))
-```
-
-etc.
-
-This file is responsible for checking whether the alias is for an additional username/custom domain and if so then is that additional username/custom domain set as active. If it is not set as active then the email is discarded. It also checks if the additional usename/custom domain has catch-all enabled and if not it checks if that alias already exists. If it does not already exist then the email is rejected.
-
 The reason these SQL queries are not all nicely formatted is because they have to be on one line.
 
-Now we need to create a stored procedure that can be called.
+Next create another new file `/etc/postfix/mysql-recipient-access.cf` and enter the following inside:
 
-In order for Postfix to REJECT or DISCARD emails sent to deleted or deactivated aliases you need to ceate a new file called `/etc/postfix/mysql-recipient-access.cf`.
-
-In this file enter the following:
-
-```
+```sql
 user = anonaddy
 password = your-database-password
 hosts = 127.0.0.1
 dbname = anonaddy_database
-query = CALL block_alias('%s')
+query = CALL check_access('%s')
 ```
 
-This query calls a stored procedure that we will create next, it passes the recipient's email address as the argument and checks to see if the alias is either deactivated or has previously been deleted and returns the appropriate response (DISCARD for deactivated and REJECT for deleted).
+This file is responsible for checking first whether an alias exists, and if so has it been deactivated or deleted. If it has been deactivated or deleted then return 'DISCARD' or 'REJECT'.
 
-The reason we're using a stored procedure here is because we need to run more than one SQL query which means we cannot just add it inline to `/etc/postfix/mysql-recipient-access.cf` as we have with the others.
+If the alias has not been deactivated or deleted or it does not exist then it also checks whether the alias is for a user, additional username or custom domain and if so, is that additional username or custom domain set as active. If it is not set as active then the email is discarded. It also checks if the user, additional usename or custom domain has catch-all enabled, and if not and the alias does not already exist then the email is rejected.
 
-Update the permissions and the group of all these files:
-
-```bash
-sudo chmod o= /etc/postfix/mysql-virtual-alias-domains-and-subdomains.cf /etc/postfix/mysql-recipient-access-domains-and-additional-usernames.cf /etc/postfix/mysql-recipient-access.cf
-
-sudo chgrp postfix /etc/postfix/mysql-virtual-alias-domains-and-subdomains.cf /etc/postfix/mysql-recipient-access-domains-and-additional-usernames.cf /etc/postfix/mysql-recipient-access.cf
-```
+The reason we're using a stored procedure here is so that we can run multiple queries and use IF statements.
 
 Either from the command line (`sudo mysql -u root -p`) or from an SQL client, run the following code to create the stored procedure.
 
-You will need to set appropriate permissions for your database user to allow them to execute the stored procedure.
+If you have any issues creating the stored procedure, make sure you have set appropriate permissions for your database user.
 
 ```sql
 DELIMITER $$
 
 USE `anonaddy_database`$$
 
-DROP PROCEDURE IF EXISTS `block_alias`$$
+DROP PROCEDURE IF EXISTS `check_access`$$
 
-CREATE DEFINER=`anonaddy`@`localhost` PROCEDURE `block_alias`(alias_email VARCHAR(254))
+CREATE DEFINER=`anonaddy`@`localhost` PROCEDURE `check_access`(alias_email VARCHAR(254) charset utf8)
 BEGIN
-   UPDATE aliases SET
-    emails_blocked = emails_blocked + 1
-   WHERE email = alias_email AND active = 0 LIMIT 1;
-   SELECT IF(deleted_at IS NULL,'DISCARD','REJECT') AS alias_action
-   FROM aliases WHERE email = alias_email AND (active = 0 OR deleted_at IS NOT NULL) LIMIT 1;
+    DECLARE alias_action varchar(7) charset utf8;
+    DECLARE no_alias_exists int(1);
+    DECLARE alias_domain varchar(254) charset utf8;
+    SET alias_domain = SUBSTRING_INDEX(alias_email, '@', -1);
+
+    # We only want to carry out the checks if it is a full RCPT TO address without any + extension
+    IF LOCATE('@',alias_email) > 1 AND LOCATE('+',alias_email) = 0 AND LENGTH(alias_domain) > 0 THEN
+
+        SET no_alias_exists = CASE WHEN NOT EXISTS(SELECT NULL FROM aliases WHERE email = alias_email) THEN 1 ELSE 0 END;
+
+        # If there is an alias, check if it is deactivated or deleted
+        IF NOT no_alias_exists THEN
+            SET alias_action = (SELECT
+                IF(deleted_at IS NULL,
+                'DISCARD',
+                'REJECT')
+            FROM
+                aliases
+            WHERE
+                email = alias_email
+                AND (active = 0
+                OR deleted_at IS NOT NULL) LIMIT 1);
+        END IF;
+
+        # If the alias is deactivated or deleted then increment its blocked count and return the alias_action
+        IF alias_action IN('DISCARD','REJECT') THEN
+            UPDATE
+                aliases
+            SET
+                emails_blocked = emails_blocked + 1
+            WHERE
+                email = alias_email
+            LIMIT 1;
+
+            SELECT alias_action;
+        ELSE
+            SELECT
+            (
+            SELECT
+                CASE
+                    WHEN no_alias_exists
+                    AND catch_all = 0 THEN "REJECT"
+                    ELSE NULL
+                END
+            FROM
+                users
+            WHERE
+                alias_domain IN ( CONCAT(username, '.example.com')) ) AS users,
+            (
+            SELECT
+                CASE
+                    WHEN no_alias_exists
+                    AND catch_all = 0 THEN "REJECT"
+                    WHEN active = 0 THEN "DISCARD"
+                    ELSE NULL
+                END
+            FROM
+                additional_usernames
+            WHERE
+                alias_domain IN ( CONCAT(username, '.example.com')) ) AS usernames,
+            (
+            SELECT
+                CASE
+                    WHEN no_alias_exists
+                    AND catch_all = 0 THEN "REJECT"
+                    WHEN active = 0 THEN "DISCARD"
+                    ELSE NULL
+                END
+            FROM
+                domains
+            WHERE
+                domain = alias_domain) AS domains
+            LIMIT 1;
+        END IF;
+    ELSE
+        SELECT NULL;
+    END IF;
  END$$
 
 DELIMITER ;
+```
+
+If you need to add multiple domains then just update both of the IN sections to:
+
+```sql
+IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))
+```
+
+You may be wondering why we have this line near the top of the procedure:
+
+```sql
+IF LOCATE('@',alias_email) > 1 AND LOCATE('+',alias_email) = 0 AND LENGTH(alias_domain) > 0 THEN
+```
+
+The reason this is present is because Postfix will pass multiple arguments to this stored procedure for each incoming email.
+
+From the Postfix docs for [check_recipient_access](http://www.postfix.org/postconf.5.html#check_recipient_access):
+
+> "Search the specified access(5) database for the resolved RCPT TO address, domain, parent domains, or localpart@, and execute the corresponding action."
+
+What this means is that if an email comes in for the alias - hello+extension@username.example.com then Postfix will run the stored procedure with the following arguements:
+
+```sql
+CALL check_access('hello+extension@username.example.com');
+CALL check_access('hello@username.example.com');
+CALL check_access('username.example.com');
+CALL check_access('example.com');
+CALL check_access('com');
+CALL check_access('hello@');
+```
+
+We only want the queries to be run for the RCPT TO address (hello@username.example.com) without any + extension, which is what the check above does. It also prevents needless database queries being run.
+
+Update the permissions and the group of these files:
+
+```bash
+sudo chmod o= /etc/postfix/mysql-virtual-alias-domains-and-subdomains.cf /etc/postfix/mysql-recipient-access.cf
+
+sudo chgrp postfix /etc/postfix/mysql-virtual-alias-domains-and-subdomains.cf /etc/postfix/mysql-recipient-access.cf
 ```
 
 Make a test call for the stored procedure as your database user to ensure everything is working as expected.
 
 ```sql
 USE anonaddy_database;
-CALL block_alias('email@example.com');
+CALL check_access('email@example.com');
 ```
 
 You will get an error stating "Table 'anonaddy_database.aliases' doesn't exist" as we have not yet migrated the database.
 
 ## Installing Redis
 
-Follow this blog post on Digital Ocean to install Redis.
+Follow this short post on Digital Ocean to install Redis.
 
-https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-18-04
+[https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04)
 
 We'll be using Redis for queues, user limits, sessions and caching.
 
@@ -661,21 +765,29 @@ git clone https://github.com/anonaddy/anonaddy.git
 cd /var/www/anonaddy
 ```
 
-Make sure composer is installed (`composer -V`), if not then goto - https://getcomposer.org/download/ for instructions.
+Make sure composer is installed (`composer -V`), if not then goto - [https://getcomposer.org/download/](https://getcomposer.org/download/) for instructions.
 
-You can add the following flags when installing composer:
+You can add the following flags when running the composer-setup.php command to add it to your $PATH:
 
 ```bash
 sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 ```
 
-Make sure node is installed (`node -v`) if not then install it using NVM - https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-18-04#installing-using-nvm
+Before running the NVM install script below make sure that you have a `~/.bashrc` file. If not create one by running `touch ~/.bashrc` so that the NVM installer can be added to your $PATH. Also create a `~/.bash_profile` and add:
 
-At the time of writing this I'm using the latest LTS - ........
+```bash
+if [ -f ~/.bashrc ]; then
+  . ~/.bashrc
+fi
+```
+
+Make sure node is installed (`node -v`) if not then install it using NVM - [https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-3-%E2%80%94-installing-node-using-the-node-version-manager](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-3-%E2%80%94-installing-node-using-the-node-version-manager)
+
+At the time of writing this I'm using the latest LTS - v12.19.0
 
 ```bash
 cd /var/www/anonaddy
-composer install && npm install
+composer install --prefer-dist --no-scripts --no-dev -o && npm install
 npm run production
 ```
 
@@ -686,15 +798,17 @@ cp .env.example .env
 nano .env
 ```
 
-Make sure to update the database settings and the AnonAddy variables, you can use Redis for queue, sessions and cache.
+Make sure to update the database settings, redis password and the AnonAddy variables. You can use Redis for queue, sessions and cache.
+
+We'll set `ANONADDY_SIGNING_KEY_FINGERPRINT` shortly.
 
 `APP_KEY` will be generted in the next step, this is used by Laravel for securely encrypting values.
 
-For more information on Laravel configuration please visit - https://laravel.com/docs/8.x/installation#configuration
+For more information on Laravel configuration please visit - [https://laravel.com/docs/8.x/installation#configuration](https://laravel.com/docs/8.x/installation#configuration)
 
 For the `ANONADDY_DKIM_SIGNING_KEY` you only need to fill in this variable if you plan to add any custom domains through the web application.
 
-You can either use the same private DKIM signing key we generated earlier from this tutorial - https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf
+You can either use the same private DKIM signing key we generated earlier from this tutorial - [https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf](https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf)
 
 Or you can generate a new private/public keypair and give your user `johndoe` ownership of the private key.
 
@@ -704,9 +818,25 @@ If you want to use the same key we already generated then you will need to add `
 sudo usermod -a -G opendkim johndoe
 ```
 
-Make sure to also run `sudo chmod g+r /path/to/dkim/private/key` so that your johndoe user has read permissions for the file.
+Make sure to also run `sudo chmod g+r /etc/opendkim/keys/example.com/default.private` so that your johndoe user has read permissions for the file.
 
-You can test it by running `cat /path/to/dkim/private/key` as the johndoe user to see if it can be displayed.
+You'll need to log out and back in again for the changes to take effect.
+
+You can test it by running `cat /etc/opendkim/keys/example.com/default.private` as the johndoe user to see if it can be displayed.
+
+Doing this will cause opendkim to show a warning in your `mail.log` like this:
+
+```
+default._domainkey.example.com: key data is not secure: /etc/opendkim/keys/example.com/default.private is in group <group-number> which has multiple users
+```
+
+If you'd like to suppress this warning then you can add `RequireSafeKeys false` to your `/etc/opendkim.conf` file and restart opendkim - `sudo service opendkim restart`.
+
+Then update your `.env` file.
+
+```
+ANONADDY_DKIM_SIGNING_KEY=/etc/opendkim/keys/example.com/default.private
+```
 
 Then we will generate an app key, migrate the database, link the storage directory, restart the queue and install laravel passport.
 
@@ -720,7 +850,7 @@ php artisan view:cache
 php artisan route:cache
 php artisan queue:restart
 
-php artisan passport:install --uuids
+php artisan passport:install
 ```
 
 ## Installing Supervisor
@@ -737,7 +867,7 @@ Create a new configuration file:
 sudo nano /etc/supervisor/conf.d/anonaddy.conf
 ```
 
-Enter the following inside (change user and command location if you need to):
+Enter the following inside (change user, command location and the number of processes if you need to):
 
 ```
 [program:anonaddy]
@@ -775,9 +905,21 @@ Just update the value of `ANONADDY_ENABLE_REGISTRATION` to false in your .env fi
 
 If you are using encryption and want to sign your forwarded emails then you'll need to create a new GPG key pair.
 
-A simple guide can be found here - https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair
+A simple guide can be found here - [https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair](https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair)
 
-Then update the value of `ANONADDY_SIGNING_KEY_FINGERPRINT=` in your .env file to match the fingerprint of your key e.g. `26A987650243B28802524E2F809FD0D502E2F695`.
+You will need to generate a key pair without giving it a password because php-gnupg is not able to use keys that are password protected.
+
+To find your key's fingerprint run:
+
+```bash
+gpg -k
+```
+
+The fingerprint is 40 characters long and looks like this `26A987650243B28802524E2F809FD0D502E2F695`.
+
+Then update the value of `ANONADDY_SIGNING_KEY_FINGERPRINT=` in your .env file to match the fingerprint of your key.
+
+Then run `php artisan config:cache` to update.
 
 ## What to do next
 
@@ -833,7 +975,7 @@ sudo systemctl restart postfix spamass-milter
 
 If you want to test if Spamassasin is working then send an email with the content from this link in it.
 
-https://spamassassin.apache.org/gtube/
+[https://spamassassin.apache.org/gtube/](https://spamassassin.apache.org/gtube/)
 
 It should be rejected with the message `ERROR_CODE :550, ERROR_CODE :5.7.1 Blocked by SpamAssassin`.
 
@@ -843,7 +985,11 @@ This is to speed up queries and to prevent you getting rate limited when queryin
 
 Follow the below blog post on how to install bind9.
 
-https://www.linuxbabe.com/ubuntu/set-up-local-dns-resolver-ubuntu-18-04-16-04-bind9
+[https://www.linuxbabe.com/ubuntu/set-up-local-dns-resolver-ubuntu-20-04-bind9](https://www.linuxbabe.com/ubuntu/set-up-local-dns-resolver-ubuntu-20-04-bind9)
+
+Or if you're using Ubuntu 18.04 then:
+
+[https://www.linuxbabe.com/ubuntu/set-up-local-dns-resolver-ubuntu-18-04-16-04-bind9](https://www.linuxbabe.com/ubuntu/set-up-local-dns-resolver-ubuntu-18-04-16-04-bind9)
 
 Now open up `/etc/nginx/conf.d/example.com.conf` and add these two lines below the ssl parameters.
 
@@ -880,6 +1026,11 @@ Update `/etc/spamassassin/local.cf` and add this near the top:
 dns_available yes
 ```
 
+Then restart spamassassin.
+
+```bash
+sudo service spamassassin restart
+```
 
 ## Updating
 
@@ -902,10 +1053,6 @@ php artisan queue:restart
 
 This should pull in any updates from the GitHub repository and update your dependencies. It will then run any migrations before finally clearing the cache and restarting the queue workers.
 
-## Adding DNSSEC
+## Credits
 
-
-
-// TODO
-DNSSEC, DANE (TLSA DNS record), SMTP TLS Reporting (TLS-RPT).
-
+A big thank you to Xiao Guoan over at [linuxbabe.com](https://www.linuxbabe.com/) for all of his amazing articles. I highly recommend you subscribe to his newsletter.

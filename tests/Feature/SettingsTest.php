@@ -211,6 +211,34 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_enable_catch_all_for_account()
+    {
+        $this->user->update(['catch_all' => false]);
+
+        $this->assertFalse($this->user->catch_all);
+
+        $response = $this->post('/settings/catch-all/', [
+            'catch_all' => true
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertTrue($this->user->catch_all);
+    }
+
+    /** @test */
+    public function user_can_disable_catch_all_for_account()
+    {
+        $this->assertTrue($this->user->catch_all);
+
+        $response = $this->post('/settings/catch-all/', [
+            'catch_all' => false
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertFalse($this->user->catch_all);
+    }
+
+    /** @test */
     public function user_can_delete_account()
     {
         $this->assertNotNull($this->user->id);

@@ -393,6 +393,51 @@
 
         <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
 
+            <form class="mb-16" method="POST" action="{{ route('settings.catch_all') }}">
+                @csrf
+
+                <div class="mb-6">
+
+                    <h3 class="font-bold text-xl">
+                        Update Catch-All Functionality for Account Username
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="mt-6">This will determine if your main account username (<b>{{ $user->username }}</b>) is able to function as a catch-all subdomain. When enabled you will be able to create any alias at {{ $user->username }}.{{ config('anonaddy.domain') }} or any of your other subdomains on-the-fly. Meaning they will be created automatically in your dashboard as soon as they receive their first email.
+                    </p>
+                    <p class="mt-4">When disabled you will only be able to receive email for your unique username subdomains if an alias <b>already exists</b> in your account.</p>
+
+                    <div class="mt-6 flex flex-wrap mb-4">
+                        <label for="catch_all" class="block text-grey-700 text-sm mb-2">
+                            {{ __('Update Catch-All') }}:
+                        </label>
+
+                        <div class="block relative w-full">
+                            <select id="catch_all" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="catch_all" required>
+                                <option value="1" {{ $user->catch_all ? 'selected' : '' }}>Enabled</option>
+                                <option value="0" {{ ! $user->catch_all ? 'selected' : '' }}>Disabled</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+
+                        @if ($errors->has('catch_all'))
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('catch_all') }}
+                            </p>
+                        @endif
+                    </div>
+
+                </div>
+
+                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                    Update Username Catch-All
+                </button>
+
+            </form>
+
             <form class="mb-16" method="POST" action="{{ route('settings.from_name') }}">
                 @csrf
 

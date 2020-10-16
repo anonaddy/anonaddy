@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'signing_key_fingerprint' => env('ANONADDY_SIGNING_KEY_FINGERPRINT'),
+    'signing_key_fingerprint' => env('ANONADDY_SIGNING_KEY_FINGERPRINT', null),
 
     /*
     |--------------------------------------------------------------------------

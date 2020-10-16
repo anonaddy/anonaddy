@@ -191,6 +191,7 @@ A few days before your billing cycle ends you will receive an email letting you 
 * Paid account settings will be reverted to default values
 * Any aliases using paid plan only domains will be **deactivated**
 * If you have any more than 20 aliases using a shared domain e.g. anonaddy.me they will be **deactivated**
+* If your account username has catch-all disabled then it will be enabled
 
 You will not be able to activate any of the above again until you resubscribe.
 

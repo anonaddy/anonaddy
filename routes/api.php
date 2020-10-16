@@ -79,4 +79,6 @@ Route::group([
     Route::get('/domain-options', 'Api\DomainOptionController@index');
 
     Route::get('/account-details', 'Api\AccountDetailController@index');
+
+    Route::get('/app-version', 'Api\AppVersionController@index');
 });

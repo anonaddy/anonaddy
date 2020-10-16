@@ -60,6 +60,8 @@ Route::group([
 
     Route::post('/banner-location', 'BannerLocationController@update')->name('settings.banner_location');
 
+    Route::post('/catch-all', 'CatchAllController@update')->name('settings.catch_all');
+
     Route::post('/password', 'PasswordController@update')->name('settings.password');
 
     Route::post('/2fa/enable', 'Auth\TwoFactorAuthController@store')->name('settings.2fa_enable');
