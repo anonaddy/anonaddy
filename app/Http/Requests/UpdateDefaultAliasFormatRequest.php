@@ -27,7 +27,7 @@ class UpdateDefaultAliasFormatRequest extends FormRequest
             'format' => [
                 'required',
                 'string',
-                'in:uuid,random_words'
+                'in:uuid,random_words,custom'
             ]
         ];
     }

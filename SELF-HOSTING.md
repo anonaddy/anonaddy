@@ -617,13 +617,17 @@ DROP PROCEDURE IF EXISTS `check_access`$$
 
 CREATE DEFINER=`anonaddy`@`localhost` PROCEDURE `check_access`(alias_email VARCHAR(254) charset utf8)
 BEGIN
-    DECLARE alias_action varchar(7) charset utf8;
     DECLARE no_alias_exists int(1);
+    DECLARE alias_action varchar(7) charset utf8;
+    DECLARE username_action varchar(7) charset utf8;
+    DECLARE additional_username_action varchar(7) charset utf8;
+    DECLARE domain_action varchar(7) charset utf8;
     DECLARE alias_domain varchar(254) charset utf8;
+
     SET alias_domain = SUBSTRING_INDEX(alias_email, '@', -1);
 
     # We only want to carry out the checks if it is a full RCPT TO address without any + extension
-    IF LOCATE('@',alias_email) > 1 AND LOCATE('+',alias_email) = 0 AND LENGTH(alias_domain) > 0 THEN
+    IF LOCATE('+',alias_email) = 0 THEN
 
         SET no_alias_exists = CASE WHEN NOT EXISTS(SELECT NULL FROM aliases WHERE email = alias_email) THEN 1 ELSE 0 END;
 
@@ -638,7 +642,7 @@ BEGIN
             WHERE
                 email = alias_email
                 AND (active = 0
-                OR deleted_at IS NOT NULL) LIMIT 1);
+                OR deleted_at IS NOT NULL));
         END IF;
 
         # If the alias is deactivated or deleted then increment its blocked count and return the alias_action
@@ -648,8 +652,7 @@ BEGIN
             SET
                 emails_blocked = emails_blocked + 1
             WHERE
-                email = alias_email
-            LIMIT 1;
+                email = alias_email;
 
             SELECT alias_action;
         ELSE
@@ -664,7 +667,7 @@ BEGIN
             FROM
                 users
             WHERE
-                alias_domain IN ( CONCAT(username, '.example.com')) ) AS users,
+                alias_domain IN ( CONCAT(username, '.example.com')) ),
             (
             SELECT
                 CASE
@@ -676,7 +679,7 @@ BEGIN
             FROM
                 additional_usernames
             WHERE
-                alias_domain IN ( CONCAT(username, '.example.com')) ) AS usernames,
+                alias_domain IN ( CONCAT(username, '.example.com')) ),
             (
             SELECT
                 CASE
@@ -688,10 +691,21 @@ BEGIN
             FROM
                 domains
             WHERE
-                domain = alias_domain) AS domains
-            LIMIT 1;
+                domain = alias_domain) INTO username_action, additional_username_action, domain_action;
+
+            # If all actions are NULL then we can return 'DUNNO' which will prevent Postfix from trying substrings of the alias
+            IF username_action IS NULL AND additional_username_action IS NULL AND domain_action IS NULL THEN
+                SELECT 'DUNNO';
+            ELSEIF username_action IN('DISCARD','REJECT') THEN
+                SELECT username_action;
+            ELSEIF additional_username_action IN('DISCARD','REJECT') THEN
+                SELECT additional_username_action;
+            ELSE
+                SELECT domain_action;
+            END IF;
         END IF;
     ELSE
+        # This means the alias must have a + extension so we will ignore it
         SELECT NULL;
     END IF;
  END$$
@@ -708,27 +722,27 @@ IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))
 You may be wondering why we have this line near the top of the procedure:
 
 ```sql
-IF LOCATE('@',alias_email) > 1 AND LOCATE('+',alias_email) = 0 AND LENGTH(alias_domain) > 0 THEN
+IF LOCATE('+',alias_email) = 0 THEN
 ```
 
-The reason this is present is because Postfix will pass multiple arguments to this stored procedure for each incoming email.
+This is present because Postfix will pass multiple arguments (substrings of the alias) to this stored procedure for each incoming email.
 
 From the Postfix docs for [check_recipient_access](http://www.postfix.org/postconf.5.html#check_recipient_access):
 
 > "Search the specified access(5) database for the resolved RCPT TO address, domain, parent domains, or localpart@, and execute the corresponding action."
 
-What this means is that if an email comes in for the alias - hello+extension@username.example.com then Postfix will run the stored procedure with the following arguements:
+What this means is that if an email comes in for the alias - hello+extension@username.example.com then Postfix will run the stored procedure with the following arguments and order:
 
 ```sql
 CALL check_access('hello+extension@username.example.com');
-CALL check_access('hello@username.example.com');
+CALL check_access('hello@username.example.com'); # We want it to stop the checks here which is why we return 'DUNNO'
 CALL check_access('username.example.com');
 CALL check_access('example.com');
 CALL check_access('com');
 CALL check_access('hello@');
 ```
 
-We only want the queries to be run for the RCPT TO address (hello@username.example.com) without any + extension, which is what the check above does. It also prevents needless database queries being run.
+We only want the queries to be run for the RCPT TO address (hello@username.example.com) without any + extension, which is what the check above does. It also prevents needless database queries being run by returning 'DUNNO' when it finds a match.
 
 Update the permissions and the group of these files:
 
@@ -787,7 +801,7 @@ At the time of writing this I'm using the latest LTS - v12.19.0
 
 ```bash
 cd /var/www/anonaddy
-composer install --prefer-dist --no-scripts --no-dev -o && npm install
+composer install --prefer-dist --no-dev -o && npm install
 npm run production
 ```
 
@@ -1041,8 +1055,9 @@ In order to update you can run the following commands:
 ```bash
 git pull origin master
 
-composer update
+composer install --prefer-dist --no-dev -o
 npm update
+npm run production
 php artisan migrate
 
 php artisan config:cache
