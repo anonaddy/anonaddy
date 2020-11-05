@@ -531,7 +531,7 @@ class ReceiveEmailTest extends TestCase
             'emails_blocked' => 0
         ]);
 
-        Mail::assertNotSent(ForwardEmail::class);
+        Mail::assertNotQueued(ForwardEmail::class);
     }
 
     /** @test */
@@ -583,66 +583,7 @@ class ReceiveEmailTest extends TestCase
             'active' => false
         ]);
 
-        Mail::assertNotSent(ForwardEmail::class);
-    }
-
-    /** @test */
-    public function it_does_not_count_unsubscribe_recipient_when_calculating_size()
-    {
-        Mail::fake();
-
-        Mail::assertNothingSent();
-
-        Alias::factory()->create([
-            'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
-            'user_id' => $this->user->id,
-            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'local_part' => 'ebay',
-            'domain' => 'johndoe.'.config('anonaddy.domain')
-        ]);
-
-        Recipient::factory()->create([
-            'user_id' => $this->user->id,
-            'email' => 'will@anonaddy.com'
-        ]);
-
-        $this->assertDatabaseHas('aliases', [
-            'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
-            'user_id' => $this->user->id,
-            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'active' => true
-        ]);
-
-        $this->artisan(
-            'anonaddy:receive-email',
-            [
-                'file' => base_path('tests/emails/email_unsubscribe_plus_other_recipient.eml'),
-                '--sender' => 'will@anonaddy.com',
-                '--recipient' => ['8f36380f-df4e-4875-bb12-9c4448573712@unsubscribe.anonaddy.com', 'another@johndoe.anonaddy.com'],
-                '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712', 'another'],
-                '--extension' => ['', ''],
-                '--domain' => ['unsubscribe.anonaddy.com', 'johndoe.anonaddy.com'],
-                '--size' => '1000'
-            ]
-        )->assertExitCode(0);
-
-        $this->assertDatabaseHas('aliases', [
-            'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
-            'user_id' => $this->user->id,
-            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'local_part' => 'ebay',
-            'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'active' => false
-        ]);
-        $this->assertDatabaseHas('aliases', [
-            'user_id' => $this->user->id,
-            'email' => 'another@johndoe.'.config('anonaddy.domain'),
-            'local_part' => 'another',
-            'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'active' => true
-        ]);
-
-        Mail::assertNotSent(ForwardEmail::class);
+        Mail::assertNotQueued(ForwardEmail::class);
     }
 
     /** @test */
@@ -689,7 +630,7 @@ class ReceiveEmailTest extends TestCase
             'active' => true
         ]);
 
-        Mail::assertNotSent(ForwardEmail::class);
+        Mail::assertNotQueued(ForwardEmail::class);
     }
 
     /** @test */

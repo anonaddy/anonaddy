@@ -537,12 +537,8 @@ export default {
       axios
         .delete(`/api/v1/recipients/${recipient.id}`)
         .then(response => {
-          let recipients = _.filter(this.rows, ['fingerprint', recipient.fingerprint])
-
-          _.forEach(recipients, function(recipient) {
-            recipient.should_encrypt = false
-            recipient.fingerprint = null
-          })
+          recipient.should_encrypt = false
+          recipient.fingerprint = null
 
           this.rows = _.reject(this.rows, row => row.id === recipient.id)
           this.deleteRecipientModalOpen = false
@@ -568,12 +564,9 @@ export default {
       axios
         .delete(`/api/v1/recipient-keys/${recipient.id}`)
         .then(response => {
-          let recipients = _.filter(this.rows, ['fingerprint', recipient.fingerprint])
+          recipient.should_encrypt = false
+          recipient.fingerprint = null
 
-          _.forEach(recipients, function(recipient) {
-            recipient.should_encrypt = false
-            recipient.fingerprint = null
-          })
           this.deleteRecipientKeyModalOpen = false
           this.deleteRecipientKeyLoading = false
         })

@@ -323,31 +323,27 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $gnupg = new \gnupg();
 
-        $key = $gnupg->keyinfo($fingerprint);
+        $recipientsUsingFingerprint = $this
+            ->recipients()
+            ->get()
+            ->where('fingerprint', $fingerprint);
 
-        // Check that the user has a verified recipient matching the keys email.
-        collect($key[0]['uids'])
-            ->filter(function ($uid) {
-                return ! $uid['invalid'];
-            })
-            ->pluck('email')
-            ->each(function ($email) use ($gnupg, $fingerprint) {
-                if ($this->isVerifiedRecipient($email)) {
-                    $gnupg->deletekey($fingerprint);
-                }
-            });
+        // Check that the user has a verified recipient matching the key's email and if any other recipients are using that key.
+        if (isset($key[0])) {
+            collect($key[0]['uids'])
+                ->filter(function ($uid) {
+                    return ! $uid['invalid'];
+                })
+                ->pluck('email')
+                ->each(function ($email) use ($gnupg, $fingerprint, $recipientsUsingFingerprint) {
+                    if ($this->isVerifiedRecipient($email) && $recipientsUsingFingerprint->count() === 1) {
+                        $gnupg->deletekey($fingerprint);
 
-        // Remove the key from all user recipients using that same fingerprint.
-        if (! $gnupg->keyinfo($fingerprint)) {
-            $this
-                ->recipients()
-                ->get()
-                ->where('fingerprint', $fingerprint)
-                ->each(function ($recipient) {
-                    $recipient->update([
-                        'should_encrypt' => false,
-                        'fingerprint' => null
-                    ]);
+                        $recipientsUsingFingerprint->first()->update([
+                            'should_encrypt' => false,
+                            'fingerprint' => null
+                        ]);
+                    }
                 });
         }
     }

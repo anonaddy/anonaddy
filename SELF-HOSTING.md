@@ -430,6 +430,12 @@ listen.owner = johndoe
 listen.group = johndoe
 ```
 
+Then restart php7.4-fpm by running:
+
+```bash
+sudo service php7.4-fpm restart
+```
+
 ## Let's Encrypt
 
 Now we need to get an SSL certificate using Acme.sh.
@@ -503,10 +509,10 @@ Next follow this blog post on how to install OpenDMARC.
 
 [https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu](https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu)
 
-Next add a new TXT record to your domain for DMARC with a host of `@` and value:
+Next add a new TXT record to your domain for DMARC with a host of `_dmarc` and value:
 
 ```
-v=DMARC1; p=none; pct=100; rua=mailto:dmarc-reports@example.com
+"v=DMARC1; p=none; sp=none; adkim=r; aspf=r; pct=100;"
 ```
 
 For further reading about DMARC records and the different options available see - [https://www.linuxbabe.com/mail-server/create-dmarc-record](https://www.linuxbabe.com/mail-server/create-dmarc-record)
@@ -866,6 +872,34 @@ php artisan queue:restart
 
 php artisan passport:install
 ```
+
+Running `passport:install` will output details about a new personal access client, e.g.
+
+```bash
+Encryption keys generated successfully.
+Personal access client created successfully.
+Client ID: 1
+Client secret: MlVp37PNqtN9efBTw2wuenjMnMIlDuKBWK3GZQoJ
+Password grant client created successfully.
+Client ID: 2
+Client secret: ZTvhZCRZMdKUvmwqSmNAfWzAoaRatVWgbCVN2cR2
+```
+
+You need to update your `.env` file and add the details for the personal access client:
+
+```
+PASSPORT_PERSONAL_ACCESS_CLIENT_ID=client-id-value
+PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET=unhashed-client-secret-value
+```
+
+So I would enter:
+
+```
+PASSPORT_PERSONAL_ACCESS_CLIENT_ID=1
+PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET=MlVp37PNqtN9efBTw2wuenjMnMIlDuKBWK3GZQoJ
+```
+
+More information can be found in the Laravel documentation for Passport - [https://laravel.com/docs/8.x/passport](https://laravel.com/docs/8.x/passport)
 
 ## Installing Supervisor
 

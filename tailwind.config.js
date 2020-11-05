@@ -3,6 +3,20 @@ module.exports = {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
   },
+  purge: {
+    content: [
+      'app/**/*.php',
+      'resources/**/*.html',
+      'resources/**/*.js',
+      'resources/**/*.php',
+      'resources/**/*.vue',
+    ],
+
+    // These options are passed through directly to PurgeCSS
+    options: {
+      whitelistPatterns: [/-active$/, /-enter$/, /-leave-to$/, /show$/],
+    },
+  },
   theme: {
     colors: {
       white: '#FFF',

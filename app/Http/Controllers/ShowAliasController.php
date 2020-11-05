@@ -21,7 +21,7 @@ class ShowAliasController extends Controller
             'aliases' => user()
                 ->aliases()
                 ->with([
-                    'recipients:recipient_id,email',
+                    'recipients:id,email',
                     'aliasable.defaultRecipient:id,email'
                 ])
                 ->latest()

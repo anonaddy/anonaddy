@@ -7,7 +7,7 @@ class ShowRecipientController extends Controller
     public function index()
     {
         $recipients = user()->recipients()->with([
-            'aliases:alias_id,aliasable_id,email',
+            'aliases:id,aliasable_id,email',
             'domainsUsingAsDefault.aliases:id,aliasable_id,email',
             'AdditionalUsernamesUsingAsDefault.aliases:id,aliasable_id,email'
         ])->latest()->get();

@@ -30,5 +30,7 @@ class AuthServiceProvider extends ServiceProvider
         }, ['middleware' => ['web', 'auth', '2fa']]);
 
         Passport::cookie('anonaddy_token');
+
+        Passport::personalAccessTokensExpireIn(now()->addYears(5));
     }
 }
