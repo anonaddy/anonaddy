@@ -5,9 +5,9 @@ current:
   major: 0
   minor: 6
   patch: 0
-  prerelease: 1-geaed93a
+  prerelease: 2-g2bfc353
   buildmetadata: ''
-  commit: eaed93
+  commit: 2bfc35
   timestamp:
     year: 2020
     month: 10

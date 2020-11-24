@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\Webauthn;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ class BackupCodeController extends Controller
     {
         $authenticator = app(Authenticator::class)->boot($request);
 
-        if ($authenticator->isAuthenticated() || ! $request->user()->two_factor_enabled) {
+        if (($authenticator->isAuthenticated() || ! $request->user()->two_factor_enabled) && ! Webauthn::enabled($request->user())) {
             return redirect('/');
         }
 
@@ -45,6 +46,8 @@ class BackupCodeController extends Controller
             'two_factor_secret' => $twoFactor->generateSecretKey(),
             'two_factor_backup_code' => null
         ]);
+
+        user()->webauthnKeys()->delete();
 
         if ($request->session()->has('intended_path')) {
             return redirect($request->session()->pull('intended_path'));

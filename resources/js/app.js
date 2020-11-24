@@ -35,6 +35,7 @@ Vue.component(
   'passport-personal-access-tokens',
   require('./components/passport/PersonalAccessTokens.vue').default
 )
+Vue.component('webauthn-keys', require('./components/WebauthnKeys.vue').default)
 
 Vue.filter('formatDate', value => {
   return dayjs(value).format('Do MMM YYYY')

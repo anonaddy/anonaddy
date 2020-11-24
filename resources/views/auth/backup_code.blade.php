@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">

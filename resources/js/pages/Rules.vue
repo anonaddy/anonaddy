@@ -2,7 +2,7 @@
   <div>
     <div class="mb-6 flex flex-col md:flex-row justify-between md:items-center">
       <div class="flex items-center">
-        <icon name="move" class="block w-6 h-6 mr-2 text-grey-200 fill-current" />
+        <icon name="move" class="block w-6 h-6 mr-2 text-grey-300 fill-current" />
         You can drag and drop rules to order them.
       </div>
       <button
@@ -30,7 +30,7 @@
             <div class="flex items-center w-3/5">
               <icon
                 name="menu"
-                class="handle block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
               />
 
               <span class="m-4">{{ row.name }} </span>
@@ -47,12 +47,12 @@
             <div class="w-1/5 flex justify-end">
               <icon
                 name="edit"
-                class="block w-6 h-6 mr-3 text-grey-200 fill-current cursor-pointer"
+                class="block w-6 h-6 mr-3 text-grey-300 fill-current cursor-pointer"
                 @click.native="openEditModal(row)"
               />
               <icon
                 name="trash"
-                class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
                 @click.native="openDeleteModal(row.id)"
               />
             </div>
@@ -227,7 +227,7 @@
                   <icon
                     v-if="createRuleObject.conditions.length > 1"
                     name="trash"
-                    class="block ml-4 w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                    class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
                     @click.native="deleteCondition(createRuleObject, key)"
                   />
                 </div>
@@ -371,7 +371,7 @@
                   <icon
                     v-if="createRuleObject.actions.length > 1"
                     name="trash"
-                    class="block ml-4 w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                    class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
                     @click.native="deleteAction(createRuleObject, key)"
                   />
                 </div>
@@ -562,7 +562,7 @@
                   <icon
                     v-if="editRuleObject.conditions.length > 1"
                     name="trash"
-                    class="block ml-4 w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                    class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
                     @click.native="deleteCondition(editRuleObject, key)"
                   />
                 </div>
@@ -700,7 +700,7 @@
                   <icon
                     v-if="editRuleObject.actions.length > 1"
                     name="trash"
-                    class="block ml-4 w-6 h-6 text-grey-200 fill-current cursor-pointer"
+                    class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
                     @click.native="deleteAction(editRuleObject, key)"
                   />
                 </div>

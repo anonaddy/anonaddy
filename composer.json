@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
+        "asbiin/laravel-webauthn": "^0.9.0",
         "bacon/bacon-qr-code": "^2.0",
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.2",

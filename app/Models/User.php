@@ -190,6 +190,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's webauthn keys.
+     */
+    public function webauthnKeys()
+    {
+        return $this->hasMany(WebauthnKey::class);
+    }
+
+    /**
      * Get all of the user's verified recipients.
      */
     public function verifiedRecipients()

@@ -11,7 +11,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalActive }}
-            <p class="text-grey-200 text-sm tracking-wide uppercase">
+            <p class="text-grey-300 text-sm tracking-wide uppercase">
               Active
             </p>
           </div>
@@ -27,7 +27,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalInactive }}
-            <p class="text-grey-200 text-sm tracking-wide uppercase">
+            <p class="text-grey-300 text-sm tracking-wide uppercase">
               Inactive
             </p>
           </div>
@@ -43,7 +43,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalForwarded }}
-            <p class="text-grey-200 text-sm tracking-wide uppercase">
+            <p class="text-grey-300 text-sm tracking-wide uppercase">
               Emails Forwarded
             </p>
           </div>
@@ -59,7 +59,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalBlocked }}
-            <p class="text-grey-200 text-sm tracking-wide uppercase">
+            <p class="text-grey-300 text-sm tracking-wide uppercase">
               Emails Blocked
             </p>
           </div>
@@ -75,7 +75,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalReplies }}
-            <p class="text-grey-200 text-sm tracking-wide uppercase">
+            <p class="text-grey-300 text-sm tracking-wide uppercase">
               Email Replies
             </p>
           </div>
@@ -91,7 +91,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ bandwidthMb }}<span class="text-sm tracking-wide uppercase">MB</span>
-            <p class="text-grey-200 text-sm tracking-wide uppercase">Bandwidth ({{ month }})</p>
+            <p class="text-grey-300 text-sm tracking-wide uppercase">Bandwidth ({{ month }})</p>
           </div>
         </div>
       </div>
@@ -231,7 +231,7 @@
             </span>
             <icon
               name="edit"
-              class="inline-block w-6 h-6 ml-2 text-grey-200 fill-current cursor-pointer"
+              class="inline-block w-6 h-6 ml-2 text-grey-300 fill-current cursor-pointer"
               @click.native="
                 ;(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = props.row.description)
               "
@@ -239,7 +239,7 @@
           </div>
           <div v-else>
             <span
-              class="inline-block text-grey-200 text-sm cursor-pointer py-1 border border-transparent"
+              class="inline-block text-grey-300 text-sm cursor-pointer py-1 border border-transparent"
               @click=";(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = '')"
               >Add description</span
             >
@@ -275,7 +275,7 @@
           >
           <icon
             name="edit"
-            class="ml-2 inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
             @click.native="openAliasRecipientsModal(props.row)"
           />
         </span>
@@ -295,7 +295,7 @@
           v-else-if="props.column.field == 'emails_replied'"
           class="font-semibold text-indigo-800"
         >
-          {{ props.row.emails_replied }} <span class="text-grey-200">/</span>
+          {{ props.row.emails_replied }} <span class="text-grey-300">/</span>
           {{ props.row.emails_sent }}
         </span>
         <span v-else-if="props.column.field === 'active'" class="flex items-center">
@@ -309,13 +309,13 @@
           <icon
             v-if="props.row.deleted_at"
             name="undo"
-            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer outline-none"
+            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer outline-none"
             @click.native="openRestoreModal(props.row.id)"
           />
           <icon
             v-else
             name="trash"
-            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer outline-none"
+            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer outline-none"
             @click.native="openDeleteModal(props.row.id)"
           />
         </span>

@@ -100,7 +100,7 @@
             }}</span>
             <icon
               name="edit"
-              class="inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer ml-2"
+              class="inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer ml-2"
               @click.native="
                 ;(usernameIdToEdit = props.row.id),
                   (usernameDescriptionToEdit = props.row.description)
@@ -110,7 +110,7 @@
           <div v-else class="flex justify-center">
             <icon
               name="plus"
-              class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
               @click.native=";(usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = '')"
             />
           </div>
@@ -120,14 +120,14 @@
             {{ props.row.default_recipient.email | truncate(30) }}
             <icon
               name="edit"
-              class="ml-2 inline-block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
               @click.native="openUsernameDefaultRecipientModal(props.row)"
             />
           </div>
           <div class="flex justify-center" v-else>
             <icon
               name="plus"
-              class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+              class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
               @click.native="openUsernameDefaultRecipientModal(props.row)"
             />
           </div>
@@ -152,7 +152,7 @@
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <icon
             name="trash"
-            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
             @click.native="openDeleteModal(props.row.id)"
           />
         </span>

@@ -1,0 +1,127 @@
+<template>
+  <div>
+    <div class="mt-6">
+      <h3 class="font-bold text-xl">
+        Device Authentication (U2F)
+      </h3>
+
+      <div class="my-4 w-24 border-b-2 border-grey-200"></div>
+
+      <p class="my-6">
+        Webauthn Keys you have registered for 2nd factor authentication. To remove a key simply
+        click the delete button next to it.
+      </p>
+
+      <div>
+        <p class="mb-0" v-if="keys.length === 0">
+          You have not registered any Webauthn Keys.
+        </p>
+
+        <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
+          <div class="table-row">
+            <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
+            <div class="table-cell p-1 md:p-4 text-right">
+              <a href="/webauthn/register" class="text-indigo-700">Add New Device</a>
+            </div>
+          </div>
+          <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
+            <div class="table-cell p-1 md:p-4">{{ key.name }}</div>
+            <div class="table-cell p-1 md:p-4">{{ key.created_at | timeAgo }}</div>
+            <div class="table-cell p-1 md:p-4 text-right">
+              <a
+                class="text-red-500 font-bold cursor-pointer focus:outline-none"
+                @click="showRemoveModal(key)"
+              >
+                Delete
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <Modal :open="deleteKeyModalOpen" @close="closeDeleteKeyModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Remove U2F Device
+        </h2>
+        <p class="my-4 text-grey-700">
+          Once this device is removed, <b>Two-Factor Authentication</b> will be disabled on your
+          account.
+        </p>
+        <div class="mt-6">
+          <button
+            @click="remove"
+            class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none"
+            :class="removeKeyLoading ? 'cursor-not-allowed' : ''"
+            :disabled="removeKeyLoading"
+          >
+            Remove
+            <loader v-if="removeKeyLoading" />
+          </button>
+          <button
+            @click="closeDeleteKeyModal"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </Modal>
+  </div>
+</template>
+
+<script>
+import Modal from './Modal.vue'
+
+export default {
+  components: {
+    Modal,
+  },
+  data() {
+    return {
+      deleteKeyModalOpen: false,
+      keys: [],
+      keyToRemove: null,
+      loading: false,
+      removeKeyLoading: false,
+    }
+  },
+  mounted() {
+    this.getWebauthnKeys()
+  },
+
+  methods: {
+    getWebauthnKeys() {
+      axios.get('/webauthn/keys').then(response => {
+        this.keys = response.data
+      })
+    },
+    showRemoveModal(token) {
+      this.keyToRemove = token
+      this.deleteKeyModalOpen = true
+    },
+    remove() {
+      this.removeKeyLoading = true
+
+      axios.delete(`/webauthn/${this.keyToRemove.id}`).then(response => {
+        this.removeKeyLoading = false
+        this.deleteKeyModalOpen = false
+        this.keyToRemove = null
+
+        if (this.keys.length === 1) {
+          location.reload()
+        } else {
+          this.getWebauthnKeys()
+        }
+      })
+    },
+    closeDeleteKeyModal() {
+      this.deleteKeyModalOpen = false
+    },
+  },
+}
+</script>

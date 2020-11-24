@@ -63,7 +63,7 @@
               }.anonaddy.com. Separating each key by a full stop.`
             "
           >
-            <icon name="info" class="inline-block w-4 h-4 text-grey-200 fill-current" />
+            <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>
         </span>
         <span v-else>
@@ -125,7 +125,7 @@
             />
             <icon
               name="fingerprint"
-              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current mx-2"
+              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-300 fill-current mx-2"
               :data-tippy-content="props.row.fingerprint"
               v-clipboard="() => props.row.fingerprint"
               v-clipboard:success="clipboardSuccess"
@@ -133,7 +133,7 @@
             />
             <icon
               name="delete"
-              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-200 fill-current"
+              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-300 fill-current"
               @click.native="openDeleteRecipientKeyModal(props.row)"
               data-tippy-content="Remove public key"
             />
@@ -168,7 +168,7 @@
           <icon
             v-if="!isDefault(props.row.id)"
             name="trash"
-            class="block w-6 h-6 text-grey-200 fill-current cursor-pointer"
+            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
             @click.native="openDeleteModal(props.row)"
           />
         </span>

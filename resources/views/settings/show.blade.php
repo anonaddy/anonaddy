@@ -9,7 +9,7 @@
                 <div class="flex items-center mb-2">
                     <span class="rounded-full bg-yellow-400 uppercase px-2 py-1 text-xs font-bold mr-2">Important</span>
                     <div>
-                        2FA enabled successfully. Please <b>make a copy of your backup code below</b>. If you lose your 2FA device you can use this backup code to disable 2FA on your account. <b>This is the only time this code will be displayed, so be sure not to lose it!</b>
+                        2FA enabled successfully. Please <b>make a copy of your backup code below</b>. If you have an old backup code saved <b>you must update it with this one.</b> If you lose your 2FA device you can use this backup code to disable 2FA on your account. <b>This is the only time this code will be displayed, so be sure not to lose it!</b>
                     </div>
                 </div>
                 <pre class="flex p-3 text-grey-900 bg-white border rounded">
@@ -289,8 +289,33 @@
 
             </form>
 
+        </div>
 
-            <div id="two-factor" class="pt-16">
+        <div class="mb-4">
+            <h2 class="text-3xl font-bold">
+                Two-Factor Authentication
+            </h2>
+            <p class="text-grey-500">Manage your 2FA options</p>
+        </div>
+
+        <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
+
+            <div id="two-factor">
+
+                <h3 class="font-bold text-xl">
+                Information
+                </h3>
+
+                <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                <p class="mt-6">
+                    Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of security to your account beyond your username and password. There are <b>two options for 2FA</b> - Authentication App (e.g. Google Authenticator or another, Aegis, andOTP) or U2F Device Authentication (e.g. YubiKey, SoloKey, Nitrokey).
+                </p>
+
+                <p class="mt-4 pb-16">
+                    When you login with 2FA enabled, you will be prompted to use a security key or enter a OTP (one time passcode) depending on which method you choose below. You can only have one method of 2nd factor authentication enabled at once.
+                </p>
+
                 @if($user->two_factor_enabled)
 
                     <form method="POST" action="{{ route('settings.2fa_disable') }}">
@@ -299,7 +324,7 @@
                         <div class="mb-6">
 
                             <h3 class="font-bold text-xl">
-                                Disable 2 Factor Authentication
+                                Disable Authentication App (TOTP)
                             </h3>
 
                             <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
@@ -323,63 +348,89 @@
                         </div>
 
                         <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
-                            {{ __('Disable 2FA') }}
+                            {{ __('Disable') }}
                         </button>
 
                     </form>
 
                 @else
 
+                    @if(App\Facades\Webauthn::enabled($user))
 
-                    <div class="mb-6">
+                        <webauthn-keys />
 
-                        <h3 class="font-bold text-xl">
-                            Enable 2 Factor Authentication
-                        </h3>
+                    @else
 
-                        <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+                        <div class="mb-6">
 
-                        <p class="mt-6">2 factor authentication requires the use of Google Authenticator or another compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively, you can use the code below. Make sure that you write down your secret code in a safe place.</p>
+                            <h3 class="font-bold text-xl">
+                                Enable Authentication App (TOTP)
+                            </h3>
 
-                        <div>
-                            <img src="{{ $qrCode }}">
-                            <p class="mb-2">Secret: {{ $authSecret }}</p>
-                            <form method="POST" action="{{ route('settings.2fa_regenerate') }}">
-                                @csrf
-                                <input type="submit" class="text-indigo-900 bg-transparent cursor-pointer" value="Click here to regenerate your secret key">
+                            <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
-                                @if ($errors->has('regenerate_2fa'))
-                                    <p class="text-red-500 text-xs italic mt-4">
-                                        {{ $errors->first('regenerate_2fa') }}
-                                    </p>
-                                @endif
-                            </form>
-                        </div>
+                            <p class="mt-6">TOTP 2 factor authentication requires the use of Google Authenticator or another compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively, you can use the code below. Make sure that you write down your secret code in a safe place.</p>
 
-                    </div>
+                            <div>
+                                <img src="{{ $qrCode }}">
+                                <p class="mb-2">Secret: {{ $authSecret }}</p>
+                                <form method="POST" action="{{ route('settings.2fa_regenerate') }}">
+                                    @csrf
+                                    <input type="submit" class="text-indigo-900 bg-transparent cursor-pointer" value="Click here to regenerate your secret key">
 
-                    <form method="POST" action="{{ route('settings.2fa_enable') }}">
-                        @csrf
-                        <div class="my-6 flex flex-wrap">
-                            <label for="two_factor_token" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Verify and Enable') }}:
-                            </label>
-
-                            <div class="block relative w-full">
-                                <input id="two_factor_token" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="two_factor_token" placeholder="123456" />
+                                    @if ($errors->has('regenerate_2fa'))
+                                        <p class="text-red-500 text-xs italic mt-4">
+                                            {{ $errors->first('regenerate_2fa') }}
+                                        </p>
+                                    @endif
+                                </form>
                             </div>
 
-                            @if ($errors->has('two_factor_token'))
-                                <p class="text-red-500 text-xs italic mt-4">
-                                    {{ $errors->first('two_factor_token') }}
-                                </p>
-                            @endif
                         </div>
-                        <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
-                            {{ __('Verify and Enable') }}
-                        </button>
-                    </form>
 
+                        <form method="POST" action="{{ route('settings.2fa_enable') }}">
+                            @csrf
+                            <div class="my-6 flex flex-wrap">
+                                <label for="two_factor_token" class="block text-grey-700 text-sm mb-2">
+                                    {{ __('Verify and Enable') }}:
+                                </label>
+
+                                <div class="block relative w-full">
+                                    <input id="two_factor_token" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="two_factor_token" placeholder="123456" />
+                                </div>
+
+                                @if ($errors->has('two_factor_token'))
+                                    <p class="text-red-500 text-xs italic mt-4">
+                                        {{ $errors->first('two_factor_token') }}
+                                    </p>
+                                @endif
+                            </div>
+                            <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                                {{ __('Verify and Enable') }}
+                            </button>
+                        </form>
+
+                        <div class="pt-16">
+
+                            <h3 class="font-bold text-xl">
+                                Enable Device Authentication (U2F)
+                            </h3>
+
+                            <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                            <p class="my-6">U2F is a standard for universal two-factor authentication tokens. You can use any U2F key such as a Yubikey, Solokey, NitroKey etc.</p>
+
+                            <a
+                            type="button"
+                            href="/webauthn/register"
+                            class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
+                            >
+                                Register U2F Device
+                            </a>
+
+                        </div>
+
+                    @endif
                 @endif
             </div>
 
@@ -387,9 +438,9 @@
 
         <div class="mb-4">
             <h2 class="text-3xl font-bold">
-                Pro Settings
+                Other Settings
             </h2>
-            <p class="text-grey-500">Update pro account preferences</p>
+            <p class="text-grey-500">Update your other account preferences</p>
         </div>
 
         <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">

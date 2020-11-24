@@ -23,7 +23,17 @@ Route::post('/login/2fa', 'Auth\TwoFactorAuthController@authenticateTwoFactor')-
 Route::get('/login/backup-code', 'Auth\BackupCodeController@index')->name('login.backup_code.index');
 Route::post('/login/backup-code', 'Auth\BackupCodeController@login')->name('login.backup_code.login');
 
-Route::middleware(['auth', 'verified', '2fa'])->group(function () {
+Route::group([
+    'middleware' => config('webauthn.middleware', []),
+    'domain' => config('webauthn.domain', null),
+    'prefix' => config('webauthn.prefix', 'webauthn'),
+], function () {
+    Route::get('keys', 'Auth\WebauthnController@index')->name('webauthn.index');
+    Route::post('register', 'Auth\WebauthnController@create')->name('webauthn.create');
+    Route::delete('{id}', 'Auth\WebauthnController@destroy')->name('webauthn.destroy');
+});
+
+Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
     Route::get('/', 'ShowAliasController@index')->name('aliases.index');
 
     Route::get('/recipients', 'ShowRecipientController@index')->name('recipients.index');
@@ -41,7 +51,7 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
 
 
 Route::group([
-    'middleware' => ['auth', '2fa'],
+    'middleware' => ['auth', '2fa', 'webauthn'],
     'prefix' => 'settings'
 ], function () {
     Route::get('/', 'SettingController@show')->name('settings.show');
