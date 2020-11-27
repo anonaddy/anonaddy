@@ -48,9 +48,13 @@
         >
           Remove U2F Device
         </h2>
-        <p class="my-4 text-grey-700">
+        <p v-if="keys.length === 1" class="my-4 text-grey-700">
           Once this device is removed, <b>Two-Factor Authentication</b> will be disabled on your
           account.
+        </p>
+        <p v-else class="my-4 text-grey-700">
+          Once this device is removed, <b>Two-Factor Authentication</b> will still be enabled as you
+          have other U2F devices associated with your account.
         </p>
         <div class="mt-6">
           <button

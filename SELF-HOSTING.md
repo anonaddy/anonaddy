@@ -871,6 +871,7 @@ php artisan route:cache
 php artisan queue:restart
 
 php artisan passport:install
+php artisan passport:keys
 ```
 
 Running `passport:install` will output details about a new personal access client, e.g.
