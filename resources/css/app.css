@@ -256,7 +256,7 @@ table.vgt-table tr.clickable:hover {
 }
 
 .vgt-wrap__footer .footer__navigation__page-btn {
-  @apply no-underline text-grey-500 font-bold whitespace-no-wrap;
+  @apply no-underline text-grey-500 font-bold whitespace-nowrap;
 }
 
 .vgt-wrap__footer .footer__navigation__page-btn:focus {

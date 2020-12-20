@@ -27,7 +27,7 @@ function WebAuthn(notifyCallback = null) {
  * @param {PublicKeyCredentialCreationOptions} publicKey  - see https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialcreationoptions
  * @param {function(PublicKeyCredential)} callback  User callback
  */
-WebAuthn.prototype.register = function(publicKey, callback) {
+WebAuthn.prototype.register = function (publicKey, callback) {
   let publicKeyCredential = Object.assign({}, publicKey)
   publicKeyCredential.user.id = this._bufferDecode(publicKey.user.id)
   publicKeyCredential.challenge = this._bufferDecode(this._base64Decode(publicKey.challenge))
@@ -56,7 +56,7 @@ WebAuthn.prototype.register = function(publicKey, callback) {
  * @param {PublicKeyCredential} publicKey @see https://www.w3.org/TR/webauthn/#publickeycredential
  * @param {function(PublicKeyCredential)} callback  User callback
  */
-WebAuthn.prototype._registerCallback = function(publicKey, callback) {
+WebAuthn.prototype._registerCallback = function (publicKey, callback) {
   let publicKeyCredential = {
     id: publicKey.id,
     type: publicKey.type,
@@ -77,7 +77,7 @@ WebAuthn.prototype._registerCallback = function(publicKey, callback) {
  * @param {PublicKeyCredentialRequestOptions} publicKey  - see https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialrequestoptions
  * @param {function(PublicKeyCredential)} callback  User callback
  */
-WebAuthn.prototype.sign = function(publicKey, callback) {
+WebAuthn.prototype.sign = function (publicKey, callback) {
   let publicKeyCredential = Object.assign({}, publicKey)
   publicKeyCredential.challenge = this._bufferDecode(this._base64Decode(publicKey.challenge))
   if (publicKey.allowCredentials) {
@@ -105,7 +105,7 @@ WebAuthn.prototype.sign = function(publicKey, callback) {
  * @param {PublicKeyCredential} publicKey @see https://www.w3.org/TR/webauthn/#publickeycredential
  * @param {function(PublicKeyCredential)} callback  User callback
  */
-WebAuthn.prototype._signCallback = function(publicKey, callback) {
+WebAuthn.prototype._signCallback = function (publicKey, callback) {
   let publicKeyCredential = {
     id: publicKey.id,
     type: publicKey.type,
@@ -130,7 +130,7 @@ WebAuthn.prototype._signCallback = function(publicKey, callback) {
  * @param {ArrayBuffer} value
  * @return {string}
  */
-WebAuthn.prototype._bufferEncode = function(value) {
+WebAuthn.prototype._bufferEncode = function (value) {
   return window.btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
 }
 
@@ -140,7 +140,7 @@ WebAuthn.prototype._bufferEncode = function(value) {
  * @param {ArrayBuffer} value
  * @return {string}
  */
-WebAuthn.prototype._bufferDecode = function(value) {
+WebAuthn.prototype._bufferDecode = function (value) {
   var t = window.atob(value)
   return Uint8Array.from(t, c => c.charCodeAt(0))
 }
@@ -151,7 +151,7 @@ WebAuthn.prototype._bufferDecode = function(value) {
  * @param {string} input
  * @return {string}
  */
-WebAuthn.prototype._base64Decode = function(input) {
+WebAuthn.prototype._base64Decode = function (input) {
   // Replace non-url compatible chars with base64 standard chars
   input = input.replace(/-/g, '+').replace(/_/g, '/')
 
@@ -175,9 +175,9 @@ WebAuthn.prototype._base64Decode = function(input) {
  * @param {PublicKeyCredentialDescriptor} credentials
  * @return {PublicKeyCredentialDescriptor}
  */
-WebAuthn.prototype._credentialDecode = function(credentials) {
+WebAuthn.prototype._credentialDecode = function (credentials) {
   var self = this
-  return credentials.map(function(data) {
+  return credentials.map(function (data) {
     return {
       id: self._bufferDecode(self._base64Decode(data.id)),
       type: data.type,
@@ -191,7 +191,7 @@ WebAuthn.prototype._credentialDecode = function(credentials) {
  *
  * @return {bool}
  */
-WebAuthn.prototype.webAuthnSupport = function() {
+WebAuthn.prototype.webAuthnSupport = function () {
   return !(
     window.PublicKeyCredential === undefined ||
     typeof window.PublicKeyCredential !== 'function' ||
@@ -204,7 +204,7 @@ WebAuthn.prototype.webAuthnSupport = function() {
  *
  * @return {string}
  */
-WebAuthn.prototype.notSupportedMessage = function() {
+WebAuthn.prototype.notSupportedMessage = function () {
   if (
     !window.isSecureContext &&
     window.location.hostname !== 'localhost' &&
@@ -221,7 +221,7 @@ WebAuthn.prototype.notSupportedMessage = function() {
  * @param {string} message
  * @param {bool} isError
  */
-WebAuthn.prototype._notify = function(message, isError) {
+WebAuthn.prototype._notify = function (message, isError) {
   if (this._notifyCallback) {
     this._notifyCallback(message, isError)
   }
@@ -232,7 +232,7 @@ WebAuthn.prototype._notify = function(message, isError) {
  *
  * @param {function(name: string, message: string, isError: bool)} callback
  */
-WebAuthn.prototype.setNotify = function(callback) {
+WebAuthn.prototype.setNotify = function (callback) {
   this._notifyCallback = callback
 }
 

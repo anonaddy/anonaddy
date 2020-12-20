@@ -30,7 +30,7 @@
                                 {{ __('Username') }}:
                             </label>
 
-                            <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required autofocus>
+                            <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required autofocus>
 
                             @if ($errors->has('username'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -44,7 +44,7 @@
                                 {{ __('Password') }}:
                             </label>
 
-                            <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
+                            <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
 
                             @if ($errors->has('password'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -61,7 +61,7 @@
                                 </label>
                             </div>
                             @if (Route::has('password.request'))
-                                <a class="whitespace-no-wrap no-underline text-sm" href="{{ route('password.request') }}">
+                                <a class="whitespace-nowrap no-underline text-sm" href="{{ route('password.request') }}">
                                     {{ __('Forgot Username/Password?') }}
                                 </a>
                             @endif

@@ -29,7 +29,7 @@
                                 {{ __('One Time Token') }}:
                             </label>
 
-                            <input id="one_time_password" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('message') ? ' border border-red-500' : '' }}" name="one_time_password" placeholder="123456" required autofocus>
+                            <input id="one_time_password" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('message') ? ' border border-red-500' : '' }}" name="one_time_password" placeholder="123456" required autofocus>
 
                             @if ($errors->has('message'))
                                 <p class="text-red-500 text-xs italic mt-4">

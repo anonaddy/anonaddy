@@ -11,17 +11,17 @@
         "format": "prettier --write 'resources/**/*.{css,js,vue}'"
     },
     "dependencies": {
-        "axios": "^0.19",
-        "cross-env": "^7.0",
-        "dayjs": "^1.9.6",
+        "autoprefixer": "^9.8.6",
+        "axios": "^0.21.0",
+        "cross-env": "^7.0.3",
+        "dayjs": "^1.9.7",
         "laravel-mix": "^5.0.9",
         "lodash": "^4.17.20",
         "portal-vue": "^2.1.7",
-        "postcss-import": "^11.1.0",
-        "postcss-nesting": "^5.0.0",
+        "postcss": "^7.0.35",
         "resolve-url-loader": "^3.1.2",
-        "tailwindcss": "^1.9.5",
-        "tippy.js": "^4.3.5",
+        "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
+        "tippy.js": "^6.2.7",
         "v-clipboard": "^2.2.3",
         "vue": "^2.6.12",
         "vue-good-table": "^2.21.1",
@@ -31,9 +31,9 @@
         "vuedraggable": "^2.24.2"
     },
     "devDependencies": {
-        "husky": "^2.7.0",
-        "lint-staged": "^8.2.1",
-        "prettier": "1.16.4"
+        "husky": "^4.3.6",
+        "lint-staged": "^10.5.3",
+        "prettier": "2.2.1"
     },
     "husky": {
         "hooks": {
@@ -42,12 +42,10 @@
     },
     "lint-staged": {
         "*.{css,js,vue}": [
-            "npm run format --",
-            "git add"
+            "npm run format --"
         ],
         "*.php": [
-            "composer format",
-            "git add"
+            "composer format"
         ]
     }
 }

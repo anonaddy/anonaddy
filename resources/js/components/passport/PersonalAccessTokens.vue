@@ -1,8 +1,6 @@
 <template>
   <div>
-    <h3 class="font-bold text-xl">
-      Information
-    </h3>
+    <h3 class="font-bold text-xl">Information</h3>
 
     <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
@@ -44,9 +42,7 @@
     </button>
 
     <div class="mt-6">
-      <h3 class="font-bold text-xl">
-        Personal Access Tokens
-      </h3>
+      <h3 class="font-bold text-xl">Personal Access Tokens</h3>
 
       <div class="my-4 w-24 border-b-2 border-grey-200"></div>
 
@@ -106,9 +102,7 @@
               </li>
             </ul>
           </div>
-          <label for="create-token-name" class="block text-grey-700 text-sm my-2">
-            Name:
-          </label>
+          <label for="create-token-name" class="block text-grey-700 text-sm my-2"> Name: </label>
           <input
             v-model="form.name"
             type="text"

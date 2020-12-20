@@ -55,13 +55,7 @@
           Key
           <span
             class="tooltip outline-none"
-            :data-tippy-content="
-              `Use this to attach recipients to new aliases as they are created e.g. alias+key@${
-                user.username
-              }.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${
-                user.username
-              }.anonaddy.com. Separating each key by a full stop.`
-            "
+            :data-tippy-content="`Use this to attach recipients to new aliases as they are created e.g. alias+key@${user.username}.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${user.username}.anonaddy.com. Separating each key by a full stop.`"
           >
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>
@@ -328,6 +322,9 @@
 <script>
 import Modal from './../components/Modal.vue'
 import Toggle from './../components/Toggle.vue'
+import { roundArrow } from 'tippy.js'
+import 'tippy.js/dist/svg-arrow.css'
+import 'tippy.js/dist/tippy.css'
 import tippy from 'tippy.js'
 
 export default {
@@ -360,9 +357,6 @@ export default {
   created() {
     this.defaultRecipient = _.find(this.rows, ['id', this.user.default_recipient_id])
     this.defaultRecipient.aliases = this.defaultRecipient.aliases.concat(this.aliasesUsingDefault)
-  },
-  mounted() {
-    this.addTooltips()
   },
   data() {
     return {
@@ -424,21 +418,26 @@ export default {
         },
       ],
       rows: this.initialRecipients,
+      tippyInstance: null,
     }
   },
   watch: {
-    addRecipientKeyModalOpen: _.debounce(function() {
+    addRecipientKeyModalOpen: _.debounce(function () {
       this.addTooltips()
     }, 50),
   },
   methods: {
     addTooltips() {
-      tippy('.tooltip', {
-        arrow: true,
-        arrowType: 'round',
+      if (this.tippyInstance) {
+        _.each(this.tippyInstance, instance => instance.destroy())
+      }
+
+      this.tippyInstance = tippy('.tooltip', {
+        arrow: roundArrow,
+        allowHTML: true,
       })
     },
-    debounceToolips: _.debounce(function() {
+    debounceToolips: _.debounce(function () {
       this.addTooltips()
     }, 50),
     aliasesTooltip(aliases, isDefault) {
@@ -618,9 +617,7 @@ export default {
           this.recipientKey = ''
           this.addRecipientKeyModalOpen = false
           this.success(
-            `Key Successfully Added for ${
-              this.recipientToAddKey.email
-            }. Make sure to check the fingerprint is correct!`
+            `Key Successfully Added for ${this.recipientToAddKey.email}. Make sure to check the fingerprint is correct!`
           )
         })
         .catch(error => {

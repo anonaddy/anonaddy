@@ -67,9 +67,7 @@
           It doesn't look like you have any rules yet!
         </h1>
         <div class="mx-auto mb-6 w-24 border-b-2 border-grey-200"></div>
-        <p class="mb-4">
-          Click the button above to create a new rule.
-        </p>
+        <p class="mb-4">Click the button above to create a new rule.</p>
       </div>
     </div>
 
@@ -85,9 +83,7 @@
           actions will be added over time.
         </p>
 
-        <label for="rule_name" class="block text-grey-700 text-sm my-2">
-          Name:
-        </label>
+        <label for="rule_name" class="block text-grey-700 text-sm my-2"> Name: </label>
         <p v-show="errors.ruleName" class="mb-3 text-red-500 text-sm">
           {{ errors.ruleName }}
         </p>
@@ -112,11 +108,11 @@
                 <select
                   v-model="createRuleObject.operator"
                   id="rule_operator"
-                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                   required
                 >
-                  <option value="AND">AND </option>
-                  <option value="OR">OR </option>
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
                 </select>
                 <div
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -143,14 +139,15 @@
                       <select
                         v-model="createRuleObject.conditions[key].type"
                         id="rule_condition_types"
-                        class="block appearance-none w-32 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none w-32 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionTypeOptions"
                           :key="option.value"
                           :value="option.value"
-                          >{{ option.label }}
+                        >
+                          {{ option.label }}
                         </option>
                       </select>
                       <div
@@ -177,14 +174,15 @@
                       <select
                         v-model="createRuleObject.conditions[key].match"
                         id="rule_condition_matches"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionMatchOptions(createRuleObject, key)"
                           :key="option"
                           :value="option"
-                          >{{ option }}
+                        >
+                          {{ option }}
                         </option>
                       </select>
                       <div
@@ -275,9 +273,7 @@
           <div v-for="(action, key) in createRuleObject.actions" :key="key">
             <!-- AND/OR operator -->
             <div v-if="key !== 0" class="flex justify-center my-2">
-              <div class="relative">
-                AND
-              </div>
+              <div class="relative">AND</div>
             </div>
 
             <div class="p-2 w-full bg-grey-100">
@@ -290,14 +286,15 @@
                         v-model="createRuleObject.actions[key].type"
                         @change="ruleActionChange(createRuleObject.actions[key])"
                         id="rule_action_types"
-                        class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in actionTypeOptions"
                           :key="option.value"
                           :value="option.value"
-                          >{{ option.label }}
+                        >
+                          {{ option.label }}
                         </option>
                       </select>
                       <div
@@ -319,7 +316,7 @@
                   <span
                     v-if="
                       createRuleObject.actions[key].type === 'subject' ||
-                        createRuleObject.actions[key].type === 'displayFrom'
+                      createRuleObject.actions[key].type === 'displayFrom'
                     "
                     class="ml-4 flex"
                   >
@@ -343,12 +340,12 @@
                       <select
                         v-model="createRuleObject.actions[key].value"
                         id="create_rule_action_banner"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
-                        <option selected value="top">Top </option>
-                        <option selected value="bottom">Bottom </option>
-                        <option selected value="off">Off </option>
+                        <option selected value="top">Top</option>
+                        <option selected value="bottom">Bottom</option>
+                        <option selected value="off">Off</option>
                       </select>
                       <div
                         class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -423,9 +420,7 @@
           actions will be added over time.
         </p>
 
-        <label for="edit_rule_name" class="block text-grey-700 text-sm my-2">
-          Name:
-        </label>
+        <label for="edit_rule_name" class="block text-grey-700 text-sm my-2"> Name: </label>
         <p v-show="errors.ruleName" class="mb-3 text-red-500 text-sm">
           {{ errors.ruleName }}
         </p>
@@ -450,11 +445,11 @@
                 <select
                   v-model="editRuleObject.operator"
                   id="edit_rule_operator"
-                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                   required
                 >
-                  <option value="AND">AND </option>
-                  <option value="OR">OR </option>
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
                 </select>
                 <div
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -481,14 +476,15 @@
                       <select
                         v-model="editRuleObject.conditions[key].type"
                         id="edit_rule_condition_types"
-                        class="block appearance-none w-32 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none w-32 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionTypeOptions"
                           :key="option.value"
                           :value="option.value"
-                          >{{ option.label }}
+                        >
+                          {{ option.label }}
                         </option>
                       </select>
                       <div
@@ -512,14 +508,15 @@
                       <select
                         v-model="editRuleObject.conditions[key].match"
                         id="edit_rule_condition_matches"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionMatchOptions(editRuleObject, key)"
                           :key="option"
                           :value="option"
-                          >{{ option }}
+                        >
+                          {{ option }}
                         </option>
                       </select>
                       <div
@@ -607,9 +604,7 @@
           <div v-for="(action, key) in editRuleObject.actions" :key="key">
             <!-- AND/OR operator -->
             <div v-if="key !== 0" class="flex justify-center my-2">
-              <div class="relative">
-                AND
-              </div>
+              <div class="relative">AND</div>
             </div>
 
             <div class="p-2 w-full bg-grey-100">
@@ -622,14 +617,15 @@
                         v-model="editRuleObject.actions[key].type"
                         @change="ruleActionChange(editRuleObject.actions[key])"
                         id="rule_action_types"
-                        class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in actionTypeOptions"
                           :key="option.value"
                           :value="option.value"
-                          >{{ option.label }}
+                        >
+                          {{ option.label }}
                         </option>
                       </select>
                       <div
@@ -651,7 +647,7 @@
                   <span
                     v-if="
                       editRuleObject.actions[key].type === 'subject' ||
-                        editRuleObject.actions[key].type === 'displayFrom'
+                      editRuleObject.actions[key].type === 'displayFrom'
                     "
                     class="ml-4 flex"
                   >
@@ -672,12 +668,12 @@
                       <select
                         v-model="editRuleObject.actions[key].value"
                         id="edit_rule_action_banner"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:shadow-outline"
+                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
                         required
                       >
-                        <option value="top">Top </option>
-                        <option value="bottom">Bottom </option>
-                        <option value="off">Off </option>
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                        <option value="off">Off</option>
                       </select>
                       <div
                         class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -747,9 +743,7 @@
         >
           Delete rule
         </h2>
-        <p class="mt-4 text-grey-700">
-          Are you sure you want to delete this rule?
-        </p>
+        <p class="mt-4 text-grey-700">Are you sure you want to delete this rule?</p>
         <div class="mt-6">
           <button
             type="button"
@@ -776,7 +770,6 @@
 <script>
 import Modal from './../components/Modal.vue'
 import Toggle from './../components/Toggle.vue'
-import tippy from 'tippy.js'
 import draggable from 'vuedraggable'
 
 export default {
@@ -790,9 +783,6 @@ export default {
     Modal,
     Toggle,
     draggable,
-  },
-  mounted() {
-    this.addTooltips()
   },
   data() {
     return {
@@ -869,11 +859,6 @@ export default {
       errors: {},
     }
   },
-  watch: {
-    editRuleObject: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
-  },
   computed: {
     activeRules() {
       return _.filter(this.rows, rule => rule.active)
@@ -891,15 +876,6 @@ export default {
     },
   },
   methods: {
-    addTooltips() {
-      tippy('.tooltip', {
-        arrow: true,
-        arrowType: 'round',
-      })
-    },
-    debounceToolips: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
     openCreateModal() {
       this.errors = {}
       this.createRuleModalOpen = true

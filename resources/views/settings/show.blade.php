@@ -70,7 +70,7 @@
                             </label>
 
                             <div class="block relative w-full">
-                                <select id="default-recipient" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="default_recipient" required>
+                                <select id="default-recipient" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="default_recipient" required>
                                     @foreach($recipientOptions as $recipient)
                                     <option value="{{ $recipient->id }}" {{ $user->email === $recipient->email ? 'selected' : '' }}>{{ $recipient->email }}</option>
                                     @endforeach
@@ -116,7 +116,7 @@
                             </label>
 
                             <div class="block relative w-full">
-                                <input id="email" type="email" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="email" value="{{ old('email') ?? $user->email }}">
+                                <input id="email" type="email" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="email" value="{{ old('email') ?? $user->email }}">
                             </div>
 
                             @if ($errors->has('email'))
@@ -132,7 +132,7 @@
                             </label>
 
                             <div class="block relative w-full">
-                                <input id="email_confirmation" type="email" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="email_confirmation">
+                                <input id="email_confirmation" type="email" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="email_confirmation">
                             </div>
                         </div>
 
@@ -165,7 +165,7 @@
                         </label>
 
                         <div class="block relative w-full">
-                            <select id="default-alias-domain" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="domain" required>
+                            <select id="default-alias-domain" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="domain" required>
                                 @foreach($user->domainOptions() as $domainOption)
                                 <option value="{{ $domainOption }}" {{ $user->default_alias_domain === $domainOption ? 'selected' : '' }}>{{ $domainOption }}</option>
                                 @endforeach
@@ -209,7 +209,7 @@
                         </label>
 
                         <div class="block relative w-full">
-                            <select id="default-alias-format" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="format" required>
+                            <select id="default-alias-format" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="format" required>
                                 <option value="uuid" {{ $user->default_alias_format === 'uuid' ? 'selected' : '' }}>UUID</option>
                                 <option value="random_words" {{ $user->default_alias_format === 'random_words' ? 'selected' : '' }}>Random Words</option>
                                 <option value="custom" {{ $user->default_alias_format === 'custom' ? 'selected' : '' }}>Custom</option>
@@ -250,7 +250,7 @@
                             {{ __('Current Password') }}:
                         </label>
 
-                        <input id="current" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('current') ? ' border-red-500' : '' }}" name="current" placeholder="********" required>
+                        <input id="current" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('current') ? ' border-red-500' : '' }}" name="current" placeholder="********" required>
 
                         @if ($errors->has('current'))
                             <p class="text-red-500 text-xs italic mt-4">
@@ -264,7 +264,7 @@
                             {{ __('New Password') }}:
                         </label>
 
-                        <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
+                        <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
 
                         @if ($errors->has('password'))
                             <p class="text-red-500 text-xs italic mt-4">
@@ -278,7 +278,7 @@
                             {{ __('Confirm New Password') }}:
                         </label>
 
-                        <input id="password-confirm" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline" name="password_confirmation" placeholder="********" required>
+                        <input id="password-confirm" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="password_confirmation" placeholder="********" required>
                     </div>
 
                 </div>
@@ -336,7 +336,7 @@
                                     {{ __('Current Password') }}:
                                 </label>
 
-                                <input id="current_password_2fa" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('current_password_2fa') ? ' border-red-500' : '' }}" name="current_password_2fa" placeholder="********" required>
+                                <input id="current_password_2fa" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('current_password_2fa') ? ' border-red-500' : '' }}" name="current_password_2fa" placeholder="********" required>
 
                                 @if ($errors->has('current_password_2fa'))
                                     <p class="text-red-500 text-xs italic mt-4">
@@ -396,7 +396,7 @@
                                 </label>
 
                                 <div class="block relative w-full">
-                                    <input id="two_factor_token" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="two_factor_token" placeholder="123456" />
+                                    <input id="two_factor_token" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="two_factor_token" placeholder="123456" />
                                 </div>
 
                                 @if ($errors->has('two_factor_token'))
@@ -466,7 +466,7 @@
                         </label>
 
                         <div class="block relative w-full">
-                            <select id="catch_all" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="catch_all" required>
+                            <select id="catch_all" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="catch_all" required>
                                 <option value="1" {{ $user->catch_all ? 'selected' : '' }}>Enabled</option>
                                 <option value="0" {{ ! $user->catch_all ? 'selected' : '' }}>Disabled</option>
                             </select>
@@ -509,7 +509,7 @@
                         </label>
 
                         <div class="block relative w-full">
-                            <input id="from_name" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="from_name" value="{{ $user->from_name }}" placeholder="John Doe" />
+                            <input id="from_name" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="from_name" value="{{ $user->from_name }}" placeholder="John Doe" />
                         </div>
 
                         @if ($errors->has('from_name'))
@@ -546,7 +546,7 @@
                         </label>
 
                         <div class="block relative w-full">
-                            <select id="banner_location" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="banner_location" required>
+                            <select id="banner_location" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="banner_location" required>
                                 <option value="top" {{ $user->banner_location === 'top' ? 'selected' : '' }}>Top</option>
                                 <option value="bottom" {{ $user->banner_location === 'bottom' ? 'selected' : '' }}>Bottom</option>
                                 <option value="off" {{ $user->banner_location === 'off' ? 'selected' : '' }}>Off</option>
@@ -592,7 +592,7 @@
                         </label>
 
                         <div class="block relative w-full">
-                            <input id="email_subject" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline" name="email_subject" value="{{ $user->email_subject }}" placeholder="The subject" />
+                            <input id="email_subject" type="text" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="email_subject" value="{{ $user->email_subject }}" placeholder="The subject" />
                         </div>
 
                         @if ($errors->has('email_subject'))
@@ -677,7 +677,7 @@
                             {{ __('Enter your password to continue') }}:
                         </label>
 
-                        <input id="current-password-delete" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:outline-none focus:shadow-outline{{ $errors->has('current_password_delete') ? ' border-red-500' : '' }}" name="current_password_delete" placeholder="********" required>
+                        <input id="current-password-delete" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:outline-none focus:ring{{ $errors->has('current_password_delete') ? ' border-red-500' : '' }}" name="current_password_delete" placeholder="********" required>
 
                         @if ($errors->has('current_password_delete'))
                             <p class="text-red-500 text-xs italic mt-4">

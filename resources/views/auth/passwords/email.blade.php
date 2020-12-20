@@ -29,7 +29,7 @@
                                 {{ __('Username') }}:
                             </label>
 
-                            <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required>
+                            <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required>
 
                             @if ($errors->has('username'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -38,7 +38,7 @@
                             @endif
                         </div>
 
-                        <a class="whitespace-no-wrap no-underline text-sm" href="{{ route('username.reminder.show') }}">
+                        <a class="whitespace-nowrap no-underline text-sm" href="{{ route('username.reminder.show') }}">
                             {{ __('Forgot Username?') }}
                         </a>
 

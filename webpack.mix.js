@@ -3,14 +3,7 @@ let mix = require('laravel-mix')
 mix
   .js('resources/js/app.js', 'public/js')
   .js('resources/js/webauthn.js', 'public/js')
-  .postCss('resources/css/app.css', 'public/css')
-  .options({
-    postCss: [
-      require('postcss-import')(),
-      require('tailwindcss')('./tailwind.config.js'),
-      require('postcss-nesting')(),
-    ],
-  })
+  .postCss('resources/css/app.css', 'public/css', [require('tailwindcss')])
 
 if (mix.inProduction()) {
   mix.version()

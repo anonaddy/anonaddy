@@ -11,9 +11,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalActive }}
-            <p class="text-grey-300 text-sm tracking-wide uppercase">
-              Active
-            </p>
+            <p class="text-grey-300 text-sm tracking-wide uppercase">Active</p>
           </div>
         </div>
       </div>
@@ -27,9 +25,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalInactive }}
-            <p class="text-grey-300 text-sm tracking-wide uppercase">
-              Inactive
-            </p>
+            <p class="text-grey-300 text-sm tracking-wide uppercase">Inactive</p>
           </div>
         </div>
       </div>
@@ -43,9 +39,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalForwarded }}
-            <p class="text-grey-300 text-sm tracking-wide uppercase">
-              Emails Forwarded
-            </p>
+            <p class="text-grey-300 text-sm tracking-wide uppercase">Emails Forwarded</p>
           </div>
         </div>
       </div>
@@ -59,9 +53,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalBlocked }}
-            <p class="text-grey-300 text-sm tracking-wide uppercase">
-              Emails Blocked
-            </p>
+            <p class="text-grey-300 text-sm tracking-wide uppercase">Emails Blocked</p>
           </div>
         </div>
       </div>
@@ -75,9 +67,7 @@
           />
           <div class="font-bold text-xl md:text-3xl text-indigo-800">
             {{ totalReplies }}
-            <p class="text-grey-300 text-sm tracking-wide uppercase">
-              Email Replies
-            </p>
+            <p class="text-grey-300 text-sm tracking-wide uppercase">Email Replies</p>
           </div>
         </div>
       </div>
@@ -122,7 +112,7 @@
         <div class="block relative mr-4">
           <select
             v-model="showAliases"
-            class="block appearance-none w-full text-grey-700 bg-white p-3 pr-8 rounded shadow focus:shadow-outline"
+            class="block appearance-none w-full text-grey-700 bg-white p-3 pr-8 rounded shadow focus:ring"
             required
           >
             <option value="without">Hide Deleted</option>
@@ -148,7 +138,7 @@
             @click="generateAliasModalOpen = true"
             class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
           >
-            Generate New Alias
+            Create New Alias
           </button>
         </div>
       </div>
@@ -182,11 +172,23 @@
         No aliases found for that search!
       </div>
       <template slot="table-row" slot-scope="props">
-        <span
-          v-if="props.column.field == 'created_at'"
-          class="tooltip outline-none text-sm"
-          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
-          >{{ props.row.created_at | timeAgo }}
+        <span v-if="props.column.field == 'created_at'" class="flex items-center">
+          <span
+            :class="`bg-${getAliasStatus(props.row).colour}-100`"
+            class="tooltip outline-none h-4 w-4 rounded-full flex items-center justify-center mr-2"
+            :data-tippy-content="getAliasStatus(props.row).status"
+            tabindex="-1"
+          >
+            <span
+              :class="`bg-${getAliasStatus(props.row).colour}-400`"
+              class="h-2 w-2 rounded-full"
+            ></span>
+          </span>
+          <span
+            class="tooltip outline-none text-sm whitespace-nowrap"
+            :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
+            >{{ props.row.created_at | timeAgo }}
+          </span>
         </span>
         <span v-else-if="props.column.field == 'email'" class="block">
           <span
@@ -306,18 +308,44 @@
           />
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
-          <icon
-            v-if="props.row.deleted_at"
-            name="undo"
-            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer outline-none"
-            @click.native="openRestoreModal(props.row.id)"
-          />
-          <icon
-            v-else
-            name="trash"
-            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer outline-none"
-            @click.native="openDeleteModal(props.row.id)"
-          />
+          <more-options>
+            <div role="none">
+              <span
+                @click="openSendFromModal(props.row)"
+                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                role="menuitem"
+              >
+                <icon name="send" class="block mr-3 w-5 h-5 text-grey-300 outline-none" />
+                Send From
+              </span>
+            </div>
+            <div v-if="props.row.deleted_at" role="none">
+              <span
+                @click="openRestoreModal(props.row.id)"
+                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                role="menuitem"
+              >
+                <icon
+                  name="undo"
+                  class="block mr-3 w-5 h-5 text-grey-300 fill-current outline-none"
+                />
+                Restore
+              </span>
+            </div>
+            <div v-else role="none">
+              <span
+                @click="openDeleteModal(props.row.id)"
+                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                role="menuitem"
+              >
+                <icon
+                  name="trash"
+                  class="block mr-3 w-5 h-5 text-grey-300 fill-current outline-none"
+                />
+                Delete
+              </span>
+            </div>
+          </more-options>
         </span>
       </template>
     </vue-good-table>
@@ -328,9 +356,7 @@
           It doesn't look like you have any aliases yet!
         </h1>
         <div class="mx-auto mb-6 w-24 border-b-2 border-grey-200"></div>
-        <p class="mb-4">
-          There are two ways to create new aliases.
-        </p>
+        <p class="mb-4">There are two ways to create new aliases.</p>
         <h3 class="mb-4 text-xl text-indigo-800 font-semibold">
           Option 1: Create aliases on the fly
         </h3>
@@ -375,28 +401,23 @@
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
-          Generate new alias
+          Create new alias
         </h2>
         <p class="mt-4 text-grey-700">
           Other aliases e.g. alias@{{ subdomain }} can also be created automatically when they
           receive their first email.
         </p>
-        <label for="alias_domain" class="block text-grey-700 text-sm my-2">
-          Alias Domain:
-        </label>
+        <label for="alias_domain" class="block text-grey-700 text-sm my-2"> Alias Domain: </label>
         <div class="block relative w-full mb-4">
           <select
             v-model="generateAliasDomain"
             id="alias_domain"
-            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
+            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
             required
           >
-            <option
-              v-for="domainOption in domainOptions"
-              :key="domainOption"
-              :value="domainOption"
-              >{{ domainOption }}</option
-            >
+            <option v-for="domainOption in domainOptions" :key="domainOption" :value="domainOption">
+              {{ domainOption }}
+            </option>
           </select>
           <div
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -420,15 +441,16 @@
           <select
             v-model="generateAliasFormat"
             id="alias_domain"
-            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:shadow-outline"
+            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
             required
           >
             <option
               v-for="formatOption in aliasFormatOptions"
               :key="formatOption.value"
               :value="formatOption.value"
-              >{{ formatOption.label }}</option
             >
+              {{ formatOption.label }}
+            </option>
           </select>
           <div
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -486,7 +508,7 @@
             :class="generateAliasLoading ? 'cursor-not-allowed' : ''"
             :disabled="generateAliasLoading"
           >
-            Generate Alias
+            Create Alias
             <loader v-if="generateAliasLoading" />
           </button>
           <button
@@ -609,12 +631,114 @@
         </div>
       </div>
     </Modal>
+
+    <Modal :open="sendFromAliasModalOpen" @close="closeSendFromModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Send from alias
+        </h2>
+        <p class="mt-4 text-grey-700">
+          Use this to automatically create the correct address to send an email to in order to send
+          an <b>email from this alias</b>.
+        </p>
+        <label for="send_from_alias" class="block text-grey-700 text-sm my-2"> Alias: </label>
+        <input
+          v-model="aliasToSendFrom.email"
+          id="send_from_alias"
+          type="text"
+          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+          disabled
+        />
+        <label for="send_from_alias_destination" class="block text-grey-700 text-sm my-2">
+          Email destination:
+        </label>
+        <p v-show="errors.sendFromAliasDestination" class="mb-3 text-red-500 text-sm">
+          {{ errors.sendFromAliasDestination }}
+        </p>
+        <input
+          v-model="sendFromAliasDestination"
+          id="send_from_alias_destination"
+          type="text"
+          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+          :class="errors.sendFromAliasDestination ? 'border-red-500' : ''"
+          placeholder="Enter email..."
+          autofocus
+        />
+        <div v-if="sendFromAliasEmailToSendTo">
+          <p for="alias_domain" class="block text-grey-700 text-sm my-2">
+            Send your message to this email:
+          </p>
+          <div
+            v-clipboard="() => sendFromAliasEmailToSendTo"
+            v-clipboard:success="setSendFromAliasCopied"
+            class="flex items-center justify-between cursor-pointer text-xs border-t-4 rounded-sm text-green-800 border-green-600 bg-green-100 p-2 mb-3"
+            role="alert"
+          >
+            <span>
+              {{ sendFromAliasEmailToSendTo }}
+            </span>
+            <svg
+              v-if="sendFromAliasCopied"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <svg
+              v-else
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="displaySendFromAddress(aliasToSendFrom)"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            :class="sendFromAliasLoading ? 'cursor-not-allowed' : ''"
+            :disabled="sendFromAliasLoading"
+          >
+            Show address
+            <loader v-if="sendFromAliasLoading" />
+          </button>
+          <button
+            @click="closeSendFromModal"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
 import Modal from './../components/Modal.vue'
 import Toggle from './../components/Toggle.vue'
+import MoreOptions from './../components/MoreOptions.vue'
+import { roundArrow } from 'tippy.js'
+import 'tippy.js/dist/svg-arrow.css'
+import 'tippy.js/dist/tippy.css'
 import tippy from 'tippy.js'
 import Multiselect from 'vue-multiselect'
 
@@ -677,9 +801,7 @@ export default {
     Modal,
     Toggle,
     Multiselect,
-  },
-  mounted() {
-    this.addTooltips()
+    MoreOptions,
   },
   data() {
     return {
@@ -688,9 +810,15 @@ export default {
       aliasIdToEdit: '',
       aliasDescriptionToEdit: '',
       aliasIdToDelete: '',
+      aliasToSendFrom: {},
+      sendFromAliasDestination: '',
+      sendFromAliasEmailToSendTo: '',
+      sendFromAliasCopied: false,
       aliasIdToRestore: '',
       deleteAliasLoading: false,
       deleteAliasModalOpen: false,
+      sendFromAliasLoading: false,
+      sendFromAliasModalOpen: false,
       restoreAliasLoading: false,
       restoreAliasModalOpen: false,
       editAliasRecipientsLoading: false,
@@ -776,16 +904,11 @@ export default {
         },
       ],
       rows: this.initialAliases,
+      tippyInstance: null,
       errors: {},
     }
   },
   watch: {
-    aliasIdToEdit: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
-    editAliasRecipientsModalOpen: _.debounce(function() {
-      this.addTooltips()
-    }, 50),
     showAliases(value) {
       this.updateAliases()
     },
@@ -803,12 +926,16 @@ export default {
   },
   methods: {
     addTooltips() {
-      tippy('.tooltip', {
-        arrow: true,
-        arrowType: 'round',
+      if (this.tippyInstance) {
+        _.each(this.tippyInstance, instance => instance.destroy())
+      }
+
+      this.tippyInstance = tippy('.tooltip', {
+        arrow: roundArrow,
+        allowHTML: true,
       })
     },
-    debounceToolips: _.debounce(function() {
+    debounceToolips: _.debounce(function () {
       this.addTooltips()
     }, 50),
     recipientsTooltip(recipients) {
@@ -821,6 +948,17 @@ export default {
     closeDeleteModal() {
       this.deleteAliasModalOpen = false
       this.aliasIdToDelete = ''
+    },
+    openSendFromModal(alias) {
+      this.sendFromAliasDestination = ''
+      this.sendFromAliasEmailToSendTo = ''
+      this.sendFromAliasCopied = false
+      this.sendFromAliasModalOpen = true
+      this.aliasToSendFrom = alias
+    },
+    closeSendFromModal() {
+      this.sendFromAliasModalOpen = false
+      this.aliasToSendFrom = {}
     },
     openRestoreModal(id) {
       this.restoreAliasModalOpen = true
@@ -1021,6 +1159,21 @@ export default {
           this.error()
         })
     },
+    displaySendFromAddress(alias) {
+      this.errors = {}
+
+      if (!this.validEmail(this.sendFromAliasDestination)) {
+        this.errors.sendFromAliasDestination = 'Valid Email required'
+        return
+      }
+
+      this.sendFromAliasEmailToSendTo = `${
+        alias.local_part
+      }+${this.sendFromAliasDestination.replace('@', '=')}@${alias.domain}`
+    },
+    setSendFromAliasCopied() {
+      this.sendFromAliasCopied = true
+    },
     getAliasEmail(alias) {
       return alias.extension
         ? `${alias.local_part}+${alias.extension}@${alias.domain}`
@@ -1028,6 +1181,19 @@ export default {
     },
     getAliasLocalPart(alias) {
       return alias.extension ? `${alias.local_part}+${alias.extension}` : alias.local_part
+    },
+    getAliasStatus(alias) {
+      if (alias.deleted_at) {
+        return {
+          colour: 'red',
+          status: 'Deleted',
+        }
+      } else {
+        return {
+          colour: alias.active ? 'green' : 'grey',
+          status: alias.active ? 'Active' : 'Inactive',
+        }
+      }
     },
     sortRecipients(x, y) {
       return x.length < y.length ? -1 : x.length > y.length ? 1 : 0
@@ -1038,6 +1204,10 @@ export default {
     validLocalPart(part) {
       let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))$/
       return re.test(part)
+    },
+    validEmail(email) {
+      let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      return re.test(email)
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

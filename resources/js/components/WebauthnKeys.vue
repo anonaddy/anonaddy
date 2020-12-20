@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="mt-6">
-      <h3 class="font-bold text-xl">
-        Device Authentication (U2F)
-      </h3>
+      <h3 class="font-bold text-xl">Device Authentication (U2F)</h3>
 
       <div class="my-4 w-24 border-b-2 border-grey-200"></div>
 
@@ -13,9 +11,7 @@
       </p>
 
       <div>
-        <p class="mb-0" v-if="keys.length === 0">
-          You have not registered any Webauthn Keys.
-        </p>
+        <p class="mb-0" v-if="keys.length === 0">You have not registered any Webauthn Keys.</p>
 
         <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
           <div class="table-row">

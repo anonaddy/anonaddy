@@ -27,7 +27,7 @@
                                 Backup Code:
                             </label>
 
-                            <input id="backup_code" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('backup_code') ? ' border border-red-500' : '' }}" name="backup_code" required autofocus>
+                            <input id="backup_code" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('backup_code') ? ' border border-red-500' : '' }}" name="backup_code" required autofocus>
 
                             @if ($errors->has('backup_code'))
                                 <p class="text-red-500 text-xs italic mt-4">

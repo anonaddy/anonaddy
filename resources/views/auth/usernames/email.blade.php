@@ -29,7 +29,7 @@
                                 {{ __('Email') }}:
                             </label>
 
-                            <input id="email" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>
+                            <input id="email" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>
 
                             @if ($errors->has('email'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -39,7 +39,7 @@
                         </div>
 
                         @if (Route::has('password.request'))
-                            <a class="whitespace-no-wrap no-underline text-sm" href="{{ route('password.request') }}">
+                            <a class="whitespace-nowrap no-underline text-sm" href="{{ route('password.request') }}">
                                 {{ __('Forgot Password?') }}
                             </a>
                         @endif

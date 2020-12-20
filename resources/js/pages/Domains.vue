@@ -186,9 +186,7 @@
           To get started all you have to do is add a TXT record to your domain to verify ownership
           and then add the domain here by clicking the button above.
         </p>
-        <p class="mb-4">
-          The TXT record needs to have the following values:
-        </p>
+        <p class="mb-4">The TXT record needs to have the following values:</p>
         <p class="mb-4">
           Type: <b>TXT</b><br />
           Host: <b>@</b><br />
@@ -396,6 +394,9 @@
 <script>
 import Modal from './../components/Modal.vue'
 import Toggle from './../components/Toggle.vue'
+import { roundArrow } from 'tippy.js'
+import 'tippy.js/dist/svg-arrow.css'
+import 'tippy.js/dist/tippy.css'
 import tippy from 'tippy.js'
 import Multiselect from 'vue-multiselect'
 
@@ -426,9 +427,6 @@ export default {
     Modal,
     Toggle,
     Multiselect,
-  },
-  mounted() {
-    this.addTooltips()
   },
   data() {
     return {
@@ -499,21 +497,26 @@ export default {
         },
       ],
       rows: this.initialDomains,
+      tippyInstance: null,
     }
   },
   watch: {
-    domainIdToEdit: _.debounce(function() {
+    domainIdToEdit: _.debounce(function () {
       this.addTooltips()
     }, 50),
   },
   methods: {
     addTooltips() {
-      tippy('.tooltip', {
-        arrow: true,
-        arrowType: 'round',
+      if (this.tippyInstance) {
+        _.each(this.tippyInstance, instance => instance.destroy())
+      }
+
+      this.tippyInstance = tippy('.tooltip', {
+        arrow: roundArrow,
+        allowHTML: true,
       })
     },
-    debounceToolips: _.debounce(function() {
+    debounceToolips: _.debounce(function () {
       this.addTooltips()
     }, 50),
     validateNewDomain(e) {

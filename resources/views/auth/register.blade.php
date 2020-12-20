@@ -24,7 +24,7 @@
                             </label>
 
                             <div class="table w-full">
-                                <input id="username" type="text" class="table-cell relative appearance-none bg-grey-100 rounded-l w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required autofocus>
+                                <input id="username" type="text" class="table-cell relative appearance-none bg-grey-100 rounded-l w-full p-3 text-grey-700 focus:ring{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required autofocus>
                                 <div class="py-3 px-2 table-cell align-middle bg-grey-200 rounded-r text-grey-600">
                                     .{{ config('anonaddy.domain') }}
                                 </div>
@@ -45,7 +45,7 @@
                                 Your Real Email Address:
                             </label>
 
-                            <input id="email" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>
+                            <input id="email" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>
 
                             <p class="text-xs mt-1 text-grey-600">This is your recipient where emails will be forwarded</p>
 
@@ -61,7 +61,7 @@
                                 Confirm Email Address:
                             </label>
 
-                            <input id="email-confirm" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline" name="email_confirmation" value="{{ old('email_confirmation') }}" placeholder="johndoe@example.com" required>
+                            <input id="email-confirm" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="email_confirmation" value="{{ old('email_confirmation') }}" placeholder="johndoe@example.com" required>
                         </div>
 
                         <div class="flex flex-wrap mb-6">
@@ -69,7 +69,7 @@
                                 {{ __('Password') }}:
                             </label>
 
-                            <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
+                            <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
 
                             @if ($errors->has('password'))
                                 <p class="text-red-500 text-xs italic mt-4">
@@ -86,7 +86,7 @@
                             <div class="flex flex-grow flex-wrap">
                                 <img src="{{captcha_src('mini')}}" class="flex-shrink-0 h-12 w-16 mr-2 mt-2">
 
-                                <input id="captcha" type="text" class="flex-grow mt-2 appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:shadow-outline{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
+                                <input id="captcha" type="text" class="flex-grow mt-2 appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:ring{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
                             </div>
 
                             @if ($errors->has('captcha'))

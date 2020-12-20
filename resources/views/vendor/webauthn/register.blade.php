@@ -40,7 +40,7 @@
                         <label for="name" class="block text-grey-700 text-sm mb-2">
                             Name:
                         </label>
-                        <input type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:shadow-outline" name="name" id="name" placeholder="Yubikey" required autofocus>
+                        <input type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="name" id="name" placeholder="Yubikey" required autofocus>
 
                         @if ($errors->has('name'))
                             <p class="text-red-500 text-xs italic mt-4">

@@ -79,7 +79,7 @@ export default {
   },
   watch: {
     open: {
-      handler: function(newValue) {
+      handler: function (newValue) {
         if (newValue) {
           this.show()
         } else {

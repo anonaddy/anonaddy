@@ -1,8 +1,4 @@
 module.exports = {
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true,
-  },
   purge: {
     content: [
       'app/**/*.php',
@@ -14,7 +10,15 @@ module.exports = {
 
     // These options are passed through directly to PurgeCSS
     options: {
-      whitelistPatterns: [/-active$/, /-enter$/, /-leave-to$/, /show$/],
+      safelist: [
+        /-active$/,
+        /-enter$/,
+        /-leave-to$/,
+        /show$/,
+        'bg-green-400',
+        'bg-red-400',
+        'bg-grey-400',
+      ],
     },
   },
   theme: {
@@ -106,6 +110,18 @@ module.exports = {
         800: '#07600E',
         900: '#014807',
       },
+    },
+    fontSize: {
+      xs: '0.75rem',
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
+      '6xl': '4rem',
     },
     container: {
       center: true,
