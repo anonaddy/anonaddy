@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "autoprefixer": "^9.8.6",
-        "axios": "^0.21.0",
+        "axios": "^0.21.1",
         "cross-env": "^7.0.3",
         "dayjs": "^1.9.7",
         "laravel-mix": "^5.0.9",
