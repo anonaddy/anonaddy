@@ -57,8 +57,15 @@ class AliasController extends Controller
                 'extension' => $extension ?? null
             ];
         } else {
-            if ($request->input('format', 'uuid') === 'random_words') {
+            if ($request->input('format', 'random_characters') === 'random_words') {
                 $localPart = user()->generateRandomWordLocalPart();
+
+                $data = [
+                    'email' => $localPart . '@' . $request->domain,
+                    'local_part' => $localPart,
+                ];
+            } elseif ($request->input('format', 'random_characters') === 'random_characters') {
+                $localPart = user()->generateRandomCharacterLocalPart(8);
 
                 $data = [
                     'email' => $localPart . '@' . $request->domain,

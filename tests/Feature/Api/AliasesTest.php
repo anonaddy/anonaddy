@@ -104,6 +104,21 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
+        $this->assertEquals($this->user->aliases[0]->local_part, $response->getData()->data->local_part);
+    }
+
+    /** @test */
+    public function user_can_generate_new_uuid_alias()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'anonaddy.me',
+            'format' => 'uuid',
+            'description' => 'the description',
+            'local_part' => 'not-required-for-shared-alias'
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
         $this->assertEquals($this->user->aliases[0]->id, $response->getData()->data->local_part);
         $this->assertEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
     }

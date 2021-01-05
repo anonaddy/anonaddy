@@ -32,7 +32,7 @@ class StoreAliasRequest extends FormRequest
                 Rule::in($this->user()->domainOptions())
             ],
             'description' => 'nullable|max:100',
-            'format' => 'nullable|in:uuid,random_words,custom'
+            'format' => 'nullable|in:random_characters,uuid,random_words,custom'
         ];
     }
 
@@ -47,7 +47,7 @@ class StoreAliasRequest extends FormRequest
             }),
             new ValidAliasLocalPart
         ], function () {
-            $format = $this->validationData()['format'] ?? 'uuid';
+            $format = $this->validationData()['format'] ?? 'random_characters';
             return $format === 'custom';
         });
     }

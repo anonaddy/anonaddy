@@ -210,6 +210,7 @@
 
                         <div class="block relative w-full">
                             <select id="default-alias-format" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="format" required>
+                                <option value="random_characters" {{ $user->default_alias_format === 'random_characters' ? 'selected' : '' }}>Random Characters</option>
                                 <option value="uuid" {{ $user->default_alias_format === 'uuid' ? 'selected' : '' }}>UUID</option>
                                 <option value="random_words" {{ $user->default_alias_format === 'random_words' ? 'selected' : '' }}>Random Words</option>
                                 <option value="custom" {{ $user->default_alias_format === 'custom' ? 'selected' : '' }}>Custom</option>

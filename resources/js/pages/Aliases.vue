@@ -828,8 +828,12 @@ export default {
       generateAliasDomain: this.defaultAliasDomain ? this.defaultAliasDomain : this.domain,
       generateAliasLocalPart: '',
       generateAliasDescription: '',
-      generateAliasFormat: this.defaultAliasFormat ? this.defaultAliasFormat : 'uuid',
+      generateAliasFormat: this.defaultAliasFormat ? this.defaultAliasFormat : 'random_characters',
       aliasFormatOptions: [
+        {
+          value: 'random_characters',
+          label: 'Random Characters',
+        },
         {
           value: 'uuid',
           label: 'UUID',
@@ -909,7 +913,7 @@ export default {
     }
   },
   watch: {
-    showAliases(value) {
+    showAliases() {
       this.updateAliases()
     },
   },

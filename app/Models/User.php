@@ -363,6 +363,20 @@ class User extends Authenticatable implements MustVerifyEmail
             ->implode('.').mt_rand(0, 999);
     }
 
+    public function generateRandomCharacterLocalPart(int $length) : string
+    {
+        $alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+        $str = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $index = random_int(0, 35);
+            $str .= $alphabet[$index];
+        }
+
+        return $str;
+    }
+
     public function domainOptions()
     {
         $customDomains = $this->verifiedDomains()->pluck('domain')->toArray();
