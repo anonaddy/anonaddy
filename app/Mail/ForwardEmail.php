@@ -40,6 +40,9 @@ class ForwardEmail extends Mailable implements ShouldQueue
     protected $encryptedParts;
     protected $fromEmail;
     protected $size;
+    protected $messageId;
+    protected $inReplyTo;
+    protected $references;
 
     /**
      * Create a new message instance.
@@ -59,7 +62,9 @@ class ForwardEmail extends Mailable implements ShouldQueue
         $this->emailAttachments = $emailData->attachments;
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->size = $emailData->size;
-
+        $this->messageId = $emailData->messageId;
+        $this->inReplyTo = $emailData->inReplyTo;
+        $this->references = $emailData->references;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
 
         $fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
@@ -88,30 +93,29 @@ class ForwardEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $replyToEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+        $this->fromEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+
+        $returnPath = $this->alias->email;
 
         if ($this->alias->isCustomDomain()) {
             if ($this->alias->aliasable->isVerifiedForSending()) {
-                $this->fromEmail = $this->alias->email;
-                $returnPath = $this->alias->email;
-
                 if (config('anonaddy.dkim_signing_key')) {
                     $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
                     $this->dkimSigner->ignoreHeader('List-Unsubscribe');
                     $this->dkimSigner->ignoreHeader('Return-Path');
                 }
             } else {
+                $replyToEmail = $this->fromEmail;
+
                 $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
             }
         } else {
-            $this->fromEmail = $this->alias->email;
             $returnPath = 'mailer@'.$this->alias->parentDomain();
         }
 
         $this->email =  $this
             ->from($this->fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
-            ->replyTo($replyToEmail)
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->text('emails.forward.text')->with([
                 'text' => base64_decode($this->emailText)
@@ -120,10 +124,31 @@ class ForwardEmail extends Mailable implements ShouldQueue
                 $message->getHeaders()
                         ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>');
 
-                $message->getHeaders()
-                        ->addTextHeader('Return-Path', $returnPath);
+                $message->setReturnPath($returnPath);
 
-                $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+                // This header is used to set the To: header as the alias just before sending.
+                $message->getHeaders()
+                        ->addTextHeader('Alias-To', $this->alias->email);
+
+                if ($this->messageId) {
+                    $message->getHeaders()->remove('Message-ID');
+
+                    // We're not using $message->setId here because it can cause RFC exceptions
+                    $message->getHeaders()
+                            ->addTextHeader('Message-ID', base64_decode($this->messageId));
+                } else {
+                    $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+                }
+
+                if ($this->inReplyTo) {
+                    $message->getHeaders()
+                            ->addTextHeader('In-Reply-To', base64_decode($this->inReplyTo));
+                }
+
+                if ($this->references) {
+                    $message->getHeaders()
+                            ->addTextHeader('References', base64_decode($this->references));
+                }
 
                 if ($this->encryptedParts) {
                     $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
@@ -166,6 +191,10 @@ class ForwardEmail extends Mailable implements ShouldQueue
             'replacedSubject' => $this->replacedSubject,
             'shouldBlock' => $this->size === 0
         ]);
+
+        if (isset($replyToEmail)) {
+            $this->email->replyTo($replyToEmail);
+        }
 
         if ($this->size > 0) {
             $this->alias->increment('emails_forwarded');

@@ -18,6 +18,9 @@ class EmailData
         $this->html = base64_encode($parser->getMessageBody('html'));
         $this->attachments = [];
         $this->size = $size;
+        $this->messageId = base64_encode($parser->getHeader('Message-ID'));
+        $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
+        $this->references = base64_encode($parser->getHeader('References'));
 
         if ($parser->getParts()[1]['content-type'] === 'multipart/encrypted') {
             $this->encryptedParts = $parser->getAttachments();

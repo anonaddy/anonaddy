@@ -82,9 +82,9 @@ class SendFromEmail extends Mailable implements ShouldQueue
                 'text' => base64_decode($this->emailText)
             ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
-                $message->getHeaders()
-                        ->addTextHeader('Return-Path', config('anonaddy.return_path'));
+                $message->setReturnPath($returnPath);
 
+                // Message-ID is replaced on send from as it can leak parts of the real email
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
                 if ($this->encryptedParts) {

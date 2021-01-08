@@ -30,6 +30,8 @@ class ReplyToEmail extends Mailable implements ShouldQueue
     protected $displayFrom;
     protected $fromEmail;
     protected $size;
+    protected $inReplyTo;
+    protected $references;
 
     /**
      * Create a new message instance.
@@ -48,6 +50,8 @@ class ReplyToEmail extends Mailable implements ShouldQueue
         $this->encryptedParts = $emailData->encryptedParts ?? null;
         $this->displayFrom = $user->from_name ?? null;
         $this->size = $emailData->size;
+        $this->inReplyTo = $emailData->inReplyTo;
+        $this->references = $emailData->references;
     }
 
     /**
@@ -82,10 +86,20 @@ class ReplyToEmail extends Mailable implements ShouldQueue
                 'text' => base64_decode($this->emailText)
             ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
-                $message->getHeaders()
-                        ->addTextHeader('Return-Path', config('anonaddy.return_path'));
+                $message->setReturnPath($returnPath);
 
+                // Message-ID is replaced on replies as it can leak parts of the real email
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+
+                if ($this->inReplyTo) {
+                    $message->getHeaders()
+                            ->addTextHeader('In-Reply-To', base64_decode($this->inReplyTo));
+                }
+
+                if ($this->references) {
+                    $message->getHeaders()
+                            ->addTextHeader('References', base64_decode($this->references));
+                }
 
                 if ($this->encryptedParts) {
                     $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);

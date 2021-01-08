@@ -2,7 +2,7 @@
 
 ## Setting up the server
 
-Choosing a provider (that you trust), Vultr, Greenhost, OVH, Hetzner, Linode, Cockbox (make sure the host allows post 25 to be used, some providers block it).
+Choosing a provider (that you trust), Vultr, Greenhost, OVH, Hetzner, Linode, Cockbox (make sure the host allows port 25 to be used, some providers block it).
 
 With Vultr you may need to open a support ticket and request for them to unblock port 25.
 
