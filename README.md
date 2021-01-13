@@ -351,13 +351,13 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 ## Software Requirements
 
 * Postfix (3.0.0+) (plus postfix-mysql for database queries and postfix-pcre)
-* PHP (7.3+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
+* PHP (7.4+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
 * Port 25 unblocked and open
 * Redis (4.x+) for throttling and queues
 * FQDN as hostname e.g. mail.anonaddy.me
 * MariaDB / MySQL
 * Nginx
-* SpamAssassin, Amavis, OpenDKIM, OpenDMARC, postfix-policyd-spf-python
+* (SpamAssassin, OpenDKIM, OpenDMARC, postfix-policyd-spf-python) OR Rspamd
 * DNS records - MX, SPF, DKIM, DMARC
 * Reverse DNS
 * SSL/TLS Encryption - you can install a free certificate from Let’s Encrypt.
