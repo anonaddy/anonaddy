@@ -9,7 +9,7 @@ dayjs.extend(advancedFormat)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
-window.Vue = require('vue')
+import Vue from 'vue'
 
 import PortalVue from 'portal-vue'
 import Clipboard from 'v-clipboard'

@@ -20,7 +20,7 @@ class ApiTokensTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        Passport::actingAs($this->user, []);
+        Passport::actingAs($this->user, [], 'web');
         $this->user->recipients()->save($this->user->defaultRecipient);
 
         $clientRepository = new ClientRepository();

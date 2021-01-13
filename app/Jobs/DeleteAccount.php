@@ -46,6 +46,7 @@ class DeleteAccount implements ShouldQueue
         $this->user->additionalUsernames()->get()->each->delete(); // In order to fire deleting model event.
         $this->user->tokens()->delete();
         $this->user->rules()->delete();
+        $this->user->webauthnKeys()->delete();
         $this->user->delete();
     }
 }

@@ -246,6 +246,8 @@
 
                     <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
+                    <p class="mt-6">Ensure your account is using a long, random, unique password to stay secure. It is recommended to use a password manager such as BitWarden. Updating your password will also logout your active sessions on other browsers and devices.</p>
+
                     <div class="mt-6 flex flex-wrap mb-4">
                         <label for="current" class="block text-grey-700 text-sm mb-2">
                             {{ __('Current Password') }}:
@@ -286,6 +288,42 @@
 
                 <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
                     {{ __('Update Password') }}
+                </button>
+
+            </form>
+
+            <form id="logout-browser-sessions" method="POST" action="{{ route('browser-sessions.destroy') }}" class="pt-16">
+                @method('DELETE')
+                @csrf
+
+                <div class="mb-6">
+
+                    <h3 class="font-bold text-xl">
+                        Browser Sessions
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="mt-6">If necessary, you may logout of all of your other browser sessions across all of your devices. If you feel your account has been compromised, you should also update your password.</p>
+
+                    <div class="mt-6 flex flex-wrap mb-4">
+                        <label for="current" class="block text-grey-700 text-sm mb-2">
+                            {{ __('Current Password') }}:
+                        </label>
+
+                        <input id="current" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('current_password_sesssions') ? ' border-red-500' : '' }}" name="current_password_sesssions" placeholder="********" required>
+
+                        @if ($errors->has('current_password_sesssions'))
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('current_password_sesssions') }}
+                            </p>
+                        @endif
+                    </div>
+
+                </div>
+
+                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                    {{ __('Logout Other Browser Sessions') }}
                 </button>
 
             </form>

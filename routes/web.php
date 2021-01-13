@@ -74,6 +74,8 @@ Route::group([
 
     Route::post('/password', 'PasswordController@update')->name('settings.password');
 
+    Route::delete('/browser-sessions', 'BrowserSessionController@destroy')->name('browser-sessions.destroy');
+
     Route::post('/2fa/enable', 'Auth\TwoFactorAuthController@store')->name('settings.2fa_enable');
     Route::post('/2fa/regenerate', 'Auth\TwoFactorAuthController@update')->name('settings.2fa_regenerate');
     Route::post('/2fa/disable', 'Auth\TwoFactorAuthController@destroy')->name('settings.2fa_disable');
