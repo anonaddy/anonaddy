@@ -106,7 +106,7 @@ Here are a few reasons I can think of:
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
-* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another for paid plan users)
+* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another 2 for paid plan users)
 * Ability to generate UUID and random word aliases at shared domains
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
@@ -121,12 +121,11 @@ There is not an official Android app that I have made myself as I am not familia
 
 There is however an excellent [open-source](https://gitlab.com/Stjin/anonaddy-android) Android app created by [Stjin](https://twitter.com/Stjinchan) that is available to download from the [Play Store](https://play.google.com/store/apps/details?id=host.stjin.anonaddy) (paid) and [F-Droid](https://f-droid.org/packages/host.stjin.anonaddy) (free). The developer of this app has put in a lot of time and effort so if you would like to support him please purchase the Play Store version.
 
-There is also another unofficial [open-source](https://github.com/KhalidWar/anonaddy) Android app created by [KhalidWar](https://twitter.com/RealKhalidWar) available from the [Play Store](https://play.google.com/store/apps/details?id=com.khalidwar.anonaddy).
+There is also another unofficial [open-source](https://github.com/KhalidWar/anonaddy) Android app created by [KhalidWar](https://twitter.com/RealKhalidWar) available on the [Play Store](https://play.google.com/store/apps/details?id=com.khalidwar.anonaddy).
 
 ## Is there an iOS app?
 
-At the moment there is not an app available for iOS. I believe the developers above may be looking into creating one but there is no time scale on this. In the meantime please use the web application in your mobile's browser.
-
+Yes, [KhalidWar's](https://twitter.com/RealKhalidWar) unofficial [open-source](https://github.com/KhalidWar/anonaddy) app from above is also available on the [App Store](https://apps.apple.com/us/app/addymanager/id1547461270).
 
 ## How do I add my own GPG/OpenPGP key for encryption?
 
@@ -363,6 +362,10 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 * SSL/TLS Encryption - you can install a free certificate from Let’s Encrypt.
 
 For full details please see the [self-hosting instructions file](SELF-HOSTING.md).
+
+## My sponsors
+
+Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev) who is my very first GitHub sponsor!
 
 ## Thanks
 
