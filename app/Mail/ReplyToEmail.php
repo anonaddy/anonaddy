@@ -8,12 +8,13 @@ use App\Models\EmailData;
 use App\Models\User;
 use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Swift_Signers_DKIMSigner;
 
-class ReplyToEmail extends Mailable implements ShouldQueue
+class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 {
     use Queueable, SerializesModels, CheckUserRules;
 

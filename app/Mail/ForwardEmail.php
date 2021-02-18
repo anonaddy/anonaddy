@@ -10,6 +10,7 @@ use App\Models\Recipient;
 use App\Notifications\GpgKeyExpired;
 use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -18,7 +19,7 @@ use Illuminate\Support\Str;
 use Swift_Signers_DKIMSigner;
 use Swift_SwiftException;
 
-class ForwardEmail extends Mailable implements ShouldQueue
+class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 {
     use Queueable, SerializesModels, CheckUserRules;
 
