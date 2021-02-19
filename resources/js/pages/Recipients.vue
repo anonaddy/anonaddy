@@ -491,6 +491,8 @@ export default {
           this.addRecipientLoading = false
           if (error.response.status === 422) {
             this.error(error.response.data.errors.email[0])
+          } else if (error.response.status === 429) {
+            this.error('You are making too many requests')
           } else {
             this.error()
           }

@@ -27,6 +27,7 @@ class RegisterUniqueRecipient implements Rule
     public function passes($attribute, $value)
     {
         $items = Recipient::whereNotNull('email_verified_at')
+            ->select('email')
             ->get()
             ->filter(function ($recipient) use ($value) {
                 if (($recipient->email) == strtolower($value)) {

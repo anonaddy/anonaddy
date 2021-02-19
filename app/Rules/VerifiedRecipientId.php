@@ -29,6 +29,7 @@ class VerifiedRecipientId implements Rule
     {
         $verifiedRecipientIds = $this->user
             ->verifiedRecipients()
+            ->select('id')
             ->get()
             ->map(function ($recipient) {
                 return $recipient->id;

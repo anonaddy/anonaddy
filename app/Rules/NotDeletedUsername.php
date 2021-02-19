@@ -26,7 +26,8 @@ class NotDeletedUsername implements Rule
      */
     public function passes($attribute, $value)
     {
-        $deletedUsernames = DeletedUsername::all()
+        $deletedUsernames = DeletedUsername::select('username')
+            ->get()
             ->map(function ($item) {
                 return $item->username;
             })

@@ -28,10 +28,10 @@ class NotUsedAsRecipientDomain implements Rule
     public function passes($attribute, $value)
     {
         return ! Recipient::whereNotNull('email_verified_at')
+            ->select('email')
             ->get()
-            ->pluck('email')
-            ->map(function ($recipientEmail) {
-                return Str::afterLast($recipientEmail, '@');
+            ->map(function ($recipient) {
+                return Str::afterLast($recipient->email, '@');
             })
             ->unique()
             ->contains($value);

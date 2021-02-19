@@ -561,7 +561,7 @@ export default {
           if (error.response.status === 422) {
             this.error(error.response.data.errors.domain[0])
           } else if (error.response.status === 429) {
-            this.error('Please wait a little while before checking the records again')
+            this.error('You are making too many requests')
           } else if (error.response.status === 404) {
             this.warn(
               'Verification TXT record not found, this could be due to DNS caching, please try again shortly.'

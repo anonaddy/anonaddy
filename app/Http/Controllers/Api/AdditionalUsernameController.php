@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAdditionalUsernameRequest;
 use App\Http\Requests\UpdateAdditionalUsernameRequest;
 use App\Http\Resources\AdditionalUsernameResource;
-use App\Models\DeletedUsername;
 
 class AdditionalUsernameController extends Controller
 {
@@ -47,8 +46,6 @@ class AdditionalUsernameController extends Controller
     public function destroy($id)
     {
         $username = user()->additionalUsernames()->findOrFail($id);
-
-        DeletedUsername::create(['username' => $username->username]);
 
         $username->delete();
 

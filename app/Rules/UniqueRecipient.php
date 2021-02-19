@@ -30,6 +30,7 @@ class UniqueRecipient implements Rule
     {
         $items = Recipient::where('user_id', $this->user->id)
             ->orWhere('email_verified_at', '!=', null)
+            ->select('email')
             ->get()
             ->filter(function ($recipient) use ($value) {
                 if (($recipient->email) == strtolower($value)) {
