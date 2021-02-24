@@ -434,13 +434,13 @@
           </div>
         </div>
 
-        <label for="alias_domain" class="block text-grey-700 text-sm mt-4 mb-2">
+        <label for="alias_format" class="block text-grey-700 text-sm mt-4 mb-2">
           Alias Format:
         </label>
         <div class="block relative w-full mb-4">
           <select
             v-model="generateAliasFormat"
-            id="alias_domain"
+            id="alias_format"
             class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
             required
           >
@@ -500,6 +500,29 @@
           placeholder="Enter description (optional)..."
           autofocus
         />
+
+        <label for="alias_recipient_ids" class="block text-grey-700 text-sm my-2">
+          Recipients:
+        </label>
+        <p v-show="errors.generateAliasRecipientIds" class="mb-3 text-red-500 text-sm">
+          {{ errors.generateAliasRecipientIds }}
+        </p>
+        <multiselect
+          id="alias_recipient_ids"
+          v-model="generateAliasRecipientIds"
+          :options="recipientOptions"
+          :multiple="true"
+          :close-on-select="true"
+          :clear-on-select="false"
+          :searchable="true"
+          :max="10"
+          placeholder="Select recipients (optional)..."
+          label="email"
+          track-by="email"
+          :preselect-first="false"
+          :show-labels="false"
+        >
+        </multiselect>
 
         <div class="mt-6">
           <button
@@ -828,6 +851,7 @@ export default {
       generateAliasDomain: this.defaultAliasDomain ? this.defaultAliasDomain : this.domain,
       generateAliasLocalPart: '',
       generateAliasDescription: '',
+      generateAliasRecipientIds: [],
       generateAliasFormat: this.defaultAliasFormat ? this.defaultAliasFormat : 'random_characters',
       aliasFormatOptions: [
         {
@@ -1086,6 +1110,7 @@ export default {
             local_part: this.generateAliasLocalPart,
             description: this.generateAliasDescription,
             format: this.generateAliasFormat,
+            recipient_ids: _.map(this.generateAliasRecipientIds, recipient => recipient.id),
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -1095,6 +1120,7 @@ export default {
           this.generateAliasLoading = false
           this.generateAliasLocalPart = ''
           this.generateAliasDescription = ''
+          this.generateAliasRecipientIds = []
           this.rows.push(data.data)
           this.generateAliasModalOpen = false
           this.success('New alias generated successfully')

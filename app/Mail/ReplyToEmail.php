@@ -62,10 +62,11 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
      */
     public function build()
     {
+        $returnPath = $this->alias->email;
+
         if ($this->alias->isCustomDomain()) {
             if ($this->alias->aliasable->isVerifiedForSending()) {
                 $this->fromEmail = $this->alias->email;
-                $returnPath = $this->alias->email;
 
                 if (config('anonaddy.dkim_signing_key')) {
                     $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
@@ -77,7 +78,6 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             }
         } else {
             $this->fromEmail = $this->alias->email;
-            $returnPath = 'mailer@'.$this->alias->parentDomain();
         }
 
         $this->email =  $this

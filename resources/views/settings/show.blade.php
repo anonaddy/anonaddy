@@ -351,11 +351,11 @@
                     <p class="mt-6">If necessary, you may logout of all of your other browser sessions across all of your devices. If you feel your account has been compromised, you should also update your password.</p>
 
                     <div class="mt-6 flex flex-wrap mb-4">
-                        <label for="current" class="block text-grey-700 text-sm mb-2">
+                        <label for="current-password-sessions" class="block text-grey-700 text-sm mb-2">
                             {{ __('Current Password') }}:
                         </label>
 
-                        <input id="current" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('current_password_sesssions') ? ' border-red-500' : '' }}" name="current_password_sesssions" placeholder="********" required>
+                        <input id="current-password-sessions" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('current_password_sesssions') ? ' border-red-500' : '' }}" name="current_password_sesssions" placeholder="********" required>
 
                         @if ($errors->has('current_password_sesssions'))
                             <p class="text-red-500 text-xs italic mt-4">

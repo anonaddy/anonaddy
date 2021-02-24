@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Rules\ValidAliasLocalPart;
+use App\Rules\VerifiedRecipientId;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -32,7 +33,13 @@ class StoreAliasRequest extends FormRequest
                 Rule::in($this->user()->domainOptions())
             ],
             'description' => 'nullable|max:100',
-            'format' => 'nullable|in:random_characters,uuid,random_words,custom'
+            'format' => 'nullable|in:random_characters,uuid,random_words,custom',
+            'recipient_ids' => [
+                'nullable',
+                'array',
+                'max:10',
+                new VerifiedRecipientId
+            ]
         ];
     }
 

@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\AdditionalUsername;
 use App\Models\Alias;
 use App\Models\Domain;
+use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -105,6 +106,31 @@ class AliasesTest extends TestCase
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
         $this->assertEquals($this->user->aliases[0]->local_part, $response->getData()->data->local_part);
+    }
+
+    /** @test */
+    public function user_can_generate_alias_with_recipients()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $recipient2 = Recipient::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'anonaddy.me',
+            'description' => 'the description',
+            'recipient_ids' => [
+                $recipient->id,
+                $recipient2->id
+            ]
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(2, $this->user->aliases[0]->recipients);
+        $this->assertEquals($recipient->email, $this->user->aliases[0]->recipients[0]->email);
     }
 
     /** @test */

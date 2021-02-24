@@ -113,6 +113,10 @@ class AliasController extends Controller
 
         $alias = user()->aliases()->create($data);
 
+        if ($request->recipient_ids) {
+            $alias->recipients()->sync($request->recipient_ids);
+        }
+
         return new AliasResource($alias->refresh()->load('recipients'));
     }
 
