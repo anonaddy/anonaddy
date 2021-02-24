@@ -94,7 +94,14 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
      */
     public function build()
     {
-        $this->fromEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+        // Check if the user is using the old reply-to and from headers
+        if ($this->user->use_reply_to) {
+            $this->fromEmail = $this->alias->email;
+
+            $replyToEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+        } else {
+            $this->fromEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+        }
 
         $returnPath = $this->alias->email;
 
@@ -106,13 +113,13 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                     $this->dkimSigner->ignoreHeader('Return-Path');
                 }
             } else {
-                $replyToEmail = $this->fromEmail;
+                if (! isset($replyToEmail)) {
+                    $replyToEmail = $this->fromEmail;
+                }
 
                 $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
             }
-        } else {
-            $returnPath = 'mailer@'.$this->alias->parentDomain();
         }
 
         $this->email =  $this

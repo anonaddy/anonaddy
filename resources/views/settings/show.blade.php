@@ -235,6 +235,50 @@
 
             </form>
 
+            <form class="pt-16" method="POST" action="{{ route('settings.use_reply_to') }}">
+                @csrf
+
+                <div class="mb-6">
+
+                    <h3 class="font-bold text-xl">
+                        Use Reply-To Header For Replying
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="mt-6">This will determine if forwarded emails use the From header or the Reply-To header for sending replies. Some users may find it easier to set up inbox filters having the From: header set as just the alias.
+                    </p>
+                    <p class="mt-4">If enabled, then the <b>From:</b> header will bet set as the alias email e.g. <b>alias{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}</b> instead of the default <b>alias+sender=example.com{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}</b> (this will be set as the Reply-To header instead)</p>
+
+                    <div class="mt-6 flex flex-wrap mb-4">
+                        <label for="use_reply_to" class="block text-grey-700 text-sm mb-2">
+                            {{ __('Update Use Reply-To') }}:
+                        </label>
+
+                        <div class="block relative w-full">
+                            <select id="use_reply_to" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="use_reply_to" required>
+                                <option value="1" {{ $user->use_reply_to ? 'selected' : '' }}>Enabled</option>
+                                <option value="0" {{ ! $user->use_reply_to ? 'selected' : '' }}>Disabled</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+
+                        @if ($errors->has('use_reply_to'))
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('use_reply_to') }}
+                            </p>
+                        @endif
+                    </div>
+
+                </div>
+
+                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                    Update Use Reply-To
+                </button>
+            </form>
+
             <form id="update-password" method="POST" action="{{ route('settings.password') }}" class="pt-16">
                 @csrf
 

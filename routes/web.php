@@ -72,6 +72,8 @@ Route::group([
 
     Route::post('/catch-all', 'CatchAllController@update')->name('settings.catch_all');
 
+    Route::post('/use-reply-to', 'UseReplyToController@update')->name('settings.use_reply_to');
+
     Route::post('/password', 'PasswordController@update')->name('settings.password');
 
     Route::delete('/browser-sessions', 'BrowserSessionController@destroy')->name('browser-sessions.destroy');

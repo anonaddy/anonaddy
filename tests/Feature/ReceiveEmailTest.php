@@ -1000,4 +1000,37 @@ class ReceiveEmailTest extends TestCase
             return $mail->hasTo($recipient->email);
         });
     }
+
+    /** @test */
+    public function it_can_forward_email_using_old_reply_to_and_from_headers()
+    {
+        Mail::fake();
+
+        Mail::assertNothingSent();
+
+        $this->user->update(['use_reply_to' => true]);
+
+        $this->assertTrue($this->user->use_reply_to);
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [''],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1346'
+            ]
+        )->assertExitCode(0);
+
+        $this->assertEquals(1, $this->user->aliases()->count());
+
+        Mail::assertQueued(ForwardEmail::class, function ($mail) {
+            $mail->build();
+
+            return $mail->hasTo($this->user->email) && $mail->hasFrom('ebay@johndoe.anonaddy.com') && $mail->hasReplyTo('ebay+will=anonaddy.com@johndoe.anonaddy.com');
+        });
+    }
 }

@@ -239,6 +239,34 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_enable_use_reply_to()
+    {
+        $this->assertFalse($this->user->use_reply_to);
+
+        $response = $this->post('/settings/use-reply-to/', [
+            'use_reply_to' => true
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertTrue($this->user->use_reply_to);
+    }
+
+    /** @test */
+    public function user_can_disable_use_reply_to()
+    {
+        $this->user->update(['use_reply_to' => true]);
+
+        $this->assertTrue($this->user->use_reply_to);
+
+        $response = $this->post('/settings/use-reply-to/', [
+            'use_reply_to' => false
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertFalse($this->user->use_reply_to);
+    }
+
+    /** @test */
     public function user_can_delete_account()
     {
         $this->assertNotNull($this->user->id);

@@ -33,6 +33,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'banner_location',
         'catch_all',
         'bandwidth',
+        'default_alias_domain',
+        'default_alias_format',
+        'use_reply_to',
         'default_recipient_id',
         'password',
         'two_factor_enabled',
@@ -67,7 +70,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'id' => 'string',
         'default_recipient_id' => 'string',
         'catch_all' => 'boolean',
-        'two_factor_enabled' => 'boolean'
+        'two_factor_enabled' => 'boolean',
+        'use_reply_to' => 'boolean'
     ];
 
     protected $dates = [
