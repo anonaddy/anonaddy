@@ -42,6 +42,7 @@ This is the source code for self-hosting AnonAddy.
 - [Can I login using an additional username?](#can-i-login-using-an-additional-username)
 - [I'm not receiving any emails, what's wrong?](#im-not-receiving-any-emails-whats-wrong)
 - [How do I know this site won't disappear next month?](#how-do-i-know-this-site-wont-disappear-next-month)
+- [What happens to AnonAddy if you die?](#what-happens-to-anonaddy-if-you-die)
 - [Is the application tested?](#is-the-appliction-tested)
 - [How do I host this myself?](#how-do-i-host-this-myself)
 - [Who's behind AnonAddy?](#whos-behind-anonaddy)
@@ -326,6 +327,12 @@ If you still aren't receiving emails please contact me.
 ## How do I know this site won't disappear next month?
 
 I am very passionate about this project. I use it myself every day and will be keeping it running indefinitely. The service also provides me with an income.
+
+## What happens to AnonAddy if you die?
+
+I do have someone in place who can keep the service running in the event of me not being here. They are able to continue paying for the servers that host AnonAddy and the domains that it uses. All AnonAddy domains also always have over 5 years until they expire.
+
+They would make a Twitter announcement informing all users that they would be keeping the service running. You would then be able to decide whether you'd like to continue using AnonAddy or start to update your email addresses.
 
 ## Is the application tested?
 
