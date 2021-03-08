@@ -151,13 +151,30 @@
           />
         </span>
         <span v-else-if="props.column.field === 'domain_sending_verified_at'">
-          <span
-            name="check"
-            v-if="props.row.domain_sending_verified_at"
-            class="py-1 px-2 bg-green-200 text-green-900 rounded-full text-xs"
-          >
-            verified
-          </span>
+          <div v-if="props.row.domain_sending_verified_at">
+            <svg
+              class="h-5 w-5 inline-block"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <g fill="none" fill-rule="evenodd">
+                <circle class="text-green-200 fill-current" cx="10" cy="10" r="10"></circle>
+                <polyline
+                  class="text-green-900 stroke-current"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  points="6 10 8.667 12.667 14 7.333"
+                ></polyline>
+              </g>
+            </svg>
+            <button
+              @click="openCheckRecordsModal(rows[props.row.originalIndex])"
+              class="focus:outline-none text-sm ml-2"
+            >
+              Recheck
+            </button>
+          </div>
           <button
             v-else
             @click="openCheckRecordsModal(rows[props.row.originalIndex])"

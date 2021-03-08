@@ -180,7 +180,7 @@ class Domain extends Model
 
         return collect(dns_get_record($this->domain . '.', DNS_TXT))
             ->contains(function ($r) {
-                return trim($r['txt']) === 'aa-verify=' . sha1(config('anonaddy.secret') . user()->id);
+                return trim($r['txt']) === 'aa-verify=' . sha1(config('anonaddy.secret') . user()->id . user()->domains->count());
             });
     }
 
