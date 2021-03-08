@@ -195,7 +195,7 @@
         </p>
         <p>
           Once the DNS changes propagate and you have verified ownership of the domain you will need
-          to add a few more records to be able to recieve emails at your own domain.
+          to add a few more records to be able to receive emails at your own domain.
         </p>
       </div>
     </div>
