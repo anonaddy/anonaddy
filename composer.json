@@ -21,7 +21,7 @@
         "laravel/ui": "^3.0",
         "maatwebsite/excel": "^3.1",
         "mews/captcha": "^3.0.0",
-        "php-mime-mail-parser/php-mime-mail-parser": "^6.0",
+        "php-mime-mail-parser/php-mime-mail-parser": "^7.0",
         "pragmarx/google2fa-laravel": "^1.3",
         "pragmarx/version": "^1.2",
         "ramsey/uuid": "^4.0"
