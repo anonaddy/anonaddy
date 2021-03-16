@@ -8,10 +8,11 @@
         "hot": "mix watch --hot",
         "prod": "npm run production",
         "production": "mix --production",
-        "format": "prettier --write 'resources/**/*.{css,js,vue}'"
+        "format": "prettier --write 'resources/**/*.{css,js,vue}'",
+        "prepare": "husky install"
     },
     "dependencies": {
-        "autoprefixer": "^10.2.3",
+        "autoprefixer": "^10.2.4",
         "axios": "^0.21.1",
         "cross-env": "^7.0.3",
         "dayjs": "^1.10.4",
@@ -44,7 +45,7 @@
     },
     "lint-staged": {
         "*.{css,js,vue}": [
-            "npm run format --"
+            "prettier --write"
         ],
         "*.php": [
             "composer format"

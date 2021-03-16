@@ -11,6 +11,7 @@ This is the source code for self-hosting AnonAddy.
 - [What is a shared domain alias?](#what-is-a-shared-domain-alias)
 - [What is a standard alias?](#what-is-a-standard-alias)
 - [Can I use my own domain?](#can-i-use-my-own-domain)
+- [Can I add a domain and also use it as a recipient?](#can-i-add-a-domain-and-also-use-it-as-a-recipients)
 - [Why should I use this instead of a similar service?](#why-should-i-use-this-instead-of-a-similar-service)
 - [Is there a browser extension?](#is-there-a-browser-extension)
 - [Is there an Android app?](#is-there-an-android-app)
@@ -95,6 +96,14 @@ A standard alias is any alias that can be created on-the-fly. Automatic on-the-f
 ## Can I use my own domain?
 
 Yes you can use your own domain name so you can also have *@example.com as your aliases. To do so you simply need to add a TXT record to verify your ownership of the domain. Then you will need to add an MX record to your domain so that our server can handle incoming emails. You can then add a few other records to enable sending from your domain too.
+
+## Can I add a domain and also use it as a recipient?
+
+No, you cannot use the same domain as a custom domain and also for a recipient on AnonAddy.
+
+e.g if you add "example.com" as a custom domain, you cannot then add "xyz@example.com" as a recipient. This is because a domain cannot direct email to multiple locations simultaneously using MX records. So your email would arrive for "example.com" and then attempt to be forwarded to "xyz@example.com" which would create a loop.
+
+You can instead use a subdomain for your custom domain, e.g. "mail.example.com" instead of "example.com", this would allow you to create *@mail.example.com for your aliases. More details can be found [here](https://anonaddy.com/help/adding-a-custom-domain/).
 
 ## Why should I use this instead of a similar service?
 
