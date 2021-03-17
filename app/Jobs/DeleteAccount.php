@@ -38,8 +38,19 @@ class DeleteAccount implements ShouldQueue, ShouldBeEncrypted
 
         $this->user->aliasRecipients()->delete();
 
+        $sharedDomainAliases = $this->user->aliases()->whereIn('domain', config('anonaddy.all_domains'));
+        // Remove data from shared domain aliases
+        $sharedDomainAliases->update([
+            'extension' => null,
+            'description' => null,
+            'emails_forwarded' => 0,
+            'emails_blocked' => 0,
+            'emails_replied' => 0,
+            'emails_sent' => 0,
+        ]);
         // Soft delete any aliases at shared domains
-        $this->user->aliases()->whereIn('domain', config('anonaddy.all_domains'))->delete();
+        $sharedDomainAliases->delete();
+        // Force delete any other aliases
         $this->user->aliases()->whereNotIn('domain', config('anonaddy.all_domains'))->forceDelete();
 
         $this->user->recipients()->get()->each->delete(); // In order to fire deleting model event.

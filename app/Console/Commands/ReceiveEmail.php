@@ -76,7 +76,7 @@ class ReceiveEmail extends Command
             foreach ($recipients as $recipient) {
 
                 // First determine if the alias already exists in the database
-                if ($alias = Alias::where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first()) {
+                if ($alias = Alias::firstWhere('email', $recipient['local_part'] . '@' . $recipient['domain'])) {
                     $user = $alias->user;
 
                     if ($alias->aliasable_id) {

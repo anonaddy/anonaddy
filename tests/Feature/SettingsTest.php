@@ -283,7 +283,13 @@ class SettingsTest extends TestCase
 
         $uuidAlias = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'domain' => 'anonaddy.me'
+            'domain' => 'anonaddy.me',
+            'extension' => 'ext',
+            'description' => 'Alias',
+            'emails_forwarded' => 10,
+            'emails_blocked' => 1,
+            'emails_replied' => 2,
+            'emails_sent' => 3
         ]);
         $uuidAlias->update(['local_part' => $uuidAlias->id]);
 
@@ -341,6 +347,12 @@ class SettingsTest extends TestCase
         $this->assertDatabaseHas('aliases', [
             'id' => $uuidAlias->id,
             'user_id' => $this->user->id,
+            'extension' => null,
+            'description' => null,
+            'emails_forwarded' => 0,
+            'emails_blocked' => 0,
+            'emails_replied' => 0,
+            'emails_sent' => 0,
             'deleted_at' => now()
         ]);
 
