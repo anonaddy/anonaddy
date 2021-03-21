@@ -5,7 +5,9 @@
         <div class="w-full max-w-md">
 
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                <a href="https://anonaddy.com" aria-label="Go to Anonaddy homepage">
+                    <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                </a>
             </div>
             <div class="flex flex-col break-words bg-white border border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('login') }}">
