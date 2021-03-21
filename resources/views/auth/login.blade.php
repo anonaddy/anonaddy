@@ -41,7 +41,7 @@
                             @endif
                         </div>
 
-                        <div class="flex flex-wrap mb-6">
+                        <div class="flex flex-wrap mb-2">
                             <label for="password" class="block text-grey-700 text-sm mb-2">
                                 {{ __('Password') }}:
                             </label>
@@ -55,15 +55,15 @@
                             @endif
                         </div>
 
-                        <div class="flex justify-between">
-                            <div>
+                        <div class="flex flex-wrap justify-between items-center">
+                            <div class="mr-5 mt-4">
                                 <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                                 <label class="text-sm text-grey-700 ml-3" for="remember">
                                     {{ __('Remember Me') }}
                                 </label>
                             </div>
                             @if (Route::has('password.request'))
-                                <a class="whitespace-nowrap no-underline text-sm" href="{{ route('password.request') }}">
+                                <a class="whitespace-nowrap no-underline text-sm mt-4" href="{{ route('password.request') }}">
                                     {{ __('Forgot Username/Password?') }}
                                 </a>
                             @endif
