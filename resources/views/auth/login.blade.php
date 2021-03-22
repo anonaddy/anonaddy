@@ -5,7 +5,9 @@
         <div class="w-full max-w-md">
 
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                <a href="https://anonaddy.com" aria-label="Go to Anonaddy homepage">
+                    <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                </a>
             </div>
             <div class="flex flex-col break-words bg-white border border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('login') }}">
@@ -39,7 +41,7 @@
                             @endif
                         </div>
 
-                        <div class="flex flex-wrap mb-6">
+                        <div class="flex flex-wrap mb-2">
                             <label for="password" class="block text-grey-700 text-sm mb-2">
                                 {{ __('Password') }}:
                             </label>
@@ -53,15 +55,15 @@
                             @endif
                         </div>
 
-                        <div class="flex justify-between">
-                            <div>
+                        <div class="flex flex-wrap justify-between items-center">
+                            <div class="mr-5 mt-4">
                                 <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                                 <label class="text-sm text-grey-700 ml-3" for="remember">
                                     {{ __('Remember Me') }}
                                 </label>
                             </div>
                             @if (Route::has('password.request'))
-                                <a class="whitespace-nowrap no-underline text-sm" href="{{ route('password.request') }}">
+                                <a class="whitespace-nowrap no-underline text-sm mt-4" href="{{ route('password.request') }}">
                                     {{ __('Forgot Username/Password?') }}
                                 </a>
                             @endif
