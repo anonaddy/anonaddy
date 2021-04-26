@@ -12,6 +12,7 @@ This is the source code for self-hosting AnonAddy.
 - [What is a standard alias?](#what-is-a-standard-alias)
 - [Can I use my own domain?](#can-i-use-my-own-domain)
 - [Can I add a domain and also use it as a recipient?](#can-i-add-a-domain-and-also-use-it-as-a-recipient)
+- [Can I add a domain if I'm already using it for email somewhere else?](#can-i-add-a-domain-if-im-already-using-it-for-email-somewhere-else)
 - [Why should I use this instead of a similar service?](#why-should-i-use-this-instead-of-a-similar-service)
 - [Is there a browser extension?](#is-there-a-browser-extension)
 - [Is there an Android app?](#is-there-an-android-app)
@@ -105,6 +106,19 @@ No, you cannot use the same domain as a custom domain and also for a recipient o
 e.g if you add "example.com" as a custom domain, you cannot then add "xyz@example.com" as a recipient. This is because a domain cannot direct email to multiple locations simultaneously using MX records. So your email would arrive for "example.com" and then attempt to be forwarded to "xyz@example.com" which would create a loop.
 
 You can instead use a subdomain for your custom domain, e.g. "mail.example.com" instead of "example.com", this would allow you to create *@mail.example.com for your aliases. More details can be found [here](https://anonaddy.com/help/adding-a-custom-domain/).
+
+## Can I add a domain if I'm already using it for email somewhere else?
+
+If you have a custom domain say **example.com** and you are already using it for email somewhere else e.g. ProtonMail or Namecheap then you cannot also use it simultaneously with AnonAddy.
+
+This is because emails cannot be handled by multiple different mail servers at the same time, even if they have the same priority MX records. It can only be delivered to one mail server at a time which will typically be the MX record with the smallest number since this has the highest priority.
+
+You can either:
+
+- Migrate your domain to AnonAddy by removing the current provider's MX records and adding AnonAddy's.
+- Or, if you would like to keep using your domain with your current email provider then I would recommend instead adding a subdomain of it to AnonAddy such as **mail.example.com**.
+
+Using a subdomain will not interfere with your current email setup and you'll be able to create aliases ***@mail.example.com** through AnonAddy.
 
 ## Why should I use this instead of a similar service?
 
