@@ -1,24 +1,26 @@
 # AnonAddy Self-Hosting Instructions
 
+## Assumptions
+
+This guide assumes that you are competent using the command line to manage an Ubuntu server and that you have already taken appropriate steps to harden and secure the server, for example: no root login, key auth only, 2FA, automatic security updates etc.). I will not go over these here as there are already many great resources availble covering this:
+
+- [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
+- [https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/](https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/)
+- [https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers](https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers)
+
+You should have a fresh 20.04 Ubuntu server (or 18.04) with Fail2ban, a Firewall (e.g UFW), and make sure that ports **25**, **22** (or whatever your SSH port is if you've changed it) **443** and **80** are open.
+
 ## Setting up the server
 
-Choosing a provider (that you trust), Vultr, Greenhost, OVH, Hetzner, Linode, Cockbox (make sure the host allows port 25 to be used, some providers block it).
+Choosing a provider (that you trust), [UpCloud](https://upcloud.com/signup/?promo=D5H33W) (referral link), Vultr, Greenhost, OVH, Hetzner, Linode, Cockbox (make sure the host allows port 25 to be used, some providers block it).
 
-With Vultr you may need to open a support ticket and request for them to unblock port 25.
+With Vultr and UpCloud you may need to open a support ticket and request for them to unblock port 25 as it is typically disabled by default.
 
-Before starting you will want to check the IP of your new server to make sure it is not on any blacklists - [https://multirbl.valli.org/lookup/](https://multirbl.valli.org/lookup/)
+Before starting you will want to check the IP of your new server to make sure it is not on many blacklists - [https://multirbl.valli.org/lookup/](https://multirbl.valli.org/lookup/)
 
-If it is, destroy it and deploy a new one. You might notice that some providers such as Vultr have entire ranges of IPs listed.
+If it is, then check if the blacklists are just preventitive e.g. because the IP has no reverse DNS setup. These listings can easily be removed once you've correctly set up the server.
 
-You should have a fresh 20.04 Ubuntu server (or 18.04). I'm assuming that you have taken proper steps to secure the server (no root login, key auth only, 2FA, automatic security updates etc.).
-
-Add Fail2ban, a Firewall (e.g UFW), make sure that ports 25, 22 (or whatever your SSH port is if you've changed it) 443 and 80 are open.
-
-A good place to get started - [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
-
-[https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/](https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/)
-
-[https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers](https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers)
+If the IP is on many blacklists specifically for sending out spam then it migt be best to destroy it and deploy a new one. You might notice that some providers such as Vultr have entire ranges of IPs listed.
 
 I will be running all commands as a sudo user called `johndoe`. The domain used will be `example.com` and the hostname `mail.example.com`. I'll be using Vultr for this example (Note: if you also use Vultr for managing DNS records they do not currently support TSLA records required for DANE).
 
@@ -60,7 +62,7 @@ Add a wildcard A and AAAA (if using IPv6) record too if you want to use all subd
 
 ```
 A * <Your-IPv4-address>
-AAAA * <Your-IPv4-address>
+AAAA * <Your-IPv6-address>
 ```
 
 If you want to just use the example.com domain and not bother with subdomains then you can skip the wildcard MX, A, AAAA records above (you will still need to add MX and A/AAAA for unsubscribe.example.com though to handle deactivating aliases).
@@ -213,13 +215,10 @@ smtpd_sender_restrictions =
    reject_unknown_sender_domain
    reject_unknown_reverse_client_hostname
 
-policyd-spf_time_limit = 3600
-
 smtpd_recipient_restrictions =
    permit_mynetworks,
    reject_unauth_destination,
    check_recipient_access mysql:/etc/postfix/mysql-recipient-access.cf,
-   check_policy_service unix:private/policyd-spf
    reject_rhsbl_helo dbl.spamhaus.org,
    reject_rhsbl_reverse_client dbl.spamhaus.org,
    reject_rhsbl_sender dbl.spamhaus.org,
@@ -232,8 +231,9 @@ smtpd_data_restrictions = reject_unauth_pipelining
 # Milter configuration
 milter_default_action = accept
 milter_protocol = 6
-smtpd_milters = local:opendkim/opendkim.sock,local:opendmarc/opendmarc.sock
+smtpd_milters = inet:localhost:11332
 non_smtpd_milters = $smtpd_milters
+milter_mail_macros =  i {mail_addr} {client_addr} {client_name} {auth_authen}
 
 disable_vrfy_command = yes
 strict_rfc821_envelopes = yes
@@ -245,13 +245,13 @@ Make sure your hostname is correct in the Postfix config file.
 sudo postconf myhostname
 ```
 
-You'll see warnings that the mysql-... files do not exist. You should see mail.example.com if you don't edit `/etc/postfix/main.cf` and update the myhostname value.
+You'll see warnings that the mysql-... files do not exist. You should see mail.example.com, if you don't edit `/etc/postfix/main.cf` and update the myhostname value.
 
 Open up `/etc/postfix/master.cf` and update this line at the top of the file:
 
 ```
 smtp       inet  n       -       -       -       -       smtpd
-        -o content_filter=anonaddy:dummy
+    -o content_filter=anonaddy:dummy
 ```
 
 This should be the only line for smtp.
@@ -286,7 +286,7 @@ sudo apt-key adv --fetch-keys 'https://nginx.org/keys/nginx_signing.key'
 sudo sh -c "echo 'deb https://nginx.org/packages/mainline/ubuntu/ '$(lsb_release -cs)' nginx' > /etc/apt/sources.list.d/Nginx.list"
 ```
 
-Then you can Install and check the version.
+Then you can install and check the version.
 
 ```bash
 sudo apt update
@@ -294,7 +294,7 @@ sudo apt install nginx
 sudo nginx -v
 ```
 
-At the time of writing this I have `nginx version: nginx/1.18.0`.
+At the time of writing this I have `nginx version: nginx/1.19.10`.
 
 Create the directory for where the application will be stored.
 
@@ -324,66 +324,66 @@ Add the following inside
 
 ```
 server {
-        listen 80;
-        listen [::]:80;
+listen 80;
+listen [::]:80;
 
-        server_name app.example.com;
-        return 301 https://$server_name$request_uri;
+server_name app.example.com;
+return 301 https://$server_name$request_uri;
 }
 
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name app.example.com;
-    root /var/www/anonaddy/public;
-    server_tokens off;
+listen 443 ssl http2;
+listen [::]:443 ssl http2;
+server_name app.example.com;
+root /var/www/anonaddy/public;
+server_tokens off;
 
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-XSS-Protection "1; mode=block";
-    add_header X-Content-Type-Options "nosniff";
-    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'";
-    add_header Referrer-Policy "origin-when-cross-origin";
-    add_header Expect-CT "enforce, max-age=604800";
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-XSS-Protection "1; mode=block";
+add_header X-Content-Type-Options "nosniff";
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'";
+add_header Referrer-Policy "origin-when-cross-origin";
+add_header Expect-CT "enforce, max-age=604800";
 
-    index index.html index.htm index.php;
+index index.html index.htm index.php;
 
-    charset utf-8;
+charset utf-8;
 
-    ssl_certificate             /etc/nginx/conf.d/example.com.d/server.crt;
-    ssl_certificate_key         /etc/nginx/conf.d/example.com.d/server.key;
-    ssl_trusted_certificate     /root/.acme.sh/example.com/fullchain.cer;
+ssl_certificate             /etc/nginx/conf.d/example.com.d/server.crt;
+ssl_certificate_key         /etc/nginx/conf.d/example.com.d/server.key;
+ssl_trusted_certificate     /root/.acme.sh/example.com/fullchain.cer;
 
-    ssl_prefer_server_ciphers   on;
-    ssl_session_timeout         5m;
-    ssl_protocols               TLSv1.2 TLSv1.3;
-    ssl_stapling                on;
-    ssl_stapling_verify         on;
-    ssl_ciphers                 "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
-    ssl_ecdh_curve              secp384r1;
-    ssl_session_cache           shared:SSL:10m;
-    ssl_session_tickets         off;
-    ssl_dhparam                 /etc/nginx/ssl/dhparam.pem;
+ssl_prefer_server_ciphers   on;
+ssl_session_timeout         5m;
+ssl_protocols               TLSv1.2 TLSv1.3;
+ssl_stapling                on;
+ssl_stapling_verify         on;
+ssl_ciphers                 "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+ssl_ecdh_curve              secp384r1;
+ssl_session_cache           shared:SSL:10m;
+ssl_session_tickets         off;
+ssl_dhparam                 /etc/nginx/ssl/dhparam.pem;
 
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
 
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
+location = /favicon.ico { access_log off; log_not_found off; }
+location = /robots.txt  { access_log off; log_not_found off; }
 
-    error_page 404 /index.php;
+error_page 404 /index.php;
 
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
+location ~ \.php$ {
+    fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    include fastcgi_params;
+}
 
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
+location ~ /\.(?!well-known).* {
+    deny all;
+}
 }
 ```
 
@@ -398,7 +398,7 @@ We won't restart nginx yet because it won't be able to find the SSL certificates
 
 We're going to install the latest version of PHP at the time of writing this - version 7.4
 
-If you are using Ubuntu 18.04 you will need to add the below repository, Ubuntu 20.04 can skip this step.
+First we need to add the following repository so we can install PHP8.0.
 
 ```bash
 sudo apt install software-properties-common
@@ -406,21 +406,21 @@ sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 ```
 
-Install PHP7.4 and check the version.
+Install PHP8.0 and check the version.
 
 ```bash
-sudo apt install php7.4-fpm
-php-fpm7.4 -v
+sudo apt install php8.0-fpm
+php-fpm8.0 -v
 ```
 
 Install some required extensions:
 
 ```bash
-sudo apt install php7.4-common php7.4-mysql php7.4-dev php7.4-mbstring php7.4-gd php7.4-imagick php7.4-opcache php7.4-soap php7.4-zip php7.4-cli php7.4-curl php-mailparse php-gnupg php-redis -y
+sudo apt install php8.0-common php8.0-mysql php8.0-dev php8.0-gmp php8.0-mbstring php8.0-dom php8.0-gd php8.0-imagick php8.0-opcache php8.0-soap php8.0-zip php8.0-cli php8.0-curl php8.0-mailparse php8.0-gnupg php8.0-redis -y
 ```
 
 ```bash
-sudo nano /etc/php/7.4/fpm/pool.d/www.conf
+sudo nano /etc/php/8.0/fpm/pool.d/www.conf
 ```
 
 ```
@@ -430,10 +430,10 @@ listen.owner = johndoe
 listen.group = johndoe
 ```
 
-Then restart php7.4-fpm by running:
+Restart php8.0-fpm to reflect the changes.
 
 ```bash
-sudo service php7.4-fpm restart
+sudo service php8.0-fpm restart
 ```
 
 ## Let's Encrypt
@@ -446,12 +446,12 @@ We again need to switch to the root user to run these commands:
 sudo su
 ```
 
-Download the install script from GitHub and run it.
+Download the install script from GitHub and run it. (you can install git by running `sudo apt install git`)
 
 ```bash
 cd ~
 git clone https://github.com/acmesh-official/acme.sh.git
-cd ./acme.sh
+cd acme.sh
 ./acme.sh --install
 ```
 
@@ -481,44 +481,6 @@ Make sure to change example.com to your domain.
 
 You can now type `exit` to go back to the `johndoe` user instead of `root`.
 
-## SPF and DKIM
-
-Follow the instructions in the linked blog post at the end of this section on how to install OpenDKIM and then add an SPF record.
-
-The only differences are the following couple of points:
-
-```
-Canonicalization   simple
-Mode               sv
-SubDomains         yes
-```
-
-Also when editing `/etc/opendkim/signing.table` add this line too so that emails from subdomain aliases will also be signed.
-
-```
-*@*.example.com    default._domainkey.example.com
-```
-
-[https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf](https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf)
-
-Once you've finished following the above post you should have SPF and DKIM set up for your domain.
-
-## DMARC
-
-Next follow this blog post on how to install OpenDMARC.
-
-[https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu](https://www.linuxbabe.com/mail-server/opendmarc-postfix-ubuntu)
-
-Next add a new TXT record to your domain for DMARC with a host of `_dmarc` and value:
-
-```
-"v=DMARC1; p=none; sp=none; adkim=r; aspf=r; pct=100;"
-```
-
-For further reading about DMARC records and the different options available see - [https://www.linuxbabe.com/mail-server/create-dmarc-record](https://www.linuxbabe.com/mail-server/create-dmarc-record)
-
-You should now have a valid DMARC record for your domain.
-
 ## Installing MariaDB
 
 At the time of writing this the latest stable release is v10.5. Make sure to check for any newer releases.
@@ -534,11 +496,9 @@ sudo systemctl status mariadb
 sudo mysql -V
 ```
 
-At the time of writing this I am using "Ver 15.1 Distrib 10.5.6-MariaDB"
+At the time of writing this I am using "Ver 15.1 Distrib 10.5.8-MariaDB"
 
-Set a secure MySQL root password by running the command below and make a note of it somewhere e.g. password manager.
-
-Answer `no` for "Switch to unix_socket authentication" and `no` for "Change the root password?" as you have already set it in the first step. Answer `yes` (default) to the other questions.
+When running securing mariadb Answer `no` for "Switch to unix_socket authentication" and `yes` for "Change the root password?" (Set a secure MySQL root password and make a note of it somewhere e.g. password manager.). Answer `yes` (default) to the other questions.
 
 ```bash
 sudo mysql_secure_installation
@@ -552,7 +512,7 @@ sudo mysql -u root -p
 Once in the MariaDB shell create a new database called anonaddy_database (or whatever you like)
 
 ```sql
-CREATE DATABASE anonaddy_database;
+CREATE DATABASE anonaddy_database DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 ```
 
 Then create a new user and give them a strong password (replace below)
@@ -564,7 +524,7 @@ CREATE USER 'anonaddy'@'localhost' IDENTIFIED BY 'STRONG-PASSWORD-HERE';
 Grant the user privileges for the new database.
 
 ```sql
-GRANT ALL PRIVILEGES ON anonaddy_database.* TO 'anonaddy'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON anonaddy_database.* TO 'anonaddy'@'localhost';
 ```
 
 Next flush privileges and exit the MariaDB shell.
@@ -621,14 +581,14 @@ USE `anonaddy_database`$$
 
 DROP PROCEDURE IF EXISTS `check_access`$$
 
-CREATE DEFINER=`anonaddy`@`localhost` PROCEDURE `check_access`(alias_email VARCHAR(254) charset utf8)
+CREATE PROCEDURE `check_access`(alias_email VARCHAR(254))
 BEGIN
     DECLARE no_alias_exists int(1);
-    DECLARE alias_action varchar(7) charset utf8;
-    DECLARE username_action varchar(7) charset utf8;
-    DECLARE additional_username_action varchar(7) charset utf8;
-    DECLARE domain_action varchar(7) charset utf8;
-    DECLARE alias_domain varchar(254) charset utf8;
+    DECLARE alias_action varchar(7);
+    DECLARE username_action varchar(7);
+    DECLARE additional_username_action varchar(7);
+    DECLARE domain_action varchar(7);
+    DECLARE alias_domain varchar(254);
 
     SET alias_domain = SUBSTRING_INDEX(alias_email, '@', -1);
 
@@ -767,13 +727,259 @@ CALL check_access('email@example.com');
 
 You will get an error stating "Table 'anonaddy_database.aliases' doesn't exist" as we have not yet migrated the database.
 
+Let's also restart Postfix now that we have created the files for it:
+
+```bash
+sudo service postfix restart
+```
+
 ## Installing Redis
 
-Follow this short post on Digital Ocean to install Redis.
+Redis is an advanced key-value store that we will use for caching, sessions, queues and more. To install Redis, run the following commands:
 
-[https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04)
+```bash
+sudo apt update
 
-We'll be using Redis for queues, user limits, sessions and caching.
+sudo apt install redis-server
+```
+
+Next edit the Redis config file.
+
+```bash
+sudo nano /etc/redis/redis.conf
+```
+
+Find the line with `supervised no` and update it to `supervised systemd`. Also make sure the line `bind 127.0.0.1 ::1` is present and uncommented which binds Redis to localhost.
+
+Next we will add a strong password for Redis in the same redis.conf file.
+
+Find the line `# requirepass foobared`, uncomment this line and change "foobared" to a very strong password. (You can generate one using `openssl rand 60 | openssl base64 -A`)
+
+Save the file and restart Redis to reflect the changes.
+
+```bash
+sudo systemctl restart redis.service
+```
+
+Now run:
+
+```bash
+redis-cli
+```
+
+Then type `ping`. You'll be promted for the password we just added. You can enter `auth your-password` to authenticate.
+
+Type `exit` to quit the redis-cli.
+
+## Rspamd
+
+Rspamd is a fast, free and open-source spam filtering system. It can also handle DKIM/ARC signing, SPF checks, DMARC checks, DKIM checks, RBLs and much more.
+
+To install Rspamd run the following commands:
+
+```bash
+sudo apt install -y lsb-release wget
+
+CODENAME=`lsb_release -c -s`
+
+wget -O- https://rspamd.com/apt-stable/gpg.key | sudo apt-key add -
+
+echo "deb [arch=amd64] http://rspamd.com/apt-stable/ $CODENAME main" | sudo tee -a /etc/apt/sources.list.d/rspamd.list
+
+echo "deb-src [arch=amd64] http://rspamd.com/apt-stable/ $CODENAME main" | sudo tee -a /etc/apt/sources.list.d/rspamd.list
+
+sudo apt update
+sudo apt --no-install-recommends install rspamd
+```
+
+Next let's use Rspamd to create a new DKIM key pair.
+
+First make a new directory:
+
+```bash
+sudo mkdir /var/lib/rspamd/dkim
+```
+
+```bash
+sudo rspamadm dkim_keygen -s 'default' -b 2048 -d example.com -k /var/lib/rspamd/dkim/example.com.default.key | sudo tee -a /var/lib/rspamd/dkim/example.com.default.pub
+```
+
+Set the correct ownership and permissions:
+
+```bash
+sudo chown -R _rspamd: /var/lib/rspamd/dkim
+sudo chmod 750 /var/lib/rspamd/dkim
+sudo chmod 440 /var/lib/rspamd/dkim/example.com.default.key /var/lib/rspamd/dkim/example.com.default.pub
+```
+
+You will now need to create a new TXT record for your domain for this key.
+
+```bash
+sudo cat /var/lib/rspamd/dkim/example.com.default.pub
+```
+
+```
+default._domainkey IN TXT ( "v=DKIM1; k=rsa; "
+	"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAfXEYcoRG7TQbIDXVvsHr6wSF7s6daT4wqDLuxaQwpnp6SADTkltqemr8IMV3TAOs5lah9+bNIEhlCPxNbXgRQqT2YxBgKfDP1pW00oTJWpy5FfNRJVrGi8MzfyOMjKrg/iwdLHm0/jftk/PnBQAyTgeEaFQxrJqc5XbbWNfvFwIDAQAB" ) ;
+```
+
+Create a new TXT record with host as `default._domainkey` and value as the above (everything inside the parentheses with extra quotes and whitespace removed).
+
+So in the case above the record value would look like this:
+
+```
+"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAfXEYcoRG7TQbIDXVvsHr6wSF7s6daT4wqDLuxaQwpnp6SADTkltqemr8IMV3TAOs5lah9+bNIEhlCPxNbXgRQqT2YxBgKfDP1pW00oTJWpy5FfNRJVrGi8MzfyOMjKrg/iwdLHm0/jftk/PnBQAyTgeEaFQxrJqc5XbbWNfvFwIDAQAB"
+```
+
+While we're adding records let's add an SPF and DMARC record for our domain too.
+
+```
+TXT  @   "v=spf1 mx ~all"
+```
+
+Add a wildcard SPF record for subdomains too e.g. username.example.com
+
+```
+TXT  *   "v=spf1 mx ~all"
+```
+
+```
+TXT _dmarc  "v=DMARC1; p=none; sp=none; adkim=r; aspf=r; pct=100;"
+```
+
+IMAGE HERE SPF RECORD ETC
+
+
+Now we need to create a signing table to tell Rspamd which domains we want it to sign with DKIM and also which key to use.
+
+Create a new file `/etc/rspamd/local.d/dkim_signing.conf` and enter the following inside:
+
+```
+signing_table = [
+"*@example.com example.com",
+"*@*.example.com example.com",
+];
+
+key_table = [
+"example.com example.com:default:/var/lib/rspamd/dkim/example.com.default.key",
+];
+
+use_domain = "envelope";
+allow_hdrfrom_mismatch = true;
+allow_hdrfrom_mismatch_sign_networks = true;
+allow_username_mismatch = true;
+use_esld = true;
+sign_authenticated = false;
+```
+
+As we want to use Authenticated Reply Chain (ARC) signing too, let's copy that file: 
+
+```bash
+sudo cp /etc/rspamd/local.d/dkim_signing.conf /etc/rspamd/local.d/arc.conf
+```
+
+Create a new file `/etc/rspamd/local.d/redis.conf` and enter the following inside (making sure to update with your Redis password set earlier):
+
+```
+write_servers = "localhost";
+password = "your-redis-password";
+read_servers = "localhost";
+```
+
+Create a new file `/etc/rspamd/local.d/classifier-bayes.conf` and enter the following inside:
+
+```
+backend = "redis";
+```
+
+Create a new file `/etc/rspamd/local.d/logging.inc` and enter the following inside:
+
+```
+level = "error";
+debug_modules = [];
+```
+
+Create a new file `/etc/rspamd/local.d/greylist.conf` and enter the following inside:
+
+```
+servers = "127.0.0.1:6379";
+```
+
+Create a new file `/etc/rspamd/local.d/history_redis.conf` and enter the following inside:
+
+```
+subject_privacy = true;
+```
+
+To see the currently enabled modules in Rspamd we can run:
+
+```bash
+sudo rspamadm configdump -m
+```
+
+Let's disable a few modules to keep Rspamd nice and lightweight.
+
+We can run the following command for each module we wish to disable.
+
+```bash
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/module_name.conf
+```
+
+Let's disable the following modules:
+
+```bash
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/fuzzy_check.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/asn.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/metadata_exporter.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/trie.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/neural.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/chartable.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/ratelimit.conf
+echo "enabled = false;" | sudo tee -a /etc/rspamd/override.d/replies.conf
+```
+
+Restart Rspamd to reflect the changes.
+
+```bash
+sudo service rspamd restart
+```
+
+You can use view the Rspamd web interface by creating an SSH tunnel by running the following command on you local pc:
+
+```bash
+ssh -L 11334:localhost:11334 johndoe@example.com
+```
+
+Then you will be able to visit [http://localhost:11334/](http://localhost:11334/) in your web browser.
+
+You may need to change the scores for a couple of symbols to 0 since AnonAddy uses a different email in the display from and email from.
+
+Create a new file `/etc/rspamd/local.d/groups.conf` and enter the following inside:
+
+```
+group "headers" {
+  symbols {
+    "FAKE_REPLY" {
+      weight = 0.0;
+    }
+
+    "FROM_NEQ_DISPLAY_NAME" {
+      weight = 0.0;
+    }
+    
+    "FORGED_RECIPIENTS" {
+      weight = 0.0;
+    }
+  }
+}
+```
+
+Restart Rspamd to reflect the changes.
+
+```bash
+sudo service rspamd restart
+```
+
 
 ## The web application
 
@@ -795,15 +1001,15 @@ sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 Before running the NVM install script below make sure that you have a `~/.bashrc` file. If not create one by running `touch ~/.bashrc` so that the NVM installer can be added to your $PATH. Also create a `~/.bash_profile` and add:
 
-```bash
+```
 if [ -f ~/.bashrc ]; then
-  . ~/.bashrc
+. ~/.bashrc
 fi
 ```
 
 Make sure node is installed (`node -v`) if not then install it using NVM - [https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-3-%E2%80%94-installing-node-using-the-node-version-manager](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-3-%E2%80%94-installing-node-using-the-node-version-manager)
 
-At the time of writing this I'm using the latest LTS - v12.19.0
+At the time of writing this I'm using the latest LTS - v14.15.1
 
 ```bash
 cd /var/www/anonaddy
@@ -822,40 +1028,34 @@ Make sure to update the database settings, redis password and the AnonAddy varia
 
 We'll set `ANONADDY_SIGNING_KEY_FINGERPRINT` shortly.
 
-`APP_KEY` will be generted in the next step, this is used by Laravel for securely encrypting values.
+`APP_KEY` will be generated in the next step, this is used by Laravel for securely encrypting values.
 
 For more information on Laravel configuration please visit - [https://laravel.com/docs/8.x/installation#configuration](https://laravel.com/docs/8.x/installation#configuration)
 
 For the `ANONADDY_DKIM_SIGNING_KEY` you only need to fill in this variable if you plan to add any custom domains through the web application.
 
-You can either use the same private DKIM signing key we generated earlier from this tutorial - [https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf](https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf)
+You can either use the same private DKIM signing key we generated earlier whilst setting up Rspamd.
 
 Or you can generate a new private/public keypair and give your user `johndoe` ownership of the private key.
 
-If you want to use the same key we already generated then you will need to add `johndoe` to the `opendkim` group by running:
+If you want to use the same key we already generated then you will need to add `johndoe` to the `_rspamd` group by running:
 
 ```
-sudo usermod -a -G opendkim johndoe
+sudo usermod -a -G _rspamd johndoe
 ```
 
-Make sure to also run `sudo chmod g+r /etc/opendkim/keys/example.com/default.private` so that your johndoe user has read permissions for the file.
+Make sure to also run `sudo chmod g+r /var/lib/rspamd/dkim/example.com.default.key` so that your johndoe user has read permissions for the file.
+
+You may also need to run `sudo chmod g+x /var/lib/rspamd/dkim`.
 
 You'll need to log out and back in again for the changes to take effect.
 
-You can test it by running `cat /etc/opendkim/keys/example.com/default.private` as the johndoe user to see if it can be displayed.
-
-Doing this will cause opendkim to show a warning in your `mail.log` like this:
-
-```
-default._domainkey.example.com: key data is not secure: /etc/opendkim/keys/example.com/default.private is in group <group-number> which has multiple users
-```
-
-If you'd like to suppress this warning then you can add `RequireSafeKeys false` to your `/etc/opendkim.conf` file and restart opendkim - `sudo service opendkim restart`.
+You can test it by running `cat /var/lib/rspamd/dkim/example.com.default.key` as the johndoe user to see if it can be displayed.
 
 Then update your `.env` file.
 
 ```
-ANONADDY_DKIM_SIGNING_KEY=/etc/opendkim/keys/example.com/default.private
+ANONADDY_DKIM_SIGNING_KEY=/var/lib/rspamd/dkim/example.com.default.key
 ```
 
 Then we will generate an app key, migrate the database, link the storage directory, restart the queue and install laravel passport.
@@ -871,7 +1071,6 @@ php artisan route:cache
 php artisan queue:restart
 
 php artisan passport:install
-php artisan passport:keys
 ```
 
 Running `passport:install` will output details about a new personal access client, e.g.
@@ -901,6 +1100,20 @@ PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET=MlVp37PNqtN9efBTw2wuenjMnMIlDuKBWK3GZQoJ
 ```
 
 More information can be found in the Laravel documentation for Passport - [https://laravel.com/docs/8.x/passport](https://laravel.com/docs/8.x/passport)
+
+Then run `php artisan config:cache` again to reflect the changes.
+
+We also need to add a cronjob in order to run Laravel's schedules commands.
+
+Type `crontab -e` in the terminal as your `johndoe` user.
+
+In the file that is opened add the following line:
+
+```
+* * * * * php /var/www/anonaddy/artisan schedule:run >> /dev/null 2>&1
+```
+
+This cronjob will run every minute which in turn runs the commands listed in `app/Console/Kernel.php` at the appropriate time.
 
 ## Installing Supervisor
 
@@ -948,15 +1161,42 @@ Register an account and start using it straight away!
 
 You can disable user registration after you've created your account to prevent anyone else from signing up.
 
-Just update the value of `ANONADDY_ENABLE_REGISTRATION` to false in your .env file (and then run `php artisan config:cache` to update).
+Just update the value of `ANONADDY_ENABLE_REGISTRATION` to false in your .env file (and then run the following commands to reflect the update).
+
+```bash
+php artisan config:cache
+php artisan view:cache
+php artisan route:cache
+```
 
 ## Adding your private key to sign emails
 
 If you are using encryption and want to sign your forwarded emails then you'll need to create a new GPG key pair.
 
-A simple guide can be found here - [https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair](https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair)
+To do this we can run:
 
-You will need to generate a key pair without giving it a password because php-gnupg is not able to use keys that are password protected.
+```bash
+gpg --full-gen-key
+```
+
+You will need to generate a key pair without giving it a password because php-gnupg is not able to use keys that are password protected. Leave the password blank when generating the key.
+
+If you have issues creating the key with no passphrase then try the following command:
+
+```bash
+gpg --batch --gen-key <<EOF
+%no-protection
+Key-Type:1
+Key-Length:4096
+Subkey-Type:1
+Subkey-Length:4096
+Name-Real: John Doe
+Name-Email: mailer@example.com
+Expire-Date:0
+EOF
+```
+
+Make sure to replace **Name-Real** and **Name-Email** with your own values.
 
 To find your key's fingerprint run:
 
@@ -970,63 +1210,6 @@ Then update the value of `ANONADDY_SIGNING_KEY_FINGERPRINT=` in your .env file t
 
 Then run `php artisan config:cache` to update.
 
-## What to do next
-
-The above steps are enough to get you set up and running with AnonAddy but if you'd like to take it further then keep reading.
-
-## Installing Spamassassin
-
-We can use Spamassassin to reject spam emails arriving at our server.
-
-```bash
-sudo apt install spamassassin spamc
-
-sudo systemctl enable spamassassin
-
-sudo systemctl start spamassassin
-```
-
-Next install the milter so that we can reject emails if they have a high spam score.
-
-```bash
-sudo apt install spamass-milter
-```
-
-Update `/etc/postfix/main.cf` and add the milter to smtpd_milters.
-
-```
-# Milter configuration
-milter_default_action = accept
-milter_protocol = 6
-smtpd_milters = local:opendkim/opendkim.sock,local:opendmarc/opendmarc.sock,local:spamass/spamass.sock
-non_smtpd_milters = $smtpd_milters
-```
-
-You can change the score needed in order for an email to be rejected by editing `/etc/default/spamass-milter`.
-
-```
-# Reject emails with spamassassin scores > 15.
-#OPTIONS="${OPTIONS} -r 15"
-```
-
-Just uncomment the OPTIONS line and change 15 to something else, for example 7.5
-
-```
-# Reject emails with spamassassin scores > 7.5.
-OPTIONS="${OPTIONS} -r 7.5"
-```
-
-Next restart Spamassassin and Postfix
-
-```bash
-sudo systemctl restart postfix spamass-milter
-```
-
-If you want to test if Spamassasin is working then send an email with the content from this link in it.
-
-[https://spamassassin.apache.org/gtube/](https://spamassassin.apache.org/gtube/)
-
-It should be rejected with the message `ERROR_CODE :550, ERROR_CODE :5.7.1 Blocked by SpamAssassin`.
 
 ## Setting up a local caching DNS resolver
 
@@ -1069,17 +1252,160 @@ You should see the response
 
 This means you can query URIBL successfully now.
 
-Update `/etc/spamassassin/local.cf` and add this near the top:
+Create a new file `/etc/rspamd/local.d/options.inc` and enter the following inside:
 
 ```
-dns_available yes
+dns {
+  nameserver = ["127.0.0.1:53:1"];
+}
 ```
 
-Then restart spamassassin.
+This will tell Rspamd to use our new local DNS resolver. Restart Rspamd to reflect the change.
 
 ```bash
-sudo service spamassassin restart
+sudo service rspamd restart
 ```
+
+## Adding MTA Strict Transport Security and SMTP TLS Reporting
+
+MTA-STS allows mail service providers to declare their ability to receive Transport Layer Security (TLS) secure SMTP connections. It also allows them to specify whether sending SMTP servers should refuse to deliver to MX hosts that do not offer TLS with a trusted server certificate.
+
+Let's add a new Nginx block `/etc/nginx/conf.d/wildcard.example.com.conf`
+
+```
+server {
+listen 80;
+listen [::]:80;
+
+server_name *.example.com;
+return 301 https://$server_name$request_uri;
+}
+
+server {
+listen 443 ssl http2;
+listen [::]:443 ssl http2;
+server_name *.example.com;
+server_tokens off;
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-XSS-Protection "1; mode=block";
+add_header X-Content-Type-Options "nosniff";
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'";
+add_header Referrer-Policy "origin-when-cross-origin";
+add_header Expect-CT "enforce, max-age=604800";
+
+index index.html;
+
+charset utf-8;
+
+ssl_certificate             /etc/nginx/conf.d/example.com.d/server.crt;
+ssl_certificate_key         /etc/nginx/conf.d/example.com.d/server.key;
+ssl_trusted_certificate     /root/.acme.sh/example.com/fullchain.cer;
+
+ssl_prefer_server_ciphers   on;
+ssl_session_timeout         5m;
+ssl_protocols               TLSv1.2 TLSv1.3;
+ssl_stapling                on;
+ssl_stapling_verify         on;
+ssl_ciphers                 "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+ssl_ecdh_curve              secp384r1;
+ssl_session_cache           shared:SSL:10m;
+ssl_session_tickets         off;
+ssl_dhparam                 /etc/nginx/ssl/dhparam.pem;
+
+location / {
+    add_header Content-Type text/plain;
+    return 200 'Hello world';
+}
+
+location = /favicon.ico { return 204; access_log off; log_not_found off; }
+location = /robots.txt  { access_log off; log_not_found off; }
+
+location ~ /\.(?!well-known).* {
+    deny all;
+}
+
+location ^~ /.well-known/mta-sts.txt {
+    try_files $uri @mta-sts;
+}
+location @mta-sts {
+    add_header Content-Type text/plain;
+    return 200 "version: STSv1
+mode: enforce
+max_age: 10368000
+mx: mail.example.com\n";
+}
+}
+```
+
+Replace any mention of `example.com` with your own domain and restart Nginx:
+
+```bash
+sudo service nginx restart
+```
+
+Now we need to add a new TXT record for our domain:
+
+You can use any unqiue value for the id, I've just used a UNIX timestamp that you can get by running the following command in the terminal:
+
+```bash
+date +%s
+```
+The name/host for this record is `_mta-sts`.
+
+```
+TXT _mta-sts "v=STSv1; id=1603899738;"
+```
+
+SMTP TLS Reporting is a standard that enables reporting of TLS connectivity problems experienced by applications that send email. It's easy to implement.
+
+Add new TXT record to your domain with a name/host of `_smtp._tls`:
+
+```
+TXT _smtp._tls "v=TLSRPTv1; rua=mailto:tlsrpt@example.com"
+```
+
+You can enter any email you like as the one to receive reports.
+
+## Enabling DANE by implementing DNSSEC and adding a TLSA record
+
+DNS Secturity Extensions (DNSSEC) protects the user from getting bad data from a signed zone by detecting the attack and preventing the user from receiving any tampered data.
+
+In order to generate our TLSA record you can run the following command:
+
+```bash
+printf '_25._tcp.%s. IN TLSA 3 1 1 %s\n' \
+        mail.example.com \
+        $(openssl x509 -in /etc/nginx/conf.d/example.com.d/server.crt -noout -pubkey |
+            openssl pkey -pubin -outform DER |
+            openssl dgst -sha256 -binary |
+            hexdump -ve '/1 "%02x"')
+```
+
+Or you can use the following website to generate it - [https://www.huque.com/bin/gen_tlsa](https://www.huque.com/bin/gen_tlsa)
+
+As mentioned earlier, some providers such as Vultr do not allow you to add a TLSA record via their DNS manager.
+
+You can check if DANE is configured correctly using this site - [https://www.huque.com/bin/danecheck-smtp](https://www.huque.com/bin/danecheck-smtp)
+
+## Adding Certification Authority Authorization
+
+Certification Authority Authorization (CAA) is a standard that allows domain name owners to restrict which CAs are allowed to issue certificates for their domains. This can help to reduce the chance of misissuance, either accidentally or maliciously.
+
+Since our certificate is issued by Let's Encrypt we should add the following CAA records:
+
+```
+CAA @ 0 issue "letsencrypt.org"
+```
+
+```
+CAA @ 0 issuewild "letsencrypt.org"
+```
+
+```
+CAA @ 0 iodef "mailto:caapolicy@example.com"
+```
+
 
 ## Updating
 
@@ -1088,7 +1414,8 @@ Before updating, please check the release notes on [GitHub](https://github.com/a
 In order to update you can run the following commands:
 
 ```bash
-git pull origin master
+git fetch
+git pull origin release
 
 composer install --prefer-dist --no-dev -o
 npm update

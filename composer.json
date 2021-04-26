@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.3",
+        "php": "^7.3|^8.0",
         "asbiin/laravel-webauthn": "^1.0.0",
         "bacon/bacon-qr-code": "^2.0",
         "doctrine/dbal": "^2.9",
@@ -29,8 +29,8 @@
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
         "facade/ignition": "^2.3.6",
+        "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^2.14",
-        "fzaninotto/faker": "^1.9.1",
         "mockery/mockery": "^1.3.1",
         "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "^9.3"

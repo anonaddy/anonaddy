@@ -33,7 +33,7 @@ class DomainController extends Controller
         $domain->domain = $request->domain;
 
         if (! $domain->checkVerification()) {
-            return response('Verification record not found, please add the following TXT record to your domain: aa-verify=' . sha1(config('anonaddy.secret') . user()->id), 404);
+            return response('Verification record not found, please add the following TXT record to your domain: aa-verify=' . sha1(config('anonaddy.secret') . user()->id . user()->domains->count()), 404);
         }
 
         user()->domains()->save($domain);

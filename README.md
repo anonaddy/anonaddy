@@ -11,7 +11,7 @@ This is the source code for self-hosting AnonAddy.
 - [What is a shared domain alias?](#what-is-a-shared-domain-alias)
 - [What is a standard alias?](#what-is-a-standard-alias)
 - [Can I use my own domain?](#can-i-use-my-own-domain)
-- [Can I add a domain and also use it as a recipient?](#can-i-add-a-domain-and-also-use-it-as-a-recipients)
+- [Can I add a domain and also use it as a recipient?](#can-i-add-a-domain-and-also-use-it-as-a-recipient)
 - [Why should I use this instead of a similar service?](#why-should-i-use-this-instead-of-a-similar-service)
 - [Is there a browser extension?](#is-there-a-browser-extension)
 - [Is there an Android app?](#is-there-an-android-app)
@@ -26,6 +26,7 @@ This is the source code for self-hosting AnonAddy.
 - [What happens when I delete my account?](#what-happens-when-i-delete-my-account)
 - [Does this work with any email provider?](#does-this-work-with-any-email-provider)
 - [How do I reply to a forwarded email?](#how-do-i-reply-to-a-forwarded-email)
+- [I'm trying to reply/send from an alias but the email keeps coming back to me, what's wrong?](#im-trying-to-reply-send-from-an-alias-but-the-email-keeps-coming-back-to-me-whats-wrong)
 - [Does AnonAddy strip out the banner information when I reply to an email?](#does-anonaddy-strip-out-the-banner-information-when-i-reply-to-an-email)
 - [How do I send email from an alias?](#how-do-i-send-email-from-an-alias)
 - [Will people see my real email if I reply to a forwarded one?](#will-people-see-my-real-email-if-i-reply-to-a-forwarded-one)
@@ -201,6 +202,14 @@ All you need to do is click reply in your email client or web interface and it w
 To check if a reply has worked properly check in your dashboard if the reply count has been incremented for that alias.
 
 For further details please see this help article - [Replying to email using an alias](https://anonaddy.com/help/replying-to-email-using-an-alias/).
+
+## I'm trying to reply/send from an alias but the email keeps coming back to me, what's wrong?
+
+If you are tying to reply or send from an alias but the email keeps coming back to yourself then it is most likely because you are not sending the message from an email address that **is not listed as a verified recipient** on your AnonAddy account.
+
+If you try to reply or send from an alias using an unverified email address then the message will simply be forwarded to you as it would be if it was sent by any other sender.
+
+Please double check that you are indeed sending from a verified recipient email address by inspecting your sent items to see which address it was actually sent from.
 
 ## Does AnonAddy strip out the banner information when I reply to an email?
 

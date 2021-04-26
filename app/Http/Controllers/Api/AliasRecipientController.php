@@ -14,6 +14,6 @@ class AliasRecipientController extends Controller
 
         $alias->recipients()->sync($request->recipient_ids);
 
-        return new AliasResource($alias);
+        return new AliasResource($alias->refresh()->load('recipients'));
     }
 }
