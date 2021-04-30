@@ -131,7 +131,7 @@ Here are a few reasons I can think of:
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
-* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another 2 for paid plan users)
+* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another 3 for paid plan users)
 * Ability to generate UUID and random word aliases at shared domains
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
