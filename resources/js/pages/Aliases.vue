@@ -272,7 +272,7 @@
           <span
             v-else
             class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
-            :data-tippy-content="defaultRecipient.email"
+            :data-tippy-content="defaultRecipientEmail"
             >default</span
           >
           <icon
@@ -767,7 +767,7 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   props: {
-    defaultRecipient: {
+    defaultRecipientEmail: {
       type: Object,
       required: true,
     },

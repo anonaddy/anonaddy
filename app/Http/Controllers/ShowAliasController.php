@@ -17,7 +17,7 @@ class ShowAliasController extends Controller
 
         return view('aliases.index', [
             'user' => user(),
-            'defaultRecipient' => user()->defaultRecipient,
+            'defaultRecipientEmail' => user()->email,
             'aliases' => user()
                 ->aliases()
                 ->with([
