@@ -31,6 +31,8 @@
 
                             <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required>
 
+                            <p class="text-xs mt-1 text-grey-600">Note: your username is <b>not</b> your email address.</p>
+
                             @if ($errors->has('username'))
                                 <p class="text-red-500 text-xs italic mt-4">
                                     {{ $errors->first('username') }}

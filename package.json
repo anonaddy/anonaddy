@@ -22,7 +22,7 @@
         "portal-vue": "^2.1.7",
         "postcss": "^8.1.14",
         "postcss-import": "^14.0.0",
-        "resolve-url-loader": "^3.1.2",
+        "resolve-url-loader": "^4.0.0",
         "tailwindcss": "^2.0.1",
         "tippy.js": "^6.2.7",
         "v-clipboard": "^2.2.3",
@@ -36,8 +36,8 @@
     },
     "devDependencies": {
         "husky": "^6.0.0",
-        "lint-staged": "^10.5.3",
-        "prettier": "2.2.1"
+        "lint-staged": "^11.0.0",
+        "prettier": "^2.2.1"
     },
     "lint-staged": {
         "*.{css,js,vue}": [
