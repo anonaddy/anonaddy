@@ -2,7 +2,21 @@
   <div>
     <div class="flex flex-wrap flex-row items-center justify-between mb-8 md:px-2 lg:px-6">
       <div
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 md:-mx-2 lg:-mx-6 rounded overflow-hidden shadow-md bg-white mb-4 lg:mb-4 xl:mb-0"
+        class="
+          w-full
+          md:w-1/2
+          lg:w-1/3
+          xl:w-1/6
+          md:-mx-2
+          lg:-mx-6
+          rounded
+          overflow-hidden
+          shadow-md
+          bg-white
+          mb-4
+          lg:mb-4
+          xl:mb-0
+        "
       >
         <div class="p-4 flex items-center justify-between relative">
           <icon
@@ -16,7 +30,21 @@
         </div>
       </div>
       <div
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 md:-mx-2 lg:-mx-6 rounded overflow-hidden shadow-md bg-white mb-4 lg:mb-4 xl:mb-0"
+        class="
+          w-full
+          md:w-1/2
+          lg:w-1/3
+          xl:w-1/6
+          md:-mx-2
+          lg:-mx-6
+          rounded
+          overflow-hidden
+          shadow-md
+          bg-white
+          mb-4
+          lg:mb-4
+          xl:mb-0
+        "
       >
         <div class="p-4 flex items-center justify-between relative">
           <icon
@@ -30,7 +58,21 @@
         </div>
       </div>
       <div
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 md:-mx-2 lg:-mx-6 rounded overflow-hidden shadow-md bg-white mb-4 lg:mb-4 xl:mb-0"
+        class="
+          w-full
+          md:w-1/2
+          lg:w-1/3
+          xl:w-1/6
+          md:-mx-2
+          lg:-mx-6
+          rounded
+          overflow-hidden
+          shadow-md
+          bg-white
+          mb-4
+          lg:mb-4
+          xl:mb-0
+        "
       >
         <div class="p-4 flex items-center justify-between relative">
           <icon
@@ -44,7 +86,20 @@
         </div>
       </div>
       <div
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 md:-mx-2 lg:-mx-6 rounded overflow-hidden shadow-md bg-white mb-4 lg:mb-0"
+        class="
+          w-full
+          md:w-1/2
+          lg:w-1/3
+          xl:w-1/6
+          md:-mx-2
+          lg:-mx-6
+          rounded
+          overflow-hidden
+          shadow-md
+          bg-white
+          mb-4
+          lg:mb-0
+        "
       >
         <div class="p-4 flex items-center justify-between relative">
           <icon
@@ -58,7 +113,20 @@
         </div>
       </div>
       <div
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 md:-mx-2 lg:-mx-6 rounded overflow-hidden shadow-md bg-white mb-4 md:mb-0"
+        class="
+          w-full
+          md:w-1/2
+          lg:w-1/3
+          xl:w-1/6
+          md:-mx-2
+          lg:-mx-6
+          rounded
+          overflow-hidden
+          shadow-md
+          bg-white
+          mb-4
+          md:mb-0
+        "
       >
         <div class="p-4 flex items-center justify-between relative">
           <icon
@@ -72,7 +140,18 @@
         </div>
       </div>
       <div
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/6 md:-mx-2 lg:-mx-6 rounded overflow-hidden shadow-md bg-white"
+        class="
+          w-full
+          md:w-1/2
+          lg:w-1/3
+          xl:w-1/6
+          md:-mx-2
+          lg:-mx-6
+          rounded
+          overflow-hidden
+          shadow-md
+          bg-white
+        "
       >
         <div class="p-4 flex items-center justify-between relative">
           <icon
@@ -93,26 +172,73 @@
           @keyup.esc="search = ''"
           tabindex="0"
           type="text"
-          class="w-full md:w-64 appearance-none shadow bg-white text-grey-700 focus:outline-none rounded py-3 pl-3 pr-8"
+          class="
+            w-full
+            md:w-64
+            appearance-none
+            shadow
+            bg-white
+            text-grey-700
+            focus:outline-none
+            rounded
+            py-3
+            pl-3
+            pr-8
+          "
           placeholder="Search Aliases"
         />
         <icon
           v-if="search"
           @click.native="search = ''"
           name="close-circle"
-          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
+          class="
+            absolute
+            right-0
+            inset-y-0
+            w-5
+            h-full
+            text-grey-300
+            fill-current
+            mr-2
+            flex
+            items-center
+            cursor-pointer
+          "
         />
         <icon
           v-else
           name="search"
-          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current pointer-events-none mr-2 flex items-center"
+          class="
+            absolute
+            right-0
+            inset-y-0
+            w-5
+            h-full
+            text-grey-300
+            fill-current
+            pointer-events-none
+            mr-2
+            flex
+            items-center
+          "
         />
       </div>
       <div class="flex flex-wrap mt-4 md:mt-0">
         <div class="block relative mr-4">
           <select
             v-model="showAliases"
-            class="block appearance-none w-full text-grey-700 bg-white p-3 pr-8 rounded shadow focus:ring"
+            class="
+              block
+              appearance-none
+              w-full
+              text-grey-700
+              bg-white
+              p-3
+              pr-8
+              rounded
+              shadow
+              focus:ring
+            "
             required
           >
             <option value="without">Hide Deleted</option>
@@ -120,7 +246,16 @@
             <option value="only">Deleted Only</option>
           </select>
           <div
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+            class="
+              pointer-events-none
+              absolute
+              inset-y-0
+              right-0
+              flex
+              items-center
+              px-2
+              text-gray-700
+            "
           >
             <svg
               class="fill-current h-4 w-4"
@@ -136,7 +271,17 @@
         <div>
           <button
             @click="generateAliasModalOpen = true"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
+            class="
+              bg-cyan-400
+              hover:bg-cyan-300
+              text-cyan-900
+              font-bold
+              py-3
+              px-4
+              rounded
+              focus:outline-none
+              ml-auto
+            "
           >
             Create New Alias
           </button>
@@ -210,7 +355,18 @@
               @keyup.esc="aliasIdToEdit = aliasDescriptionToEdit = ''"
               v-model="aliasDescriptionToEdit"
               type="text"
-              class="flex-grow text-sm appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              class="
+                flex-grow
+                text-sm
+                appearance-none
+                bg-grey-100
+                border
+                text-grey-700
+                focus:outline-none
+                rounded
+                px-2
+                py-1
+              "
               :class="aliasDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'"
               placeholder="Add description"
               tabindex="0"
@@ -241,7 +397,13 @@
           </div>
           <div v-else>
             <span
-              class="inline-block text-grey-300 text-sm cursor-pointer py-1 border border-transparent"
+              class="
+                inline-block
+                text-grey-300 text-sm
+                cursor-pointer
+                py-1
+                border border-transparent
+              "
               @click=";(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = '')"
               >Add description</span
             >
@@ -263,7 +425,16 @@
           }}</span>
           <span
             v-else-if="has(props.row.aliasable, 'default_recipient.email')"
-            class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
+            class="
+              py-1
+              px-2
+              text-xs
+              bg-yellow-200
+              text-yellow-900
+              rounded-full
+              tooltip
+              outline-none
+            "
             :data-tippy-content="props.row.aliasable.default_recipient.email"
             >{{
               props.row.aliasable_type === 'App\\Models\\Domain' ? 'domain' : 'username'
@@ -271,8 +442,17 @@
           >
           <span
             v-else
-            class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
-            :data-tippy-content="defaultRecipient.email"
+            class="
+              py-1
+              px-2
+              text-xs
+              bg-yellow-200
+              text-yellow-900
+              rounded-full
+              tooltip
+              outline-none
+            "
+            :data-tippy-content="defaultRecipientEmail"
             >default</span
           >
           <icon
@@ -312,7 +492,17 @@
             <div role="none">
               <span
                 @click="openSendFromModal(props.row)"
-                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                class="
+                  group
+                  cursor-pointer
+                  flex
+                  items-center
+                  px-4
+                  py-3
+                  text-sm text-grey-700
+                  hover:bg-grey-100
+                  hover:text-grey-900
+                "
                 role="menuitem"
               >
                 <icon name="send" class="block mr-3 w-5 h-5 text-grey-300 outline-none" />
@@ -322,7 +512,17 @@
             <div v-if="props.row.deleted_at" role="none">
               <span
                 @click="openRestoreModal(props.row.id)"
-                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                class="
+                  group
+                  cursor-pointer
+                  flex
+                  items-center
+                  px-4
+                  py-3
+                  text-sm text-grey-700
+                  hover:bg-grey-100
+                  hover:text-grey-900
+                "
                 role="menuitem"
               >
                 <icon
@@ -335,7 +535,17 @@
             <div v-else role="none">
               <span
                 @click="openDeleteModal(props.row.id)"
-                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                class="
+                  group
+                  cursor-pointer
+                  flex
+                  items-center
+                  px-4
+                  py-3
+                  text-sm text-grey-700
+                  hover:bg-grey-100
+                  hover:text-grey-900
+                "
                 role="menuitem"
               >
                 <icon
@@ -412,7 +622,18 @@
           <select
             v-model="generateAliasDomain"
             id="alias_domain"
-            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
+            class="
+              block
+              appearance-none
+              w-full
+              text-grey-700
+              bg-grey-100
+              p-3
+              pr-8
+              rounded
+              shadow
+              focus:ring
+            "
             required
           >
             <option v-for="domainOption in domainOptions" :key="domainOption" :value="domainOption">
@@ -420,7 +641,16 @@
             </option>
           </select>
           <div
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+            class="
+              pointer-events-none
+              absolute
+              inset-y-0
+              right-0
+              flex
+              items-center
+              px-2
+              text-gray-700
+            "
           >
             <svg
               class="fill-current h-4 w-4"
@@ -441,7 +671,18 @@
           <select
             v-model="generateAliasFormat"
             id="alias_format"
-            class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
+            class="
+              block
+              appearance-none
+              w-full
+              text-grey-700
+              bg-grey-100
+              p-3
+              pr-8
+              rounded
+              shadow
+              focus:ring
+            "
             required
           >
             <option
@@ -453,7 +694,16 @@
             </option>
           </select>
           <div
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+            class="
+              pointer-events-none
+              absolute
+              inset-y-0
+              right-0
+              flex
+              items-center
+              px-2
+              text-gray-700
+            "
           >
             <svg
               class="fill-current h-4 w-4"
@@ -478,7 +728,16 @@
             v-model="generateAliasLocalPart"
             id="alias_local_part"
             type="text"
-            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+            class="
+              w-full
+              appearance-none
+              bg-grey-100
+              border border-transparent
+              text-grey-700
+              focus:outline-none
+              rounded
+              p-3
+            "
             :class="errors.generateAliasLocalPart ? 'border-red-500' : ''"
             placeholder="Enter local part..."
             autofocus
@@ -495,7 +754,16 @@
           v-model="generateAliasDescription"
           id="alias_description"
           type="text"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+          class="
+            w-full
+            appearance-none
+            bg-grey-100
+            border border-transparent
+            text-grey-700
+            focus:outline-none
+            rounded
+            p-3
+          "
           :class="errors.generateAliasDescription ? 'border-red-500' : ''"
           placeholder="Enter description (optional)..."
           autofocus
@@ -527,7 +795,16 @@
         <div class="mt-6">
           <button
             @click="generateNewAlias"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="
+              bg-cyan-400
+              hover:bg-cyan-300
+              text-cyan-900
+              font-bold
+              py-3
+              px-4
+              rounded
+              focus:outline-none
+            "
             :class="generateAliasLoading ? 'cursor-not-allowed' : ''"
             :disabled="generateAliasLoading"
           >
@@ -536,7 +813,18 @@
           </button>
           <button
             @click="generateAliasModalOpen = false"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -574,7 +862,17 @@
           <button
             type="button"
             @click="editAliasRecipients()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-cyan-900
+              font-semibold
+              bg-cyan-400
+              hover:bg-cyan-300
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="editAliasRecipientsLoading ? 'cursor-not-allowed' : ''"
             :disabled="editAliasRecipientsLoading"
           >
@@ -583,7 +881,18 @@
           </button>
           <button
             @click="closeAliasRecipientsModal()"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -606,7 +915,17 @@
           <button
             type="button"
             @click="restoreAlias(aliasIdToRestore)"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-cyan-900
+              font-semibold
+              bg-cyan-400
+              hover:bg-cyan-300
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="restoreAliasLoading ? 'cursor-not-allowed' : ''"
             :disabled="restoreAliasLoading"
           >
@@ -615,7 +934,18 @@
           </button>
           <button
             @click="closeRestoreModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -638,7 +968,17 @@
           <button
             type="button"
             @click="deleteAlias(aliasIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-white
+              font-semibold
+              bg-red-500
+              hover:bg-red-600
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="deleteAliasLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteAliasLoading"
           >
@@ -647,7 +987,18 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -671,7 +1022,16 @@
           v-model="aliasToSendFrom.email"
           id="send_from_alias"
           type="text"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+          class="
+            w-full
+            appearance-none
+            bg-grey-100
+            border border-transparent
+            text-grey-700
+            focus:outline-none
+            rounded
+            p-3
+          "
           disabled
         />
         <label for="send_from_alias_destination" class="block text-grey-700 text-sm my-2">
@@ -684,7 +1044,16 @@
           v-model="sendFromAliasDestination"
           id="send_from_alias_destination"
           type="text"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3"
+          class="
+            w-full
+            appearance-none
+            bg-grey-100
+            border border-transparent
+            text-grey-700
+            focus:outline-none
+            rounded
+            p-3
+          "
           :class="errors.sendFromAliasDestination ? 'border-red-500' : ''"
           placeholder="Enter email..."
           autofocus
@@ -696,7 +1065,20 @@
           <div
             v-clipboard="() => sendFromAliasEmailToSendTo"
             v-clipboard:success="setSendFromAliasCopied"
-            class="flex items-center justify-between cursor-pointer text-xs border-t-4 rounded-sm text-green-800 border-green-600 bg-green-100 p-2 mb-3"
+            class="
+              flex
+              items-center
+              justify-between
+              cursor-pointer
+              text-xs
+              border-t-4
+              rounded-sm
+              text-green-800
+              border-green-600
+              bg-green-100
+              p-2
+              mb-3
+            "
             role="alert"
           >
             <span>
@@ -736,7 +1118,17 @@
           <button
             type="button"
             @click="displaySendFromAddress(aliasToSendFrom)"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-cyan-900
+              font-semibold
+              bg-cyan-400
+              hover:bg-cyan-300
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="sendFromAliasLoading ? 'cursor-not-allowed' : ''"
             :disabled="sendFromAliasLoading"
           >
@@ -745,7 +1137,18 @@
           </button>
           <button
             @click="closeSendFromModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -767,7 +1170,7 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   props: {
-    defaultRecipient: {
+    defaultRecipientEmail: {
       type: Object,
       required: true,
     },
@@ -1236,7 +1639,8 @@ export default {
       return re.test(part)
     },
     validEmail(email) {
-      let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      let re =
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       return re.test(email)
     },
     clipboardSuccess() {
