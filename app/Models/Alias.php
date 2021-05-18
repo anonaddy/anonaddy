@@ -23,6 +23,7 @@ class Alias extends Model
 
     protected $fillable = [
         'id',
+        'user_id',
         'active',
         'description',
         'email',
@@ -30,7 +31,11 @@ class Alias extends Model
         'extension',
         'domain',
         'aliasable_id',
-        'aliasable_type'
+        'aliasable_type',
+        'emails_forwarded',
+        'emails_blocked',
+        'emails_replied',
+        'emails_sent'
     ];
 
     protected $dates = [
@@ -46,6 +51,18 @@ class Alias extends Model
         'aliasable_type' => 'string',
         'active' => 'boolean'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        // Deactivate the alias when it is deleted
+        Alias::deleting(function ($alias) {
+            if ($alias->active) {
+                $alias->deactivate();
+            }
+        });
+    }
 
     public function setLocalPartAttribute($value)
     {

@@ -483,8 +483,8 @@
         <span v-else-if="props.column.field === 'active'" class="flex items-center">
           <Toggle
             v-model="rows[props.row.originalIndex].active"
-            @on="activateAlias(props.row.id)"
-            @off="deactivateAlias(props.row.id)"
+            @on="activateAlias(rows[props.row.originalIndex])"
+            @off="deactivateAlias(rows[props.row.originalIndex])"
           />
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
@@ -553,6 +553,29 @@
                   class="block mr-3 w-5 h-5 text-grey-300 fill-current outline-none"
                 />
                 Delete
+              </span>
+            </div>
+            <div role="none">
+              <span
+                @click="openForgetModal(props.row.id)"
+                class="
+                  group
+                  cursor-pointer
+                  flex
+                  items-center
+                  px-4
+                  py-3
+                  text-sm text-grey-700
+                  hover:bg-grey-100
+                  hover:text-grey-900
+                "
+                role="menuitem"
+              >
+                <icon
+                  name="rubber"
+                  class="block mr-3 w-5 h-5 text-grey-300 fill-current outline-none"
+                />
+                Forget
               </span>
             </div>
           </more-options>
@@ -908,8 +931,8 @@
           Restore alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to restore this alias? Once restored, this alias will
-          <b>be able to receive emails again</b>.
+          Are you sure you want to restore this alias? Once restored, you will need to set the alias
+          as <b>active before it can receive emails again</b>.
         </p>
         <div class="mt-6">
           <button
@@ -987,6 +1010,64 @@
           </button>
           <button
             @click="closeDeleteModal"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+
+    <Modal :open="forgetAliasModalOpen" @close="closeForgetModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Forget alias
+        </h2>
+        <p class="mt-4 text-grey-700">
+          Are you sure you want to forget this alias? Forgetting an alias will disassociate it from
+          your account.
+        </p>
+        <p class="mt-4 text-grey-700">
+          <b>Note:</b> If this alias uses a shared domain then it can <b>never be restored</b> or
+          used again so make sure you are certain. If it is a standard alias then it can be created
+          again since it will be as if it never existed.
+        </p>
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="forgetAlias(aliasIdToForget)"
+            class="
+              px-4
+              py-3
+              text-white
+              font-semibold
+              bg-red-500
+              hover:bg-red-600
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
+            :class="forgetAliasLoading ? 'cursor-not-allowed' : ''"
+            :disabled="forgetAliasLoading"
+          >
+            Forget alias
+            <loader v-if="forgetAliasLoading" />
+          </button>
+          <button
+            @click="closeForgetModal"
             class="
               ml-4
               px-4
@@ -1150,7 +1231,7 @@
               focus:outline-none
             "
           >
-            Cancel
+            Close
           </button>
         </div>
       </div>
@@ -1171,7 +1252,7 @@ import Multiselect from 'vue-multiselect'
 export default {
   props: {
     defaultRecipientEmail: {
-      type: Object,
+      type: String,
       required: true,
     },
     initialAliases: {
@@ -1236,13 +1317,16 @@ export default {
       aliasIdToEdit: '',
       aliasDescriptionToEdit: '',
       aliasIdToDelete: '',
+      aliasIdToForget: '',
       aliasToSendFrom: {},
       sendFromAliasDestination: '',
       sendFromAliasEmailToSendTo: '',
       sendFromAliasCopied: false,
       aliasIdToRestore: '',
       deleteAliasLoading: false,
+      forgetAliasLoading: false,
       deleteAliasModalOpen: false,
+      forgetAliasModalOpen: false,
       sendFromAliasLoading: false,
       sendFromAliasModalOpen: false,
       restoreAliasLoading: false,
@@ -1380,6 +1464,14 @@ export default {
       this.deleteAliasModalOpen = false
       this.aliasIdToDelete = ''
     },
+    openForgetModal(id) {
+      this.forgetAliasModalOpen = true
+      this.aliasIdToForget = id
+    },
+    closeForgetModal() {
+      this.forgetAliasModalOpen = false
+      this.aliasIdToForget = ''
+    },
     openSendFromModal(alias) {
       this.sendFromAliasDestination = ''
       this.sendFromAliasEmailToSendTo = ''
@@ -1425,6 +1517,22 @@ export default {
           this.error()
           this.deleteAliasModalOpen = false
           this.deleteAliasLoading = false
+        })
+    },
+    forgetAlias(id) {
+      this.forgetAliasLoading = true
+
+      axios
+        .delete(`/api/v1/aliases/${id}/forget`)
+        .then(response => {
+          this.rows = _.reject(this.rows, alias => alias.id === id)
+          this.forgetAliasModalOpen = false
+          this.forgetAliasLoading = false
+        })
+        .catch(error => {
+          this.error()
+          this.forgetAliasModalOpen = false
+          this.forgetAliasLoading = false
         })
     },
     restoreAlias(id) {
@@ -1564,12 +1672,12 @@ export default {
           this.error()
         })
     },
-    activateAlias(id) {
+    activateAlias(alias) {
       axios
         .post(
           `/api/v1/active-aliases`,
           JSON.stringify({
-            id: id,
+            id: alias.id,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -1579,17 +1687,27 @@ export default {
           //
         })
         .catch(error => {
-          this.error()
+          alias.active = false
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
         })
     },
-    deactivateAlias(id) {
+    deactivateAlias(alias) {
       axios
-        .delete(`/api/v1/active-aliases/${id}`)
+        .delete(`/api/v1/active-aliases/${alias.id}`)
         .then(response => {
           //
         })
         .catch(error => {
-          this.error()
+          alias.active = true
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
         })
     },
     displaySendFromAddress(alias) {

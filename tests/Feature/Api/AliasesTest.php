@@ -256,13 +256,70 @@ class AliasesTest extends TestCase
     public function user_can_delete_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
+            'active' => true
         ]);
 
         $response = $this->json('DELETE', '/api/v1/aliases/'.$alias->id);
 
         $response->assertStatus(204);
         $this->assertEmpty($this->user->aliases);
+        $this->assertFalse($alias->refresh()->active);
+    }
+
+    /** @test */
+    public function user_can_forget_alias()
+    {
+        $this->withoutExceptionHandling();
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/aliases/'.$alias->id.'/forget');
+
+        $response->assertStatus(204);
+        $this->assertEmpty($this->user->aliases()->withTrashed()->get());
+
+        $this->assertDatabaseMissing('aliases', [
+            'id' => $alias->id
+        ]);
+    }
+
+    /** @test */
+    public function user_can_forget_shared_domain_alias()
+    {
+        $this->withoutExceptionHandling();
+
+        $sharedDomainAlias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'domain' => 'anonaddy.me',
+            'local_part' => '9nmrhanm',
+            'email' => '9nmrhanm@anonaddy.me',
+            'extension' => 'ext',
+            'description' => 'Alias',
+            'emails_forwarded' => 10,
+            'emails_blocked' => 1,
+            'emails_replied' => 2,
+            'emails_sent' => 3
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/aliases/'.$sharedDomainAlias->id.'/forget');
+
+        $response->assertStatus(204);
+        $this->assertEmpty($this->user->aliases()->withTrashed()->get());
+
+        $this->assertDatabaseHas('aliases', [
+            'id' => $sharedDomainAlias->id,
+            'user_id' => '00000000-0000-0000-0000-000000000000',
+            'extension' => null,
+            'description' => null,
+            'emails_forwarded' => 0,
+            'emails_blocked' => 0,
+            'emails_replied' => 0,
+            'emails_sent' => 0,
+            'deleted_at' => now()
+        ]);
     }
 
     /** @test */

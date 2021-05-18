@@ -23,6 +23,7 @@ Route::group([
     Route::patch('/aliases/{id}', 'Api\AliasController@update');
     Route::patch('/aliases/{id}/restore', 'Api\AliasController@restore');
     Route::delete('/aliases/{id}', 'Api\AliasController@destroy');
+    Route::delete('/aliases/{id}/forget', 'Api\AliasController@forget');
 
     Route::post('/active-aliases', 'Api\ActiveAliasController@store');
     Route::delete('/active-aliases/{id}', 'Api\ActiveAliasController@destroy');

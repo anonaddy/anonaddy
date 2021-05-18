@@ -12,6 +12,10 @@ class ActiveAliasController extends Controller
     {
         $alias = user()->aliases()->withTrashed()->findOrFail($request->id);
 
+        if ($alias->trashed()) {
+            return response('You need to restore this alias before you can activate it', 422);
+        }
+
         $alias->activate();
 
         return new AliasResource($alias);

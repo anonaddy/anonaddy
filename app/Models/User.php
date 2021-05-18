@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
@@ -304,10 +305,21 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasExceededNewAliasLimit()
     {
-        return $this
-                ->aliases()
-                ->where('created_at', '>=', now()->subHour())
-                ->count() >= config('anonaddy.new_alias_hourly_limit');
+        if (App::environment('testing')) {
+            return false;
+        }
+
+        return \Illuminate\Support\Facades\Redis::throttle("user:{$this->username}:limit:new-alias")
+            ->allow(config('anonaddy.new_alias_hourly_limit'))
+            ->every(3600)
+            ->then(
+                function () {
+                    return false;
+                },
+                function () {
+                    return true;
+                }
+            );
     }
 
     public function hasReachedAdditionalUsernameLimit()

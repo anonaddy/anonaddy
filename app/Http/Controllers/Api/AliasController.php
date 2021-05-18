@@ -39,7 +39,7 @@ class AliasController extends Controller
     public function store(StoreAliasRequest $request)
     {
         if (user()->hasExceededNewAliasLimit()) {
-            return response('', 429);
+            return response('You have reached your hourly limit for creating new aliases', 429);
         }
 
         if (isset($request->validated()['local_part'])) {
@@ -145,6 +145,33 @@ class AliasController extends Controller
         $alias->recipients()->detach();
 
         $alias->delete();
+
+        return response('', 204);
+    }
+
+    public function forget($id)
+    {
+        $alias = user()->aliases()->withTrashed()->findOrFail($id);
+
+        $alias->recipients()->detach();
+
+        if ($alias->hasSharedDomain()) {
+            // Remove all data from the alias and change user_id
+            $alias->update([
+                'user_id' => '00000000-0000-0000-0000-000000000000',
+                'extension' => null,
+                'description' => null,
+                'emails_forwarded' => 0,
+                'emails_blocked' => 0,
+                'emails_replied' => 0,
+                'emails_sent' => 0
+            ]);
+
+            // Soft delete to prevent from being regenerated
+            $alias->delete();
+        } else {
+            $alias->forceDelete();
+        }
 
         return response('', 204);
     }
