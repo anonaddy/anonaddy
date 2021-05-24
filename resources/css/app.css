@@ -73,7 +73,7 @@ html {
   clear: both;
 }
 .vgt-responsive {
-  @apply w-full overflow-x-auto relative;
+  @apply w-full relative;
 }
 .vgt-text-disabled {
   @apply text-grey-300;
