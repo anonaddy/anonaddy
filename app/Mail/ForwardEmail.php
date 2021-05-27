@@ -158,6 +158,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                             ->addTextHeader('References', base64_decode($this->references));
                 }
 
+                $message->getHeaders()
+                        ->addTextHeader('X-AnonAddy-Original-Sender', $this->sender);
+
                 if ($this->encryptedParts) {
                     $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
 

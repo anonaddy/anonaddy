@@ -5,9 +5,9 @@ current:
   major: 0
   minor: 7
   patch: 3
-  prerelease: ''
+  prerelease: 1-g3011a28
   buildmetadata: ''
-  commit: '399881'
+  commit: 3011a2
   timestamp:
     year: 2020
     month: 10
