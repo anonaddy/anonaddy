@@ -58,6 +58,18 @@ class Recipient extends Model
     }
 
     /**
+     * Query scope to return verified or unverified recipients.
+     */
+    public function scopeVerified($query, $condition = null)
+    {
+        if ($condition === 'false') {
+            return $query->whereNull('email_verified_at');
+        }
+
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    /**
      * Get the user the recipient belongs to.
      */
     public function user()

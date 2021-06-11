@@ -7,7 +7,17 @@
       </div>
       <button
         @click="openCreateModal"
-        class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
+        class="
+          bg-cyan-400
+          hover:bg-cyan-300
+          text-cyan-900
+          font-bold
+          py-3
+          px-4
+          rounded
+          focus:outline-none
+          ml-auto
+        "
       >
         Add New Rule
       </button>
@@ -91,7 +101,16 @@
           v-model="createRuleObject.name"
           id="rule_name"
           type="text"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-2"
+          class="
+            w-full
+            appearance-none
+            bg-grey-100
+            border border-transparent
+            text-grey-700
+            focus:outline-none
+            rounded
+            p-2
+          "
           :class="errors.ruleName ? 'border-red-500' : ''"
           placeholder="Enter name"
           autofocus
@@ -108,14 +127,34 @@
                 <select
                   v-model="createRuleObject.operator"
                   id="rule_operator"
-                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                  class="
+                    block
+                    appearance-none
+                    w-full
+                    text-grey-700
+                    bg-white
+                    p-2
+                    pr-6
+                    rounded
+                    shadow
+                    focus:ring
+                  "
                   required
                 >
                   <option value="AND">AND</option>
                   <option value="OR">OR</option>
                 </select>
                 <div
-                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                  class="
+                    pointer-events-none
+                    absolute
+                    inset-y-0
+                    right-0
+                    flex
+                    items-center
+                    px-2
+                    text-gray-700
+                  "
                 >
                   <svg
                     class="fill-current h-4 w-4"
@@ -139,7 +178,18 @@
                       <select
                         v-model="createRuleObject.conditions[key].type"
                         id="rule_condition_types"
-                        class="block appearance-none w-32 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          w-32
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option
@@ -151,7 +201,16 @@
                         </option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -174,7 +233,18 @@
                       <select
                         v-model="createRuleObject.conditions[key].match"
                         id="rule_condition_matches"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          w-40
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option
@@ -186,7 +256,16 @@
                         </option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -205,7 +284,16 @@
                         v-model="createRuleObject.conditions[key].currentConditionValue"
                         @keyup.enter="addValueToCondition(createRuleObject, key)"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2"
+                        class="
+                          w-full
+                          appearance-none
+                          bg-white
+                          border border-transparent
+                          rounded-l
+                          text-grey-700
+                          focus:outline-none
+                          p-2
+                        "
                         :class="errors.createRuleValues ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
@@ -256,7 +344,16 @@
           <!-- add condition button -->
           <button
             @click="addCondition(createRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              mt-4
+              p-2
+              text-grey-800
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Add condition
           </button>
@@ -286,7 +383,17 @@
                         v-model="createRuleObject.actions[key].type"
                         @change="ruleActionChange(createRuleObject.actions[key])"
                         id="rule_action_types"
-                        class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option
@@ -298,7 +405,16 @@
                         </option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -324,7 +440,16 @@
                       <input
                         v-model="createRuleObject.actions[key].value"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2"
+                        class="
+                          w-full
+                          appearance-none
+                          bg-white
+                          border border-transparent
+                          rounded
+                          text-grey-700
+                          focus:outline-none
+                          p-2
+                        "
                         :class="errors.createRuleActionValue ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
@@ -340,7 +465,18 @@
                       <select
                         v-model="createRuleObject.actions[key].value"
                         id="create_rule_action_banner"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          w-40
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option selected value="top">Top</option>
@@ -348,7 +484,16 @@
                         <option selected value="off">Off</option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -378,7 +523,16 @@
           <!-- add action button -->
           <button
             @click="addAction(createRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              mt-4
+              p-2
+              text-grey-800
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Add action
           </button>
@@ -391,7 +545,16 @@
         <div class="mt-6">
           <button
             @click="createNewRule"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="
+              bg-cyan-400
+              hover:bg-cyan-300
+              text-cyan-900
+              font-bold
+              py-3
+              px-4
+              rounded
+              focus:outline-none
+            "
             :class="createRuleLoading ? 'cursor-not-allowed' : ''"
             :disabled="createRuleLoading"
           >
@@ -400,7 +563,18 @@
           </button>
           <button
             @click="createRuleModalOpen = false"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -428,7 +602,16 @@
           v-model="editRuleObject.name"
           id="edit_rule_name"
           type="text"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-2"
+          class="
+            w-full
+            appearance-none
+            bg-grey-100
+            border border-transparent
+            text-grey-700
+            focus:outline-none
+            rounded
+            p-2
+          "
           :class="errors.ruleName ? 'border-red-500' : ''"
           placeholder="Enter name"
           autofocus
@@ -445,14 +628,34 @@
                 <select
                   v-model="editRuleObject.operator"
                   id="edit_rule_operator"
-                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                  class="
+                    block
+                    appearance-none
+                    w-full
+                    text-grey-700
+                    bg-white
+                    p-2
+                    pr-6
+                    rounded
+                    shadow
+                    focus:ring
+                  "
                   required
                 >
                   <option value="AND">AND</option>
                   <option value="OR">OR</option>
                 </select>
                 <div
-                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                  class="
+                    pointer-events-none
+                    absolute
+                    inset-y-0
+                    right-0
+                    flex
+                    items-center
+                    px-2
+                    text-gray-700
+                  "
                 >
                   <svg
                     class="fill-current h-4 w-4"
@@ -476,7 +679,18 @@
                       <select
                         v-model="editRuleObject.conditions[key].type"
                         id="edit_rule_condition_types"
-                        class="block appearance-none w-32 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          w-32
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option
@@ -488,7 +702,16 @@
                         </option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -508,7 +731,18 @@
                       <select
                         v-model="editRuleObject.conditions[key].match"
                         id="edit_rule_condition_matches"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          w-40
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option
@@ -520,7 +754,16 @@
                         </option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -539,7 +782,16 @@
                         v-model="editRuleObject.conditions[key].currentConditionValue"
                         @keyup.enter="addValueToCondition(editRuleObect, key)"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2"
+                        class="
+                          w-full
+                          appearance-none
+                          bg-white
+                          border border-transparent
+                          rounded-l
+                          text-grey-700
+                          focus:outline-none
+                          p-2
+                        "
                         :class="errors.ruleConditions ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
@@ -587,7 +839,16 @@
           <!-- add condition button -->
           <button
             @click="addCondition(editRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              mt-4
+              p-2
+              text-grey-800
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Add condition
           </button>
@@ -617,7 +878,17 @@
                         v-model="editRuleObject.actions[key].type"
                         @change="ruleActionChange(editRuleObject.actions[key])"
                         id="rule_action_types"
-                        class="block appearance-none text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option
@@ -629,7 +900,16 @@
                         </option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -655,7 +935,16 @@
                       <input
                         v-model="editRuleObject.actions[key].value"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2"
+                        class="
+                          w-full
+                          appearance-none
+                          bg-white
+                          border border-transparent
+                          rounded
+                          text-grey-700
+                          focus:outline-none
+                          p-2
+                        "
                         :class="errors.ruleActions ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
@@ -668,7 +957,18 @@
                       <select
                         v-model="editRuleObject.actions[key].value"
                         id="edit_rule_action_banner"
-                        class="block appearance-none w-40 text-grey-700 bg-white p-2 pr-6 rounded shadow focus:ring"
+                        class="
+                          block
+                          appearance-none
+                          w-40
+                          text-grey-700
+                          bg-white
+                          p-2
+                          pr-6
+                          rounded
+                          shadow
+                          focus:ring
+                        "
                         required
                       >
                         <option value="top">Top</option>
@@ -676,7 +976,16 @@
                         <option value="off">Off</option>
                       </select>
                       <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        class="
+                          pointer-events-none
+                          absolute
+                          inset-y-0
+                          right-0
+                          flex
+                          items-center
+                          px-2
+                          text-gray-700
+                        "
                       >
                         <svg
                           class="fill-current h-4 w-4"
@@ -706,7 +1015,16 @@
           <!-- add action button -->
           <button
             @click="addAction(editRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              mt-4
+              p-2
+              text-grey-800
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Add action
           </button>
@@ -719,7 +1037,16 @@
         <div class="mt-6">
           <button
             @click="editRule"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="
+              bg-cyan-400
+              hover:bg-cyan-300
+              text-cyan-900
+              font-bold
+              py-3
+              px-4
+              rounded
+              focus:outline-none
+            "
             :class="editRuleLoading ? 'cursor-not-allowed' : ''"
             :disabled="editRuleLoading"
           >
@@ -728,7 +1055,18 @@
           </button>
           <button
             @click="closeEditModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -748,7 +1086,17 @@
           <button
             type="button"
             @click="deleteRule(ruleIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-white
+              font-semibold
+              bg-red-500
+              hover:bg-red-600
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="deleteRuleLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteRuleLoading"
           >
@@ -757,7 +1105,18 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>

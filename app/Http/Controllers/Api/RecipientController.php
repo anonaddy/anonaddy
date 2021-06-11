@@ -3,14 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexRecipientRequest;
 use App\Http\Requests\StoreRecipientRequest;
 use App\Http\Resources\RecipientResource;
 
 class RecipientController extends Controller
 {
-    public function index()
+    public function index(IndexRecipientRequest $request)
     {
-        return RecipientResource::collection(user()->recipients()->with('aliases')->latest()->get());
+        $recipients = user()->recipients()->with('aliases')->latest();
+
+        if ($request->input('filter.verified') === 'true') {
+            $recipients->verified();
+        }
+
+        if ($request->input('filter.verified') === 'false') {
+            $recipients->verified('false');
+        }
+
+        return RecipientResource::collection($recipients->get());
     }
 
     public function show($id)

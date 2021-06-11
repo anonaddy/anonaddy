@@ -7,25 +7,71 @@
           @keyup.esc="search = ''"
           tabindex="0"
           type="text"
-          class="w-full md:w-64 appearance-none shadow bg-white text-grey-700 focus:outline-none rounded py-3 pl-3 pr-8"
+          class="
+            w-full
+            md:w-64
+            appearance-none
+            shadow
+            bg-white
+            text-grey-700
+            focus:outline-none
+            rounded
+            py-3
+            pl-3
+            pr-8
+          "
           placeholder="Search Usernames"
         />
         <icon
           v-if="search"
           @click.native="search = ''"
           name="close-circle"
-          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
+          class="
+            absolute
+            right-0
+            inset-y-0
+            w-5
+            h-full
+            text-grey-300
+            fill-current
+            mr-2
+            flex
+            items-center
+            cursor-pointer
+          "
         />
         <icon
           v-else
           name="search"
-          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current pointer-events-none mr-2 flex items-center"
+          class="
+            absolute
+            right-0
+            inset-y-0
+            w-5
+            h-full
+            text-grey-300
+            fill-current
+            pointer-events-none
+            mr-2
+            flex
+            items-center
+          "
         />
       </div>
       <div class="mt-4 md:mt-0">
         <button
           @click="addUsernameModalOpen = true"
-          class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
+          class="
+            bg-cyan-400
+            hover:bg-cyan-300
+            text-cyan-900
+            font-bold
+            py-3
+            px-4
+            rounded
+            focus:outline-none
+            ml-auto
+          "
         >
           Add Username
         </button>
@@ -75,7 +121,17 @@
               @keyup.esc="usernameIdToEdit = usernameDescriptionToEdit = ''"
               v-model="usernameDescriptionToEdit"
               type="text"
-              class="flex-grow appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              class="
+                flex-grow
+                appearance-none
+                bg-grey-100
+                border
+                text-grey-700
+                focus:outline-none
+                rounded
+                px-2
+                py-1
+              "
               :class="
                 usernameDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
               "
@@ -200,14 +256,33 @@
           <input
             v-model="newUsername"
             type="text"
-            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
+            class="
+              w-full
+              appearance-none
+              bg-grey-100
+              border border-transparent
+              text-grey-700
+              focus:outline-none
+              rounded
+              p-3
+              mb-6
+            "
             :class="errors.newUsername ? 'border-red-500' : ''"
             placeholder="johndoe"
             autofocus
           />
           <button
             @click="validateNewUsername"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="
+              bg-cyan-400
+              hover:bg-cyan-300
+              text-cyan-900
+              font-bold
+              py-3
+              px-4
+              rounded
+              focus:outline-none
+            "
             :class="addUsernameLoading ? 'cursor-not-allowed' : ''"
             :disabled="addUsernameLoading"
           >
@@ -216,7 +291,18 @@
           </button>
           <button
             @click="addUsernameModalOpen = false"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -255,7 +341,17 @@
           <button
             type="button"
             @click="editDefaultRecipient()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-cyan-900
+              font-semibold
+              bg-cyan-400
+              hover:bg-cyan-300
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="editDefaultRecipientLoading ? 'cursor-not-allowed' : ''"
             :disabled="editDefaultRecipientLoading"
           >
@@ -264,7 +360,18 @@
           </button>
           <button
             @click="closeUsernameDefaultRecipientModal()"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>
@@ -289,7 +396,17 @@
           <button
             type="button"
             @click="deleteUsername(usernameIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
+            class="
+              px-4
+              py-3
+              text-white
+              font-semibold
+              bg-red-500
+              hover:bg-red-600
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
             :class="deleteUsernameLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteUsernameLoading"
           >
@@ -298,7 +415,18 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Cancel
           </button>

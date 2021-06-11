@@ -55,7 +55,16 @@
         <div class="mt-6">
           <button
             @click="remove"
-            class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none"
+            class="
+              bg-red-500
+              hover:bg-red-600
+              text-white
+              font-bold
+              py-3
+              px-4
+              rounded
+              focus:outline-none
+            "
             :class="removeKeyLoading ? 'cursor-not-allowed' : ''"
             :disabled="removeKeyLoading"
           >
@@ -64,7 +73,18 @@
           </button>
           <button
             @click="closeDeleteKeyModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
           >
             Close
           </button>

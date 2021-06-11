@@ -3,30 +3,45 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexAliasRequest;
 use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
 use App\Models\AdditionalUsername;
 use App\Models\Domain;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
 class AliasController extends Controller
 {
-    public function index(Request $request)
+    public function index(IndexAliasRequest $request)
     {
         $aliases = user()->aliases()->with('recipients')->latest();
 
-        if ($request->deleted === 'with') {
+        // Keep /aliases?deleted=with for backwards compatibility
+        if ($request->deleted === 'with' || $request->input('filter.deleted') === 'with') {
             $aliases->withTrashed();
         }
 
-        if ($request->deleted === 'only') {
+        if ($request->deleted === 'only' || $request->input('filter.deleted') === 'only') {
             $aliases->onlyTrashed();
         }
 
-        return AliasResource::collection($aliases->get());
+        if ($request->input('filter.search')) {
+            $searchTerm = strtolower($request->input('filter.search'));
+
+            $aliases = $aliases->get()->filter(function ($alias) use ($searchTerm) {
+                return Str::contains(strtolower($alias->email), $searchTerm) || Str::contains(strtolower($alias->description), $searchTerm);
+            })->values();
+        }
+
+        if ($request->page) {
+            $aliases = $aliases->jsonPaginate(10);
+        } elseif (!$request->input('filter.search')) {
+            $aliases = $aliases->get();
+        }
+
+        return AliasResource::collection($aliases);
     }
 
     public function show($id)

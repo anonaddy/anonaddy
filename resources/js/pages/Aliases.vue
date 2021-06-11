@@ -500,8 +500,7 @@
                   px-4
                   py-3
                   text-sm text-grey-700
-                  hover:bg-grey-100
-                  hover:text-grey-900
+                  hover:bg-grey-100 hover:text-grey-900
                 "
                 role="menuitem"
               >
@@ -520,8 +519,7 @@
                   px-4
                   py-3
                   text-sm text-grey-700
-                  hover:bg-grey-100
-                  hover:text-grey-900
+                  hover:bg-grey-100 hover:text-grey-900
                 "
                 role="menuitem"
               >
@@ -543,8 +541,7 @@
                   px-4
                   py-3
                   text-sm text-grey-700
-                  hover:bg-grey-100
-                  hover:text-grey-900
+                  hover:bg-grey-100 hover:text-grey-900
                 "
                 role="menuitem"
               >
@@ -566,8 +563,7 @@
                   px-4
                   py-3
                   text-sm text-grey-700
-                  hover:bg-grey-100
-                  hover:text-grey-900
+                  hover:bg-grey-100 hover:text-grey-900
                 "
                 role="menuitem"
               >
@@ -807,7 +803,7 @@
           :clear-on-select="false"
           :searchable="true"
           :max="10"
-          placeholder="Select recipients (optional)..."
+          placeholder="Select recipient(s) (optional)..."
           label="email"
           track-by="email"
           :preselect-first="false"
@@ -931,8 +927,8 @@
           Restore alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to restore this alias? Once restored, you will need to set the alias
-          as <b>active before it can receive emails again</b>.
+          Are you sure you want to restore this alias? Once restored it will be
+          <b>able to receive emails again</b>.
         </p>
         <div class="mt-6">
           <button

@@ -62,6 +62,11 @@ class Alias extends Model
                 $alias->deactivate();
             }
         });
+
+        // Activate the alias when it is restored
+        Alias::restoring(function ($alias) {
+            $alias->activate();
+        });
     }
 
     public function setLocalPartAttribute($value)

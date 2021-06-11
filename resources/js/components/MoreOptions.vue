@@ -7,7 +7,18 @@
       id="project-options-menu-0"
       aria-has-popup="true"
       type="button"
-      class="w-8 h-8 bg-white inline-flex items-center justify-center text-grey-400 rounded-full hover:text-grey-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+      class="
+        w-8
+        h-8
+        bg-white
+        inline-flex
+        items-center
+        justify-center
+        text-grey-400
+        rounded-full
+        hover:text-grey-500
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500
+      "
     >
       <span class="sr-only">Open options</span>
 
@@ -28,7 +39,21 @@
     >
       <div
         v-show="isOpen"
-        class="mx-3 origin-top-right absolute right-7 top-0 w-48 mt-1 rounded-md shadow-lg z-10 bg-white ring-1 ring-black ring-opacity-5 divide-y divide-grey-200"
+        class="
+          mx-3
+          origin-top-right
+          absolute
+          right-7
+          top-0
+          w-48
+          mt-1
+          rounded-md
+          shadow-lg
+          z-10
+          bg-white
+          ring-1 ring-black ring-opacity-5
+          divide-y divide-grey-200
+        "
         role="menu"
         aria-orientation="vertical"
         aria-labelledby="project-options-menu-0"
