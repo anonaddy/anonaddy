@@ -2,7 +2,7 @@
 
 ## Assumptions
 
-This guide assumes that you are competent using the command line to manage an Ubuntu server and that you have already taken appropriate steps to harden and secure the server, for example: no root login, key auth only, 2FA, automatic security updates etc.). I will not go over these here as there are already many great resources availble covering this:
+This guide assumes that you are competent using the command line to manage an Ubuntu server and that you have already taken appropriate steps to harden and secure the server, for example: no root login, key auth only, 2FA, automatic security updates etc. I will not go over these here as there are already many great resources availble covering this:
 
 - [https://github.com/imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
 - [https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/](https://jacyhong.wordpress.com/2016/06/27/my-first-10-minutes-on-a-server-primer-for-securing-ubuntu/)
@@ -581,14 +581,14 @@ USE `anonaddy_database`$$
 
 DROP PROCEDURE IF EXISTS `check_access`$$
 
-CREATE PROCEDURE `check_access`(alias_email VARCHAR(254))
+CREATE PROCEDURE `check_access`(alias_email VARCHAR(254) charset utf8)
 BEGIN
     DECLARE no_alias_exists int(1);
-    DECLARE alias_action varchar(7);
-    DECLARE username_action varchar(7);
-    DECLARE additional_username_action varchar(7);
-    DECLARE domain_action varchar(7);
-    DECLARE alias_domain varchar(254);
+    DECLARE alias_action varchar(7) charset utf8;
+    DECLARE username_action varchar(7) charset utf8;
+    DECLARE additional_username_action varchar(7) charset utf8;
+    DECLARE domain_action varchar(7) charset utf8;
+    DECLARE alias_domain varchar(254) charset utf8;
 
     SET alias_domain = SUBSTRING_INDEX(alias_email, '@', -1);
 
