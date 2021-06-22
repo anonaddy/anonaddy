@@ -228,13 +228,26 @@ Please double check that you are indeed sending from a verified recipient email 
 
 ## I'm trying to reply/send from an alias but it is rejected, what's wrong?
 
-If you see the rejection message `554 5.7.1 Recipient address rejected: Access denied` then this means that the alias has been deleted, you must restore it before you can send/reply from it.
+If you see the rejection message `5.7.1 Recipient address rejected: Access denied` then this means that the alias has been deleted, you must restore it before you can send/reply from it.
 
 If you see the rejection message `5.7.1 Rejected due to missing/failed DMARC policy...` then it is because your AnonAddy recipient's domain either does not have a DMARC policy or it has failed DMARC checks.
 
-> Note: This is referring to **your verified recipient address on your AnonAddy account** and not the email address that you are replying / sending to
+This is usually because you have a verified recipient that is using your own domain which does not have a DMARC policy.
+
+> Note: This is referring to **your verified recipient address** on your AnonAddy account **and not** any of your custom domains or the email address that you are replying / sending to
 
 When replying or sending from an alias, **additional checks** are carried out to ensure it is not a spoofed email. Your AnonAddy recipient's email domain must pass DMARC checks in order to protect against spoofed emails and to make sure that the reply/send from attempt definitely came from your recipient.
+
+For example if the verified recipient on your AnonAddy account is `hello@example.com` and you get the "missing/failed DMARC policy" rejection message then it is because the domain "example.com" does not have a DMARC policy in place.
+
+To resolve this you simply need to add a DMARC record, for example:
+
+| Type | Host   | Value                       |
+|:-----|:-------|:----------------------------|
+| TXT  | _dmarc | "v=DMARC1; p=none; adkim=s" |
+
+
+You should also have SPF and DKIM records in place.
 
 To learn more about DMARC please see this site - [https://dmarc.org/](https://dmarc.org/).
 
