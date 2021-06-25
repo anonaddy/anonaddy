@@ -27,7 +27,10 @@ class CreateWebauthnKeysTable extends Migration
             $table->integer('counter');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // Causing foreign key mistmatch errors in SQLite
+            if (config('database.default') !== 'sqlite') {
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            }
             $table->primary('id');
         });
     }
