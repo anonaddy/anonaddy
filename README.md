@@ -143,15 +143,13 @@ Yes there is an [open-source](https://github.com/anonaddy/browser-extension) bro
 
 ## Is there an Android app?
 
-There is not an official Android app that I have made myself as I am not familiar with mobile development.
+Yes, there is an excellent [open-source](https://gitlab.com/Stjin/anonaddy-android) Android app created by [Stjin](https://twitter.com/Stjinchan) that is available to download from the [Play Store](https://play.google.com/store/apps/details?id=host.stjin.anonaddy) (paid) and [F-Droid](https://f-droid.org/packages/host.stjin.anonaddy) (free). The developer of this app has put in a lot of time and effort so if you would like to support him please purchase the Play Store version.
 
-There is however an excellent [open-source](https://gitlab.com/Stjin/anonaddy-android) Android app created by [Stjin](https://twitter.com/Stjinchan) that is available to download from the [Play Store](https://play.google.com/store/apps/details?id=host.stjin.anonaddy) (paid) and [F-Droid](https://f-droid.org/packages/host.stjin.anonaddy) (free). The developer of this app has put in a lot of time and effort so if you would like to support him please purchase the Play Store version.
-
-There is also another unofficial [open-source](https://github.com/KhalidWar/anonaddy) Android app created by [KhalidWar](https://twitter.com/RealKhalidWar) available on the [Play Store](https://play.google.com/store/apps/details?id=com.khalidwar.anonaddy).
+There is also another [open-source](https://github.com/KhalidWar/anonaddy) Android app created by [KhalidWar](https://twitter.com/RealKhalidWar) available on the [Play Store](https://play.google.com/store/apps/details?id=com.khalidwar.anonaddy).
 
 ## Is there an iOS app?
 
-Yes, [KhalidWar's](https://twitter.com/RealKhalidWar) unofficial [open-source](https://github.com/KhalidWar/anonaddy) app from above is also available on the [App Store](https://apps.apple.com/us/app/addymanager/id1547461270).
+Yes, [KhalidWar's](https://twitter.com/RealKhalidWar) [open-source](https://github.com/KhalidWar/anonaddy) app from above is also available on the [App Store](https://apps.apple.com/us/app/addymanager/id1547461270).
 
 ## How do I add my own GPG/OpenPGP key for encryption?
 
@@ -178,7 +176,7 @@ If you're concerned that your aliases are all linked by your username e.g. @john
 
 ## Where is the server located?
 
-The server is located in Amsterdam, Netherlands with [Greenhost.net](https://greenhost.net/). Greenhost focuses greatly on privacy and security and their servers run entirely on Dutch wind energy.
+The server is located in Amsterdam, Netherlands with [Greenhost.net](https://greenhost.net/). Greenhost focuses greatly on privacy and security and their servers run entirely on Dutch wind energy. The backup mail server is located in Warsaw, Poland with [UpCloud](https://upcloud.com).
 
 ## What if I don't trust you?
 
@@ -364,7 +362,7 @@ You can add 1 additional username as a Lite user and up to 3 additional username
 
 ## I'm not receiving any emails, what's wrong?
 
-Please make sure to add mailer@anonaddy.me, mailer@anonaddy.com and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from us as safe if they turn up in spam.
+Please make sure to add mailer@anonaddy.me, mailer@anonaddy.com and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from AnonAddy as safe if they turn up in spam.
 
 If an alias has been previously deleted and you try to send email to it, the emails will be rejected with an error message - "554 5.7.1 Recipient address rejected: Access denied".
 
@@ -374,13 +372,20 @@ The sender of the email may be failing SPF, DMARC or DNS blacklist checks result
 
 If you are forwarding emails to an icloud.com email address some users are having issues with a small number of emails being rejected (often those from Facebook).
 
-For some reason Apple seems to think these emails are spam and returns this error message:
+For some reason Apple seems to think these emails are spam/phishing and returns this error message:
 
 > Diagnostic-Code: smtp; 550 5.7.1 [CS01] Message rejected due to local policy.
 
 I have contacted Apple multiple times about this but they have not yet responded.
 
-If you are having issues with emails being rejected as "possibly spammy" by Google, iCloud or Microsoft then try adding a GPP key and **enabling encryption**. This will prevent the email's content being scanned and reduce the change of it being rejected.
+If you are having issues with emails being rejected as "possibly spammy" by Google, iCloud or Microsoft then please try the following steps if you can:
+
+1. **Replace the email subject** by going to your settings in AnonAddy
+2. Try adding a GPP key and **enabling encryption**. This will prevent the email's content being scanned and reduce the change of it being rejected.
+
+I will also soon be adding an option to change the format of the display from part of the "From:" header.
+
+If neither of the above options work then please try changing to another recipient so that you can continue to receive emails.
 
 If you still aren't receiving emails please contact me.
 
@@ -417,7 +422,7 @@ For any other questions just send an email to - [contact@anonaddy.com](mailto:co
 ## Software Requirements
 
 * Postfix (3.0.0+) (plus postfix-mysql for database queries and postfix-pcre)
-* PHP (7.4+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
+* PHP (8.0+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
 * Port 25 unblocked and open
 * Redis (4.x+) for throttling and queues
 * FQDN as hostname e.g. mail.anonaddy.me

@@ -30,6 +30,7 @@ Vue.component('recipients', require('./pages/Recipients.vue').default)
 Vue.component('domains', require('./pages/Domains.vue').default)
 Vue.component('usernames', require('./pages/Usernames.vue').default)
 Vue.component('rules', require('./pages/Rules.vue').default)
+Vue.component('failed-deliveries', require('./pages/FailedDeliveries.vue').default)
 
 Vue.component(
   'passport-personal-access-tokens',

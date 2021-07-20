@@ -9,10 +9,13 @@ use App\Models\AdditionalUsername;
 use App\Models\Alias;
 use App\Models\Domain;
 use App\Models\EmailData;
+use App\Models\PostfixQueueId;
+use App\Models\Recipient;
 use App\Models\User;
 use App\Notifications\NearBandwidthLimit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
@@ -74,6 +77,11 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $recipient) {
+
+                // Handle bounces
+                if ($this->option('sender') === 'MAILER-DAEMON') {
+                    $this->handleBounce($recipient['email']);
+                }
 
                 // First determine if the alias already exists in the database
                 if ($alias = Alias::firstWhere('email', $recipient['local_part'] . '@' . $recipient['domain'])) {
@@ -254,6 +262,100 @@ class ReceiveEmail extends Command
         });
     }
 
+    protected function handleBounce($returnPath)
+    {
+        // Collect the attachments
+        $attachments = collect($this->parser->getAttachments());
+
+        // Find the delivery report
+        $deliveryReport = $attachments->filter(function ($attachment) {
+            return $attachment->getContentType() === 'message/delivery-status';
+        })->first();
+
+        if ($deliveryReport) {
+            $dsn = $this->parseDeliveryStatus($deliveryReport->getMimePartStr());
+
+            // Verify queue ID
+            if (isset($dsn['X-postfix-queue-id'])) {
+
+                // First check in DB
+                $postfixQueueId = PostfixQueueId::firstWhere('queue_id', strtoupper($dsn['X-postfix-queue-id']));
+
+                if (!$postfixQueueId) {
+                    exit(0);
+                }
+
+                // If found then delete from DB
+                $postfixQueueId->delete();
+            } else {
+                exit(0);
+            }
+
+            // Get the bounced email address
+            $bouncedEmailAddress = isset($dsn['Final-recipient']) ? trim(Str::after($dsn['Final-recipient'], ';')) : '';
+
+            $remoteMta = isset($dsn['Remote-mta']) ? trim(Str::after($dsn['Remote-mta'], ';')) : '';
+
+            if (isset($dsn['Diagnostic-code']) && isset($dsn['Status'])) {
+                // Try to determine the bounce type, HARD, SPAM, SOFT
+                $bounceType = $this->getBounceType($dsn['Diagnostic-code'], $dsn['Status']);
+
+                $diagnosticCode = Str::limit($dsn['Diagnostic-code'], 497);
+            } else {
+                $bounceType = null;
+                $diagnosticCode = null;
+            }
+
+            // The return path is the alias except when it is from an unverified custom domain
+            if ($returnPath !== config('anonaddy.return_path')) {
+                $alias = Alias::withTrashed()->firstWhere('email', $returnPath);
+
+                if (isset($alias)) {
+                    $user = $alias->user;
+                }
+            }
+
+            // Try to find a user from the bounced email address
+            if ($recipient = Recipient::select(['id', 'email', 'email_verified_at'])->whereNotNull('email_verified_at')->get()->firstWhere('email', $bouncedEmailAddress)) {
+                if (!isset($user)) {
+                    $user = $recipient->user;
+                }
+            }
+
+            // Get the undelivered message
+            $undeliveredMessage = $attachments->filter(function ($attachment) {
+                return in_array($attachment->getContentType(), ['text/rfc822-headers', 'message/rfc822']);
+            })->first();
+
+            $undeliveredMessageHeaders = [];
+
+            if ($undeliveredMessage) {
+                $undeliveredMessageHeaders = $this->parseDeliveryStatus($undeliveredMessage->getMimePartStr());
+            }
+
+            if (isset($user)) {
+                $user->failedDeliveries()->create([
+                    'recipient_id' => $recipient->id ?? null,
+                    'alias_id' => $alias->id ?? null,
+                    'bounce_type' => $bounceType,
+                    'remote_mta' => $remoteMta ?? null,
+                    'sender' => $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null,
+                    'email_type' => $parts[0] ?? null,
+                    'status' => $dsn['Status'] ?? null,
+                    'code' => $diagnosticCode,
+                ]);
+            } else {
+                Log::info([
+                    'info' => 'user not found from bounce report',
+                    'deliveryReport' => $deliveryReport,
+                    'undeliveredMessage' => $undeliveredMessage,
+                ]);
+            }
+        }
+
+        exit(0);
+    }
+
     protected function checkBandwidthLimit($user)
     {
         if ($user->hasReachedBandwidthLimit()) {
@@ -332,6 +434,45 @@ class ReceiveEmail extends Command
             $parser->setPath($file);
         }
         return $parser;
+    }
+
+    protected function parseDeliveryStatus($deliveryStatus)
+    {
+        $lines = explode(PHP_EOL, $deliveryStatus);
+
+        $result = [];
+
+        foreach ($lines as $line) {
+            if (preg_match('#^([^\s.]*):\s*(.*)\s*#', $line, $matches)) {
+                $key = ucfirst(strtolower($matches[1]));
+
+                if (empty($result[$key])) {
+                    $result[$key] = trim($matches[2]);
+                }
+            } elseif (preg_match('/^\s+(.+)\s*/', $line) && isset($key)) {
+                $result[$key] .= ' ' . $line;
+            }
+        }
+
+        return $result;
+    }
+
+    protected function getBounceType($code, $status)
+    {
+        if (preg_match("/(:?mailbox|address|user|account|recipient|@).*(:?rejected|unknown|disabled|unavailable|invalid|inactive|not exist|does(n't| not) exist)|(:?rejected|unknown|unavailable|no|illegal|invalid|no such).*(:?mailbox|address|user|account|recipient|alias)|(:?address|user|recipient) does(n't| not) have .*(:?mailbox|account)|returned to sender|(:?auth).*(:?required)/i", $code)) {
+            return 'hard';
+        }
+
+        if (preg_match("/(:?spam|unsolicited|blacklisting|blacklisted|blacklist|554|mail content denied|reject for policy reason|mail rejected by destination domain|security issue)/i", $code)) {
+            return 'spam';
+        }
+
+        // No match for code but status starts with 5 e.g. 5.2.2
+        if (Str::startsWith($status, '5')) {
+            return 'hard';
+        }
+
+        return 'soft';
     }
 
     protected function exitIfFromSelf()

@@ -18,6 +18,7 @@ class DomainResource extends JsonResource
             'active' => $this->active,
             'catch_all' => $this->catch_all,
             'domain_verified_at' => $this->domain_verified_at ? $this->domain_verified_at->toDateTimeString() : null,
+            'domain_mx_validated_at' => $this->domain_mx_validated_at ? $this->domain_mx_validated_at->toDateTimeString() : null,
             'domain_sending_verified_at' => $this->domain_sending_verified_at ? $this->domain_sending_verified_at->toDateTimeString() : null,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),

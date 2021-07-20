@@ -59,6 +59,7 @@ class DeleteAccount implements ShouldQueue, ShouldBeEncrypted
         $this->user->tokens()->delete();
         $this->user->rules()->delete();
         $this->user->webauthnKeys()->delete();
+        $this->user->failedDeliveries()->delete();
         $this->user->delete();
     }
 }

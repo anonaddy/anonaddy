@@ -25,6 +25,9 @@
                 <a href="{{ route('usernames.index') }}" class="block mt-4 md:inline-block md:mt-0 hover:text-white mr-4 {{ Route::currentRouteNamed('usernames.index') ? 'text-white' : 'text-indigo-100' }}">
                     Usernames
                 </a>
+                <a href="{{ route('failed_deliveries.index') }}" class="block mt-3 md:inline-block md:mt-0 hover:text-white mr-4 {{ Route::currentRouteNamed('failed_deliveries.index') ? 'text-white' : 'text-indigo-100' }}">
+                    Failed Deliveries
+                </a>
                 <a href="{{ route('rules.index') }}" class="block mt-4 md:inline-block md:mt-0 hover:text-white mr-4 {{ Route::currentRouteNamed('rules.index') ? 'text-white' : 'text-indigo-100' }}">
                     Rules
                 </a>

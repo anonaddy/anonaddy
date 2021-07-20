@@ -73,10 +73,19 @@
 
     <div v-else class="bg-white rounded shadow overflow-x-auto">
       <div class="p-8 text-center text-lg text-grey-700">
-        <h1 class="mb-6 text-2xl text-indigo-800 font-semibold">
-          It doesn't look like you have any rules yet!
+        <h1 class="mb-6 text-xl text-indigo-800 font-semibold">
+          This is where you can add and view your rules
         </h1>
         <div class="mx-auto mb-6 w-24 border-b-2 border-grey-200"></div>
+        <p class="mb-4">
+          Rules can be used to set certain conditions that when matched cause actions to be
+          performed. Rules are evaluated in the order they appear on this page, you can reorder them
+          by dragging and dropping them.
+        </p>
+        <p class="mb-4">
+          For example you could create a rule that checks if the subject of an email contains the
+          word "offer" and if so to block the email.
+        </p>
         <p class="mb-4">Click the button above to create a new rule.</p>
       </div>
     </div>

@@ -73,6 +73,6 @@ class ShowDomainsTest extends TestCase
 
         $response->assertStatus(200);
 
-        $this->assertEquals('SPF record not found. This could be due to DNS caching, please try again later.', $response->json('message'));
+        $this->assertEquals('Records verified for sending.', $response->json('message'));
     }
 }

@@ -47,6 +47,8 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
     Route::get('/deactivate/{alias}', 'DeactivateAliasController@deactivate')->name('deactivate');
 
     Route::get('/rules', 'ShowRuleController@index')->name('rules.index');
+
+    Route::get('/failed-deliveries', 'ShowFailedDeliveryController@index')->name('failed_deliveries.index');
 });
 
 

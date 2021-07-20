@@ -86,6 +86,14 @@ class Recipient extends Model
     }
 
     /**
+     * Get all of the recipient's failed deliveries.
+     */
+    public function failedDeliveries()
+    {
+        return $this->hasMany(FailedDelivery::class);
+    }
+
+    /**
      * Get all of the user's custom domains.
      */
     public function domainsUsingAsDefault()

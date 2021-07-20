@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="aliases">
     <div class="flex flex-wrap flex-row items-center justify-between mb-8 md:px-2 lg:px-6">
       <div
         class="
@@ -293,6 +293,7 @@
       v-if="initialAliases.length"
       @on-search="debounceToolips"
       @on-page-change="debounceToolips"
+      @on-per-page-change="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{

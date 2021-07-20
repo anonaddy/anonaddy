@@ -171,6 +171,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's failed deliveries.
+     */
+    public function failedDeliveries()
+    {
+        return $this->hasMany(FailedDelivery::class);
+    }
+
+    /**
      * Get all of the user's active rules.
      */
     public function activeRules()

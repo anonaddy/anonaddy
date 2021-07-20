@@ -39,7 +39,7 @@ class ForgotUsernameController extends Controller
     {
         $this->validateEmail($request);
 
-        $recipient = Recipient::all()->where('email', $request->email)->first();
+        $recipient = Recipient::select(['id', 'email', 'email_verified_at'])->whereNotNull('email_verified_at')->get()->firstWhere('email', $request->email);
 
         if (isset($recipient)) {
             $recipient->sendUsernameReminderNotification();
@@ -56,6 +56,6 @@ class ForgotUsernameController extends Controller
      */
     protected function validateEmail(Request $request)
     {
-        $request->validate(['email' => 'required|email:rfc,dns']);
+        $request->validate(['email' => 'required|email:rfc']);
     }
 }

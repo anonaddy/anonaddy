@@ -109,6 +109,14 @@ class Alias extends Model
     }
 
     /**
+     * Get all of the aliases' failed deliveries.
+     */
+    public function failedDeliveries()
+    {
+        return $this->hasMany(FailedDelivery::class);
+    }
+
+    /**
      * Get all of the verified recipients for the email alias.
      */
     public function verifiedRecipients()

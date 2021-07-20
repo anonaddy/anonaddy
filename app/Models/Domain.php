@@ -32,6 +32,7 @@ class Domain extends Model
         'created_at',
         'updated_at',
         'domain_verified_at',
+        'domain_mx_validated_at',
         'domain_sending_verified_at'
     ];
 
@@ -170,6 +171,18 @@ class Domain extends Model
     }
 
     /**
+     * Mark this domain as having valid MX records.
+     *
+     * @return bool
+     */
+    public function markDomainAsValidMx()
+    {
+        return $this->forceFill([
+            'domain_mx_validated_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    /**
      * Checks if the domain has the correct records.
      */
     public function checkVerification()
@@ -185,10 +198,43 @@ class Domain extends Model
     }
 
     /**
+     * Checks if the domain has the correct MX records.
+     */
+    public function checkMxRecords()
+    {
+        if (App::environment('testing')) {
+            return true;
+        }
+
+        $mx = collect(dns_get_record($this->domain . '.', DNS_MX))
+            ->sortBy('pri')
+            ->first();
+
+        if (! isset($mx['target'])) {
+            return false;
+        }
+
+        if ($mx['target'] !== config('anonaddy.hostname')) {
+            return false;
+        }
+
+        $this->markDomainAsValidMx();
+
+        return true;
+    }
+
+    /**
      * Checks if the domain has the correct records for sending.
      */
     public function checkVerificationForSending()
     {
+        if (App::environment('testing')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Records verified for sending.',
+            ]);
+        }
+
         $spf = collect(dns_get_record($this->domain . '.', DNS_TXT))
             ->contains(function ($r) {
                 return preg_match("/^(v=spf1).*(include:spf\." . config('anonaddy.domain') . ").*(-|~)all$/", $r['txt']);

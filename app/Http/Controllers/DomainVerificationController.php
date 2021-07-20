@@ -13,6 +13,14 @@ class DomainVerificationController extends Controller
     {
         $domain = user()->domains()->findOrFail($id);
 
+        // Check MX records separately
+        if (! $domain->checkMxRecords()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'MX record not found or does not have correct priority. This could be due to DNS caching, please try again later.'
+            ]);
+        }
+
         return $domain->checkVerificationForSending();
     }
 }

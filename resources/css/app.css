@@ -74,6 +74,8 @@ html {
 }
 .vgt-responsive {
   @apply overflow-x-auto w-full relative;
+}
+.aliases .vgt-responsive {
   min-height: 220px;
 }
 .vgt-text-disabled {
