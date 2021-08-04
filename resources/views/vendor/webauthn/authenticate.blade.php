@@ -31,12 +31,20 @@
                         {{ trans('webauthn::messages.buttonAdvise') }}
                         <br />
                         {{ trans('webauthn::messages.noButtonAdvise') }}
+                        <br />
+                        If nothing happens then click the button below to authenticate.
                     </p>
 
                     <form method="POST" action="{{ route('webauthn.auth') }}" id="form">
                         @csrf
                         <input type="hidden" name="data" id="data" />
                     </form>
+
+                    <div class="mt-4">
+                        <button onclick="authenticateDevice()" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto">
+                            Authenticate
+                        </button>
+                    </div>
 
                 </div>
 
@@ -92,14 +100,27 @@
             }
         }
 
-        webauthn.sign(
-            publicKey,
-            function (datas) {
-                document.getElementById("success").classList.remove("hidden");
-                document.getElementById("data").value = JSON.stringify(datas);
-                document.getElementById("form").submit();
-            }
-        );
+        if (! /apple/i.test(navigator.vendor)) {
+            webauthn.sign(
+                publicKey,
+                function (datas) {
+                    document.getElementById("success").classList.remove("hidden");
+                    document.getElementById("data").value = JSON.stringify(datas);
+                    document.getElementById("form").submit();
+                }
+            );
+        }
+
+        function authenticateDevice() {
+            webauthn.sign(
+                publicKey,
+                function (datas) {
+                    document.getElementById("success").classList.remove("hidden");
+                    document.getElementById("data").value = JSON.stringify(datas);
+                    document.getElementById("form").submit();
+                }
+            );
+        }
     </script>
 @endsection
 

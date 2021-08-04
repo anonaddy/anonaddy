@@ -46,4 +46,26 @@ class Webauthn extends ServicesWebauthn
 
         return $webauthnKey;
     }
+
+    /**
+     * Test if the user has one webauthn key set or more.
+     *
+     * @param \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return bool
+     */
+    public function enabled(User $user): bool
+    {
+        return (bool) $this->config->get('webauthn.enable', true) && $this->hasKey($user);
+    }
+
+    /**
+     * Detect if user has a key that is enabled.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function hasKey(User $user): bool
+    {
+        return WebauthnKey::where('user_id', $user->getAuthIdentifier())->where('enabled', true)->count() > 0;
+    }
 }

@@ -438,7 +438,7 @@
 
                 @else
 
-                    @if(App\Facades\Webauthn::enabled($user))
+                    @if(LaravelWebauthn\Facades\Webauthn::enabled($user))
 
                         <webauthn-keys />
 
@@ -506,7 +506,7 @@
                             <a
                             type="button"
                             href="/webauthn/register"
-                            class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
+                            class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
                             >
                                 Register U2F Device
                             </a>

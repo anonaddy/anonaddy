@@ -18,7 +18,7 @@ class AccountDetailsTest extends TestCase
     /** @test */
     public function user_can_get_account_details()
     {
-        $response = $this->get('/api/v1/account-details');
+        $response = $this->json('GET', '/api/v1/account-details');
 
         $response->assertSuccessful();
 

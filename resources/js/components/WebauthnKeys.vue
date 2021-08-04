@@ -7,7 +7,7 @@
 
       <p class="my-6">
         Webauthn Keys you have registered for 2nd factor authentication. To remove a key simply
-        click the delete button next to it.
+        click the delete button next to it. Disabling all keys will turn off 2FA on your account.
       </p>
 
       <div>
@@ -17,6 +17,7 @@
           <div class="table-row">
             <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
             <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Enabled</div>
             <div class="table-cell p-1 md:p-4 text-right">
               <a href="/webauthn/register" class="text-indigo-700">Add New Device</a>
             </div>
@@ -24,6 +25,9 @@
           <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
             <div class="table-cell p-1 md:p-4">{{ key.name }}</div>
             <div class="table-cell p-1 md:p-4">{{ key.created_at | timeAgo }}</div>
+            <div class="table-cell p-1 md:p-4">
+              <Toggle v-model="key.enabled" @on="enableKey(key.id)" @off="disableKey(key.id)" />
+            </div>
             <div class="table-cell p-1 md:p-4 text-right">
               <a
                 class="text-red-500 font-bold cursor-pointer focus:outline-none"
@@ -96,10 +100,12 @@
 
 <script>
 import Modal from './Modal.vue'
+import Toggle from './../components/Toggle.vue'
 
 export default {
   components: {
     Modal,
+    Toggle,
   },
   data() {
     return {
@@ -138,6 +144,42 @@ export default {
           this.getWebauthnKeys()
         }
       })
+    },
+    enableKey(id) {
+      axios
+        .post(
+          `/webauthn/enabled-keys`,
+          JSON.stringify({
+            id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
+        })
+    },
+    disableKey(id) {
+      axios
+        .delete(`/webauthn/enabled-keys/${id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response !== undefined) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
+        })
     },
     closeDeleteKeyModal() {
       this.deleteKeyModalOpen = false

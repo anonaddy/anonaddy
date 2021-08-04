@@ -275,7 +275,7 @@ class Domain extends Model
 
         return response()->json([
             'success' => true,
-            'message' => 'Records successfully verified for sending.',
+            'message' => 'Records successfully verified.',
             'data' => new DomainResource($this->fresh())
         ]);
     }

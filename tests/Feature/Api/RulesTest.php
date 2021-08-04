@@ -33,7 +33,7 @@ class RulesTest extends TestCase
         ]);
 
         // At
-        $response = $this->get('/api/v1/rules');
+        $response = $this->json('GET', '/api/v1/rules');
 
         // Assert
         $response->assertSuccessful();
@@ -49,7 +49,7 @@ class RulesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/rules/'.$rule->id);
+        $response = $this->json('GET', '/api/v1/rules/'.$rule->id);
 
         // Assert
         $response->assertSuccessful();

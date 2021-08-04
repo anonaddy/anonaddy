@@ -28,7 +28,7 @@ class AliasesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/aliases');
+        $response = $this->json('GET', '/api/v1/aliases');
 
         // Assert
         $response->assertSuccessful();
@@ -49,7 +49,7 @@ class AliasesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/aliases?deleted=with');
+        $response = $this->json('GET', '/api/v1/aliases?deleted=with');
 
         // Assert
         $response->assertSuccessful();
@@ -70,7 +70,7 @@ class AliasesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/aliases?deleted=only');
+        $response = $this->json('GET', '/api/v1/aliases?deleted=only');
 
         // Assert
         $response->assertSuccessful();
@@ -86,7 +86,7 @@ class AliasesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/aliases/'.$alias->id);
+        $response = $this->json('GET', '/api/v1/aliases/'.$alias->id);
 
         // Assert
         $response->assertSuccessful();

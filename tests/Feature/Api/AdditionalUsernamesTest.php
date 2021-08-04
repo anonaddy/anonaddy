@@ -28,7 +28,7 @@ class AdditionalUsernamesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/usernames');
+        $response = $this->json('GET', '/api/v1/usernames');
 
         // Assert
         $response->assertSuccessful();
@@ -44,7 +44,7 @@ class AdditionalUsernamesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/usernames/'.$username->id);
+        $response = $this->json('GET', '/api/v1/usernames/'.$username->id);
 
         // Assert
         $response->assertSuccessful();

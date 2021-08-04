@@ -77,6 +77,10 @@ Route::group([
     Route::post('/active-rules', 'Api\ActiveRuleController@store');
     Route::delete('/active-rules/{id}', 'Api\ActiveRuleController@destroy');
 
+    Route::get('/failed-deliveries', 'Api\FailedDeliveryController@index');
+    Route::get('/failed-deliveries/{id}', 'Api\FailedDeliveryController@show');
+    Route::delete('/failed-deliveries/{id}', 'Api\FailedDeliveryController@destroy');
+
     Route::get('/domain-options', 'Api\DomainOptionController@index');
 
     Route::get('/account-details', 'Api\AccountDetailController@index');

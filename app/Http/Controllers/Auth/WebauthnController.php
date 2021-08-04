@@ -16,7 +16,7 @@ class WebauthnController extends ControllersWebauthnController
 {
     public function index()
     {
-        return user()->webauthnKeys()->latest()->select(['id','name','created_at'])->get()->values();
+        return user()->webauthnKeys()->latest()->select(['id','name','enabled','created_at'])->get()->values();
     }
 
     /**
@@ -75,6 +75,12 @@ class WebauthnController extends ControllersWebauthnController
     protected function redirectAfterSuccessRegister($webauthnKey)
     {
         if ($this->config->get('webauthn.register.postSuccessRedirectRoute', '') !== '') {
+
+            // If the user already has at least one key do not generate a new backup code.
+            if (user()->webauthnKeys()->count() > 1) {
+                return Redirect::intended($this->config->get('webauthn.register.postSuccessRedirectRoute'));
+            }
+
             user()->update([
                 'two_factor_backup_code' => bcrypt($code = Str::random(40))
             ]);

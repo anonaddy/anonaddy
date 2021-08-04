@@ -31,6 +31,8 @@ Route::group([
     Route::get('keys', 'Auth\WebauthnController@index')->name('webauthn.index');
     Route::post('register', 'Auth\WebauthnController@create')->name('webauthn.create');
     Route::delete('{id}', 'Auth\WebauthnController@destroy')->name('webauthn.destroy');
+    Route::post('enabled-keys', 'Auth\WebauthnEnabledKeyController@store')->name('webauthn.enabled_key.store');
+    Route::delete('enabled-keys/{id}', 'Auth\WebauthnEnabledKeyController@destroy')->name('webauthn.enabled_key.destroy');
 });
 
 Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {

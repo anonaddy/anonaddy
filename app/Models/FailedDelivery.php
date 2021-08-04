@@ -29,10 +29,12 @@ class FailedDelivery extends Model
         'sender',
         'email_type',
         'status',
-        'code'
+        'code',
+        'attempted_at'
     ];
 
     protected $dates = [
+        'attempted_at',
         'created_at',
         'updated_at'
     ];

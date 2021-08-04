@@ -316,7 +316,7 @@ class ReceiveEmail extends Command
             }
 
             // Try to find a user from the bounced email address
-            if ($recipient = Recipient::select(['id', 'email', 'email_verified_at'])->whereNotNull('email_verified_at')->get()->firstWhere('email', $bouncedEmailAddress)) {
+            if ($recipient = Recipient::select(['id', 'email'])->get()->firstWhere('email', $bouncedEmailAddress)) {
                 if (!isset($user)) {
                     $user = $recipient->user;
                 }
@@ -343,6 +343,7 @@ class ReceiveEmail extends Command
                     'email_type' => $parts[0] ?? null,
                     'status' => $dsn['Status'] ?? null,
                     'code' => $diagnosticCode,
+                    'attempted_at' => $postfixQueueId->created_at
                 ]);
             } else {
                 Log::info([

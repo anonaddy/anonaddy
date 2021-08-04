@@ -19,7 +19,7 @@ class AppVersionTest extends TestCase
     /** @test */
     public function user_can_get_app_version()
     {
-        $response = $this->get('/api/v1/app-version');
+        $response = $this->json('GET', '/api/v1/app-version');
 
         $response->assertSuccessful();
 

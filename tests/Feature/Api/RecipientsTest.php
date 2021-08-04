@@ -26,7 +26,7 @@ class RecipientsTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/recipients');
+        $response = $this->json('GET', '/api/v1/recipients');
 
         // Assert
         $response->assertSuccessful();
@@ -42,7 +42,7 @@ class RecipientsTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/recipients/'.$recipient->id);
+        $response = $this->json('GET', '/api/v1/recipients/'.$recipient->id);
 
         // Assert
         $response->assertSuccessful();

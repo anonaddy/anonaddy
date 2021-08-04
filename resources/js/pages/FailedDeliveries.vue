@@ -139,6 +139,19 @@
         <span v-else-if="props.column.field == 'code'" class="text-sm">
           {{ props.row.code }}
         </span>
+        <span
+          v-else-if="props.column.field == 'attempted_at'"
+          class="tooltip outline-none text-sm"
+          :data-tippy-content="rows[props.row.originalIndex].attempted_at | formatDateTime"
+          >{{ props.row.attempted_at | timeAgo }}
+        </span>
+        <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
+          <icon
+            name="trash"
+            class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
+            @click.native="openDeleteModal(props.row.id)"
+          />
+        </span>
       </template>
     </vue-good-table>
 
@@ -158,10 +171,64 @@
         </p>
       </div>
     </div>
+
+    <Modal :open="deleteFailedDeliveryModalOpen" @close="closeDeleteModal">
+      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
+        <h2
+          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
+        >
+          Delete Failed Delivery
+        </h2>
+        <p class="mt-4 text-grey-700">Are you sure you want to delete this failed delivery?</p>
+        <p class="mt-4 text-grey-700">
+          Failed deliveries are automatically removed when they are more than 3 days old.
+        </p>
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="deleteFailedDelivery(failedDeliveryIdToDelete)"
+            class="
+              px-4
+              py-3
+              text-white
+              font-semibold
+              bg-red-500
+              hover:bg-red-600
+              border border-transparent
+              rounded
+              focus:outline-none
+            "
+            :class="deleteFailedDeliveryLoading ? 'cursor-not-allowed' : ''"
+            :disabled="deleteFailedDeliveryLoading"
+          >
+            Delete failed delivery
+            <loader v-if="deleteFailedDeliveryLoading" />
+          </button>
+          <button
+            @click="closeDeleteModal"
+            class="
+              ml-4
+              px-4
+              py-3
+              text-grey-800
+              font-semibold
+              bg-white
+              hover:bg-grey-50
+              border border-grey-100
+              rounded
+              focus:outline-none
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
+import Modal from './../components/Modal.vue'
 import { roundArrow } from 'tippy.js'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/dist/tippy.css'
@@ -174,10 +241,16 @@ export default {
       required: true,
     },
   },
+  components: {
+    Modal,
+  },
   data() {
     return {
       search: '',
       errors: {},
+      deleteFailedDeliveryLoading: false,
+      deleteFailedDeliveryModalOpen: false,
+      failedDeliveryIdToDelete: null,
       columns: [
         {
           label: 'Created',
@@ -220,6 +293,11 @@ export default {
           sortable: false,
         },
         {
+          label: 'First Attempted',
+          field: 'attempted_at',
+          globalSearchDisabled: true,
+        },
+        {
           label: '',
           field: 'actions',
           sortable: false,
@@ -244,6 +322,30 @@ export default {
     debounceToolips: _.debounce(function () {
       this.addTooltips()
     }, 50),
+    openDeleteModal(id) {
+      this.deleteFailedDeliveryModalOpen = true
+      this.failedDeliveryIdToDelete = id
+    },
+    closeDeleteModal() {
+      this.deleteFailedDeliveryModalOpen = false
+      this.failedDeliveryIdToDelete = null
+    },
+    deleteFailedDelivery(id) {
+      this.deleteFailedDeliveryLoading = true
+
+      axios
+        .delete(`/api/v1/failed-deliveries/${id}`)
+        .then(response => {
+          this.rows = _.reject(this.rows, delivery => delivery.id === id)
+          this.deleteFailedDeliveryModalOpen = false
+          this.deleteFailedDeliveryLoading = false
+        })
+        .catch(error => {
+          this.error()
+          this.deleteFailedDeliveryLoading = false
+          this.deleteFailedDeliveryModalOpen = false
+        })
+    },
     clipboardSuccess() {
       this.success('Copied to clipboard')
     },

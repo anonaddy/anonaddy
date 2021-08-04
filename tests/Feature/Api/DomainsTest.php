@@ -26,7 +26,7 @@ class DomainsTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/domains');
+        $response = $this->json('GET', '/api/v1/domains');
 
         // Assert
         $response->assertSuccessful();
@@ -42,7 +42,7 @@ class DomainsTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/api/v1/domains/'.$domain->id);
+        $response = $this->json('GET', '/api/v1/domains/'.$domain->id);
 
         // Assert
         $response->assertSuccessful();
