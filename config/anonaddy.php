@@ -127,11 +127,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value is an integer that determines the number of new aliases
-    | a user can create each hour, the default value is 10 aliases per hour
+    | a user can create each hour, the default value is 100 aliases per hour
     |
     */
 
-    'new_alias_hourly_limit' => env('ANONADDY_NEW_ALIAS_LIMIT', 10),
+    'new_alias_hourly_limit' => env('ANONADDY_NEW_ALIAS_LIMIT', 100),
 
     /*
     |--------------------------------------------------------------------------
@@ -139,11 +139,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value is an integer that determines the number of additional
-    | usernames a user can add to their account, the default value is 3
+    | usernames a user can add to their account, the default value is 10
     |
     */
 
-    'additional_username_limit' => env('ANONADDY_ADDITIONAL_USERNAME_LIMIT', 3),
+    'additional_username_limit' => env('ANONADDY_ADDITIONAL_USERNAME_LIMIT', 10),
 
     /*
     |--------------------------------------------------------------------------

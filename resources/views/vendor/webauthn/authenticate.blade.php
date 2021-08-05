@@ -24,7 +24,7 @@
                     </h3>
 
                     <p class="my-4 text-center">
-                        <img src="https://ssl.gstatic.com/accounts/strongauth/Challenge_2SV-Gnubby_graphic.png" alt=""/>
+                        <img src="/webauthn.png" alt="security key"/>
                     </p>
 
                     <p>

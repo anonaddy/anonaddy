@@ -19,6 +19,7 @@ class EmailData
         $this->attachments = [];
         $this->size = $size;
         $this->messageId = base64_encode($parser->getHeader('Message-ID'));
+        $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
 

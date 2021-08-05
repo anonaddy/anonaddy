@@ -42,6 +42,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $fromEmail;
     protected $size;
     protected $messageId;
+    protected $listUnsubscribe;
     protected $inReplyTo;
     protected $references;
 
@@ -64,6 +65,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->size = $emailData->size;
         $this->messageId = $emailData->messageId;
+        $this->listUnsubscribe = $emailData->listUnsubscribe;
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
@@ -129,9 +131,6 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 'text' => base64_decode($this->emailText)
             ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
-                $message->getHeaders()
-                        ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>');
-
                 $message->setReturnPath($returnPath);
 
                 // This header is used to set the To: header as the alias just before sending.
@@ -147,6 +146,14 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 } else {
                     $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
                 }
+
+                if ($this->listUnsubscribe) {
+                    $message->getHeaders()
+                            ->addTextHeader('List-Unsubscribe', base64_decode($this->listUnsubscribe));
+                }
+
+                /* $message->getHeaders()
+                        ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>'); */
 
                 if ($this->inReplyTo) {
                     $message->getHeaders()

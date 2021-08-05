@@ -39,11 +39,11 @@ Vue.component(
 Vue.component('webauthn-keys', require('./components/WebauthnKeys.vue').default)
 
 Vue.filter('formatDate', value => {
-  return dayjs.utc(value).format('Do MMM YYYY')
+  return dayjs.utc(value).local().format('Do MMM YYYY')
 })
 
 Vue.filter('formatDateTime', value => {
-  return dayjs.utc(value).format('Do MMM YYYY h:mm A')
+  return dayjs.utc(value).local().format('Do MMM YYYY h:mm A')
 })
 
 Vue.filter('timeAgo', value => {
