@@ -205,6 +205,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'location' => $this->bannerLocation,
             'deactivateUrl' => $this->deactivateUrl,
             'aliasEmail' => $this->alias->email,
+            'aliasDescription' => $this->alias->description,
             'fromEmail' => $this->sender,
             'replacedSubject' => $this->replacedSubject,
             'shouldBlock' => $this->size === 0

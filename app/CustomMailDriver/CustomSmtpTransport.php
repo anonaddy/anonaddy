@@ -106,7 +106,7 @@ class CustomSmtpTransport extends Swift_Transport_EsmtpTransport
         $message->generateId(); //Make sure a new Message ID is used
 
         try {
-            // Get Postfix Queue ID and store in Redis for 6 hours?
+            // Get Postfix Queue ID and store in the database
             $id = str_replace("\r\n", "", Str::after($logger->dump(), 'Ok: queued as '));
 
             PostfixQueueId::create([

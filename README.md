@@ -128,7 +128,7 @@ Here are a few reasons I can think of:
 * Bring your own GPG/OpenPGP key to encrypt your forwarded emails (and the option to replace subjects)
 * No adverts
 * No analytics or trackers (just server access logs)
-* No third party content (excluding stripe.js on the subscription page)
+* No third party content
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth

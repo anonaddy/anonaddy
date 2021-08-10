@@ -316,7 +316,7 @@ class ReceiveEmail extends Command
             }
 
             // Try to find a user from the bounced email address
-            if ($recipient = Recipient::select(['id', 'email'])->get()->firstWhere('email', $bouncedEmailAddress)) {
+            if ($recipient = Recipient::select(['id', 'user_id', 'email', 'email_verified_at'])->get()->firstWhere('email', $bouncedEmailAddress)) {
                 if (!isset($user)) {
                     $user = $recipient->user;
                 }
