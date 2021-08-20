@@ -1396,26 +1396,41 @@ CAA @ 0 iodef "mailto:caapolicy@example.com"
 
 ## Updating
 
-Before updating, please check the release notes on [GitHub](https://github.com/anonaddy/anonaddy/releases) for any breaking changes.
+Before updating, **please check the release notes** on [GitHub](https://github.com/anonaddy/anonaddy/releases) for any **breaking changes**.
 
-In order to update you can run the following commands:
+To update to the latest version run the following commands:
 
 ```bash
-git fetch
-git pull origin release
+# Fetch the tags from the remote repository
+git fetch --tags
 
+# Set a variable with the latest tag (release version)
+tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+
+# You can check the version by typing:
+echo $tag
+
+# Checkout the latest release, note: if you have made any local changes they will be overwritten by this command
+git checkout --force $tag -b $tag
+
+# Install dependencies
 composer install --prefer-dist --no-dev -o
-npm update
+npm install
+
+# Compile assets
 npm run production
+
+# Run any database migrations
 php artisan migrate
 
+# Clear cache
 php artisan config:cache
 php artisan view:cache
 php artisan route:cache
+
+# Restart queue workers to reflect changes
 php artisan queue:restart
 ```
-
-This should pull in any updates from the GitHub repository and update your dependencies. It will then run any migrations before finally clearing the cache and restarting the queue workers.
 
 ## Credits
 
