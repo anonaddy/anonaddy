@@ -7,6 +7,7 @@ use App\Helpers\OpenPGPSigner;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\Recipient;
+use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\GpgKeyExpired;
 use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
@@ -45,6 +46,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $listUnsubscribe;
     protected $inReplyTo;
     protected $references;
+    protected $recipientId;
 
     /**
      * Create a new message instance.
@@ -69,6 +71,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
+        $this->recipientId = $recipient->id;
 
         $fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
 
@@ -133,6 +136,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->setReturnPath($returnPath);
 
+                $message->getHeaders()
+                        ->addTextHeader('Feedback-ID', 'F:' . $this->alias->id . ':anonaddy');
+
                 // This header is used to set the To: header as the alias just before sending.
                 $message->getHeaders()
                         ->addTextHeader('Alias-To', $this->alias->email);
@@ -151,9 +157,6 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                     $message->getHeaders()
                             ->addTextHeader('List-Unsubscribe', base64_decode($this->listUnsubscribe));
                 }
-
-                /* $message->getHeaders()
-                        ->addTextHeader('List-Unsubscribe', '<mailto:' . $this->alias->id . '@unsubscribe.' . config('anonaddy.domain') . '?subject=unsubscribe>, <' . $this->deactivateUrl . '>'); */
 
                 if ($this->inReplyTo) {
                     $message->getHeaders()
@@ -223,6 +226,32 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         }
 
         return $this->email;
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    public function failed()
+    {
+        // Send user failed delivery notification, add to failed deliveries table
+        $recipient = Recipient::find($this->recipientId);
+
+        $recipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject)));
+
+        $this->user->failedDeliveries()->create([
+            'recipient_id' => $this->recipientId,
+            'alias_id' => $this->alias->id,
+            'bounce_type' => null,
+            'remote_mta' => null,
+            'sender' => $this->sender,
+            'email_type' => 'F',
+            'status' => null,
+            'code' => 'An error has occurred, please check the logs.',
+            'attempted_at' => now()
+        ]);
     }
 
     private function isAlreadyEncrypted()

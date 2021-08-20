@@ -2,11 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Helpers\OpenPGPSigner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Swift_SwiftException;
 
 class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
@@ -45,6 +47,24 @@ class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEn
      */
     public function toMail($notifiable)
     {
+        $openpgpsigner = null;
+        $recipient = $notifiable->defaultRecipient;
+        $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
+
+        if ($fingerprint) {
+            try {
+                $openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
+                $openpgpsigner->addRecipient($fingerprint);
+            } catch (Swift_SwiftException $e) {
+                info($e->getMessage());
+                $openpgpsigner = null;
+
+                $recipient->update(['should_encrypt' => false]);
+
+                $recipient->notify(new GpgKeyExpired);
+            }
+        }
+
         return (new MailMessage)
         ->subject("You're close to your bandwidth limit for ".$this->month)
         ->markdown('mail.near_bandwidth_limit', [
@@ -52,7 +72,15 @@ class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEn
             'bandwidthLimit' => $notifiable->getBandwidthLimitMb(),
             'month' => $this->month,
             'reset' => $this->reset
-        ]);
+        ])
+        ->withSwiftMessage(function ($message) use ($openpgpsigner) {
+            $message->getHeaders()
+                    ->addTextHeader('Feedback-ID', 'NBL:anonaddy');
+
+            if ($openpgpsigner) {
+                $message->attachSigner($openpgpsigner);
+            }
+        });
     }
 
     /**

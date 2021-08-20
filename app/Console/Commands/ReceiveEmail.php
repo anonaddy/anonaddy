@@ -12,6 +12,7 @@ use App\Models\EmailData;
 use App\Models\PostfixQueueId;
 use App\Models\Recipient;
 use App\Models\User;
+use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -331,6 +332,33 @@ class ReceiveEmail extends Command
 
             if ($undeliveredMessage) {
                 $undeliveredMessageHeaders = $this->parseDeliveryStatus($undeliveredMessage->getMimePartStr());
+
+                if (isset($undeliveredMessageHeaders['Feedback-id'])) {
+                    $parts = explode(':', $undeliveredMessageHeaders['Feedback-id']);
+
+                    if (in_array($parts[0], ['F', 'R', 'S']) && !isset($alias)) {
+                        $alias = Alias::find($parts[1]);
+
+                        // Find the user from the alias if we don't have it from the recipient
+                        if (!isset($user) && isset($alias)) {
+                            $user = $alias->user;
+                        }
+                    }
+
+                    // Check if failed delivery notification or Alias deactivated notification and if so do not notify the user again
+                    if (! in_array($parts[0], ['FDN'])) {
+                        if (isset($recipient)) {
+                            // Notify recipient of failed delivery, check that $recipient address is verified
+                            if ($recipient->email_verified_at) {
+                                $recipient->notify(new FailedDeliveryNotification($alias->email ?? null, $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null, $undeliveredMessageHeaders['Subject'] ?? null));
+                            }
+                        } elseif (in_array($parts[0], ['R', 'S']) && isset($user)) {
+                            if ($user->email_verified_at) {
+                                $user->defaultRecipient->notify(new FailedDeliveryNotification($alias->email ?? null, $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null, $undeliveredMessageHeaders['Subject'] ?? null));
+                            }
+                        }
+                    }
+                }
             }
 
             if (isset($user)) {

@@ -6,6 +6,7 @@ use App\Helpers\AlreadyEncryptedSigner;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\User;
+use App\Notifications\FailedDeliveryNotification;
 use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -89,6 +90,9 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->setReturnPath($returnPath);
 
+                $message->getHeaders()
+                        ->addTextHeader('Feedback-ID', 'R:' . $this->alias->id . ':anonaddy');
+
                 // Message-ID is replaced on replies as it can leak parts of the real email
                 $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
@@ -145,5 +149,29 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         }
 
         return $this->email;
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @param  \Throwable  $exception
+     * @return void
+     */
+    public function failed()
+    {
+        // Send user failed delivery notification, add to failed deliveries table
+        $this->user->defaultRecipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject)));
+
+        $this->user->failedDeliveries()->create([
+            'recipient_id' => null,
+            'alias_id' => $this->alias->id,
+            'bounce_type' => null,
+            'remote_mta' => null,
+            'sender' => $this->sender,
+            'email_type' => 'R',
+            'status' => null,
+            'code' => 'An error has occurred, please check the logs.',
+            'attempted_at' => now()
+        ]);
     }
 }

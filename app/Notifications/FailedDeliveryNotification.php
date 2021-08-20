@@ -10,22 +10,24 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Swift_SwiftException;
 
-class DomainUnverifiedForSending extends Notification implements ShouldQueue, ShouldBeEncrypted
+class FailedDeliveryNotification extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
     use Queueable;
 
-    protected $domain;
-    protected $reason;
+    protected $aliasEmail;
+    protected $originalSender;
+    protected $originalSubject;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($domain, $reason)
+    public function __construct($aliasEmail, $originalSender, $originalSubject)
     {
-        $this->domain = $domain;
-        $this->reason = $reason;
+        $this->aliasEmail = $aliasEmail;
+        $this->originalSender = $originalSender;
+        $this->originalSubject = $originalSubject;
     }
 
     /**
@@ -48,8 +50,7 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
     public function toMail($notifiable)
     {
         $openpgpsigner = null;
-        $recipient = $notifiable->defaultRecipient;
-        $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
+        $fingerprint = $notifiable->should_encrypt ? $notifiable->fingerprint : null;
 
         if ($fingerprint) {
             try {
@@ -59,26 +60,27 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
                 info($e->getMessage());
                 $openpgpsigner = null;
 
-                $recipient->update(['should_encrypt' => false]);
+                $notifiable->update(['should_encrypt' => false]);
 
-                $recipient->notify(new GpgKeyExpired);
+                $notifiable->notify(new GpgKeyExpired);
             }
         }
 
         return (new MailMessage)
-            ->subject("Your domain has been unverified for sending on AnonAddy")
-            ->markdown('mail.domain_unverified_for_sending', [
-                'domain' => $this->domain,
-                'reason' => $this->reason
-            ])
-            ->withSwiftMessage(function ($message) use ($openpgpsigner) {
-                $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'DUS:anonaddy');
+                    ->subject("New failed delivery on AnonAddy")
+                    ->markdown('mail.failed_delivery_notification', [
+                        'aliasEmail' => $this->aliasEmail,
+                        'originalSender' => $this->originalSender,
+                        'originalSubject' => $this->originalSubject
+                    ])
+                    ->withSwiftMessage(function ($message) use ($openpgpsigner) {
+                        $message->getHeaders()
+                                ->addTextHeader('Feedback-ID', 'FDN:anonaddy');
 
-                if ($openpgpsigner) {
-                    $message->attachSigner($openpgpsigner);
-                }
-            });
+                        if ($openpgpsigner) {
+                            $message->attachSigner($openpgpsigner);
+                        }
+                    });
     }
 
     /**
