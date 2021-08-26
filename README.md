@@ -226,7 +226,7 @@ Please double check that you are indeed sending from a verified recipient email 
 
 ## I'm trying to reply/send from an alias but it is rejected, what's wrong?
 
-If you see the rejection message `5.7.1 Recipient address rejected: Access denied` then this means that the alias has been deleted, you must restore it before you can send/reply from it.
+If you see the rejection message `5.7.1 Recipient address rejected: Address does not exist` then this means that the alias has either been deleted or does not yet exist (and you do not have catch-all enabled), you must restore (or create) it before you can send/reply from it.
 
 If you see the rejection message `5.7.1 Rejected due to missing/failed DMARC policy...` then it is because your AnonAddy recipient's domain either does not have a DMARC policy or it has failed DMARC checks.
 
@@ -364,7 +364,7 @@ You can add 1 additional username as a Lite user and up to 3 additional username
 
 Please make sure to add mailer@anonaddy.me, mailer@anonaddy.com and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from AnonAddy as safe if they turn up in spam.
 
-If an alias has been previously deleted and you try to send email to it, the emails will be rejected with an error message - "554 5.7.1 Recipient address rejected: Access denied".
+If an alias has been previously deleted and you try to send email to it, the emails will be rejected with an error message - "554 5.7.1 Recipient address rejected: Address does not exist".
 
 Check that you have not deactivated the alias, custom domain or additional username. When any of these are deactivated, emails will be silently discarded, they will not be rejected or return any error message.
 
