@@ -799,6 +799,7 @@ export default {
             this.closeCheckRecordsModal()
             this.success(data.message)
             domain.domain_sending_verified_at = data.data.domain_sending_verified_at
+            domain.domain_mx_validated_at = data.data.domain_mx_validated_at
           } else {
             this.warn(data.message)
           }

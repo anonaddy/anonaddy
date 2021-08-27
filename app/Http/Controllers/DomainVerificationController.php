@@ -6,7 +6,7 @@ class DomainVerificationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('throttle:1,1');
+        $this->middleware('throttle:6,1');
     }
 
     public function checkSending($id)

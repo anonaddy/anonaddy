@@ -45,6 +45,7 @@ This is the source code for self-hosting AnonAddy.
 - [What happens if I go over my bandwidth limit in a given month?](#what-happens-if-i-go-over-my-bandwidth-limit-in-a-given-month)
 - [Can I login using an additional username?](#can-i-login-using-an-additional-username)
 - [I'm not receiving any emails, what's wrong?](#im-not-receiving-any-emails-whats-wrong)
+- [I'm having trouble logging in, what's wrong?](#im-having-trouble-logging-in-whats-wrong)
 - [How do I know this site won't disappear next month?](#how-do-i-know-this-site-wont-disappear-next-month)
 - [What happens to AnonAddy if you die?](#what-happens-to-anonaddy-if-you-die)
 - [Is the application tested?](#is-the-appliction-tested)
@@ -388,6 +389,30 @@ I will also soon be adding an option to change the format of the display from pa
 If neither of the above options work then please try changing to another recipient so that you can continue to receive emails.
 
 If you still aren't receiving emails please contact me.
+
+## I'm having trouble logging in, what's wrong?
+
+If you are having trouble logging in it will likely fall under one of the following scenarios:
+
+1. Incorrect username
+
+Please make sure you are using your account username (e.g. johndoe) and not your email address to try to login.
+
+2. Forgotten password
+
+If you've forgotten your password you can reset it by entering your username here - https://app.anonaddy.com/password/reset
+
+3. Forgotten username
+
+If you've forgotten your username you can request a reminder by entering your email address here - https://app.anonaddy.com/username/reminder
+
+4. Lost 2FA device
+
+Please use the backup code that you were shown when you enabled 2FA.
+
+5. Errors with U2F device
+
+If you have a YubiKey and are using Windows and have an issue with your personal password/PIN you may need to reset the key using the YubiKey manager software.
 
 ## How do I know this site won't disappear next month?
 
