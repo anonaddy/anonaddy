@@ -1,10 +1,9 @@
 {
-    "name": "laravel/laravel",
+    "name": "anonaddy/anonaddy",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Anonymous email forwarding",
     "keywords": [
-        "framework",
-        "laravel"
+        "email"
     ],
     "license": "MIT",
     "require": {
