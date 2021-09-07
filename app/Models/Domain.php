@@ -237,7 +237,7 @@ class Domain extends Model
 
         $spf = collect(dns_get_record($this->domain . '.', DNS_TXT))
             ->contains(function ($r) {
-                return preg_match("/^(v=spf1).*(include:spf\." . config('anonaddy.domain') . ").*(-|~)all$/", $r['txt']);
+                return preg_match("/^(v=spf1).*(include:spf\." . config('anonaddy.domain') . "|mx).*(-|~)all$/", $r['txt']);
             });
 
         if (!$spf) {

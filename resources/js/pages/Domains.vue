@@ -430,7 +430,7 @@
           <div class="table-row">
             <div class="table-cell py-2">TXT</div>
             <div class="table-cell py-2 px-4">@</div>
-            <div class="table-cell py-2 break-words">v=spf1 include:spf.{{ domainName }} -all</div>
+            <div class="table-cell py-2 break-words">v=spf1 mx -all</div>
           </div>
           <div class="table-row">
             <div class="table-cell py-2">CNAME</div>
