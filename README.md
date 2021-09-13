@@ -462,7 +462,7 @@ For full details please see the [self-hosting instructions file](SELF-HOSTING.md
 
 ## My sponsors
 
-Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev) who is my very first GitHub sponsor!
+Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev) and [Patrick Dobler](https://github.com/patrickdobler) for supporting me by sponsoring the project on GitHub!
 
 ## Thanks
 
