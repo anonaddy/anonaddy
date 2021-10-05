@@ -39,7 +39,7 @@ class ForgotUsernameController extends Controller
     {
         $this->validateEmail($request);
 
-        $recipient = Recipient::select(['id', 'email', 'email_verified_at'])->whereNotNull('email_verified_at')->get()->firstWhere('email', $request->email);
+        $recipient = Recipient::select(['id', 'email', 'email_verified_at'])->whereNotNull('email_verified_at')->get()->firstWhere('email', strtolower($request->email));
 
         if (isset($recipient)) {
             $recipient->sendUsernameReminderNotification();

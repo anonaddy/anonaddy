@@ -67,7 +67,14 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
                 if (config('anonaddy.dkim_signing_key')) {
                     $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
+                    $this->dkimSigner->ignoreHeader('List-Unsubscribe');
                     $this->dkimSigner->ignoreHeader('Return-Path');
+                    $this->dkimSigner->ignoreHeader('Feedback-ID');
+                    $this->dkimSigner->ignoreHeader('Content-Type');
+                    $this->dkimSigner->ignoreHeader('Content-Description');
+                    $this->dkimSigner->ignoreHeader('Content-Disposition');
+                    $this->dkimSigner->ignoreHeader('Content-Transfer-Encoding');
+                    $this->dkimSigner->ignoreHeader('MIME-Version');
                 }
             } else {
                 $this->fromEmail = config('mail.from.address');
