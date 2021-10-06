@@ -6,10 +6,11 @@ use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
@@ -110,7 +111,7 @@ class ShowRecipientsTest extends TestCase
 
         Notification::assertSentTo(
             $recipient,
-            VerifyEmail::class
+            CustomVerifyEmail::class
         );
     }
 
@@ -129,7 +130,7 @@ class ShowRecipientsTest extends TestCase
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $recipient->getKey(),
-                'hash' => sha1($recipient->getEmailForVerification()),
+                'hash' => base64_encode(Hash::make($recipient->getEmailForVerification())),
             ]
         );
 
@@ -162,7 +163,7 @@ class ShowRecipientsTest extends TestCase
 
         Notification::assertSentTo(
             $recipient,
-            VerifyEmail::class
+            CustomVerifyEmail::class
         );
 
         $response2 = $this->json('POST', '/recipients/email/resend', [

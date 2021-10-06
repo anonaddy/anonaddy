@@ -6,10 +6,11 @@ use App\Models\AdditionalUsername;
 use App\Models\DeletedUsername;
 use App\Models\Recipient;
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
@@ -43,7 +44,7 @@ class RegistrationTest extends TestCase
 
         Notification::assertSentTo(
             $user,
-            VerifyEmail::class
+            CustomVerifyEmail::class
         );
     }
 
@@ -79,7 +80,7 @@ class RegistrationTest extends TestCase
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $user->getKey(),
-                'hash' => sha1($user->getEmailForVerification()),
+                'hash' => base64_encode(Hash::make($user->getEmailForVerification())),
             ]
         );
 

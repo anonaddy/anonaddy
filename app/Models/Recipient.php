@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomVerifyEmail;
 use App\Notifications\UsernameReminder;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -138,7 +138,7 @@ class Recipient extends Model
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new VerifyEmail);
+        $this->notify(new CustomVerifyEmail);
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class VerificationController extends Controller
 {
@@ -64,7 +65,7 @@ class VerificationController extends Controller
             throw new AuthorizationException;
         }
 
-        if (! hash_equals((string) $request->route('hash'), sha1($verifiable->getEmailForVerification()))) {
+        if (! Hash::check($verifiable->getEmailForVerification(), (string) base64_decode($request->route('hash')))) {
             throw new AuthorizationException;
         }
 
