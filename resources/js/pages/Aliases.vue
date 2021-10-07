@@ -1191,6 +1191,27 @@
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
           </div>
+          <a
+            :href="'mailto:' + sendFromAliasEmailToSendTo"
+            class="
+              flex
+              items-center
+              justify-between
+              cursor-pointer
+              text-sm
+              border-t-4
+              rounded-sm
+              text-green-800
+              border-green-600
+              bg-green-100
+              p-2
+              mb-4
+            "
+            role="alert"
+            title="Click To Open Mail Application"
+          >
+            Click to open mail application
+          </a>
         </div>
         <div class="mt-6">
           <button
