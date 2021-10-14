@@ -133,7 +133,7 @@
                 py-1
               "
               :class="
-                usernameDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
+                usernameDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'
               "
               placeholder="Add description"
               tabindex="0"
@@ -617,8 +617,8 @@ export default {
       this.defaultRecipient = {}
     },
     editUsername(username) {
-      if (this.usernameDescriptionToEdit.length > 100) {
-        return this.error('Description cannot be more than 100 characters')
+      if (this.usernameDescriptionToEdit.length > 200) {
+        return this.error('Description cannot be more than 200 characters')
       }
 
       axios

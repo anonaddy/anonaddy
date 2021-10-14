@@ -32,7 +32,7 @@ class StoreAliasRequest extends FormRequest
                 'string',
                 Rule::in($this->user()->domainOptions())
             ],
-            'description' => 'nullable|max:100',
+            'description' => 'nullable|max:200',
             'format' => 'nullable|in:random_characters,uuid,random_words,custom',
             'recipient_ids' => [
                 'nullable',

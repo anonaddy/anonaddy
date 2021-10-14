@@ -248,7 +248,7 @@
 
                     <p class="mt-6">This will determine if forwarded emails use the From header or the Reply-To header for sending replies. Some users may find it easier to set up inbox filters having the From: header set as just the alias.
                     </p>
-                    <p class="mt-4">If enabled, then the <b>From:</b> header will be set as the alias email e.g. <b>alias{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}</b> instead of the default <b>alias+sender=example.com{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}</b> (this will be set as the Reply-To header instead)</p>
+                    <p class="mt-4">If enabled, then the <b>From:</b> header will be set as the alias email e.g. <b>alias{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}</b> instead of the default <b class="break-words">alias+sender=example.com{{ '@'.$user->username }}.{{ config('anonaddy.domain') }}</b> (this will be set as the Reply-To header instead)</p>
 
                     <div class="mt-6 flex flex-wrap mb-4">
                         <label for="use_reply_to" class="block text-grey-700 text-sm mb-2">

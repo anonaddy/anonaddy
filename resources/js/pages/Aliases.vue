@@ -368,7 +368,7 @@
                 px-2
                 py-1
               "
-              :class="aliasDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'"
+              :class="aliasDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'"
               placeholder="Add description"
               tabindex="0"
               autofocus
@@ -1625,8 +1625,8 @@ export default {
         return (this.errors.generateAliasLocalPart = 'Valid local part required')
       }
 
-      if (this.generateAliasDescription.length > 100) {
-        return (this.errors.generateAliasDescription = 'Description cannot exceed 100 characters')
+      if (this.generateAliasDescription.length > 200) {
+        return (this.errors.generateAliasDescription = 'Description cannot exceed 200 characters')
       }
 
       this.generateAliasLoading = true
@@ -1664,8 +1664,8 @@ export default {
         })
     },
     editAlias(alias) {
-      if (this.aliasDescriptionToEdit.length > 100) {
-        return this.error('Description cannot be more than 100 characters')
+      if (this.aliasDescriptionToEdit.length > 200) {
+        return this.error('Description cannot be more than 200 characters')
       }
 
       axios

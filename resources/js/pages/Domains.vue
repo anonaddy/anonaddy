@@ -133,7 +133,7 @@
                 py-1
               "
               :class="
-                domainDescriptionToEdit.length > 100 ? 'border-red-500' : 'border-transparent'
+                domainDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'
               "
               placeholder="Add description"
               tabindex="0"
@@ -840,8 +840,8 @@ export default {
       this.addDomainModalOpen = false
     },
     editDomain(domain) {
-      if (this.domainDescriptionToEdit.length > 100) {
-        return this.error('Description cannot be more than 100 characters')
+      if (this.domainDescriptionToEdit.length > 200) {
+        return this.error('Description cannot be more than 200 characters')
       }
 
       axios

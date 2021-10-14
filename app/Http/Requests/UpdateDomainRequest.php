@@ -24,7 +24,7 @@ class UpdateDomainRequest extends FormRequest
     public function rules()
     {
         return [
-            'description' => 'nullable|max:100'
+            'description' => 'nullable|max:200'
         ];
     }
 }
