@@ -533,7 +533,7 @@
             </div>
             <div v-else role="none">
               <span
-                @click="openDeleteModal(props.row.id)"
+                @click="openDeleteModal(props.row)"
                 class="
                   group
                   cursor-pointer
@@ -555,7 +555,7 @@
             </div>
             <div role="none">
               <span
-                @click="openForgetModal(props.row.id)"
+                @click="openForgetModal(props.row)"
                 class="
                   group
                   cursor-pointer
@@ -981,13 +981,15 @@
           Delete alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to delete this alias? <b>You can restore this alias</b> if you later
-          change your mind. Once deleted, this alias will <b>reject any emails sent to it</b>.
+          Are you sure you want to delete <b class="break-words">{{ aliasToDelete.email }}</b
+          >? You can restore it if you later change your mind. Once deleted,
+          <b class="break-words">{{ aliasToDelete.email }}</b> will
+          <b>reject any emails sent to it</b>.
         </p>
         <div class="mt-6">
           <button
             type="button"
-            @click="deleteAlias(aliasIdToDelete)"
+            @click="deleteAlias(aliasToDelete.id)"
             class="
               px-4
               py-3
@@ -1034,8 +1036,8 @@
           Forget alias
         </h2>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to forget this alias? Forgetting an alias will disassociate it from
-          your account.
+          Are you sure you want to forget <b class="break-words">{{ aliasToForget.email }}</b
+          >? Forgetting an alias will disassociate it from your account.
         </p>
         <p class="mt-4 text-grey-700">
           <b>Note:</b> If this alias uses a shared domain then it can <b>never be restored</b> or
@@ -1045,7 +1047,7 @@
         <div class="mt-6">
           <button
             type="button"
-            @click="forgetAlias(aliasIdToForget)"
+            @click="forgetAlias(aliasToForget.id)"
             class="
               px-4
               py-3
@@ -1334,8 +1336,8 @@ export default {
       showAliases: 'without',
       aliasIdToEdit: '',
       aliasDescriptionToEdit: '',
-      aliasIdToDelete: '',
-      aliasIdToForget: '',
+      aliasToDelete: {},
+      aliasToForget: {},
       aliasToSendFrom: {},
       sendFromAliasDestination: '',
       sendFromAliasEmailToSendTo: '',
@@ -1474,21 +1476,21 @@ export default {
     recipientsTooltip(recipients) {
       return _.reduce(recipients, (list, recipient) => list + `${recipient.email}<br>`, '')
     },
-    openDeleteModal(id) {
+    openDeleteModal(alias) {
       this.deleteAliasModalOpen = true
-      this.aliasIdToDelete = id
+      this.aliasToDelete = alias
     },
     closeDeleteModal() {
       this.deleteAliasModalOpen = false
-      this.aliasIdToDelete = ''
+      this.aliasToDelete = {}
     },
-    openForgetModal(id) {
+    openForgetModal(alias) {
       this.forgetAliasModalOpen = true
-      this.aliasIdToForget = id
+      this.aliasToForget = alias
     },
     closeForgetModal() {
       this.forgetAliasModalOpen = false
-      this.aliasIdToForget = ''
+      this.aliasToForget = {}
     },
     openSendFromModal(alias) {
       this.sendFromAliasDestination = ''
