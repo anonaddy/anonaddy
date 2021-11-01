@@ -91,9 +91,6 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->email =  $this
             ->from($this->fromEmail, $this->displayFrom)
             ->subject(base64_decode($this->emailSubject))
-            ->text('emails.reply.text')->with([
-                'text' => str_ireplace($this->sender, '', base64_decode($this->emailText))
-            ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->setReturnPath($returnPath);
 
@@ -123,6 +120,12 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                     $message->attachSigner($this->dkimSigner);
                 }
             });
+
+        if ($this->emailText) {
+            $this->email->text('emails.reply.text')->with([
+                'text' => str_ireplace($this->sender, '', base64_decode($this->emailText))
+            ]);
+        }
 
         if ($this->emailHtml) {
             $this->email->view('emails.reply.html')->with([

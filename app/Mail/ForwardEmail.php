@@ -136,9 +136,6 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->email =  $this
             ->from($this->fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
-            ->text('emails.forward.text')->with([
-                'text' => base64_decode($this->emailText)
-            ])
             ->withSwiftMessage(function ($message) use ($returnPath) {
                 $message->setReturnPath($returnPath);
 
@@ -191,6 +188,12 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                     $message->attachSigner($this->dkimSigner);
                 }
             });
+
+        if ($this->emailText) {
+            $this->email->text('emails.forward.text')->with([
+                'text' => base64_decode($this->emailText)
+            ]);
+        }
 
         if ($this->emailHtml) {
             $this->email->view('emails.forward.html')->with([
