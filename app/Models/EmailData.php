@@ -17,6 +17,7 @@ class EmailData
         $this->text = base64_encode($parser->getMessageBody('text'));
         $this->html = base64_encode($parser->getMessageBody('html'));
         $this->attachments = [];
+        $this->inlineAttachments = [];
         $this->size = $size;
         $this->messageId = base64_encode($parser->getHeader('Message-ID'));
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
@@ -27,11 +28,21 @@ class EmailData
             $this->encryptedParts = $parser->getAttachments();
         } else {
             foreach ($parser->getAttachments() as $attachment) {
-                $this->attachments[] = [
-                  'stream' => base64_encode(stream_get_contents($attachment->getStream())),
-                  'file_name' => base64_encode($attachment->getFileName()),
-                  'mime' => base64_encode($attachment->getContentType())
-              ];
+                if ($attachment->getContentDisposition() === 'inline') {
+                    $this->inlineAttachments[] = [
+                        'stream' => base64_encode(stream_get_contents($attachment->getStream())),
+                        'file_name' => base64_encode($attachment->getFileName()),
+                        'mime' => base64_encode($attachment->getContentType()),
+                        'contentDisposition' => base64_encode($attachment->getContentDisposition()),
+                        'contentId' => base64_encode($attachment->getContentID()),
+                    ];
+                } else {
+                    $this->attachments[] = [
+                      'stream' => base64_encode(stream_get_contents($attachment->getStream())),
+                      'file_name' => base64_encode($attachment->getFileName()),
+                      'mime' => base64_encode($attachment->getContentType())
+                  ];
+                }
             }
         }
     }

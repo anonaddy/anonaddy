@@ -17,6 +17,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Swift_Image;
 use Swift_Signers_DKIMSigner;
 use Swift_SwiftException;
 
@@ -34,6 +35,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $emailText;
     protected $emailHtml;
     protected $emailAttachments;
+    protected $emailInlineAttachments;
     protected $deactivateUrl;
     protected $bannerLocation;
     protected $fingerprint;
@@ -64,6 +66,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
+        $this->emailInlineAttachments = $emailData->inlineAttachments;
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
         $this->size = $emailData->size;
         $this->messageId = $emailData->messageId;
@@ -187,6 +190,21 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 if ($this->dkimSigner) {
                     $message->attachSigner($this->dkimSigner);
                 }
+
+                if ($this->emailInlineAttachments) {
+                    foreach ($this->emailInlineAttachments as $attachment) {
+                        $image = new Swift_Image(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+
+                        $cids[] = 'cid:' . base64_decode($attachment['contentId']);
+                        $newCids[] = $message->embed($image);
+                    }
+
+                    $message->getHeaders()
+                            ->addTextHeader('X-Old-Cids', implode(',', $cids));
+
+                    $message->getHeaders()
+                            ->addTextHeader('X-New-Cids', implode(',', $newCids));
+                }
             });
 
         if ($this->emailText) {
@@ -198,6 +216,13 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         if ($this->emailHtml) {
             $this->email->view('emails.forward.html')->with([
                 'html' => base64_decode($this->emailHtml)
+            ]);
+        }
+
+        // To prevent invalid view error where no text or html is present...
+        if (! $this->emailHtml && ! $this->emailText) {
+            $this->email->text('emails.forward.text')->with([
+                'text' => base64_decode($this->emailText)
             ]);
         }
 

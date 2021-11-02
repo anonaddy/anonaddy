@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Swift_Image;
 use Swift_Signers_DKIMSigner;
 
 class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
@@ -27,6 +28,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $emailText;
     protected $emailHtml;
     protected $emailAttachments;
+    protected $emailInlineAttachments;
     protected $dkimSigner;
     protected $encryptedParts;
     protected $displayFrom;
@@ -49,6 +51,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
         $this->emailAttachments = $emailData->attachments;
+        $this->emailInlineAttachments = $emailData->inlineAttachments;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
         $this->displayFrom = $user->from_name ?? null;
         $this->size = $emailData->size;
@@ -119,6 +122,21 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 if ($this->dkimSigner) {
                     $message->attachSigner($this->dkimSigner);
                 }
+
+                if ($this->emailInlineAttachments) {
+                    foreach ($this->emailInlineAttachments as $attachment) {
+                        $image = new Swift_Image(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+
+                        $cids[] = 'cid:' . base64_decode($attachment['contentId']);
+                        $newCids[] = $message->embed($image);
+                    }
+
+                    $message->getHeaders()
+                            ->addTextHeader('X-Old-Cids', implode(',', $cids));
+
+                    $message->getHeaders()
+                            ->addTextHeader('X-New-Cids', implode(',', $newCids));
+                }
             });
 
         if ($this->emailText) {
@@ -130,6 +148,13 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         if ($this->emailHtml) {
             $this->email->view('emails.reply.html')->with([
                 'html' => str_ireplace($this->sender, '', base64_decode($this->emailHtml))
+            ]);
+        }
+
+        // To prevent invalid view error where no text or html is present...
+        if (! $this->emailHtml && ! $this->emailText) {
+            $this->email->text('emails.forward.text')->with([
+                'text' => base64_decode($this->emailText)
             ]);
         }
 

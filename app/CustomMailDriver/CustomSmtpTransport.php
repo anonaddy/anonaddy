@@ -84,6 +84,19 @@ class CustomSmtpTransport extends Swift_Transport_EsmtpTransport
             $message->getHeaders()->remove('Alias-To');
         }
 
+        // Update Content IDs for inline image attachments
+        if ($oldCids = $message->getHeaders()->get('X-Old-Cids')) {
+            $oldCidsArray = explode(',', $oldCids->getFieldBodyModel());
+
+            $newCids = $message->getHeaders()->get('X-New-Cids');
+            $newCidsArray = explode(',', $newCids->getFieldBodyModel());
+
+            $message->getHeaders()->remove('X-Old-Cids');
+            $message->getHeaders()->remove('X-New-Cids');
+
+            $message->setBody(str_replace($oldCidsArray, $newCidsArray, $message->getBody()));
+        }
+
         try {
             $sent += $this->sendTo($message, $reversePath, $tos, $failedRecipients);
             $sent += $this->sendBcc($message, $reversePath, $bcc, $failedRecipients);
