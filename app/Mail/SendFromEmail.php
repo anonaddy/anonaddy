@@ -139,7 +139,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         // To prevent invalid view error where no text or html is present...
         if (! $this->emailHtml && ! $this->emailText) {
-            $this->email->text('emails.forward.text')->with([
+            $this->email->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText)
             ]);
         }
