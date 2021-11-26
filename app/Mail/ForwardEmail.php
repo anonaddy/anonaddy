@@ -29,6 +29,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $user;
     protected $alias;
     protected $sender;
+    protected $originalCc;
+    protected $originalTo;
     protected $displayFrom;
     protected $replyToAddress;
     protected $emailSubject;
@@ -60,6 +62,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->user = $alias->user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
+        $this->originalCc = $emailData->originalCc ?? null;
+        $this->originalTo = $emailData->originalTo ?? null;
         $this->displayFrom = $emailData->display_from;
         $this->replyToAddress = $emailData->reply_to_address ?? $this->sender;
         $this->emailSubject = $emailData->subject;
@@ -204,6 +208,16 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
                     $message->getHeaders()
                             ->addTextHeader('X-New-Cids', implode(',', $newCids));
+                }
+
+                if ($this->originalCc) {
+                    $message->getHeaders()
+                            ->addTextHeader('X-AnonAddy-Original-Cc', $this->originalCc);
+                }
+
+                if ($this->originalTo) {
+                    $message->getHeaders()
+                            ->addTextHeader('X-AnonAddy-Original-To', $this->originalTo);
                 }
             });
 

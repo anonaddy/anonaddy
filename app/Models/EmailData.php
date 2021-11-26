@@ -13,6 +13,15 @@ class EmailData
         if (isset($parser->getAddresses('reply-to')[0])) {
             $this->reply_to_address = $parser->getAddresses('reply-to')[0]['address'];
         }
+
+        if ($originalCc = $parser->getHeader('cc')) {
+            $this->originalCc = $originalCc;
+        }
+
+        if ($originalTo = $parser->getHeader('to')) {
+            $this->originalTo = $originalTo;
+        }
+
         $this->subject = base64_encode($parser->getHeader('subject'));
         $this->text = base64_encode($parser->getMessageBody('text'));
         $this->html = base64_encode($parser->getMessageBody('html'));

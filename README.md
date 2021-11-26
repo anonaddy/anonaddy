@@ -243,7 +243,7 @@ To resolve this you simply need to add a DMARC record, for example:
 
 | Type | Host   | Value                       |
 |:-----|:-------|:----------------------------|
-| TXT  | _dmarc | "v=DMARC1; p=none; adkim=s" |
+| TXT  | _dmarc | "v=DMARC1; p=quarantine; adkim=s" |
 
 
 You should also have SPF and DKIM records in place.
