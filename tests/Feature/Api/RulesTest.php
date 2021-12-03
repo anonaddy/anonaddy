@@ -91,7 +91,10 @@ class RulesTest extends TestCase
                     'value' => 'New Subject!'
                 ],
             ],
-            'operator' => 'AND'
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false
         ]);
 
         $response->assertStatus(201);
@@ -118,7 +121,10 @@ class RulesTest extends TestCase
                     'value' => 'New Subject!'
                 ],
             ],
-            'operator' => 'AND'
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false
         ]);
 
         $response->assertStatus(422);
@@ -149,7 +155,10 @@ class RulesTest extends TestCase
                     'value' => 'New Subject!'
                 ],
             ],
-            'operator' => 'OR'
+            'operator' => 'OR',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false
         ]);
 
         $response->assertStatus(200);
@@ -235,6 +244,9 @@ class RulesTest extends TestCase
                 ],
             ],
             'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false
         ]);
 
         $alias = Alias::factory()->create([
@@ -258,6 +270,66 @@ class RulesTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_apply_rules_if_email_type_is_not_selected()
+    {
+        Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'conditions' => [
+                [
+                    'type' => 'subject',
+                    'match' => 'is exactly',
+                    'values' => [
+                        'Test Email'
+                    ]
+                ],
+                [
+                    'type' => 'sender',
+                    'match' => 'starts with',
+                    'values' => [
+                        'will'
+                    ]
+                ],
+                [
+                    'type' => 'alias',
+                    'match' => 'is exactly',
+                    'values' => [
+                        'ebay@johndoe.anonaddy.com'
+                    ]
+                ]
+            ],
+            'actions' => [
+                [
+                    'type' => 'subject',
+                    'value' => 'New Subject!'
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => false,
+            'replies' => true,
+            'sends' => true
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+
+        $size = 1500;
+
+        $emailData = new EmailData($parser, $size);
+
+        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
+
+        $email = $job->build();
+
+        $this->assertEquals($parser->getHeader('subject'), $email->subject);
+    }
+
+    /** @test */
     public function it_can_apply_user_rules_in_correct_order()
     {
         Rule::factory()->create([
@@ -278,6 +350,9 @@ class RulesTest extends TestCase
                 ],
             ],
             'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
             'order' => 1
         ]);
 
@@ -313,6 +388,9 @@ class RulesTest extends TestCase
                 ],
             ],
             'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false
         ]);
 
         $alias = Alias::factory()->create([

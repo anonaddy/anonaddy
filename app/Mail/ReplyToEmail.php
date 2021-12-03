@@ -166,7 +166,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             );
         }
 
-        $this->checkRules();
+        $this->checkRules('Replies');
 
         $this->email->with([
             'shouldBlock' => $this->size === 0

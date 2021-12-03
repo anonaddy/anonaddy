@@ -250,7 +250,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         $this->replacedSubject = $this->user->email_subject ? ' with subject "' . base64_decode($this->emailSubject) . '"' : null;
 
-        $this->checkRules();
+        $this->checkRules('Forwards');
 
         $this->email->with([
             'location' => $this->bannerLocation,

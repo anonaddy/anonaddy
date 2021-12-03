@@ -196,6 +196,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's active rules in the correct order that should be run of forwards.
+     */
+    public function activeRulesForForwardsOrdered()
+    {
+        return $this->rules()->where('active', true)->where('forwards', true)->orderBy('order');
+    }
+
+    /**
+     * Get all of the user's active rules in the correct order that should be run of forwards.
+     */
+    public function activeRulesForRepliesOrdered()
+    {
+        return $this->rules()->where('active', true)->where('replies', true)->orderBy('order');
+    }
+
+    /**
+     * Get all of the user's active rules in the correct order that should be run of forwards.
+     */
+    public function activeRulesForSendsOrdered()
+    {
+        return $this->rules()->where('active', true)->where('sends', true)->orderBy('order');
+    }
+
+    /**
      * Get all of the user's additional usernames.
      */
     public function additionalUsernames()

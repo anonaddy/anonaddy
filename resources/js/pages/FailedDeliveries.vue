@@ -7,55 +7,19 @@
           @keyup.esc="search = ''"
           tabindex="0"
           type="text"
-          class="
-            w-full
-            md:w-64
-            appearance-none
-            shadow
-            bg-white
-            text-grey-700
-            focus:outline-none
-            rounded
-            py-3
-            pl-3
-            pr-8
-          "
+          class="w-full md:w-64 appearance-none shadow bg-white text-grey-700 focus:outline-none rounded py-3 pl-3 pr-8"
           placeholder="Search Failed Deliveries"
         />
         <icon
           v-if="search"
           @click.native="search = ''"
           name="close-circle"
-          class="
-            absolute
-            right-0
-            inset-y-0
-            w-5
-            h-full
-            text-grey-300
-            fill-current
-            mr-2
-            flex
-            items-center
-            cursor-pointer
-          "
+          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
         <icon
           v-else
           name="search"
-          class="
-            absolute
-            right-0
-            inset-y-0
-            w-5
-            h-full
-            text-grey-300
-            fill-current
-            pointer-events-none
-            mr-2
-            flex
-            items-center
-          "
+          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current pointer-events-none mr-2 flex items-center"
         />
       </div>
     </div>
@@ -187,17 +151,7 @@
           <button
             type="button"
             @click="deleteFailedDelivery(failedDeliveryIdToDelete)"
-            class="
-              px-4
-              py-3
-              text-white
-              font-semibold
-              bg-red-500
-              hover:bg-red-600
-              border border-transparent
-              rounded
-              focus:outline-none
-            "
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
             :class="deleteFailedDeliveryLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteFailedDeliveryLoading"
           >
@@ -206,18 +160,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Cancel
           </button>

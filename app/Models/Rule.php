@@ -19,6 +19,9 @@ class Rule extends Model
         'conditions',
         'actions',
         'operator',
+        'forwards',
+        'replies',
+        'sends',
         'active',
         'order'
     ];
@@ -32,6 +35,9 @@ class Rule extends Model
         'id' => 'string',
         'user_id' => 'string',
         'active' => 'boolean',
+        'forwards' => 'boolean',
+        'replies' => 'boolean',
+        'sends' => 'boolean',
         'conditions' => 'array',
         'actions' => 'array'
     ];

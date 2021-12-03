@@ -34,7 +34,10 @@ class RuleController extends Controller
             'name' => $request->name,
             'conditions' => $conditions,
             'actions' => $actions,
-            'operator' => $request->operator
+            'operator' => $request->operator,
+            'forwards' => $request->forwards ?? false,
+            'replies' => $request->replies ?? false,
+            'sends' => $request->sends ?? false
         ]);
 
         return new RuleResource($rule->refresh());
@@ -56,7 +59,10 @@ class RuleController extends Controller
             'name' => $request->name,
             'conditions' => $conditions,
             'actions' => $actions,
-            'operator' => $request->operator
+            'operator' => $request->operator,
+            'forwards' => $request->forwards ?? false,
+            'replies' => $request->replies ?? false,
+            'sends' => $request->sends ?? false
         ]);
 
         return new RuleResource($rule->refresh());

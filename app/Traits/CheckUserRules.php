@@ -6,9 +6,10 @@ use Illuminate\Support\Str;
 
 trait CheckUserRules
 {
-    public function checkRules()
+    public function checkRules(String $emailType)
     {
-        $this->user->activeRulesOrdered()->each(function ($rule) {
+        $method = "activeRulesFor{$emailType}Ordered";
+        $this->user->{$method}->each(function ($rule) {
             // Check if the conditions of the rule are satisfied
             if ($this->ruleConditionsSatisfied($rule->conditions, $rule->operator)) {
                 // Apply actions for that rule

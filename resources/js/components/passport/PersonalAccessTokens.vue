@@ -36,17 +36,7 @@
 
     <button
       @click="openCreateTokenModal"
-      class="
-        bg-cyan-400
-        w-full
-        hover:bg-cyan-300
-        text-cyan-900
-        font-bold
-        py-3
-        px-4
-        rounded
-        focus:outline-none
-      "
+      class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
     >
       Generate New Token
     </button>
@@ -117,33 +107,14 @@
             v-model="form.name"
             type="text"
             id="create-token-name"
-            class="
-              w-full
-              appearance-none
-              bg-grey-100
-              border border-transparent
-              text-grey-700
-              focus:outline-none
-              rounded
-              p-3
-              mb-6
-            "
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
             :class="form.errors.length > 0 ? 'border-red-500' : ''"
             placeholder="e.g. Firefox extension"
             autofocus
           />
           <button
             @click="store"
-            class="
-              bg-cyan-400
-              hover:bg-cyan-300
-              text-cyan-900
-              font-bold
-              py-3
-              px-4
-              rounded
-              focus:outline-none
-            "
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
             :class="loading ? 'cursor-not-allowed' : ''"
             :disabled="loading"
           >
@@ -152,18 +123,7 @@
           </button>
           <button
             @click="closeCreateTokenModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Close
           </button>
@@ -181,33 +141,14 @@
         </p>
         <textarea
           v-model="accessToken"
-          class="
-            w-full
-            appearance-none
-            bg-grey-100
-            border border-transparent
-            text-grey-700
-            focus:outline-none
-            rounded
-            p-3
-            text-sm
-          "
+          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-sm"
           rows="10"
           readonly
         >
         </textarea>
         <div class="mt-6">
           <button
-            class="
-              bg-cyan-400
-              hover:bg-cyan-300
-              text-cyan-900
-              font-bold
-              py-3
-              px-4
-              rounded
-              focus:outline-none
-            "
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
             v-clipboard="() => accessToken"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
@@ -216,18 +157,7 @@
           </button>
           <button
             @click="closeCreateTokenModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Close
           </button>
@@ -249,16 +179,7 @@
         <div class="mt-6">
           <button
             @click="revoke"
-            class="
-              bg-red-500
-              hover:bg-red-600
-              text-white
-              font-bold
-              py-3
-              px-4
-              rounded
-              focus:outline-none
-            "
+            class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none"
             :class="revokeTokenLoading ? 'cursor-not-allowed' : ''"
             :disabled="revokeTokenLoading"
           >
@@ -267,18 +188,7 @@
           </button>
           <button
             @click="closeRevokeTokenModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Close
           </button>

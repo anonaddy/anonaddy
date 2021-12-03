@@ -152,7 +152,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             );
         }
 
-        $this->checkRules();
+        $this->checkRules('Sends');
 
         $this->email->with([
             'shouldBlock' => $this->size === 0

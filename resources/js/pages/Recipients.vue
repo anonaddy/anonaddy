@@ -7,71 +7,25 @@
           @keyup.esc="search = ''"
           tabindex="0"
           type="text"
-          class="
-            w-full
-            md:w-64
-            appearance-none
-            shadow
-            bg-white
-            text-grey-700
-            focus:outline-none
-            rounded
-            py-3
-            pl-3
-            pr-8
-          "
+          class="w-full md:w-64 appearance-none shadow bg-white text-grey-700 focus:outline-none rounded py-3 pl-3 pr-8"
           placeholder="Search Recipients"
         />
         <icon
           v-if="search"
           @click.native="search = ''"
           name="close-circle"
-          class="
-            absolute
-            right-0
-            inset-y-0
-            w-5
-            h-full
-            text-grey-300
-            fill-current
-            mr-2
-            flex
-            items-center
-            cursor-pointer
-          "
+          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
         <icon
           v-else
           name="search"
-          class="
-            absolute
-            right-0
-            inset-y-0
-            w-5
-            h-full
-            text-grey-300
-            fill-current
-            pointer-events-none
-            mr-2
-            flex
-            items-center
-          "
+          class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current pointer-events-none mr-2 flex items-center"
         />
       </div>
       <div class="mt-4 md:mt-0">
         <button
           @click="addRecipientModalOpen = true"
-          class="
-            bg-cyan-400
-            hover:bg-cyan-300
-            text-cyan-900
-            font-bold
-            py-3
-            px-4
-            rounded
-            focus:outline-none
-            ml-auto
-          "
+          class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto"
         >
           Add Recipient
         </button>
@@ -165,17 +119,7 @@
             />
             <icon
               name="fingerprint"
-              class="
-                tooltip
-                outline-none
-                cursor-pointer
-                block
-                w-6
-                h-6
-                text-grey-300
-                fill-current
-                mx-2
-              "
+              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-300 fill-current mx-2"
               :data-tippy-content="props.row.fingerprint"
               v-clipboard="() => props.row.fingerprint"
               v-clipboard:success="clipboardSuccess"
@@ -246,33 +190,14 @@
           <input
             v-model="newRecipient"
             type="email"
-            class="
-              w-full
-              appearance-none
-              bg-grey-100
-              border border-transparent
-              text-grey-700
-              focus:outline-none
-              rounded
-              p-3
-              mb-6
-            "
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
             :class="errors.newRecipient ? 'border-red-500' : ''"
             placeholder="johndoe@example.com"
             autofocus
           />
           <button
             @click="validateNewRecipient"
-            class="
-              bg-cyan-400
-              hover:bg-cyan-300
-              text-cyan-900
-              font-bold
-              py-3
-              px-4
-              rounded
-              focus:outline-none
-            "
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
             :class="addRecipientLoading ? 'cursor-not-allowed' : ''"
             :disabled="addRecipientLoading"
           >
@@ -281,18 +206,7 @@
           </button>
           <button
             @click="addRecipientModalOpen = false"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Cancel
           </button>
@@ -315,17 +229,7 @@
           </p>
           <textarea
             v-model="recipientKey"
-            class="
-              w-full
-              appearance-none
-              bg-grey-100
-              border border-transparent
-              text-grey-700
-              focus:outline-none
-              rounded
-              p-3
-              mb-6
-            "
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
             :class="errors.recipientKey ? 'border-red-500' : ''"
             placeholder="Begins with '-----BEGIN PGP PUBLIC KEY BLOCK-----'"
             rows="10"
@@ -335,16 +239,7 @@
           <button
             type="button"
             @click="validateRecipientKey"
-            class="
-              bg-cyan-400
-              hover:bg-cyan-300
-              text-cyan-900
-              font-bold
-              py-3
-              px-4
-              rounded
-              focus:outline-none
-            "
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
             :class="addRecipientKeyLoading ? 'cursor-not-allowed' : ''"
             :disabled="addRecipientKeyLoading"
           >
@@ -353,18 +248,7 @@
           </button>
           <button
             @click="closeRecipientKeyModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Cancel
           </button>
@@ -387,17 +271,7 @@
           <button
             type="button"
             @click="deleteRecipientKey(recipientKeyToDelete)"
-            class="
-              px-4
-              py-3
-              text-white
-              font-semibold
-              bg-red-500
-              hover:bg-red-600
-              border border-transparent
-              rounded
-              focus:outline-none
-            "
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
             :class="deleteRecipientKeyLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteRecipientKeyLoading"
           >
@@ -406,18 +280,7 @@
           </button>
           <button
             @click="closeDeleteRecipientKeyModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Cancel
           </button>
@@ -437,17 +300,7 @@
           <button
             type="button"
             @click="deleteRecipient(recipientToDelete)"
-            class="
-              px-4
-              py-3
-              text-white
-              font-semibold
-              bg-red-500
-              hover:bg-red-600
-              border border-transparent
-              rounded
-              focus:outline-none
-            "
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none"
             :class="deleteRecipientLoading ? 'cursor-not-allowed' : ''"
             :disabled="deleteRecipientLoading"
           >
@@ -456,18 +309,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="
-              ml-4
-              px-4
-              py-3
-              text-grey-800
-              font-semibold
-              bg-white
-              hover:bg-grey-50
-              border border-grey-100
-              rounded
-              focus:outline-none
-            "
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
           >
             Cancel
           </button>

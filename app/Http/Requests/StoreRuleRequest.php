@@ -89,7 +89,10 @@ class StoreRuleRequest extends FormRequest
             'operator' => [
                 'required',
                 'in:AND,OR'
-            ]
+            ],
+            'forwards' => 'boolean',
+            'replies' => 'boolean',
+            'sends' => 'boolean'
         ];
     }
 }
