@@ -58,15 +58,15 @@ class VerificationController extends Controller
         $verifiable = User::find($request->route('id')) ?? Recipient::find($request->route('id'));
 
         if (is_null($verifiable)) {
-            throw new AuthorizationException;
+            throw new AuthorizationException('Email address not found.');
         }
 
         if (! hash_equals((string) $request->route('id'), (string) $verifiable->getKey())) {
-            throw new AuthorizationException;
+            throw new AuthorizationException('Invalid hash.');
         }
 
         if (! Hash::check($verifiable->getEmailForVerification(), (string) base64_decode($request->route('hash')))) {
-            throw new AuthorizationException;
+            throw new AuthorizationException('Invalid hash.');
         }
 
         if ($verifiable->hasVerifiedEmail()) {
