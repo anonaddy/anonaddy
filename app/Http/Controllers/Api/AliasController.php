@@ -35,11 +35,7 @@ class AliasController extends Controller
             })->values();
         }
 
-        if ($request->page) {
-            $aliases = $aliases->jsonPaginate(10);
-        } elseif (!$request->input('filter.search')) {
-            $aliases = $aliases->get();
-        }
+        $aliases = $aliases->jsonPaginate($request->input('page.size') ?? 100);
 
         return AliasResource::collection($aliases);
     }

@@ -32,6 +32,12 @@ class IndexAliasRequest extends FormRequest
                 'nullable',
                 'integer'
             ],
+            'page.size' => [
+                'nullable',
+                'integer',
+                'max:100',
+                'min:1'
+            ],
             'filter' => [
                 'nullable',
                 'array'

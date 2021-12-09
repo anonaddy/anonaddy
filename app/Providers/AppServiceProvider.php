@@ -34,9 +34,9 @@ class AppServiceProvider extends ServiceProvider
         Swift_Preferences::getInstance()->setQPDotEscape(true);
 
         Builder::macro('jsonPaginate', function (int $maxResults = null, int $defaultSize = null) {
-            $maxResults = $maxResults ?? 30;
-            $defaultSize = $defaultSize ?? 30;
-            $paginationMethod = 'simplePaginate'; // or 'paginate';
+            $maxResults = $maxResults ?? 100;
+            $defaultSize = $defaultSize ?? 100;
+            $paginationMethod = 'paginate'; // 'simplePaginate' or 'paginate';
 
             $size = (int) request()->input('page.size', $defaultSize);
 
@@ -51,8 +51,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Collection::macro('jsonPaginate', function (int $maxResults = null, int $defaultSize = null, $page = null) {
-            $maxResults = $maxResults ?? 30;
-            $defaultSize = $defaultSize ?? 30;
+            $maxResults = $maxResults ?? 100;
+            $defaultSize = $defaultSize ?? 100;
             $size = (int) request()->input('page.size', $defaultSize);
             $size = $size > $maxResults ? $maxResults : $size;
 
@@ -65,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
                 $page,
                 [
                     'path' => LengthAwarePaginator::resolveCurrentPath(),
+                    'query' => Arr::except(LengthAwarePaginator::resolveQueryString(), 'page.number'),
                     'pageName' => 'page[number]',
                 ]
             );
