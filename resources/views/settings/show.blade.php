@@ -455,7 +455,7 @@
                             <p class="mt-6">TOTP 2 factor authentication requires the use of Google Authenticator or another compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively, you can use the code below. Make sure that you write down your secret code in a safe place.</p>
 
                             <div>
-                                <img src="{{ $qrCode }}">
+                                {!! $qrCode !!}
                                 <p class="mb-2">Secret: {{ $authSecret }}</p>
                                 <form method="POST" action="{{ route('settings.2fa_regenerate') }}">
                                     @csrf

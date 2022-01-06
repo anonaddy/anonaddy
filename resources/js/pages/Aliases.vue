@@ -211,7 +211,7 @@
               @keyup.esc="aliasIdToEdit = aliasDescriptionToEdit = ''"
               v-model="aliasDescriptionToEdit"
               type="text"
-              class="flex-grow text-sm appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              class="grow text-sm appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
               :class="aliasDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'"
               placeholder="Add description"
               tabindex="0"

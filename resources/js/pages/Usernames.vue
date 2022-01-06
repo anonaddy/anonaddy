@@ -75,7 +75,7 @@
               @keyup.esc="usernameIdToEdit = usernameDescriptionToEdit = ''"
               v-model="usernameDescriptionToEdit"
               type="text"
-              class="flex-grow appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              class="grow appearance-none bg-grey-100 border text-grey-700 focus:outline-none rounded px-2 py-1"
               :class="
                 usernameDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'
               "

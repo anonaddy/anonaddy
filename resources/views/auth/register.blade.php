@@ -83,10 +83,10 @@
                                 Verification:
                             </label>
 
-                            <div class="flex flex-grow flex-wrap">
-                                <img src="{{captcha_src('mini')}}" class="flex-shrink-0 h-12 w-16 mr-2 mt-2">
+                            <div class="flex grow flex-wrap">
+                                <img src="{{captcha_src('mini')}}" class="shrink-0 h-12 w-16 mr-2 mt-2">
 
-                                <input id="captcha" type="text" class="flex-grow mt-2 appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:ring{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
+                                <input id="captcha" type="text" class="grow mt-2 appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:ring{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
                             </div>
 
                             @if ($errors->has('captcha'))

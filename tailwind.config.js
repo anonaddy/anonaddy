@@ -1,28 +1,22 @@
 module.exports = {
-  purge: {
-    content: [
-      'app/**/*.php',
-      'resources/**/*.html',
-      'resources/**/*.js',
-      'resources/**/*.php',
-      'resources/**/*.vue',
-    ],
-
-    // These options are passed through directly to PurgeCSS
-    options: {
-      safelist: [
-        /-active$/,
-        /-enter$/,
-        /-leave-to$/,
-        /show$/,
-        'bg-green-400',
-        'bg-red-400',
-        'bg-grey-400',
-      ],
+  content: [
+    'app/**/*.php',
+    'resources/**/*.html',
+    'resources/**/*.js',
+    'resources/**/*.php',
+    'resources/**/*.vue',
+  ],
+  safelist: [
+    {
+      pattern: /(-active|-enter|-leave-to|show)$/,
     },
-  },
+    'bg-green-400',
+    'bg-red-400',
+    'bg-grey-400',
+  ],
   theme: {
     colors: {
+      current: 'currentColor',
       white: '#FFF',
       black: '#000',
       transparent: 'transparent',
