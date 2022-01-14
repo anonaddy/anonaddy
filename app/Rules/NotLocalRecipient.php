@@ -27,16 +27,16 @@ class NotLocalRecipient implements Rule
      */
     public function passes($attribute, $value)
     {
-        $emailDomain = Str::afterLast($value, '@');
+        $emailDomain = strtolower(Str::afterLast($value, '@'));
 
         // Make sure the recipient domain is not added as a verified custom domain
-        if (Domain::whereNotNull('domain_verified_at')->pluck('domain')->contains(strtolower($emailDomain))) {
+        if (Domain::whereNotNull('domain_verified_at')->pluck('domain')->contains($emailDomain)) {
             return false;
         }
 
         $count = collect(config('anonaddy.all_domains'))
             ->filter(function ($domain) use ($emailDomain) {
-                return Str::endsWith(strtolower($emailDomain), $domain);
+                return $domain === $emailDomain || Str::endsWith($emailDomain, '.' . $domain);
             })
             ->count();
 
