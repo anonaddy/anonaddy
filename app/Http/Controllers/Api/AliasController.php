@@ -16,7 +16,19 @@ class AliasController extends Controller
 {
     public function index(IndexAliasRequest $request)
     {
-        $aliases = user()->aliases()->with('recipients')->latest();
+        $aliases = user()->aliases()->with('recipients')
+            ->when($request->input('sort'), function ($query, $sort) {
+                $direction = strpos($sort, '-') === 0 ? 'desc' : 'asc';
+
+                return $query->orderBy(ltrim($sort, '-'), $direction);
+            }, function ($query) {
+                return $query->latest();
+            })
+            ->when($request->input('filter.active'), function ($query, $value) {
+                $active = $value === 'true' ? true : false;
+
+                return $query->where('active', $active);
+            });
 
         // Keep /aliases?deleted=with for backwards compatibility
         if ($request->deleted === 'with' || $request->input('filter.deleted') === 'with') {

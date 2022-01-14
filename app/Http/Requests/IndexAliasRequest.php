@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IndexAliasRequest extends FormRequest
 {
@@ -53,6 +54,40 @@ class IndexAliasRequest extends FormRequest
                 'in:with,without,only',
                 'string',
             ],
+            'filter.active' => [
+                'nullable',
+                'in:true,false',
+                'string',
+            ],
+            'sort' => [
+                'nullable',
+                'max:50',
+                'min:3',
+                Rule::in([
+                    'local_part',
+                    'domain',
+                    'email',
+                    'emails_forwarded',
+                    'emails_blocked',
+                    'emails_replied',
+                    'emails_sent',
+                    'active',
+                    'created_at',
+                    'updated_at',
+                    'deleted_at',
+                    '-local_part',
+                    '-domain',
+                    '-email',
+                    '-emails_forwarded',
+                    '-emails_blocked',
+                    '-emails_replied',
+                    '-emails_sent',
+                    '-active',
+                    '-created_at',
+                    '-updated_at',
+                    '-deleted_at',
+                ])
+            ]
         ];
     }
 }

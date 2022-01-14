@@ -70,11 +70,33 @@ class AliasesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->json('GET', '/api/v1/aliases?deleted=only');
+        $response = $this->json('GET', '/api/v1/aliases?filter[deleted]=only');
 
         // Assert
         $response->assertSuccessful();
         $this->assertCount(2, $response->json()['data']);
+    }
+
+    /** @test */
+    public function user_can_get_only_active_aliases()
+    {
+        // Arrange
+        Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true
+        ]);
+
+        Alias::factory()->count(2)->create([
+            'user_id' => $this->user->id,
+            'active' => false
+        ]);
+
+        // Act
+        $response = $this->json('GET', '/api/v1/aliases?filter[active]=true');
+
+        // Assert
+        $response->assertSuccessful();
+        $this->assertCount(1, $response->json()['data']);
     }
 
     /** @test */
