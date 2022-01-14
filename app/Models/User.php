@@ -260,6 +260,22 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's aliases using a shared domain.
+     */
+    public function sharedDomainAliases()
+    {
+        return $this->aliases()->whereIn('domain', config('anonaddy.all_domains'));
+    }
+
+    /**
+     * Get all of the user's active aliases using a shared domain.
+     */
+    public function activeSharedDomainAliases()
+    {
+        return $this->sharedDomainAliases()->where('active', true);
+    }
+
+    /**
      * Get all of the user's aliases that are using the default recipient
      */
     public function aliasesUsingDefault()
