@@ -464,6 +464,8 @@ For full details please see the [self-hosting instructions file](SELF-HOSTING.md
 
 Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev) and [Patrick Dobler](https://github.com/patrickdobler) for supporting me by sponsoring the project on GitHub!
 
+Also an extra special thanks to [CrazyMax](https://github.com/crazy-max) for sponsoring me and also creating and maintaining the awesome [AnonAddy Docker image](https://github.com/anonaddy/docker)!
+
 ## Thanks
 
 Thanks to [https://gitlab.com/mailcare/mailcare](https://gitlab.com/mailcare/mailcare) and [https://github.com/niftylettuce/forward-email](https://github.com/niftylettuce/forward-email) for their awesome open-source projects that helped me along the way.

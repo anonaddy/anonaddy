@@ -4,10 +4,10 @@ current:
   label: v
   major: 0
   minor: 8
-  patch: 9
-  prerelease: 2-g9640ca0
+  patch: 10
+  prerelease: 2-g68f40bd
   buildmetadata: ''
-  commit: 9640ca
+  commit: 68f40b
   timestamp:
     year: 2020
     month: 10
