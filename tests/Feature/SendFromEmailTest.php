@@ -21,6 +21,8 @@ class SendFromEmailTest extends TestCase
 
         $this->user = User::factory()->create(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
+        $this->user->defaultRecipient->email = 'will@anonaddy.com';
+        $this->user->defaultRecipient->save();
     }
 
     /** @test */
@@ -43,7 +45,7 @@ class SendFromEmailTest extends TestCase
             'anonaddy:receive-email',
             [
                 'file' => base_path('tests/emails/email_send_from_alias.eml'),
-                '--sender' => $this->user->defaultRecipient->email,
+                '--sender' => $this->user->email,
                 '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [$extension],
@@ -80,7 +82,7 @@ class SendFromEmailTest extends TestCase
             'anonaddy:receive-email',
             [
                 'file' => base_path('tests/emails/email_multiple_send_from.eml'),
-                '--sender' => $this->user->defaultRecipient->email,
+                '--sender' => $this->user->email,
                 '--recipient' => [
                     'ebay+'.$extension1.'@johndoe.anonaddy.com',
                     'ebay+'.$extension2.'@johndoe.anonaddy.com'
@@ -120,7 +122,7 @@ class SendFromEmailTest extends TestCase
             'anonaddy:receive-email',
             [
                 'file' => base_path('tests/emails/email_send_from_alias.eml'),
-                '--sender' => $this->user->defaultRecipient->email,
+                '--sender' => $this->user->email,
                 '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [$extension],

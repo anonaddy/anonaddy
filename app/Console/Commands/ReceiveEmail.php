@@ -14,6 +14,7 @@ use App\Models\Recipient;
 use App\Models\User;
 use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
+use App\Notifications\SpamReplySendAttempt;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -141,7 +142,15 @@ class ReceiveEmail extends Command
                 $this->checkRateLimit($user);
 
                 // Check whether this email is a reply/send from or a new email to be forwarded.
-                if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL) && $user->isVerifiedRecipient($this->option('sender'))) {
+                if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL) && $user->isVerifiedRecipient($this->getSenderFrom())) {
+
+                    // Check if the spam header is present from Rspamd
+                    if ($this->parser->getHeader('X-AnonAddy-Spam')) {
+                        // Notify user and exit
+                        $user->notify(new SpamReplySendAttempt($recipient, $this->getSenderFrom(), $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+                        exit(0);
+                    }
+
                     if ($this->parser->getHeader('In-Reply-To')) {
                         $this->handleReply($user, $recipient);
                     } else {
@@ -373,6 +382,11 @@ class ReceiveEmail extends Command
                     'code' => $diagnosticCode,
                     'attempted_at' => $postfixQueueId->created_at
                 ]);
+
+                if (isset($alias)) {
+                    // Decrement the alias forward count due to the failed delivery
+                    $alias->decrement('emails_forwarded');
+                }
             } else {
                 Log::info([
                     'info' => 'user not found from bounce report',
@@ -502,6 +516,15 @@ class ReceiveEmail extends Command
         }
 
         return 'soft';
+    }
+
+    protected function getSenderFrom()
+    {
+        try {
+            return $this->parser->getAddresses('from')[0]['address'];
+        } catch (\Exception $e) {
+            return $this->option('sender');
+        }
     }
 
     protected function exitIfFromSelf()

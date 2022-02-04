@@ -32,6 +32,9 @@ class EmailData
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
+        $this->originalEnvelopeFrom = $this->sender;
+        $this->originalFromHeader = base64_encode($parser->getHeader('From'));
+        $this->authenticationResults = $parser->getHeader('X-AnonAddy-Authentication-Results');
 
         if ($parser->getParts()[1]['content-type'] === 'multipart/encrypted') {
             $this->encryptedParts = $parser->getAttachments();

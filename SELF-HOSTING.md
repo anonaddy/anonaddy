@@ -832,9 +832,6 @@ TXT  *   "v=spf1 mx ~all"
 TXT _dmarc  "v=DMARC1; p=none; sp=none; adkim=r; aspf=r; pct=100;"
 ```
 
-IMAGE HERE SPF RECORD ETC
-
-
 Now we need to create a signing table to tell Rspamd which domains we want it to sign with DKIM and also which key to use.
 
 Create a new file `/etc/rspamd/local.d/dkim_signing.conf` and enter the following inside:
@@ -857,7 +854,7 @@ use_esld = true;
 sign_authenticated = false;
 ```
 
-As we want to use Authenticated Reply Chain (ARC) signing too, let's copy that file: 
+As we want to use Authenticated Reply Chain (ARC) signing too, let's copy that file:
 
 ```bash
 sudo cp /etc/rspamd/local.d/dkim_signing.conf /etc/rspamd/local.d/arc.conf
@@ -895,6 +892,46 @@ Create a new file `/etc/rspamd/local.d/history_redis.conf` and enter the followi
 ```
 subject_privacy = true;
 ```
+
+Now let's setup the handling of DMARC for incoming messages, create a new file `/etc/rspamd/local.d/dmarc.conf` and enter the following inside:
+
+```
+actions = {
+  quarantine = "add_header";
+  reject = "reject";
+}
+```
+
+Here we are telling Rspamd to add a header to any message that fails DMARC checks and has a policy of `p=quarantine` and to reject any message that fails DMARC checks with a policy `p=reject`. You can change reject to "add_header"; too if you would still like to see these messages.
+
+Next we'll configure the headers to add, create a new file `/etc/rspamd/local.d/milter_headers.conf` and enter the following inside:
+
+```
+use = ["authentication-results", "remove-headers", "spam-header"];
+
+routines {
+  remove-headers {
+    headers {
+      "X-Spam" = 0;
+      "X-Spamd-Bar" = 0;
+      "X-Spam-Level" = 0;
+      "X-Spam-Status" = 0;
+      "X-Spam-Flag" = 0;
+    }
+  }
+  authentication-results {
+    header = "X-AnonAddy-Authentication-Results";
+    remove = 0;
+  }
+  spam-header {
+    header = "X-AnonAddy-Spam";
+    value = "Yes";
+    remove = 0;
+  }
+}
+```
+
+The authentication results header will give information on whether the message passed SPF, DKIM and DMARC checks and the spam header will be added if it fails any of these.
 
 To see the currently enabled modules in Rspamd we can run:
 

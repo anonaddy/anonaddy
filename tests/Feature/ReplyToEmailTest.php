@@ -22,6 +22,8 @@ class ReplyToEmailTest extends TestCase
 
         $this->user = User::factory()->create(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
+        $this->user->defaultRecipient->email = 'will@anonaddy.com';
+        $this->user->defaultRecipient->save();
     }
 
     /** @test */
@@ -44,7 +46,7 @@ class ReplyToEmailTest extends TestCase
             'anonaddy:receive-email',
             [
                 'file' => base_path('tests/emails/email_reply.eml'),
-                '--sender' => $this->user->defaultRecipient->email,
+                '--sender' => $this->user->email,
                 '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.com'],
                 '--local_part' => ['ebay'],
                 '--extension' => [$extension],
@@ -75,9 +77,14 @@ class ReplyToEmailTest extends TestCase
         ]);
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'user_id' => $this->user->id
         ]);
+
+        $this->user->email_verified_at = null;
+        $this->user->save();
+
+        $this->user->defaultRecipient = $recipient;
+        $this->user->save();
 
         $extension = 'contact=ebay.com';
 
@@ -122,7 +129,7 @@ class ReplyToEmailTest extends TestCase
             'anonaddy:receive-email',
             [
                 'file' => base_path('tests/emails/email_multiple_reply.eml'),
-                '--sender' => $this->user->defaultRecipient->email,
+                '--sender' => $this->user->email,
                 '--recipient' => [
                     'ebay+'.$extension1.'@johndoe.anonaddy.com',
                     'ebay+'.$extension2.'@johndoe.anonaddy.com'

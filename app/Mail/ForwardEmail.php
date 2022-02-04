@@ -50,6 +50,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $listUnsubscribe;
     protected $inReplyTo;
     protected $references;
+    protected $originalEnvelopeFrom;
+    protected $originalFromHeader;
+    protected $authenticationResults;
     protected $recipientId;
 
     /**
@@ -77,6 +80,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->listUnsubscribe = $emailData->listUnsubscribe;
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
+        $this->originalEnvelopeFrom = $emailData->originalEnvelopeFrom;
+        $this->originalFromHeader = $emailData->originalFromHeader;
+        $this->authenticationResults = $emailData->authenticationResults;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
         $this->recipientId = $recipient->id;
 
@@ -178,8 +184,21 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                             ->addTextHeader('References', base64_decode($this->references));
                 }
 
+                if ($this->authenticationResults) {
+                    $message->getHeaders()
+                            ->addTextHeader('X-AnonAddy-Authentication-Results', $this->authenticationResults);
+                }
+
                 $message->getHeaders()
                         ->addTextHeader('X-AnonAddy-Original-Sender', $this->sender);
+
+                $message->getHeaders()
+                        ->addTextHeader('X-AnonAddy-Original-Envelope-From', $this->originalEnvelopeFrom);
+
+                if ($this->originalFromHeader) {
+                    $message->getHeaders()
+                            ->addTextHeader('X-AnonAddy-Original-From-Header', base64_decode($this->originalFromHeader));
+                }
 
                 if ($this->encryptedParts) {
                     $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
