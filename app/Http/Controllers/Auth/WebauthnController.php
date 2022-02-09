@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Facades\Webauthn;
+use App\Actions\RegisterKeyStore;
 use App\Models\WebauthnKey;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
-use LaravelWebauthn\Http\Controllers\WebauthnController as ControllersWebauthnController;
+use LaravelWebauthn\Actions\RegisterKeyPrepare;
+use LaravelWebauthn\Http\Controllers\WebauthnKeyController as ControllersWebauthnController;
+use LaravelWebauthn\Services\Webauthn;
 use Webauthn\PublicKeyCredentialCreationOptions;
 
 class WebauthnController extends ControllersWebauthnController
@@ -27,16 +29,31 @@ class WebauthnController extends ControllersWebauthnController
     private const SESSION_PUBLICKEY_CREATION = 'webauthn.publicKeyCreation';
 
     /**
+     * Return the register data to attempt a Webauthn registration.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return RegisterViewResponse
+     */
+    public function create(Request $request)
+    {
+        $publicKey = $this->app[RegisterKeyPrepare::class]($request->user());
+
+        $request->session()->put(Webauthn::SESSION_PUBLICKEY_CREATION, $publicKey);
+
+        return view('vendor.webauthn.register')->with('publicKey', $publicKey);
+    }
+
+    /**
      * Validate and create the Webauthn request.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|max:50',
-            'register' => 'required',
+            'register' => 'required|string',
+            'name' => 'required|string|max:50'
         ]);
 
         try {
@@ -45,18 +62,24 @@ class WebauthnController extends ControllersWebauthnController
                 throw new ModelNotFoundException(trans('webauthn::errors.create_data_not_found'));
             }
 
-            $webauthnKey = Webauthn::doRegister(
+            /** @var \LaravelWebauthn\Models\WebauthnKey|null */
+            $webauthnKey = $this->app[RegisterKeyStore::class](
                 $request->user(),
                 $publicKey,
-                $this->input($request, 'register'),
-                $this->input($request, 'name')
+                $request->input('register'),
+                $request->input('name')
             );
+
+            if ($webauthnKey !== null) {
+                $request->session()->put(Webauthn::SESSION_WEBAUTHNID_CREATED, $webauthnKey->id);
+            }
 
             user()->update([
                 'two_factor_enabled' => false
             ]);
 
-            return $this->redirectAfterSuccessRegister($webauthnKey);
+
+            return $this->redirectAfterSuccessRegister();
         } catch (\Exception $e) {
             return Response::json([
                 'error' => [
@@ -72,29 +95,18 @@ class WebauthnController extends ControllersWebauthnController
      * @param WebauthnKey $webauthnKey
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    protected function redirectAfterSuccessRegister($webauthnKey)
+    protected function redirectAfterSuccessRegister()
     {
-        if ($this->config->get('webauthn.register.postSuccessRedirectRoute', '') !== '') {
-
-            // If the user already has at least one key do not generate a new backup code.
-            if (user()->webauthnKeys()->count() > 1) {
-                return Redirect::intended($this->config->get('webauthn.register.postSuccessRedirectRoute'));
-            }
-
-            user()->update([
-                'two_factor_backup_code' => bcrypt($code = Str::random(40))
-            ]);
-
-            return Redirect::intended($this->config->get('webauthn.register.postSuccessRedirectRoute'))->with(['backupCode' => $code]);
-        } else {
-            return Response::json([
-                'result' => true,
-                'id' => $webauthnKey->id,
-                'object' => 'webauthnKey',
-                'name' => $webauthnKey->name,
-                'counter' => $webauthnKey->counter,
-            ], 201);
+        // If the user already has at least one key do not generate a new backup code.
+        if (user()->webauthnKeys()->count() > 1) {
+            return Redirect::intended('/settings');
         }
+
+        user()->update([
+            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+        ]);
+
+        return Redirect::intended('/settings')->with(['backupCode' => $code]);
     }
 
     /**
@@ -121,20 +133,5 @@ class WebauthnController extends ControllersWebauthnController
                 ],
             ], 404);
         }
-    }
-
-    /**
-     * Retrieve the input with a string result.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param string $name
-     * @param string $default
-     * @return string
-     */
-    private function input(Request $request, string $name, string $default = ''): string
-    {
-        $result = $request->input($name);
-
-        return is_string($result) ? $result : $default;
     }
 }

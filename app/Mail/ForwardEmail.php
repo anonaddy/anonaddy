@@ -52,6 +52,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $references;
     protected $originalEnvelopeFrom;
     protected $originalFromHeader;
+    protected $originalReplyToHeader;
+    protected $originalSenderHeader;
     protected $authenticationResults;
     protected $recipientId;
 
@@ -82,6 +84,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->references = $emailData->references;
         $this->originalEnvelopeFrom = $emailData->originalEnvelopeFrom;
         $this->originalFromHeader = $emailData->originalFromHeader;
+        $this->originalReplyToHeader = $emailData->originalReplyToHeader;
+        $this->originalSenderHeader = $emailData->originalSenderHeader;
         $this->authenticationResults = $emailData->authenticationResults;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
         $this->recipientId = $recipient->id;
@@ -200,6 +204,16 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                             ->addTextHeader('X-AnonAddy-Original-From-Header', base64_decode($this->originalFromHeader));
                 }
 
+                if ($this->originalReplyToHeader) {
+                    $message->getHeaders()
+                            ->addTextHeader('X-AnonAddy-Original-Reply-To-Header', base64_decode($this->originalReplyToHeader));
+                }
+
+                if ($this->originalSenderHeader) {
+                    $message->getHeaders()
+                            ->addTextHeader('Sender', base64_decode($this->originalSenderHeader));
+                }
+
                 if ($this->encryptedParts) {
                     $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
 
@@ -307,6 +321,17 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $recipient = Recipient::find($this->recipientId);
 
         $recipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject)));
+
+        if ($this->size > 0) {
+            if ($this->alias->emails_forwarded > 0) {
+                $this->alias->decrement('emails_forwarded');
+            }
+
+            if ($this->user->bandwidth > $this->size) {
+                $this->user->bandwidth -= $this->size;
+                $this->user->save();
+            }
+        }
 
         $this->user->failedDeliveries()->create([
             'recipient_id' => $this->recipientId,

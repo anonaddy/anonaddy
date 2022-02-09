@@ -29,8 +29,9 @@ Route::group([
     'prefix' => config('webauthn.prefix', 'webauthn'),
 ], function () {
     Route::get('keys', 'Auth\WebauthnController@index')->name('webauthn.index');
-    Route::post('register', 'Auth\WebauthnController@create')->name('webauthn.create');
-    Route::delete('{id}', 'Auth\WebauthnController@destroy')->name('webauthn.destroy');
+    Route::get('keys/create', 'Auth\WebauthnController@create')->name('webauthn.create');
+    Route::post('keys', 'Auth\WebauthnController@store')->name('webauthn.store');
+    Route::delete('keys/{id}', 'Auth\WebauthnController@destroy')->name('webauthn.destroy');
     Route::post('enabled-keys', 'Auth\WebauthnEnabledKeyController@store')->name('webauthn.enabled_key.store');
     Route::delete('enabled-keys/{id}', 'Auth\WebauthnEnabledKeyController@destroy')->name('webauthn.enabled_key.destroy');
 });

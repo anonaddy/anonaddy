@@ -173,7 +173,7 @@ class ReceiveEmail extends Command
     {
         $alias = Alias::find($recipient['local_part']);
 
-        if (!is_null($alias) && $alias->user->isVerifiedRecipient($this->option('sender'))) {
+        if (!is_null($alias) && $alias->user->isVerifiedRecipient($this->getSenderFrom()) && ! $this->parser->getHeader('X-AnonAddy-Spam')) {
             $alias->deactivate();
         }
     }

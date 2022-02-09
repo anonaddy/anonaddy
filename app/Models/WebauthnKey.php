@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Traits\HasUuid;
+use LaravelWebauthn\Models\Casts\Base64;
+use LaravelWebauthn\Models\Casts\TrustPath;
+use LaravelWebauthn\Models\Casts\Uuid;
 use LaravelWebauthn\Models\WebauthnKey as ModelsWebauthnKey;
 
 class WebauthnKey extends ModelsWebauthnKey
@@ -28,10 +31,24 @@ class WebauthnKey extends ModelsWebauthnKey
         'timestamp',
     ];
 
+    protected $visible = [
+        'id',
+        'name',
+        'enabled',
+        'type',
+        'transports',
+        'created_at',
+        'updated_at',
+    ];
+
     protected $casts = [
-        'enabled' => 'boolean',
         'counter' => 'integer',
         'transports' => 'array',
+        'credentialId' => Base64::class,
+        'credentialPublicKey' => Base64::class,
+        'aaguid' => Uuid::class,
+        'trustPath' => TrustPath::class,
+        'enabled' => 'boolean',
     ];
 
     /**

@@ -19,7 +19,7 @@
             <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
             <div class="table-cell p-1 md:p-4 font-semibold">Enabled</div>
             <div class="table-cell p-1 md:p-4 text-right">
-              <a href="/webauthn/register" class="text-indigo-700">Add New Device</a>
+              <a href="/webauthn/keys/create" class="text-indigo-700">Add New Device</a>
             </div>
           </div>
           <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
@@ -113,7 +113,7 @@ export default {
     remove() {
       this.removeKeyLoading = true
 
-      axios.delete(`/webauthn/${this.keyToRemove.id}`).then(response => {
+      axios.delete(`/webauthn/keys/${this.keyToRemove.id}`).then(response => {
         this.removeKeyLoading = false
         this.deleteKeyModalOpen = false
         this.keyToRemove = null

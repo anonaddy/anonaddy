@@ -34,6 +34,8 @@ class EmailData
         $this->references = base64_encode($parser->getHeader('References'));
         $this->originalEnvelopeFrom = $this->sender;
         $this->originalFromHeader = base64_encode($parser->getHeader('From'));
+        $this->originalReplyToHeader = base64_encode($parser->getHeader('Reply-To'));
+        $this->originalSenderHeader = base64_encode($parser->getHeader('Sender'));
         $this->authenticationResults = $parser->getHeader('X-AnonAddy-Authentication-Results');
 
         if ($parser->getParts()[1]['content-type'] === 'multipart/encrypted') {

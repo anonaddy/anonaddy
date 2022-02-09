@@ -505,7 +505,7 @@
 
                             <a
                             type="button"
-                            href="/webauthn/register"
+                            href="{{ route('webauthn.create') }}"
                             class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
                             >
                                 Register U2F Device

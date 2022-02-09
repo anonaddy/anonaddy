@@ -40,64 +40,38 @@ return [
 
     'prefix' => 'webauthn',
 
-    'authenticate' => [
-        /*
-        |--------------------------------------------------------------------------
-        | View to load after middleware login request.
-        |--------------------------------------------------------------------------
-        |
-        | The name of blade template to load whe a user login and it request to validate
-        | the Webauthn 2nd factor.
-        |
-        */
-        'view' => 'webauthn::authenticate',
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect routes
+    |--------------------------------------------------------------------------
+    |
+    | When using navigation, redirects to these url on success:
+    | - login: after a successfull login.
+    | - register: after a successfull Webauthn key creation.
+    |
+    | Redirects are not used in case of application/json requests.
+    |
+    */
 
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect with callback url after login.
-        |--------------------------------------------------------------------------
-        |
-        | Save the destination url, then after a succesful login, redirect to this
-        | url.
-        |
-        */
-        'postSuccessCallback' => true,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect route
-        |--------------------------------------------------------------------------
-        |
-        | If postSuccessCallback if false, redirect to this route after login
-        | request is complete.
-        | If empty, send a json response to let the client side redirection.
-        |
-        */
-        'postSuccessRedirectRoute' => '',
+    'redirects' => [
+        'login' => null,
+        'register' => '/settings',
     ],
 
-    'register' => [
-        /*
-        |--------------------------------------------------------------------------
-        | View to load on register request.
-        |--------------------------------------------------------------------------
-        |
-        | The name of blade template to load when a user request a creation of
-        | Webauthn key.
-        |
-        */
-        'view' => 'webauthn::register',
+    /*
+    |--------------------------------------------------------------------------
+    | View to load after middleware login request.
+    |--------------------------------------------------------------------------
+    |
+    | The name of blade template to load:
+    | - authenticate: when a user login, and has to validate Webauthn 2nd factor.
+    | - register: when a user request to create a Webauthn key.
+    |
+    */
 
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect route
-        |--------------------------------------------------------------------------
-        |
-        | The route to redirect to after register key request is complete.
-        | If empty, send a json response to let the client side redirection.
-        |
-        */
-        'postSuccessRedirectRoute' => '/settings',
+    'views' => [
+        'authenticate' => 'webauthn::authenticate',
+        'register' => 'webauthn::register',
     ],
 
     /*
@@ -155,7 +129,7 @@ return [
     |
     */
 
-    'icon' => null,
+    'icon' => env('WEBAUTHN_ICON'),
 
     /*
     |--------------------------------------------------------------------------
@@ -164,11 +138,12 @@ return [
     |
     | This parameter specify the preference regarding the attestation conveyance
     | during credential generation.
-    | See https://www.w3.org/TR/webauthn/#attestation-convey
+    | See https://www.w3.org/TR/webauthn/#enum-attestation-convey
     |
+    | Supported: "none", "indirect", "direct", "enterprise".
     */
 
-    'attestation_conveyance' => \Webauthn\PublicKeyCredentialCreationOptions::ATTESTATION_CONVEYANCE_PREFERENCE_NONE,
+    'attestation_conveyance' => 'none',
 
     /*
     |--------------------------------------------------------------------------
@@ -180,7 +155,7 @@ return [
     |
     */
 
-    'google_safetynet_api_key' => '',
+    'google_safetynet_api_key' => env('GOOGLE_SAFETYNET_API_KEY'),
 
     /*
     |--------------------------------------------------------------------------
@@ -188,38 +163,69 @@ return [
     |--------------------------------------------------------------------------
     |
     | List of allowed Cryptographic Algorithm Identifier.
-    | See https://www.w3.org/TR/webauthn/#alg-identifier
+    | See https://www.w3.org/TR/webauthn/#sctn-alg-identifier
     |
     */
 
     'public_key_credential_parameters' => [
-        \Cose\Algorithms::COSE_ALGORITHM_ES256,
-        \Cose\Algorithms::COSE_ALGORITHM_RS256,
+        \Cose\Algorithms::COSE_ALGORITHM_ES256, // ECDSA with SHA-256
+        \Cose\Algorithms::COSE_ALGORITHM_ES512, // ECDSA with SHA-512
+        \Cose\Algorithms::COSE_ALGORITHM_RS256, // RSASSA-PKCS1-v1_5 with SHA-256
+        \Cose\Algorithms::COSE_ALGORITHM_EdDSA, // EdDSA
+        \Cose\Algorithms::COSE_ALGORITHM_ES384, // ECDSA with SHA-384
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Webauthn Authenticator Selection Criteria
+    | Credentials Attachment.
     |--------------------------------------------------------------------------
     |
-    | Requirement for the creation operation.
-    | See https://www.w3.org/TR/webauthn/#authenticatorSelection
+    | Authentication can be tied to the current device (like when using Windows
+    | Hello or Touch ID) or a cross-platform device (like USB Key). When this
+    | is "null" the user will decide where to store his authentication info.
+    |
+    | See https://www.w3.org/TR/webauthn/#enum-attachment
+    |
+    | Supported: "null", "cross-platform", "platform".
     |
     */
 
-    'authenticator_selection_criteria' => [
+    'attachment_mode' => null,
 
-        /*
-        | See https://www.w3.org/TR/webauthn/#attachment
-        */
-        'attachment_mode' => \Webauthn\AuthenticatorSelectionCriteria::AUTHENTICATOR_ATTACHMENT_NO_PREFERENCE,
+    /*
+    |--------------------------------------------------------------------------
+    | User presence and verification
+    |--------------------------------------------------------------------------
+    |
+    | Most authenticators and smartphones will ask the user to actively verify
+    | themselves for log in. Use "required" to always ask verify, "preferred"
+    | to ask when possible, and "discouraged" to just ask for user presence.
+    |
+    | See https://www.w3.org/TR/webauthn/#enum-userVerificationRequirement
+    |
+    | Supported: "required", "preferred", "discouraged".
+    |
+    */
 
-        'require_resident_key' => false,
+    'user_verification' => 'preferred',
 
-        /*
-        | See https://www.w3.org/TR/webauthn/#userVerificationRequirement
-        */
-        'user_verification' => \Webauthn\AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_PREFERRED,
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Userless (One touch, Typeless) login
+    |--------------------------------------------------------------------------
+    |
+    | By default, users must input their email to receive a list of credentials
+    | ID to use for authentication, but they can also login without specifying
+    | one if the device can remember them, allowing for true one-touch login.
+    |
+    | If required or preferred, login verification will be always required.
+    |
+    | See https://www.w3.org/TR/webauthn/#enum-residentKeyRequirement
+    |
+    | Supported: "null", "required", "preferred", "discouraged".
+    |
+    */
+
+    'userless' => 'preferred',
 
 ];

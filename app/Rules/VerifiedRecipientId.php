@@ -36,6 +36,10 @@ class VerifiedRecipientId implements Rule
             })
             ->toArray();
 
+        if (! is_array($ids)) {
+            return false;
+        }
+
         foreach ($ids as $id) {
             if (!in_array($id, $verifiedRecipientIds)) {
                 return false;

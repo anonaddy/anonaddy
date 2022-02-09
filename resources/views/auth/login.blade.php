@@ -9,7 +9,7 @@
                     <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
                 </a>
             </div>
-            <div class="flex flex-col break-words bg-white border border-2 rounded-lg shadow-lg overflow-hidden">
+            <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('login') }}">
                     @csrf
 

@@ -6,7 +6,7 @@
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
                 <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
             </div>
-            <div class="flex flex-col break-words bg-white border border-2 rounded-lg shadow-lg overflow-hidden">
+            <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('password.update') }}">
                     @csrf
 

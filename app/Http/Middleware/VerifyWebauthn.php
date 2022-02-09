@@ -5,18 +5,10 @@ namespace App\Http\Middleware;
 use App\Facades\Webauthn;
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Support\Facades\Redirect;
 
 class VerifyWebauthn
 {
-    /**
-     * The config repository instance.
-     *
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
-
     /**
      * The auth factory instance.
      *
@@ -30,9 +22,8 @@ class VerifyWebauthn
      * @param \Illuminate\Contracts\Config\Repository $config
      * @param \Illuminate\Contracts\Auth\Factory $auth
      */
-    public function __construct(Config $config, AuthFactory $auth)
+    public function __construct(AuthFactory $auth)
     {
-        $this->config = $config;
         $this->auth = $auth;
     }
 
@@ -46,8 +37,7 @@ class VerifyWebauthn
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ((bool) $this->config->get('webauthn.enable', true) &&
-            ! Webauthn::check()) {
+        if (Webauthn::webauthnEnabled() && ! Webauthn::check()) {
             abort_if($this->auth->guard($guard)->guest(), 401, trans('webauthn::errors.user_unauthenticated'));
 
             if (Webauthn::enabled($request->user($guard))) {
