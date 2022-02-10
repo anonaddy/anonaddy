@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Actions\RegisterKeyStore;
+use App\Facades\Webauthn as WebauthnFacade;
 use App\Models\WebauthnKey;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -121,6 +122,10 @@ class WebauthnController extends ControllersWebauthnController
             user()->webauthnKeys()
                 ->findOrFail($webauthnKeyId)
                 ->delete();
+
+            if (! WebauthnFacade::hasKey(user())) {
+                WebauthnFacade::logout();
+            }
 
             return Response::json([
                 'deleted' => true,

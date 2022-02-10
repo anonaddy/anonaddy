@@ -226,6 +226,6 @@ return [
     |
     */
 
-    'userless' => 'preferred',
+    'userless' => 'null',
 
 ];

@@ -371,7 +371,7 @@ class ReceiveEmail extends Command
             }
 
             if (isset($user)) {
-                $user->failedDeliveries()->create([
+                $failedDelivery = $user->failedDeliveries()->create([
                     'recipient_id' => $recipient->id ?? null,
                     'alias_id' => $alias->id ?? null,
                     'bounce_type' => $bounceType,
@@ -384,8 +384,10 @@ class ReceiveEmail extends Command
                 ]);
 
                 if (isset($alias)) {
-                    // Decrement the alias forward count due to the failed delivery
-                    $alias->decrement('emails_forwarded');
+                    // Decrement the alias forward count due to failed delivery
+                    if ($failedDelivery->email_type === 'F' && $alias->emails_forwarded > 0) {
+                        $alias->decrement('emails_forwarded');
+                    }
                 }
             } else {
                 Log::info([
