@@ -907,7 +907,7 @@ Here we are telling Rspamd to add a header to any message that fails DMARC check
 Next we'll configure the headers to add, create a new file `/etc/rspamd/local.d/milter_headers.conf` and enter the following inside:
 
 ```
-use = ["authentication-results", "remove-headers", "spam-header"];
+use = ["authentication-results", "remove-headers", "spam-header", "add_dmarc_allow_header"];
 
 routines {
   remove-headers {
@@ -929,9 +929,29 @@ routines {
     remove = 0;
   }
 }
+
+custom {
+  add_dmarc_allow_header = <<EOD
+return function(task, common_meta)
+  if task:has_symbol('DMARC_POLICY_ALLOW') then
+    return nil,
+    {['X-AnonAddy-Dmarc-Allow'] = 'Yes'},
+    {['X-AnonAddy-Dmarc-Allow'] = 0},
+    {}
+  end
+
+  return nil,
+  {},
+  {['X-AnonAddy-Dmarc-Allow'] = 0},
+  {}
+end
+EOD;
+}
 ```
 
 The authentication results header will give information on whether the message passed SPF, DKIM and DMARC checks and the spam header will be added if it fails any of these.
+
+The custom routine we've created `add_dmarc_allow_header` will simply add a header to messages that have the `DMARC_POLICY_ALLOW` symbol present in Rspamd. We will use this to only allow replies / sends from aliases that are explicity permitted by their DMARC policy, in order to prevent anyone spoofing any of your recipient's email addresses.
 
 To see the currently enabled modules in Rspamd we can run:
 

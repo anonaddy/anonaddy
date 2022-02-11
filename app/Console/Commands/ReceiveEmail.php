@@ -144,8 +144,8 @@ class ReceiveEmail extends Command
                 // Check whether this email is a reply/send from or a new email to be forwarded.
                 if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL) && $user->isVerifiedRecipient($this->getSenderFrom())) {
 
-                    // Check if the spam header is present from Rspamd
-                    if ($this->parser->getHeader('X-AnonAddy-Spam')) {
+                    // Check if the Dmarc allow or spam headers are present from Rspamd
+                    if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow') || $this->parser->getHeader('X-AnonAddy-Spam')) {
                         // Notify user and exit
                         $user->notify(new SpamReplySendAttempt($recipient, $this->getSenderFrom(), $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
                         exit(0);
