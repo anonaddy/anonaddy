@@ -10,6 +10,8 @@ class ActiveRuleController extends Controller
 {
     public function store(Request $request)
     {
+        $request->validate(['id' => 'required|string']);
+
         $rule = user()->rules()->findOrFail($request->id);
 
         $rule->activate();

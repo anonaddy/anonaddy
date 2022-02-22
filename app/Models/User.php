@@ -389,17 +389,42 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isVerifiedRecipient($email)
     {
         return $this
-                ->verifiedRecipients()
-                ->get()
-                ->map(function ($recipient) use ($email) {
-                    if (Str::contains($email, '+')) {
-                        return strtolower($recipient->email);
-                    }
+            ->verifiedRecipients()
+            ->select(['id', 'user_id', 'email', 'email_verified_at'])
+            ->get()
+            ->map(function ($recipient) use ($email) {
+                if (Str::contains($email, '+')) {
+                    return strtolower($recipient->email);
+                }
 
-                    $withoutExtension = preg_replace('/\+[\s\S]+(?=@)/', '', $recipient->email);
-                    return strtolower($withoutExtension);
-                })
-                ->contains(strtolower($email));
+                $withoutExtension = preg_replace('/\+[\s\S]+(?=@)/', '', $recipient->email);
+                return strtolower($withoutExtension);
+            })
+            ->contains(strtolower($email));
+    }
+
+    public function getVerifiedRecipientByEmail($email)
+    {
+        return $this
+            ->verifiedRecipients()
+            ->select(['id', 'user_id', 'email', 'can_reply_send', 'email_verified_at'])
+            ->get()
+            ->first(function ($recipient) use ($email) {
+                if (Str::contains($email, '+')) {
+                    $recipientEmail = strtolower($recipient->email);
+                } else {
+                    $recipientEmail = strtolower(preg_replace('/\+[\s\S]+(?=@)/', '', $recipient->email));
+                }
+
+                // Allow either pm.me or protonmail.com domains
+                if (in_array(Str::afterLast($email, '@'), ['pm.me', 'protonmail.com'])) {
+                    $localPart = Str::beforeLast($email, '@');
+
+                    return in_array($recipientEmail, [strtolower($localPart.'@pm.me'), strtolower($localPart.'@protonmail.com')]);
+                }
+
+                return $recipientEmail === strtolower($email);
+            });
     }
 
     public function deleteKeyFromKeyring($fingerprint): void

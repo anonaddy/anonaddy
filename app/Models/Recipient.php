@@ -27,6 +27,7 @@ class Recipient extends Model
     protected $fillable = [
         'email',
         'user_id',
+        'can_reply_send',
         'should_encrypt',
         'fingerprint',
         'email_verified_at'
@@ -41,6 +42,7 @@ class Recipient extends Model
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
+        'can_reply_send' => 'boolean',
         'should_encrypt' => 'boolean'
     ];
 

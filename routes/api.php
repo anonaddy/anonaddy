@@ -41,6 +41,9 @@ Route::group([
     Route::post('/encrypted-recipients', 'Api\EncryptedRecipientController@store');
     Route::delete('/encrypted-recipients/{id}', 'Api\EncryptedRecipientController@destroy');
 
+    Route::post('/allowed-recipients', 'Api\AllowedRecipientController@store');
+    Route::delete('/allowed-recipients/{id}', 'Api\AllowedRecipientController@destroy');
+
     Route::get('/domains', 'Api\DomainController@index');
     Route::get('/domains/{id}', 'Api\DomainController@show');
     Route::post('/domains', 'Api\DomainController@store');

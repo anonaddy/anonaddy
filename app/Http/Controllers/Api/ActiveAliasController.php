@@ -10,6 +10,8 @@ class ActiveAliasController extends Controller
 {
     public function store(Request $request)
     {
+        $request->validate(['id' => 'required|string']);
+
         $alias = user()->aliases()->withTrashed()->findOrFail($request->id);
 
         if ($alias->trashed()) {

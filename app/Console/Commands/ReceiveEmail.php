@@ -12,6 +12,7 @@ use App\Models\EmailData;
 use App\Models\PostfixQueueId;
 use App\Models\Recipient;
 use App\Models\User;
+use App\Notifications\DisallowedReplySendAttempt;
 use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
 use App\Notifications\SpamReplySendAttempt;
@@ -45,6 +46,7 @@ class ReceiveEmail extends Command
      */
     protected $description = 'Receive email from postfix pipe';
     protected $parser;
+    protected $senderFrom;
     protected $size;
 
     /**
@@ -70,6 +72,7 @@ class ReceiveEmail extends Command
             $file = $this->argument('file');
 
             $this->parser = $this->getParser($file);
+            $this->senderFrom = $this->getSenderFrom();
 
             $recipients = $this->getRecipients();
 
@@ -142,12 +145,17 @@ class ReceiveEmail extends Command
                 $this->checkRateLimit($user);
 
                 // Check whether this email is a reply/send from or a new email to be forwarded.
-                if (filter_var(Str::replaceLast('=', '@', $recipient['extension']), FILTER_VALIDATE_EMAIL) && $user->isVerifiedRecipient($this->getSenderFrom())) {
+                $destination = Str::replaceLast('=', '@', $recipient['extension']);
+                $validEmailDestination = filter_var($destination, FILTER_VALIDATE_EMAIL);
+                $verifiedRecipient = $user->getVerifiedRecipientByEmail($this->senderFrom);
+
+                if ($validEmailDestination && $verifiedRecipient?->can_reply_send) {
 
                     // Check if the Dmarc allow or spam headers are present from Rspamd
                     if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow') || $this->parser->getHeader('X-AnonAddy-Spam')) {
                         // Notify user and exit
-                        $user->notify(new SpamReplySendAttempt($recipient, $this->getSenderFrom(), $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+                        $verifiedRecipient->notify(new SpamReplySendAttempt($recipient, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+
                         exit(0);
                     }
 
@@ -156,6 +164,11 @@ class ReceiveEmail extends Command
                     } else {
                         $this->handleSendFrom($user, $recipient, $aliasable ?? null);
                     }
+                } elseif ($validEmailDestination && $verifiedRecipient?->can_reply_send === false) {
+                    // Notify user that they have not allowed this recipient to reply and send from aliases
+                    $verifiedRecipient->notify(new DisallowedReplySendAttempt($recipient, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+
+                    exit(0);
                 } else {
                     $this->handleForward($user, $recipient, $aliasable ?? null);
                 }
@@ -173,7 +186,7 @@ class ReceiveEmail extends Command
     {
         $alias = Alias::find($recipient['local_part']);
 
-        if (!is_null($alias) && $alias->user->isVerifiedRecipient($this->getSenderFrom()) && ! $this->parser->getHeader('X-AnonAddy-Spam')) {
+        if ($alias && $alias->user->isVerifiedRecipient($this->senderFrom) && $this->parser->getHeader('X-AnonAddy-Dmarc-Allow')) {
             $alias->deactivate();
         }
     }
@@ -387,6 +400,14 @@ class ReceiveEmail extends Command
                     // Decrement the alias forward count due to failed delivery
                     if ($failedDelivery->email_type === 'F' && $alias->emails_forwarded > 0) {
                         $alias->decrement('emails_forwarded');
+                    }
+
+                    if ($failedDelivery->email_type === 'R' && $alias->emails_replied > 0) {
+                        $alias->decrement('emails_replied');
+                    }
+
+                    if ($failedDelivery->email_type === 'S' && $alias->emails_sent > 0) {
+                        $alias->decrement('emails_sent');
                     }
                 }
             } else {

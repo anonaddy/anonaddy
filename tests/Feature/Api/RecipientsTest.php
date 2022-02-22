@@ -277,4 +277,34 @@ class RecipientsTest extends TestCase
         $response->assertStatus(204);
         $this->assertFalse($this->user->recipients[0]->should_encrypt);
     }
+
+    /** @test */
+    public function user_can_allow_recipient_to_send_or_reply()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'can_reply_send' => false
+        ]);
+
+        $response = $this->json('POST', '/api/v1/allowed-recipients/', [
+            'id' => $recipient->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $response->getData()->data->can_reply_send);
+    }
+
+    /** @test */
+    public function user_can_disallow_recipient_from_sending_or_replying()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'can_reply_send' => true
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/allowed-recipients/'.$recipient->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->recipients[0]->can_reply_send);
+    }
 }

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\RecipientResource;
 use Illuminate\Http\Request;
 
-class EncryptedRecipientController extends Controller
+class AllowedRecipientController extends Controller
 {
     public function store(Request $request)
     {
@@ -14,7 +14,7 @@ class EncryptedRecipientController extends Controller
 
         $recipient = user()->recipients()->findOrFail($request->id);
 
-        $recipient->update(['should_encrypt' => true]);
+        $recipient->update(['can_reply_send' => true]);
 
         return new RecipientResource($recipient);
     }
@@ -23,7 +23,7 @@ class EncryptedRecipientController extends Controller
     {
         $recipient = user()->recipients()->findOrFail($id);
 
-        $recipient->update(['should_encrypt' => false]);
+        $recipient->update(['can_reply_send' => false]);
 
         return response('', 204);
     }

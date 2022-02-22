@@ -10,6 +10,8 @@ class ActiveAdditionalUsernameController extends Controller
 {
     public function store(Request $request)
     {
+        $request->validate(['id' => 'required|string']);
+
         $username = user()->additionalUsernames()->findOrFail($request->id);
 
         $username->activate();

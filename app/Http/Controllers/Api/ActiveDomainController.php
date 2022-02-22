@@ -10,6 +10,8 @@ class ActiveDomainController extends Controller
 {
     public function store(Request $request)
     {
+        $request->validate(['id' => 'required|string']);
+
         $domain = user()->domains()->findOrFail($request->id);
 
         $domain->activate();

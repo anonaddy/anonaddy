@@ -426,7 +426,7 @@ They would make a Twitter announcement informing all users that they would be ke
 
 ## Is the application tested?
 
-Yes it has over 190 automated PHPUnit tests written.
+Yes it has over 200 automated PHPUnit tests written.
 
 ## How do I host this myself?
 

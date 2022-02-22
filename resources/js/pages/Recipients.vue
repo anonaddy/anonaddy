@@ -110,6 +110,16 @@
           </span>
           <span v-else class="block text-grey-500 text-sm">{{ props.row.aliases.length }}</span>
         </span>
+        <span
+          v-else-if="props.column.field === 'can_reply_send'"
+          class="flex justify-center items-center"
+        >
+          <Toggle
+            v-model="rows[props.row.originalIndex].can_reply_send"
+            @on="allowRepliesSends(props.row.id)"
+            @off="disallowRepliesSends(props.row.id)"
+          />
+        </span>
         <span v-else-if="props.column.field === 'should_encrypt'">
           <span v-if="props.row.fingerprint" class="flex">
             <Toggle
@@ -400,6 +410,12 @@ export default {
           globalSearchDisabled: true,
         },
         {
+          label: 'Can Reply/Send',
+          field: 'can_reply_send',
+          type: 'boolean',
+          globalSearchDisabled: true,
+        },
+        {
           label: 'Encryption',
           field: 'should_encrypt',
           type: 'boolean',
@@ -652,6 +668,34 @@ export default {
     turnOffEncryption(id) {
       axios
         .delete(`/api/v1/encrypted-recipients/${id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
+    allowRepliesSends(id) {
+      axios
+        .post(
+          `/api/v1/allowed-recipients`,
+          JSON.stringify({
+            id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
+    disallowRepliesSends(id) {
+      axios
+        .delete(`/api/v1/allowed-recipients/${id}`)
         .then(response => {
           //
         })

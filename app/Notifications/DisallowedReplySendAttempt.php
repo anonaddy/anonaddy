@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 use Swift_SwiftException;
 
-class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBeEncrypted
+class DisallowedReplySendAttempt extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
     use Queueable;
 
@@ -70,8 +70,8 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
         }
 
         return (new MailMessage)
-            ->subject('Attempted reply/send from alias has failed')
-            ->markdown('mail.spam_reply_send_attempt', [
+            ->subject('Disallowed reply/send from alias')
+            ->markdown('mail.disallowed_reply_send_attempt', [
                 'aliasEmail' => $this->aliasEmail,
                 'recipient' => $this->recipient,
                 'destination' => $this->destination,
@@ -79,7 +79,7 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
             ])
             ->withSwiftMessage(function ($message) use ($openpgpsigner) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'SRSA:anonaddy');
+                        ->addTextHeader('Feedback-ID', 'DRSA:anonaddy');
 
                 if ($openpgpsigner) {
                     $message->attachSigner($openpgpsigner);

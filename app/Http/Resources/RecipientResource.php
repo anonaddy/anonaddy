@@ -12,6 +12,7 @@ class RecipientResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'email' => $this->email,
+            'can_reply_send' => $this->can_reply_send,
             'should_encrypt' => $this->should_encrypt,
             'fingerprint' => $this->fingerprint,
             'email_verified_at' => $this->email_verified_at ? $this->email_verified_at->toDateTimeString() : null,
