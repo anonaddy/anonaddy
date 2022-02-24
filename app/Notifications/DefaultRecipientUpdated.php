@@ -14,16 +14,16 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
 {
     use Queueable;
 
-    protected $previousDefaultRecipient;
+    protected $newDefaultRecipient;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($previousDefaultRecipient)
+    public function __construct($newDefaultRecipient)
     {
-        $this->previousDefaultRecipient = $previousDefaultRecipient;
+        $this->newDefaultRecipient = $newDefaultRecipient;
     }
 
     /**
@@ -46,8 +46,7 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
     public function toMail($notifiable)
     {
         $openpgpsigner = null;
-        $recipient = $notifiable->defaultRecipient;
-        $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
+        $fingerprint = $notifiable->should_encrypt ? $notifiable->fingerprint : null;
 
         if ($fingerprint) {
             try {
@@ -57,17 +56,17 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
                 info($e->getMessage());
                 $openpgpsigner = null;
 
-                $recipient->update(['should_encrypt' => false]);
+                $notifiable->update(['should_encrypt' => false]);
 
-                $recipient->notify(new GpgKeyExpired);
+                $notifiable->notify(new GpgKeyExpired);
             }
         }
 
         return (new MailMessage)
             ->subject("Your default recipient has just been updated")
             ->markdown('mail.default_recipient_updated', [
-                'previousDefaultRecipient' => $this->previousDefaultRecipient,
-                'defaultRecipient' => $notifiable->email
+                'defaultRecipient' => $notifiable->email,
+                'newDefaultRecipient' => $this->newDefaultRecipient
             ])
             ->withSwiftMessage(function ($message) use ($openpgpsigner) {
                 $message->getHeaders()
