@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EditDefaultRecipientRequest;
 use App\Http\Requests\UpdateDefaultRecipientRequest;
+use App\Notifications\DefaultRecipientUpdated;
 
 class DefaultRecipientController extends Controller
 {
@@ -15,14 +16,19 @@ class DefaultRecipientController extends Controller
     public function __construct()
     {
         $this->middleware('throttle:1,1')->only('edit');
+        $this->middleware('throttle:3,1')->only('update');
     }
 
     public function update(UpdateDefaultRecipientRequest $request)
     {
         $recipient = user()->verifiedRecipients()->findOrFail($request->default_recipient);
 
+        $currentDefaultRecipient = user()->email;
+
         user()->default_recipient = $recipient;
         user()->save();
+
+        user()->notify(new DefaultRecipientUpdated($currentDefaultRecipient));
 
         return back()->with(['status' => 'Default Recipient Updated Successfully']);
     }
