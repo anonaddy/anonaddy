@@ -399,6 +399,26 @@
                     When you login with 2FA enabled, you will be prompted to use a security key or enter a OTP (one time passcode) depending on which method you choose below. You can only have one method of 2nd factor authentication enabled at once.
                 </p>
 
+                @if($user->two_factor_enabled || LaravelWebauthn\Facades\Webauthn::enabled($user))
+                    <h3 class="font-bold text-xl">
+                        Generate New Backup Code
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="my-4">
+                        The backup code can be used in a situation where you have lost your 2FA device to allow you to access your account.
+                        If you've forgotten or lost your backup code then you can generate a new one by clicking the button below. <b>This code will only be displayed once</b> so make sure you store it in a <b>secure place</b>.
+                    </p>
+
+                    <form method="POST" action="{{ route('settings.new_backup_code') }}" class="pb-16">
+                        @csrf
+                        <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                            Generate New Backup Code
+                        </button>
+                    </form>
+                @endif
+
                 @if($user->two_factor_enabled)
 
                     <form method="POST" action="{{ route('settings.2fa_disable') }}">

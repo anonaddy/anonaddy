@@ -6,6 +6,7 @@ use App\Facades\Webauthn;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 class BackupCodeController extends Controller
@@ -54,5 +55,14 @@ class BackupCodeController extends Controller
         }
 
         return redirect()->intended($request->redirectPath);
+    }
+
+    public function update()
+    {
+        user()->update([
+            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+        ]);
+
+        return back()->with(['backupCode' => $code]);
     }
 }

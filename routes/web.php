@@ -87,5 +87,7 @@ Route::group([
     Route::post('/2fa/regenerate', 'Auth\TwoFactorAuthController@update')->name('settings.2fa_regenerate');
     Route::post('/2fa/disable', 'Auth\TwoFactorAuthController@destroy')->name('settings.2fa_disable');
 
+    Route::post('/2fa/new-backup-code', 'Auth\BackupCodeController@update')->name('settings.new_backup_code');
+
     Route::get('/aliases/export', 'AliasExportController@export')->name('aliases.export');
 });

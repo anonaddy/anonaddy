@@ -12,6 +12,7 @@ use App\Models\Recipient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
@@ -264,6 +265,24 @@ class SettingsTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertFalse($this->user->use_reply_to);
+    }
+
+    /** @test */
+    public function user_can_generate_new_backup_code()
+    {
+        $this->user->update([
+            'two_factor_backup_code' => bcrypt(Str::random(40))
+        ]);
+
+        $currentBackupCode = $this->user->two_factor_backup_code;
+
+        $response = $this->post('/settings/2fa/new-backup-code/');
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHas('backupCode');
+
+        $this->assertNotEquals($currentBackupCode, $this->user->two_factor_backup_code);
     }
 
     /** @test */
