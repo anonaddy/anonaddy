@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCatchAllRequest extends FormRequest
+class UpdateUsernameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class UpdateCatchAllRequest extends FormRequest
     public function rules()
     {
         return [
-            'catch_all' => 'required|boolean'
+            'description' => 'nullable|max:200'
         ];
     }
 }

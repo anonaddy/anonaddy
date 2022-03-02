@@ -9,7 +9,7 @@ class ShowRecipientController extends Controller
         $recipients = user()->recipients()->with([
             'aliases:id,aliasable_id,email',
             'domainsUsingAsDefault.aliases:id,aliasable_id,email',
-            'AdditionalUsernamesUsingAsDefault.aliases:id,aliasable_id,email'
+            'usernamesUsingAsDefault.aliases:id,aliasable_id,email'
         ])->latest()->get();
 
         $recipients->each(function ($recipient) {
@@ -20,11 +20,11 @@ class ShowRecipientController extends Controller
                 $recipient->setRelation('aliases', $recipient->aliases->concat($domainAliases)->unique('email'));
             }
 
-            if ($recipient->AdditionalUsernamesUsingAsDefault) {
-                $AdditionalUsernameAliases = $recipient->AdditionalUsernamesUsingAsDefault->flatMap(function ($domain) {
+            if ($recipient->usernamesUsingAsDefault) {
+                $usernameAliases = $recipient->usernamesUsingAsDefault->flatMap(function ($domain) {
                     return $domain->aliases;
                 });
-                $recipient->setRelation('aliases', $recipient->aliases->concat($AdditionalUsernameAliases)->unique('email'));
+                $recipient->setRelation('aliases', $recipient->aliases->concat($usernameAliases)->unique('email'));
             }
         });
 

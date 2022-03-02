@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\AdditionalUsernameResource;
+use App\Http\Resources\UsernameResource;
 use Illuminate\Http\Request;
 
-class CatchAllAdditionalUsernameController extends Controller
+class CatchAllUsernameController extends Controller
 {
     public function store(Request $request)
     {
         $request->validate(['id' => 'required|string']);
 
-        $username = user()->additionalUsernames()->findOrFail($request->id);
+        $username = user()->usernames()->findOrFail($request->id);
 
         $username->enableCatchAll();
 
-        return new AdditionalUsernameResource($username);
+        return new UsernameResource($username);
     }
 
     public function destroy($id)
     {
-        $username = user()->additionalUsernames()->findOrFail($id);
+        $username = user()->usernames()->findOrFail($id);
 
         $username->disableCatchAll();
 

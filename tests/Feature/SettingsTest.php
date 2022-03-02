@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Exports\AliasesExport;
-use App\Models\AdditionalUsername;
 use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\DeletedUsername;
 use App\Models\Domain;
 use App\Models\Recipient;
 use App\Models\User;
+use App\Models\Username;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,6 +29,9 @@ class SettingsTest extends TestCase
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
         $this->user->recipients()->save($this->user->defaultRecipient);
+        $this->user->usernames()->save($this->user->defaultUsername);
+        $this->user->defaultUsername->username = 'johndoe';
+        $this->user->defaultUsername->save();
     }
 
     /** @test */
@@ -89,7 +92,7 @@ class SettingsTest extends TestCase
     public function user_cannot_update_default_alias_domain_if_invalid()
     {
         $response = $this->post('/settings/default-alias-domain', [
-            'domain' => 'johndoe.anonaddy.me'
+            'domain' => 'invalid.anonaddy.me'
         ]);
 
         $response->assertStatus(302);
@@ -212,34 +215,6 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
-    public function user_can_enable_catch_all_for_account()
-    {
-        $this->user->update(['catch_all' => false]);
-
-        $this->assertFalse($this->user->catch_all);
-
-        $response = $this->post('/settings/catch-all/', [
-            'catch_all' => true
-        ]);
-
-        $response->assertStatus(302);
-        $this->assertTrue($this->user->catch_all);
-    }
-
-    /** @test */
-    public function user_can_disable_catch_all_for_account()
-    {
-        $this->assertTrue($this->user->catch_all);
-
-        $response = $this->post('/settings/catch-all/', [
-            'catch_all' => false
-        ]);
-
-        $response->assertStatus(302);
-        $this->assertFalse($this->user->catch_all);
-    }
-
-    /** @test */
     public function user_can_enable_use_reply_to()
     {
         $this->assertFalse($this->user->use_reply_to);
@@ -332,14 +307,14 @@ class SettingsTest extends TestCase
             'aliasable_type' => 'App\Models\Domain'
         ]);
 
-        $additionalUsername = AdditionalUsername::factory()->create([
+        $username = Username::factory()->create([
             'user_id' => $this->user->id
         ]);
 
-        $aliasWithAdditionalUsername = Alias::factory()->create([
+        $aliasWithUsername = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'aliasable_id' => $additionalUsername->id,
-            'aliasable_type' => 'App\Models\AdditionaUsername'
+            'aliasable_id' => $username->id,
+            'aliasable_type' => 'App\Models\Username'
         ]);
 
         $response = $this->post('/settings/account', [
@@ -383,10 +358,10 @@ class SettingsTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('aliases', [
-            'id' => $aliasWithAdditionalUsername->id,
+            'id' => $aliasWithUsername->id,
             'user_id' => $this->user->id,
-            'aliasable_id' => $additionalUsername->id,
-            'aliasable_type' => 'App\Models\AdditionalUsername'
+            'aliasable_id' => $username->id,
+            'aliasable_type' => 'App\Models\Username'
         ]);
 
         $this->assertDatabaseMissing('recipients', [
@@ -399,13 +374,13 @@ class SettingsTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        $this->assertDatabaseMissing('additional_usernames', [
-            'id' => $additionalUsername->id,
+        $this->assertDatabaseMissing('usernames', [
+            'id' => $username->id,
             'user_id' => $this->user->id
         ]);
 
         $this->assertEquals(DeletedUsername::first()->username, $this->user->username);
-        $this->assertEquals(DeletedUsername::skip(1)->first()->username, $additionalUsername->username);
+        $this->assertEquals(DeletedUsername::skip(1)->first()->username, $username->username);
     }
 
     /** @test */
@@ -429,8 +404,11 @@ class SettingsTest extends TestCase
         $this->assertNull(DeletedUsername::first());
 
         $this->assertDatabaseHas('users', [
-            'id' => $this->user->id,
-            'username' => $this->user->username,
+            'id' => $this->user->id
+        ]);
+
+        $this->assertDatabaseHas('usernames', [
+            'username' => $this->user->username
         ]);
     }
 

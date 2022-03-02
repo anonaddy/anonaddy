@@ -45,7 +45,7 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
     Route::get('/domains', 'ShowDomainController@index')->name('domains.index');
     Route::get('/domains/{id}/check-sending', 'DomainVerificationController@checkSending');
 
-    Route::get('/usernames', 'ShowAdditionalUsernameController@index')->name('usernames.index');
+    Route::get('/usernames', 'ShowUsernameController@index')->name('usernames.index');
 
     Route::get('/deactivate/{alias}', 'DeactivateAliasController@deactivate')->name('deactivate');
 
@@ -74,8 +74,6 @@ Route::group([
     Route::post('/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');
 
     Route::post('/banner-location', 'BannerLocationController@update')->name('settings.banner_location');
-
-    Route::post('/catch-all', 'CatchAllController@update')->name('settings.catch_all');
 
     Route::post('/use-reply-to', 'UseReplyToController@update')->name('settings.use_reply_to');
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\AdditionalUsername;
 use App\Models\User;
+use App\Models\Username;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class ShowAdditionalUsernamesTest extends TestCase
+class ShowUsernamesTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -25,7 +25,7 @@ class ShowAdditionalUsernamesTest extends TestCase
     /** @test */
     public function user_can_view_usernames_from_the_usernames_page()
     {
-        $usernames = AdditionalUsername::factory()->count(3)->create([
+        $usernames = Username::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);
 
@@ -39,15 +39,15 @@ class ShowAdditionalUsernamesTest extends TestCase
     /** @test */
     public function latest_usernames_are_listed_first()
     {
-        $a = AdditionalUsername::factory()->create([
+        $a = Username::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(15)
         ]);
-        $b = AdditionalUsername::factory()->create([
+        $b = Username::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(5)
         ]);
-        $c = AdditionalUsername::factory()->create([
+        $c = Username::factory()->create([
             'user_id' => $this->user->id,
             'created_at' => Carbon::now()->subDays(10)
         ]);

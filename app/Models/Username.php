@@ -7,7 +7,7 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdditionalUsername extends Model
+class Username extends Model
 {
     use HasUuid, HasEncryptedAttributes, HasFactory;
 
@@ -20,6 +20,7 @@ class AdditionalUsername extends Model
     ];
 
     protected $fillable = [
+        'user_id',
         'username',
         'description',
         'active',
@@ -43,7 +44,7 @@ class AdditionalUsername extends Model
     {
         parent::boot();
 
-        AdditionalUsername::deleting(function ($username) {
+        Username::deleting(function ($username) {
             $username->aliases()->withTrashed()->forceDelete();
             DeletedUsername::create(['username' => $username->username]);
         });
@@ -58,7 +59,7 @@ class AdditionalUsername extends Model
     }
 
     /**
-     * Get the user for the additional username.
+     * Get the user for the username.
      */
     public function user()
     {
@@ -66,7 +67,7 @@ class AdditionalUsername extends Model
     }
 
     /**
-     * Get all of the additional usernames's aliases.
+     * Get all of the usernames's aliases.
      */
     public function aliases()
     {
@@ -74,14 +75,14 @@ class AdditionalUsername extends Model
     }
 
     /**
-     * Get the additional usernames's default recipient.
+     * Get the usernames's default recipient.
      */
     public function defaultRecipient()
     {
         return $this->hasOne(Recipient::class, 'id', 'default_recipient_id');
     }
     /**
-     * Set the additional usernames's default recipient.
+     * Set the usernames's default recipient.
      */
     public function setDefaultRecipientAttribute($recipient)
     {

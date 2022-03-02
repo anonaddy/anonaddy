@@ -106,9 +106,9 @@ class Recipient extends Model
     /**
      * Get all of the user's custom domains.
      */
-    public function additionalUsernamesUsingAsDefault()
+    public function usernamesUsingAsDefault()
     {
-        return $this->hasMany(AdditionalUsername::class, 'default_recipient_id', 'id');
+        return $this->hasMany(Username::class, 'default_recipient_id', 'id');
     }
 
     /**

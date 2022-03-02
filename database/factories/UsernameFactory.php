@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\AdditionalUsername;
+use App\Models\Username;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class AdditionalUsernameFactory extends Factory
+class UsernameFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = AdditionalUsername::class;
+    protected $model = Username::class;
 
     /**
      * Define the model's default state.

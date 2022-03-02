@@ -19,10 +19,14 @@ class SendFromEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create(['username' => 'johndoe']);
+        $this->user = User::factory()->create();
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->defaultRecipient->email = 'will@anonaddy.com';
         $this->user->defaultRecipient->save();
+
+        $this->user->usernames()->save($this->user->defaultUsername);
+        $this->user->defaultUsername->username = 'johndoe';
+        $this->user->defaultUsername->save();
     }
 
     /** @test */

@@ -67,6 +67,12 @@
             v-clipboard:error="clipboardError"
             >{{ props.row.username | truncate(30) }}</span
           >
+          <span
+            v-if="isDefault(props.row.id)"
+            class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full"
+          >
+            default
+          </span>
         </span>
         <span v-else-if="props.column.field == 'description'">
           <div v-if="usernameIdToEdit === props.row.id" class="flex items-center">
@@ -151,6 +157,7 @@
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <icon
+            v-if="!isDefault(props.row.id)"
             name="trash"
             class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
             @click.native="openDeleteModal(props.row.id)"
@@ -162,12 +169,12 @@
     <div v-else class="bg-white rounded shadow overflow-x-auto">
       <div class="p-8 text-center text-lg text-grey-700">
         <h1 class="mb-6 text-xl text-indigo-800 font-semibold">
-          This is where you can add and view additional usernames
+          This is where you can add and view usernames
         </h1>
         <div class="mx-auto mb-6 w-24 border-b-2 border-grey-200"></div>
         <p class="mb-4">
-          When you add an additional username here you will be able to use it exactly like the
-          username you signed up with!
+          When you add a username here you will be able to use it exactly like the username you
+          signed up with!
         </p>
         <p class="mb-4">
           You can then separate aliases under your different usernames to reduce the chance of
@@ -175,8 +182,8 @@
           and personal emails.
         </p>
         <p>
-          You can add a maximum of {{ usernameCount }} additional usernames. Deleted usernames still
-          count towards your limit so please choose carefully.
+          You can add a maximum of {{ usernameCount }} usernames. Deleted usernames still count
+          towards your limit so please choose carefully.
         </p>
       </div>
     </div>
@@ -189,9 +196,8 @@
           Add new username
         </h2>
         <p class="mt-4 text-grey-700">
-          Please choose additional usernames carefully as you can only add a maximum of
-          {{ usernameCount }}. You cannot login with these usernames, only the one you originally
-          signed up with.
+          Please choose usernames carefully as you can only add a maximum of
+          {{ usernameCount }}. You can login with any of your usernames.
         </p>
         <div class="mt-6">
           <p v-show="errors.newUsername" class="mb-3 text-red-500 text-sm">
@@ -282,7 +288,7 @@
         <p class="mt-4 text-grey-700">
           Are you sure you want to delete this username? This will also delete all aliases
           associated with this username. You will no longer be able to receive any emails at this
-          username subdomain. This will <b>still count</b> towards your additional username limit
+          username subdomain. This will <b>still count</b> towards your username limit
           <b>even once deleted</b>.
         </p>
         <div class="mt-6">
@@ -319,6 +325,10 @@ import Multiselect from 'vue-multiselect'
 
 export default {
   props: {
+    user: {
+      type: Object,
+      required: true,
+    },
     initialUsernames: {
       type: Array,
       required: true,
@@ -438,6 +448,9 @@ export default {
 
       e.preventDefault()
     },
+    isDefault(id) {
+      return this.user.default_username_id === id
+    },
     addNewUsername() {
       this.addUsernameLoading = true
 
@@ -456,13 +469,13 @@ export default {
           this.rows.push(data.data)
           this.newUsername = ''
           this.addUsernameModalOpen = false
-          this.success('Additional Username added')
+          this.success('Username added')
         })
         .catch(error => {
           this.addUsernameLoading = false
 
           if (error.response.status === 403) {
-            this.error('You have reached your additional username limit')
+            this.error('You have reached your username limit')
           } else if (error.response.status == 422) {
             this.error(error.response.data.errors.username[0])
           } else {
@@ -533,7 +546,7 @@ export default {
           this.usernameDefaultRecipientModalOpen = false
           this.editDefaultRecipientLoading = false
           this.defaultRecipient = {}
-          this.success("Additional Username's default recipient updated")
+          this.success("Username's default recipient updated")
         })
         .catch(error => {
           this.usernameDefaultRecipientModalOpen = false

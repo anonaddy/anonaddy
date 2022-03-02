@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Recipient;
 use App\Models\User;
+use App\Models\Username;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -24,10 +25,9 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'username' => $this->faker->userName.$this->faker->randomNumber(3),
+            'default_username_id' => Username::factory(['username' => $this->faker->userName.$this->faker->randomNumber(3)]),
             'banner_location' => 'top',
             'bandwidth' => 0,
-            'catch_all' => 1,
             'default_recipient_id' => Recipient::factory(),
             'use_reply_to' => 0,
             'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret

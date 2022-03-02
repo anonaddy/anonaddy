@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Username;
 use App\Notifications\UsernameReminder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -21,10 +22,13 @@ class LoginTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create([
-            'username' => 'johndoe',
             'password' => Hash::make('mypassword')
         ]);
         $this->user->recipients()->save($this->user->defaultRecipient);
+
+        $this->user->usernames()->save($this->user->defaultUsername);
+        $this->user->defaultUsername->username = 'johndoe';
+        $this->user->defaultUsername->save();
     }
 
     /** @test */
@@ -32,6 +36,23 @@ class LoginTest extends TestCase
     {
         $response = $this->post('/login', [
             'username' => 'johndoe',
+            'password' => 'mypassword'
+        ]);
+
+        $response
+            ->assertRedirect('/')
+            ->assertSessionHasNoErrors();
+    }
+
+    /** @test */
+    public function user_can_login_with_any_username()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        $response = $this->post('/login', [
+            'username' => $username->username,
             'password' => 'mypassword'
         ]);
 

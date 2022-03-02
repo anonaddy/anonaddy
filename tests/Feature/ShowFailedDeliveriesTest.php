@@ -18,7 +18,10 @@ class ShowFailedDeliveriesTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create(['username' => 'johndoe']);
+        $this->user = User::factory()->create();
+        $this->user->usernames()->save($this->user->defaultUsername);
+        $this->user->defaultUsername->username = 'johndoe';
+        $this->user->defaultUsername->save();
         $this->actingAs($this->user);
     }
 

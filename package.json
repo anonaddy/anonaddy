@@ -14,7 +14,7 @@
     },
     "dependencies": {
       "autoprefixer": "^10.4.1",
-        "axios": "^0.24.0",
+        "axios": "^0.26.0",
         "cross-env": "^7.0.3",
         "dayjs": "^1.10.4",
         "laravel-mix": "^6.0.11",

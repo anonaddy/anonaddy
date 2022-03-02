@@ -4,10 +4,10 @@ current:
   label: v
   major: 0
   minor: 10
-  patch: 0
-  prerelease: 1-g1efe2ee
+  patch: 1
+  prerelease: 1-gaca8a64
   buildmetadata: ''
-  commit: 1efe2e
+  commit: aca8a6
   timestamp:
     year: 2020
     month: 10

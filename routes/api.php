@@ -57,18 +57,18 @@ Route::group([
     Route::post('/catch-all-domains', 'Api\CatchAllDomainController@store');
     Route::delete('/catch-all-domains/{id}', 'Api\CatchAllDomainController@destroy');
 
-    Route::get('/usernames', 'Api\AdditionalUsernameController@index');
-    Route::get('/usernames/{id}', 'Api\AdditionalUsernameController@show');
-    Route::post('/usernames', 'Api\AdditionalUsernameController@store');
-    Route::patch('/usernames/{id}', 'Api\AdditionalUsernameController@update');
-    Route::delete('/usernames/{id}', 'Api\AdditionalUsernameController@destroy');
-    Route::patch('/usernames/{id}/default-recipient', 'Api\AdditionalUsernameDefaultRecipientController@update');
+    Route::get('/usernames', 'Api\UsernameController@index');
+    Route::get('/usernames/{id}', 'Api\UsernameController@show');
+    Route::post('/usernames', 'Api\UsernameController@store');
+    Route::patch('/usernames/{id}', 'Api\UsernameController@update');
+    Route::delete('/usernames/{id}', 'Api\UsernameController@destroy');
+    Route::patch('/usernames/{id}/default-recipient', 'Api\UsernameDefaultRecipientController@update');
 
-    Route::post('/active-usernames', 'Api\ActiveAdditionalUsernameController@store');
-    Route::delete('/active-usernames/{id}', 'Api\ActiveAdditionalUsernameController@destroy');
+    Route::post('/active-usernames', 'Api\ActiveUsernameController@store');
+    Route::delete('/active-usernames/{id}', 'Api\ActiveUsernameController@destroy');
 
-    Route::post('/catch-all-usernames', 'Api\CatchAllAdditionalUsernameController@store');
-    Route::delete('/catch-all-usernames/{id}', 'Api\CatchAllAdditionalUsernameController@destroy');
+    Route::post('/catch-all-usernames', 'Api\CatchAllUsernameController@store');
+    Route::delete('/catch-all-usernames/{id}', 'Api\CatchAllUsernameController@destroy');
 
     Route::get('/rules', 'Api\RuleController@index');
     Route::get('/rules/{id}', 'Api\RuleController@show');

@@ -7,8 +7,8 @@ use App\Http\Requests\IndexAliasRequest;
 use App\Http\Requests\StoreAliasRequest;
 use App\Http\Requests\UpdateAliasRequest;
 use App\Http\Resources\AliasResource;
-use App\Models\AdditionalUsername;
 use App\Models\Domain;
+use App\Models\Username;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
@@ -106,7 +106,7 @@ class AliasController extends Controller
         }
 
 
-        // Check if domain is for additional username or custom domain
+        // Check if domain is for username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))
                     ->filter(function ($name) use ($request) {
                         return Str::endsWith($request->domain, $name);
@@ -119,8 +119,8 @@ class AliasController extends Controller
         if ($parentDomain) {
             $subdomain = substr($request->domain, 0, strrpos($request->domain, '.'.$parentDomain));
 
-            if ($additionalUsername = AdditionalUsername::where('username', $subdomain)->first()) {
-                $aliasable = $additionalUsername;
+            if ($username = Username::where('username', $subdomain)->first()) {
+                $aliasable = $username;
             }
         } else {
             if ($customDomain = Domain::where('domain', $request->domain)->first()) {

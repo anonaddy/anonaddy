@@ -29,7 +29,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'id',
-        'username',
         'from_name',
         'email_subject',
         'banner_location',
@@ -38,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_alias_domain',
         'default_alias_format',
         'use_reply_to',
+        'default_username_id',
         'default_recipient_id',
         'password',
         'two_factor_enabled',
@@ -70,6 +70,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'id' => 'string',
+        'default_username_id' => 'string',
         'default_recipient_id' => 'string',
         'catch_all' => 'boolean',
         'two_factor_enabled' => 'boolean',
@@ -81,14 +82,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'updated_at',
         'email_verified_at'
     ];
-
-    /**
-     * Set the user's username.
-     */
-    public function setUsernameAttribute($value)
-    {
-        $this->attributes['username'] = strtolower($value);
-    }
 
     /**
      * Get the user's default email.
@@ -115,6 +108,23 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's default username.
+     */
+    public function getUsernameAttribute()
+    {
+        return $this->defaultUsername->username;
+    }
+
+    /**
+     * Set the user's default username.
+     */
+    public function setDefaultUsernameAttribute($username)
+    {
+        $this->attributes['default_username_id'] = $username->id;
+        $this->setRelation('defaultUsername', $username);
+    }
+
+    /**
      * Set the user's default email.
      */
     public function setDefaultRecipientAttribute($recipient)
@@ -129,6 +139,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getBandwidthMbAttribute()
     {
         return round($this->bandwidth / 1024 / 1024, 2);
+    }
+
+    /**
+     * Get the user's default username.
+     */
+    public function defaultUsername()
+    {
+        return $this->hasOne(Username::class, 'id', 'default_username_id');
     }
 
     /**
@@ -220,11 +238,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get all of the user's additional usernames.
+     * Get all of the user's usernames.
      */
-    public function additionalUsernames()
+    public function Usernames()
     {
-        return $this->hasMany(AdditionalUsername::class);
+        return $this->hasMany(Username::class);
     }
 
     /**
@@ -283,7 +301,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->aliases()->whereDoesntHave('recipients')->where(function (Builder $q) {
             return $q->whereDoesntHaveMorph(
                 'aliasable',
-                ['App\Models\Domain', 'App\Models\AdditionalUsername'],
+                ['App\Models\Domain', 'App\Models\Username'],
                 function (Builder $query) {
                     $query->whereNotNull('default_recipient_id');
                 }
@@ -368,7 +386,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        return \Illuminate\Support\Facades\Redis::throttle("user:{$this->username}:limit:new-alias")
+        return \Illuminate\Support\Facades\Redis::throttle("user:{$this->id}:limit:new-alias")
             ->allow(config('anonaddy.new_alias_hourly_limit'))
             ->every(3600)
             ->then(
@@ -381,7 +399,7 @@ class User extends Authenticatable implements MustVerifyEmail
             );
     }
 
-    public function hasReachedAdditionalUsernameLimit()
+    public function hasReachedUsernameLimit()
     {
         return $this->username_count >= config('anonaddy.additional_username_limit');
     }
@@ -483,9 +501,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $allDomains = config('anonaddy.all_domains')[0] ? config('anonaddy.all_domains') : [config('anonaddy.domain')];
 
-        return $this->additionalUsernames()
+        return $this->usernames()
             ->pluck('username')
-            ->push($this->username)
             ->flatMap(function ($username) use ($allDomains) {
                 return collect($allDomains)->map(function ($domain) use ($username) {
                     return $username.'.'.$domain;

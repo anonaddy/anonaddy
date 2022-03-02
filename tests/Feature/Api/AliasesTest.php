@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\AdditionalUsername;
 use App\Models\Alias;
 use App\Models\Domain;
 use App\Models\Recipient;
+use App\Models\Username;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,6 +17,11 @@ class AliasesTest extends TestCase
     {
         parent::setUp();
         parent::setUpPassport();
+        $this->user->update(['username' => 'johndoe']);
+        $this->user->recipients()->save($this->user->defaultRecipient);
+        $this->user->usernames()->save($this->user->defaultUsername);
+        $this->user->defaultUsername->username = 'johndoe';
+        $this->user->defaultUsername->save();
     }
 
     /** @test */
@@ -237,7 +242,7 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_generate_new_alias_with_correct_aliasable_type()
     {
-        AdditionalUsername::factory()->create([
+        Username::factory()->create([
             'user_id' => $this->user->id,
             'username' => 'john'
         ]);

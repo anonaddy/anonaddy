@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Recipient;
 use App\Models\User;
+use App\Models\Username;
 use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
 use App\Rules\NotLocalRecipient;
@@ -60,8 +61,7 @@ class RegisterController extends Controller
                 'required',
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',
-                'unique:users,username',
-                'unique:additional_usernames,username',
+                'unique:usernames,username',
                 new NotBlacklisted,
                 new NotDeletedUsername
             ],
@@ -97,11 +97,16 @@ class RegisterController extends Controller
             'user_id' => $userId
         ]);
 
+        $username = Username::create([
+            'username' => $data['username'],
+            'user_id' => $userId
+        ]);
+
         $twoFactor = app('pragmarx.google2fa');
 
         return User::create([
             'id' => $userId,
-            'username' => $data['username'],
+            'default_username_id' => $username->id,
             'default_recipient_id' => $recipient->id,
             'password' => Hash::make($data['password']),
             'two_factor_secret' => $twoFactor->generateSecretKey()

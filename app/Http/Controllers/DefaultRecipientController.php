@@ -28,7 +28,9 @@ class DefaultRecipientController extends Controller
         user()->default_recipient = $recipient;
         user()->save();
 
-        $currentDefaultRecipient->notify(new DefaultRecipientUpdated($recipient->email));
+        if ($currentDefaultRecipient->id !== $recipient->id) {
+            $currentDefaultRecipient->notify(new DefaultRecipientUpdated($recipient->email));
+        }
 
         return back()->with(['status' => 'Default Recipient Updated Successfully']);
     }

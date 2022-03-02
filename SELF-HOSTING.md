@@ -526,13 +526,13 @@ user = anonaddy
 password = your-database-password
 hosts = 127.0.0.1
 dbname = anonaddy_database
-query = SELECT (SELECT 1 FROM users WHERE '%s' IN (CONCAT(username, '.example.com'))) AS users, (SELECT 1 FROM additional_usernames WHERE '%s' IN (CONCAT(additional_usernames.username, '.example.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
+query = SELECT (SELECT 1 FROM usernames WHERE '%s' IN (CONCAT(username, '.example.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
 ```
 
 If you need to add multiple domains then just update the above query to:
 
 ```sql
-query = SELECT (SELECT 1 FROM users WHERE '%s' IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))) AS users, (SELECT 1 FROM additional_usernames WHERE '%s' IN (CONCAT(additional_usernames.username, '.example.com'),CONCAT(additional_usernames.username, '.example2.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
+query = SELECT (SELECT 1 FROM usernames WHERE '%s' IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
 ```
 
 This file is responsible for determining whether the server should accept email for a certain domain/subdomain. If no results are found from the query then the email will not be accepted.
@@ -569,10 +569,9 @@ DROP PROCEDURE IF EXISTS `check_access`$$
 CREATE PROCEDURE `check_access`(alias_email VARCHAR(254) charset utf8)
 BEGIN
     DECLARE no_alias_exists int(1);
-    DECLARE alias_action varchar(7) charset utf8;
-    DECLARE username_action varchar(7) charset utf8;
-    DECLARE additional_username_action varchar(7) charset utf8;
-    DECLARE domain_action varchar(7) charset utf8;
+    DECLARE alias_action varchar(30) charset utf8;
+    DECLARE username_action varchar(30) charset utf8;
+    DECLARE domain_action varchar(30) charset utf8;
     DECLARE alias_domain varchar(254) charset utf8;
 
     SET alias_domain = SUBSTRING_INDEX(alias_email, '@', -1);
@@ -587,7 +586,7 @@ BEGIN
             SET alias_action = (SELECT
                 IF(deleted_at IS NULL,
                 'DISCARD',
-                'REJECT')
+                'REJECT Address does not exist')
             FROM
                 aliases
             WHERE
@@ -597,7 +596,7 @@ BEGIN
         END IF;
 
         # If the alias is deactivated or deleted then increment its blocked count and return the alias_action
-        IF alias_action IN('DISCARD','REJECT') THEN
+        IF alias_action IN('DISCARD','REJECT Address does not exist') THEN
             UPDATE
                 aliases
             SET
@@ -612,45 +611,32 @@ BEGIN
             SELECT
                 CASE
                     WHEN no_alias_exists
-                    AND catch_all = 0 THEN "REJECT"
-                    ELSE NULL
-                END
-            FROM
-                users
-            WHERE
-                alias_domain IN ( CONCAT(username, '.example.com')) ),
-            (
-            SELECT
-                CASE
-                    WHEN no_alias_exists
-                    AND catch_all = 0 THEN "REJECT"
+                    AND catch_all = 0 THEN "REJECT Address does not exist"
                     WHEN active = 0 THEN "DISCARD"
                     ELSE NULL
                 END
             FROM
-                additional_usernames
+                usernames
             WHERE
                 alias_domain IN ( CONCAT(username, '.example.com')) ),
             (
             SELECT
                 CASE
                     WHEN no_alias_exists
-                    AND catch_all = 0 THEN "REJECT"
+                    AND catch_all = 0 THEN "REJECT Address does not exist"
                     WHEN active = 0 THEN "DISCARD"
                     ELSE NULL
                 END
             FROM
                 domains
             WHERE
-                domain = alias_domain) INTO username_action, additional_username_action, domain_action;
+                domain = alias_domain) INTO username_action, domain_action;
 
             # If all actions are NULL then we can return 'DUNNO' which will prevent Postfix from trying substrings of the alias
-            IF username_action IS NULL AND additional_username_action IS NULL AND domain_action IS NULL THEN
+            IF username_action IS NULL AND domain_action IS NULL THEN
                 SELECT 'DUNNO';
-            ELSEIF username_action IN('DISCARD','REJECT') THEN
+            ELSEIF username_action IN('DISCARD','REJECT Address does not exist') THEN
                 SELECT username_action;
-            ELSEIF additional_username_action IN('DISCARD','REJECT') THEN
-                SELECT additional_username_action;
             ELSE
                 SELECT domain_action;
             END IF;

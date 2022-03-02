@@ -6,7 +6,7 @@ use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreAdditionalUsernameRequest extends FormRequest
+class StoreUsernameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,8 +30,7 @@ class StoreAdditionalUsernameRequest extends FormRequest
                 'required',
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',
-                'unique:users,username',
-                'unique:additional_usernames,username',
+                'unique:usernames,username',
                 new NotBlacklisted,
                 new NotDeletedUsername
             ],

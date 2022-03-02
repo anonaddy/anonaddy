@@ -130,7 +130,7 @@ class Alias extends Model
     public function verifiedRecipientsOrDefault()
     {
         if ($this->verifiedRecipients()->count() === 0) {
-            // If the alias is for a custom domain or additional username that has a default recipient set.
+            // If the alias is for a custom domain or username that has a default recipient set.
             if (isset($this->aliasable->defaultRecipient)) {
                 return $this->aliasable->defaultRecipient();
             }

@@ -15,7 +15,6 @@ class ListUsers extends Command
      * @var string
      */
     protected $signature = 'anonaddy:list-users
-                            {--columns=* : The columns to return}
                             {--username= : The Username of the user}
                             {--json : Output as JSON}
                             {--sort= : The column to sort by}';
@@ -67,21 +66,30 @@ class ListUsers extends Command
      */
     protected function getUsers()
     {
-        if ($columns = $this->option('columns')) {
-            $users = User::select($columns);
-        } else {
-            $users = User::select($this->getColumns());
-        }
+        $users = User::with('defaultUsername:id,user_id,username')
+            ->select(['id', 'default_username_id', 'bandwidth', 'created_at', 'updated_at']);
 
         if ($username = $this->option('username')) {
-            $users->where('username', $username);
+            $users->whereHas('usernames', function ($query) use ($username) {
+                $query->where('username', $username);
+            });
         }
+
+        $users = $users->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'username' => $user->defaultUsername->username,
+                'bandwidth' => $user->bandwidth,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at
+            ];
+        });
 
         if ($sort = $this->option('sort')) {
-            $users->orderBy($sort);
+            $users = $users->sortBy($sort);
         }
 
-        return $users->get()->toArray();
+        return $users->toArray();
     }
 
     /**
@@ -118,11 +126,8 @@ class ListUsers extends Command
      */
     protected function getColumns()
     {
-        $availableColumns = array_map('strtolower', $this->headers);
-
-        if ($columns = $this->option('columns')) {
-            return array_intersect($availableColumns, $this->parseColumns($columns));
-        }
+        $availableColumns = collect($this->headers)
+            ->map(fn ($header) => strtolower($header))->toArray();
 
         return $availableColumns;
     }

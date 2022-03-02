@@ -4,9 +4,11 @@ namespace App\Console\Commands;
 
 use App\Models\Recipient;
 use App\Models\User;
+use App\Models\Username;
 use App\Rules\NotDeletedUsername;
 use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -52,8 +54,7 @@ class CreateUser extends Command
                 'required',
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',
-                'unique:users,username',
-                'unique:additional_usernames,username',
+                'unique:usernames,username',
                 new NotDeletedUsername
             ],
             'email' => [
@@ -79,18 +80,25 @@ class CreateUser extends Command
             'user_id' => $userId
         ]);
 
+        $username = Username::create([
+            'username' => $this->argument('username'),
+            'user_id' => $userId
+        ]);
+
         $twoFactor = app('pragmarx.google2fa');
 
         $user = User::create([
             'id' => $userId,
-            'username' => $this->argument('username'),
+            'default_username_id' => $username->id,
             'default_recipient_id' => $recipient->id,
             'password' => Hash::make($userId),
             'two_factor_secret' => $twoFactor->generateSecretKey()
         ]);
 
-        $this->info('Created user: '.$user->username.' with userid: '.$user->id);
-        $this->info('This user can now reset their password (the default password is their guserid)');
+        event(new Registered($user));
+
+        $this->info('Created user: "'.$user->username.'" with user_id: "'.$user->id.'"');
+        $this->info('This user can now reset their password (the default password is their user_id)');
 
         return 0;
     }

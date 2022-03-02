@@ -5,13 +5,12 @@ namespace App\Console\Commands;
 use App\Mail\ForwardEmail;
 use App\Mail\ReplyToEmail;
 use App\Mail\SendFromEmail;
-use App\Models\AdditionalUsername;
 use App\Models\Alias;
 use App\Models\Domain;
 use App\Models\EmailData;
 use App\Models\PostfixQueueId;
 use App\Models\Recipient;
-use App\Models\User;
+use App\Models\Username;
 use App\Notifications\DisallowedReplySendAttempt;
 use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
@@ -96,7 +95,7 @@ class ReceiveEmail extends Command
                         $aliasable = $alias->aliasable;
                     }
                 } else {
-                    // Does not exist, must be a standard, additional username or custom domain alias
+                    // Does not exist, must be a standard, username or custom domain alias
                     $parentDomain = collect(config('anonaddy.all_domains'))
                     ->filter(function ($name) use ($recipient) {
                         return Str::endsWith($recipient['domain'], $name);
@@ -104,7 +103,7 @@ class ReceiveEmail extends Command
                     ->first();
 
                     if (!empty($parentDomain)) {
-                        // It is standard or additional username alias
+                        // It is standard or username alias
                         $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.' . $parentDomain)); // e.g. johndoe
 
                         if ($subdomain === 'unsubscribe') {
@@ -112,15 +111,11 @@ class ReceiveEmail extends Command
                             continue;
                         }
 
-                        // Check if this is an additional username or standard alias
+                        // Check if this is an username or standard alias
                         if (!empty($subdomain)) {
-                            $user = User::where('username', $subdomain)->first();
-
-                            if (!isset($user)) {
-                                $additionalUsername = AdditionalUsername::where('username', $subdomain)->first();
-                                $user = $additionalUsername->user;
-                                $aliasable = $additionalUsername;
-                            }
+                            $username = Username::where('username', $subdomain)->first();
+                            $user = $username->user;
+                            $aliasable = $username;
                         }
                     } else {
                         // It is a custom domain
@@ -131,7 +126,7 @@ class ReceiveEmail extends Command
                     }
 
                     if (!isset($user) && !empty(config('anonaddy.admin_username'))) {
-                        $user = User::where('username', config('anonaddy.admin_username'))->first();
+                        $user = Username::where('username', config('anonaddy.admin_username'))->first()?->user;
                     }
                 }
 
@@ -430,16 +425,16 @@ class ReceiveEmail extends Command
             exit(1);
         }
 
-        if ($user->nearBandwidthLimit() && ! Cache::has("user:{$user->username}:near-bandwidth")) {
+        if ($user->nearBandwidthLimit() && ! Cache::has("user:{$user->id}:near-bandwidth")) {
             $user->notify(new NearBandwidthLimit());
 
-            Cache::put("user:{$user->username}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
+            Cache::put("user:{$user->id}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
         }
     }
 
     protected function checkRateLimit($user)
     {
-        \Illuminate\Support\Facades\Redis::throttle("user:{$user->username}:limit:emails")
+        \Illuminate\Support\Facades\Redis::throttle("user:{$user->id}:limit:emails")
             ->allow(config('anonaddy.limit'))
             ->every(3600)
             ->then(

@@ -401,7 +401,7 @@
           this:
         </p>
         <p class="mb-4">
-          <b>86064c92-da41-443e-a2bf-5a7b0247842f@{{ domain }}</b>
+          <b>x481n904@{{ domain }}</b>
         </p>
         <p>
           Useful if you do not wish to include your username in the email as a potential link

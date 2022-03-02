@@ -43,7 +43,7 @@ class RecipientController extends Controller
     public function destroy($id)
     {
         if ($id === user()->default_recipient_id) {
-            return response('', 403);
+            return response('You cannot delete your default recipient', 403);
         }
 
         $recipient = user()->recipients()->findOrFail($id);

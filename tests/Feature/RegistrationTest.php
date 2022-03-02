@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\AdditionalUsername;
 use App\Models\DeletedUsername;
 use App\Models\Recipient;
 use App\Models\User;
+use App\Models\Username;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -36,11 +36,11 @@ class RegistrationTest extends TestCase
             ->assertRedirect('/')
             ->assertSessionHasNoErrors();
 
-        $this->assertDatabaseHas('users', [
+        $this->assertDatabaseHas('usernames', [
             'username' => 'johndoe'
         ]);
 
-        $user = User::where('username', 'johndoe')->first();
+        $user = Username::where('username', 'johndoe')->first()->user;
 
         Notification::assertSentTo(
             $user,
@@ -130,15 +130,20 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_email()
     {
-        $user = User::factory()->create(['username' => 'johndoe']);
+        $user = User::factory()->create();
 
         Recipient::factory()->create([
             'user_id' => $user->id,
             'email' => 'johndoe@example.com'
         ]);
 
+        Username::factory()->create([
+            'user_id' => $user->id,
+            'username' => 'johndoe'
+        ]);
+
         $response = $this->post('/register', [
-            'username' => 'johndoe',
+            'username' => 'janedoe',
             'email' => 'johndoe@example.com',
             'email_confirmation' => 'johndoe@example.com',
             'password' => 'mypassword',
@@ -151,23 +156,12 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_username()
     {
-        User::factory()->create(['username' => 'johndoe']);
+        $user = User::factory()->create();
 
-        $response = $this->post('/register', [
-            'username' => 'johndoe',
-            'email' => 'johndoe@example.com',
-            'email_confirmation' => 'johndoe@example.com',
-            'password' => 'mypassword',
-            'terms' => true,
+        Username::factory()->create([
+            'user_id' => $user->id,
+            'username' => 'johndoe'
         ]);
-
-        $response->assertSessionHasErrors(['username']);
-    }
-
-    /** @test */
-    public function user_cannot_register_with_existing_additional_username()
-    {
-        AdditionalUsername::factory()->create(['username' => 'johndoe']);
 
         $response = $this->post('/register', [
             'username' => 'johndoe',

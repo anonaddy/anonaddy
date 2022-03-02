@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Username;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 
@@ -44,11 +45,12 @@ class ResetPasswordController extends Controller
      * If no token is present, display the link request form.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $token
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm(Request $request)
     {
+        $token = $request->route()->parameter('token');
+
         return view('auth.passwords.reset')->with(
             ['token' => $token, 'username' => $request->username]
         );
@@ -76,8 +78,13 @@ class ResetPasswordController extends Controller
      */
     protected function credentials(Request $request)
     {
+        // Find the user_id and use that for the credentials
+        $userId = Username::firstWhere('username', $request->username)?->user_id;
+
+        $request->merge(['id' => $userId]);
+
         return $request->only(
-            'username',
+            'id',
             'password',
             'password_confirmation',
             'token'

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\DeletedUsername;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -34,11 +33,9 @@ class DeleteAccount implements ShouldQueue, ShouldBeEncrypted
      */
     public function handle()
     {
-        DeletedUsername::create(['username' => $this->user->username]);
-
         $this->user->aliasRecipients()->delete();
 
-        $sharedDomainAliases = $this->user->aliases()->whereIn('domain', config('anonaddy.all_domains'));
+        $sharedDomainAliases = $this->user->aliases()->withTrashed()->whereIn('domain', config('anonaddy.all_domains'));
         // Remove data from shared domain aliases
         $sharedDomainAliases->update([
             'extension' => null,
@@ -51,11 +48,11 @@ class DeleteAccount implements ShouldQueue, ShouldBeEncrypted
         // Soft delete any aliases at shared domains
         $sharedDomainAliases->delete();
         // Force delete any other aliases
-        $this->user->aliases()->whereNotIn('domain', config('anonaddy.all_domains'))->forceDelete();
+        $this->user->aliases()->withTrashed()->whereNotIn('domain', config('anonaddy.all_domains'))->forceDelete();
 
         $this->user->recipients()->get()->each->delete(); // In order to fire deleting model event.
         $this->user->domains()->delete();
-        $this->user->additionalUsernames()->get()->each->delete(); // In order to fire deleting model event.
+        $this->user->usernames()->get()->each->delete(); // In order to fire deleting model event.
         $this->user->tokens()->delete();
         $this->user->rules()->delete();
         $this->user->webauthnKeys()->delete();
