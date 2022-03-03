@@ -526,13 +526,13 @@ user = anonaddy
 password = your-database-password
 hosts = 127.0.0.1
 dbname = anonaddy_database
-query = SELECT (SELECT 1 FROM usernames WHERE '%s' IN (CONCAT(username, '.example.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
+query = SELECT (SELECT 1 FROM usernames WHERE '%s' IN (CONCAT(username, '.example.com'))) AS usernames, (SELECT 1 FROM domains WHERE domain = '%s' AND domain_verified_at IS NOT NULL) AS domains LIMIT 1;
 ```
 
 If you need to add multiple domains then just update the above query to:
 
 ```sql
-query = SELECT (SELECT 1 FROM usernames WHERE '%s' IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))) AS usernames, (SELECT 1 FROM domains WHERE domains.domain = '%s' AND domains.domain_verified_at IS NOT NULL) AS domains LIMIT 1;
+query = SELECT (SELECT 1 FROM usernames WHERE '%s' IN (CONCAT(username, '.example.com'),CONCAT(username, '.example2.com'))) AS usernames, (SELECT 1 FROM domains WHERE domain = '%s' AND domain_verified_at IS NOT NULL) AS domains LIMIT 1;
 ```
 
 This file is responsible for determining whether the server should accept email for a certain domain/subdomain. If no results are found from the query then the email will not be accepted.
