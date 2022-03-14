@@ -3,11 +3,11 @@ blade-directive: version
 current:
   label: v
   major: 0
-  minor: 10
-  patch: 1
-  prerelease: 1-gaca8a64
+  minor: 11
+  patch: 0
+  prerelease: 1-gc784c7e
   buildmetadata: ''
-  commit: aca8a6
+  commit: c784c7
   timestamp:
     year: 2020
     month: 10
