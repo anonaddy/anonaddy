@@ -4,10 +4,10 @@ current:
   label: v
   major: 0
   minor: 11
-  patch: 0
-  prerelease: 1-gc784c7e
+  patch: 1
+  prerelease: 1-g2340e25
   buildmetadata: ''
-  commit: c784c7
+  commit: '2340e2'
   timestamp:
     year: 2020
     month: 10

@@ -182,8 +182,8 @@
           and personal emails.
         </p>
         <p>
-          You can add a maximum of {{ usernameCount }} usernames. Deleted usernames still count
-          towards your limit so please choose carefully.
+          You can add a maximum of {{ usernameCount }} usernames. In order to prevent abuse, deleted
+          usernames still count towards your limit, so please choose carefully.
         </p>
       </div>
     </div>

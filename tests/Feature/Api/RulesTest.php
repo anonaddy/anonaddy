@@ -20,7 +20,6 @@ class RulesTest extends TestCase
         parent::setUp();
         parent::setUpPassport();
 
-        $this->user->update(['username' => 'johndoe']);
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->usernames()->save($this->user->defaultUsername);
         $this->user->defaultUsername->username = 'johndoe';

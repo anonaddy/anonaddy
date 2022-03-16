@@ -616,13 +616,8 @@ export default {
           }
         )
         .then(({ data }) => {
-          this.addDomainLoading = false
-          this.rows.push(data.data)
-          this.newDomain = ''
-
-          this.domainToCheck = data.data
-
-          this.success('Custom domain added')
+          // In order to get new TXT verification value
+          location.reload()
         })
         .catch(error => {
           this.addDomainLoading = false

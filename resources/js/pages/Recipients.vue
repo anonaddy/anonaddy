@@ -396,6 +396,7 @@ export default {
         {
           label: 'Key',
           field: 'key',
+          sortable: false,
           type: 'number',
         },
         {

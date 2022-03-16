@@ -42,15 +42,9 @@ class LoginController extends Controller
 
     public function username()
     {
-        $login = request()->input('username');
+        $userId = Username::firstWhere('username', request()->input('username'))?->user_id;
 
-        $user = Username::firstWhere('username', $login)?->user;
-
-        if ($user) {
-            $login = $user->id;
-        }
-
-        request()->merge(['id' => $login]);
+        request()->merge(['id' => $userId]);
 
         return 'id';
     }

@@ -21,9 +21,6 @@ class AliasTest extends TestCase
 
         $this->user = User::factory()->create();
         $this->user->recipients()->save($this->user->defaultRecipient);
-        $this->user->usernames()->save($this->user->defaultUsername);
-        $this->user->defaultUsername->username = 'johndoe';
-        $this->user->defaultUsername->save();
     }
 
     /** @test */

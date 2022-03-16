@@ -104,7 +104,7 @@ class Recipient extends Model
     }
 
     /**
-     * Get all of the user's custom domains.
+     * Get all of the user's usernames using this recipient as their default.
      */
     public function usernamesUsingAsDefault()
     {
