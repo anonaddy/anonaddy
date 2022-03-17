@@ -17,6 +17,11 @@ class UsernamesTest extends TestCase
     {
         parent::setUp();
         parent::setUpPassport();
+
+        $this->user->recipients()->save($this->user->defaultRecipient);
+        $this->user->usernames()->save($this->user->defaultUsername);
+        $this->user->defaultUsername->username = 'johndoe';
+        $this->user->defaultUsername->save();
     }
 
     /** @test */
@@ -32,7 +37,7 @@ class UsernamesTest extends TestCase
 
         // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->json()['data']);
+        $this->assertCount(4, $response->json()['data']);
     }
 
     /** @test */
@@ -85,7 +90,7 @@ class UsernamesTest extends TestCase
 
         $response->assertStatus(403);
         $this->assertEquals(3, $this->user->username_count);
-        $this->assertCount(3, $this->user->usernames);
+        $this->assertCount(4, $this->user->usernames);
     }
 
     /** @test */
@@ -186,7 +191,7 @@ class UsernamesTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/active-usernames/'.$username->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->usernames[0]->active);
+        $this->assertFalse($this->user->usernames[1]->active);
     }
 
     /** @test */
@@ -216,7 +221,7 @@ class UsernamesTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/catch-all-usernames/'.$username->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->usernames[0]->catch_all);
+        $this->assertFalse($this->user->usernames[1]->catch_all);
     }
 
     /** @test */
@@ -244,7 +249,7 @@ class UsernamesTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/usernames/'.$username->id);
 
         $response->assertStatus(204);
-        $this->assertEmpty($this->user->usernames);
+        $this->assertCount(1, $this->user->usernames);
 
         $this->assertEquals(DeletedUsername::first()->username, $username->username);
     }

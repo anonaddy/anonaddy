@@ -38,6 +38,7 @@ class ShowRecipientController extends Controller
             'recipients' => $recipients,
             'aliasesUsingDefault' => user()->aliasesUsingDefault()->take(5)->get(),
             'aliasesUsingDefaultCount' => user()->aliasesUsingDefault()->count(),
+            'user' => user()->load('defaultUsername')
         ]);
     }
 }

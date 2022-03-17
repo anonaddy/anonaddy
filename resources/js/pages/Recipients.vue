@@ -55,7 +55,7 @@
           Key
           <span
             class="tooltip outline-none"
-            :data-tippy-content="`Use this to attach recipients to new aliases as they are created e.g. alias+key@${user.username}.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${user.username}.anonaddy.com. Separating each key by a full stop.`"
+            :data-tippy-content="`Use this to attach recipients to new aliases as they are created e.g. alias+key@${user.default_username.username}.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${user.default_username.username}.anonaddy.com. Separating each key by a full stop.`"
           >
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>

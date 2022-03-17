@@ -310,22 +310,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Disable catch-all for the user.
-     */
-    public function disableCatchAll()
-    {
-        $this->update(['catch_all' => false]);
-    }
-
-    /**
-     * Enable catch-all for the user.
-     */
-    public function enableCatchAll()
-    {
-        $this->update(['catch_all' => true]);
-    }
-
-    /**
      * Send the email verification notification.
      *
      * @return void

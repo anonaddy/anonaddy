@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'banner_location' => $this->banner_location,
             'bandwidth' => $this->bandwidth,
             'username_count' => $this->username_count,
+            'default_username_id' => $this->default_username_id,
             'default_recipient_id' => $this->default_recipient_id,
             'default_alias_domain' => $this->default_alias_domain,
             'default_alias_format' => $this->default_alias_format,

@@ -5,9 +5,9 @@ current:
   major: 0
   minor: 11
   patch: 1
-  prerelease: 1-g2340e25
+  prerelease: 2-gdfb7809
   buildmetadata: ''
-  commit: '2340e2'
+  commit: dfb780
   timestamp:
     year: 2020
     month: 10
