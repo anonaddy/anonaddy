@@ -16,7 +16,7 @@ class CatchAllUsernameController extends Controller
 
         $username->enableCatchAll();
 
-        return new UsernameResource($username);
+        return new UsernameResource($username->load(['aliases', 'defaultRecipient']));
     }
 
     public function destroy($id)

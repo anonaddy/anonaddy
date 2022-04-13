@@ -22,7 +22,7 @@
         "portal-vue": "^2.1.7",
         "postcss": "^8.4.5",
         "postcss-import": "^14.0.0",
-        "resolve-url-loader": "^4.0.0",
+        "resolve-url-loader": "^5.0.0",
         "tailwindcss": "^3.0.11",
         "tippy.js": "^6.2.7",
         "v-clipboard": "^2.2.3",

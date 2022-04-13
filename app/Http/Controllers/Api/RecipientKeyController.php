@@ -30,7 +30,7 @@ class RecipientKeyController extends Controller
             'fingerprint' => $info['fingerprint']
         ]);
 
-        return new RecipientResource($recipient->fresh());
+        return new RecipientResource($recipient->fresh()->load('aliases'));
     }
 
     public function destroy($id)

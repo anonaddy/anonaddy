@@ -16,7 +16,7 @@ class ActiveDomainController extends Controller
 
         $domain->activate();
 
-        return new DomainResource($domain);
+        return new DomainResource($domain->load(['aliases', 'defaultRecipient']));
     }
 
     public function destroy($id)

@@ -25,7 +25,7 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'default_username_id' => Username::factory(['username' => $this->faker->userName.$this->faker->randomNumber(3)]),
+            'default_username_id' => Username::factory(),
             'banner_location' => 'top',
             'bandwidth' => 0,
             'default_recipient_id' => Recipient::factory(),

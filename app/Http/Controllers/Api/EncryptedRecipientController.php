@@ -14,9 +14,13 @@ class EncryptedRecipientController extends Controller
 
         $recipient = user()->recipients()->findOrFail($request->id);
 
+        if (! $recipient->fingerprint) {
+            return response('You need to add a public key to this recipient before you can enable encryption', 422);
+        }
+
         $recipient->update(['should_encrypt' => true]);
 
-        return new RecipientResource($recipient);
+        return new RecipientResource($recipient->load('aliases'));
     }
 
     public function destroy($id)

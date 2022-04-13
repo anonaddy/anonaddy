@@ -16,7 +16,7 @@ class CatchAllDomainController extends Controller
 
         $domain->enableCatchAll();
 
-        return new DomainResource($domain);
+        return new DomainResource($domain->load(['aliases', 'defaultRecipient']));
     }
 
     public function destroy($id)

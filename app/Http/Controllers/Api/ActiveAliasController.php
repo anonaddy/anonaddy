@@ -20,7 +20,7 @@ class ActiveAliasController extends Controller
 
         $alias->activate();
 
-        return new AliasResource($alias);
+        return new AliasResource($alias->load('recipients'));
     }
 
     public function destroy($id)

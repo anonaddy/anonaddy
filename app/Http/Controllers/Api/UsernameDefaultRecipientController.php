@@ -20,6 +20,6 @@ class UsernameDefaultRecipientController extends Controller
 
         $username->save();
 
-        return new UsernameResource($username);
+        return new UsernameResource($username->load(['aliases', 'defaultRecipient']));
     }
 }
