@@ -50,6 +50,22 @@ class LoginController extends Controller
     }
 
     /**
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function validateLogin(Request $request)
+    {
+        $request->validate([
+            $this->username() => 'nullable|string',
+            'password' => 'required|string',
+        ]);
+    }
+
+    /**
      * Get the failed login response instance.
      *
      * @param  \Illuminate\Http\Request  $request
