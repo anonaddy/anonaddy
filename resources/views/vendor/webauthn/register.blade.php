@@ -33,7 +33,7 @@
                         {{ trans('webauthn::messages.noButtonAdvise') }}
                     </p>
 
-                    <form method="POST" class="mt-8" action="{{ route('webauthn.store') }}" id="form">
+                    <form method="POST" onsubmit="registerDevice();return false" class="mt-8" action="{{ route('webauthn.store') }}" id="form">
                         @csrf
                         <input type="hidden" name="register" id="register">
 

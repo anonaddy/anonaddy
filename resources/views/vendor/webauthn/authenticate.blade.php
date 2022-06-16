@@ -35,7 +35,7 @@
                         If nothing happens then click the button below to authenticate.
                     </p>
 
-                    <form method="POST" action="{{ route('webauthn.auth') }}" id="form">
+                    <form method="POST" onsubmit="authenticateDevice();return false" action="{{ route('webauthn.auth') }}" id="form">
                         @csrf
                         <input type="hidden" name="data" id="data" />
                     </form>
@@ -63,7 +63,6 @@
         var publicKey = {!! json_encode($publicKey) !!};
 
         var errors = {
-            key_already_used: "{{ trans('webauthn::errors.key_already_used') }}",
             key_not_allowed: "{{ trans('webauthn::errors.key_not_allowed') }}",
             not_secured: "{{ trans('webauthn::errors.not_secured') }}",
             not_supported: "{{ trans('webauthn::errors.not_supported') }}",
@@ -72,7 +71,7 @@
         function errorMessage(name, message) {
             switch (name) {
             case 'InvalidStateError':
-            return errors.key_already_used;
+            return errors.key_not_allowed;
             case 'NotAllowedError':
             return errors.key_not_allowed;
             default:
