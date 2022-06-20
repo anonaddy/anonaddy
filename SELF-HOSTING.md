@@ -1201,7 +1201,7 @@ php artisan route:cache
 
 ## Adding your private key to sign emails
 
-If you are using encryption and want to sign your forwarded emails then you'll need to create a new GPG key pair.
+If you are using encryption and want to sign your forwarded emails then you'll need to create a new GPG key pair. **You must do this as the user that your web application is being run by**.
 
 To do this we can run:
 
