@@ -39,7 +39,8 @@ class StoreAliasRequest extends FormRequest
                 'array',
                 'max:10',
                 new VerifiedRecipientId
-            ]
+            ],
+            'hostname' => 'nullable|string|max:100'
         ];
     }
 

@@ -11,6 +11,8 @@ use App\Models\Domain;
 use App\Models\Username;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
+use Pdp\Rules;
+use Pdp\Domain\fromIDNA2008;
 
 class AliasController extends Controller
 {
@@ -65,6 +67,10 @@ class AliasController extends Controller
             return response('You have reached your hourly limit for creating new aliases', 429);
         }
 
+        $formatEmail = function(string $localPart, string $domain, string $prefix = '') {
+            return $prefix . '.' . $localPart . '@' . $domain;
+        };
+
         if (isset($request->validated()['local_part'])) {
             $localPart = $request->validated()['local_part'];
 
@@ -80,18 +86,29 @@ class AliasController extends Controller
                 'extension' => $extension ?? null
             ];
         } else {
+            $prefix = null;
+            if (isset($request->validated()['hostname'])) {
+                // TODO this should be cached, perhaps on boot, from https://publicsuffix.org/
+                // see https://github.com/jeremykendall/php-domain-parser
+                $publicSuffixList = Rules::fromPath(sys_get_temp_dir() . '/public_suffix_list.dat');
+
+                $hostname = $request->validated()['hostname'];
+                $domain = Domain::fromIDNA2008($hostname);
+                $prefix = $publicSuffixList->resolve($domain)->secondLevelDomain()->toString();
+            }
+
             if ($request->input('format', 'random_characters') === 'random_words') {
                 $localPart = user()->generateRandomWordLocalPart();
 
                 $data = [
-                    'email' => $localPart . '@' . $request->domain,
+                    'email' => formatEmail($localPart, $request->domain, $prefix),
                     'local_part' => $localPart,
                 ];
             } elseif ($request->input('format', 'random_characters') === 'random_characters') {
                 $localPart = user()->generateRandomCharacterLocalPart(8);
 
                 $data = [
-                    'email' => $localPart . '@' . $request->domain,
+                    'email' => formatEmail($localPart, $request->domain, $prefix),
                     'local_part' => $localPart,
                 ];
             } else {
@@ -99,12 +116,11 @@ class AliasController extends Controller
 
                 $data = [
                     'id' => $uuid,
-                    'email' => $uuid . '@' . $request->domain,
+                    'emai' => formatEmail($uuid, $request->domain, $prefix),
                     'local_part' => $uuid,
                 ];
             }
         }
-
 
         // Check if domain is for username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))
