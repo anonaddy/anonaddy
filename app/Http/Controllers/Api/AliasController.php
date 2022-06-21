@@ -67,8 +67,11 @@ class AliasController extends Controller
             return response('You have reached your hourly limit for creating new aliases', 429);
         }
 
-        $formatEmail = function(string $localPart, string $domain, string $prefix = '') {
-            return $prefix . '.' . $localPart . '@' . $domain;
+        $formatEmail = function(string $localPart, string $domain, string $prefix) {
+            if (isset($prefix) {
+                $localPart = $prefix . '.' . $localPart;
+            }
+            return $localPart . '@' . $domain;
         };
 
         if (isset($request->validated()['local_part'])) {
