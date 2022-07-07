@@ -16,7 +16,11 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasUuid, HasEncryptedAttributes, HasApiTokens, HasFactory;
+    use Notifiable;
+    use HasUuid;
+    use HasEncryptedAttributes;
+    use HasApiTokens;
+    use HasFactory;
 
     public $incrementing = false;
 
@@ -316,7 +320,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new CustomVerifyEmail);
+        $this->notify(new CustomVerifyEmail());
     }
 
     public function hasVerifiedDefaultRecipient()
@@ -465,7 +469,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->implode('.').mt_rand(0, 999);
     }
 
-    public function generateRandomCharacterLocalPart(int $length) : string
+    public function generateRandomCharacterLocalPart(int $length): string
     {
         $alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
 

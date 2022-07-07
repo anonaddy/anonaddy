@@ -2,13 +2,11 @@
 
 namespace App\Mail;
 
-use App\Helpers\AlreadyEncryptedSigner;
-use App\Helpers\OpenPGPSigner;
+use App\CustomMailDriver\Mime\Part\InlineImagePart;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\Recipient;
 use App\Notifications\FailedDeliveryNotification;
-use App\Notifications\GpgKeyExpired;
 use App\Traits\CheckUserRules;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -17,13 +15,13 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Swift_Image;
-use Swift_Signers_DKIMSigner;
-use Swift_SwiftException;
+use Symfony\Component\Mime\Email;
 
 class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 {
-    use Queueable, SerializesModels, CheckUserRules;
+    use Queueable;
+    use SerializesModels;
+    use CheckUserRules;
 
     protected $email;
     protected $user;
@@ -41,8 +39,6 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $deactivateUrl;
     protected $bannerLocation;
     protected $fingerprint;
-    protected $openpgpsigner;
-    protected $dkimSigner;
     protected $encryptedParts;
     protected $fromEmail;
     protected $size;
@@ -90,23 +86,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->encryptedParts = $emailData->encryptedParts ?? null;
         $this->recipientId = $recipient->id;
 
-        $fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
+        $this->fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
 
         $this->bannerLocation = $this->isAlreadyEncrypted() ? 'off' : $this->alias->user->banner_location;
-
-        if ($this->fingerprint = $fingerprint) {
-            try {
-                $this->openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
-                $this->openpgpsigner->addRecipient($fingerprint);
-            } catch (Swift_SwiftException $e) {
-                info($e->getMessage());
-                $this->openpgpsigner = null;
-
-                $recipient->update(['should_encrypt' => false]);
-
-                $recipient->notify(new GpgKeyExpired);
-            }
-        }
     }
 
     /**
@@ -128,19 +110,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $returnPath = $this->alias->email;
 
         if ($this->alias->isCustomDomain()) {
-            if ($this->alias->aliasable->isVerifiedForSending()) {
-                if (config('anonaddy.dkim_signing_key')) {
-                    $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
-                    $this->dkimSigner->ignoreHeader('List-Unsubscribe');
-                    $this->dkimSigner->ignoreHeader('Return-Path');
-                    $this->dkimSigner->ignoreHeader('Feedback-ID');
-                    $this->dkimSigner->ignoreHeader('Content-Type');
-                    $this->dkimSigner->ignoreHeader('Content-Description');
-                    $this->dkimSigner->ignoreHeader('Content-Disposition');
-                    $this->dkimSigner->ignoreHeader('Content-Transfer-Encoding');
-                    $this->dkimSigner->ignoreHeader('MIME-Version');
-                }
-            } else {
+            if (! $this->alias->aliasable->isVerifiedForSending()) {
                 if (! isset($replyToEmail)) {
                     $replyToEmail = $this->fromEmail;
                 }
@@ -153,8 +123,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->email =  $this
             ->from($this->fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
-            ->withSwiftMessage(function ($message) use ($returnPath) {
-                $message->setReturnPath($returnPath);
+            ->withSymfonyMessage(function (Email $message) use ($returnPath) {
+                $message->returnPath($returnPath);
 
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', 'F:' . $this->alias->id . ':anonaddy');
@@ -163,14 +133,14 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 $message->getHeaders()
                         ->addTextHeader('Alias-To', $this->alias->email);
 
-                if ($this->messageId) {
-                    $message->getHeaders()->remove('Message-ID');
+                $message->getHeaders()->remove('Message-ID');
 
-                    // We're not using $message->setId here because it can cause RFC exceptions
+                if ($this->messageId) {
                     $message->getHeaders()
-                            ->addTextHeader('Message-ID', base64_decode($this->messageId));
+                            ->addIdHeader('Message-ID', base64_decode($this->messageId));
                 } else {
-                    $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+                    $message->getHeaders()
+                            ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
                 }
 
                 if ($this->listUnsubscribe) {
@@ -214,33 +184,17 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                             ->addTextHeader('Sender', base64_decode($this->originalSenderHeader));
                 }
 
-                if ($this->encryptedParts) {
-                    $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
-
-                    $message->attachSigner($alreadyEncryptedSigner);
-                }
-
-                if ($this->openpgpsigner) {
-                    $message->attachSigner($this->openpgpsigner);
-                }
-
-                if ($this->dkimSigner) {
-                    $message->attachSigner($this->dkimSigner);
-                }
-
                 if ($this->emailInlineAttachments) {
                     foreach ($this->emailInlineAttachments as $attachment) {
-                        $image = new Swift_Image(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+                        $part = new InlineImagePart(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
 
-                        $cids[] = 'cid:' . base64_decode($attachment['contentId']);
-                        $newCids[] = $message->embed($image);
+                        $part->asInline();
+
+                        $part->setContentId(base64_decode($attachment['contentId']));
+                        $part->setFileName(base64_decode($attachment['file_name']));
+
+                        $message->attachPart($part);
                     }
-
-                    $message->getHeaders()
-                            ->addTextHeader('X-Old-Cids', implode(',', $cids));
-
-                    $message->getHeaders()
-                            ->addTextHeader('X-New-Cids', implode(',', $newCids));
                 }
 
                 if ($this->originalCc) {
@@ -289,10 +243,15 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'location' => $this->bannerLocation,
             'deactivateUrl' => $this->deactivateUrl,
             'aliasEmail' => $this->alias->email,
+            'aliasDomain' => $this->alias->domain,
             'aliasDescription' => $this->alias->description,
+            'recipientId' => $this->recipientId,
+            'fingerprint' => $this->fingerprint,
+            'encryptedParts' => $this->encryptedParts,
             'fromEmail' => $this->sender,
             'replacedSubject' => $this->replacedSubject,
-            'shouldBlock' => $this->size === 0
+            'shouldBlock' => $this->size === 0,
+            'needsDkimSignature' => $this->needsDkimSignature()
         ]);
 
         if (isset($replyToEmail)) {
@@ -349,5 +308,10 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     private function isAlreadyEncrypted()
     {
         return $this->encryptedParts || preg_match('/^-----BEGIN PGP MESSAGE-----([A-Za-z0-9+=\/\n]+)-----END PGP MESSAGE-----$/', base64_decode($this->emailText));
+    }
+
+    private function needsDkimSignature()
+    {
+        return $this->alias->isCustomDomain() ? $this->alias->aliasable->isVerifiedForSending() : false;
     }
 }

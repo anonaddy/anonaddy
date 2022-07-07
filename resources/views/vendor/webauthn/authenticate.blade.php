@@ -37,7 +37,14 @@
 
                     <form method="POST" onsubmit="authenticateDevice();return false" action="{{ route('webauthn.auth') }}" id="form">
                         @csrf
-                        <input type="hidden" name="data" id="data" />
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" name="rawId" id="rawId">
+                        <input type="hidden" name="response[authenticatorData]" id="authenticatorData">
+                        <input type="hidden" name="response[clientDataJSON]" id="clientDataJSON">
+                        <input type="hidden" name="response[signature]" id="signature">
+                        <input type="hidden" name="response[userHandle]" id="userHandle">
+                        <input type="hidden" name="type" id="type">
+
                     </form>
 
                     <div class="mt-4">
@@ -102,20 +109,33 @@
         if (! /apple/i.test(navigator.vendor)) {
             webauthn.sign(
                 publicKey,
-                function (datas) {
+                function (data) {
                     document.getElementById("success").classList.remove("hidden");
-                    document.getElementById("data").value = JSON.stringify(datas);
+                    document.getElementById("id").value = data.id;
+                    document.getElementById("rawId").value = data.rawId;
+                    document.getElementById("authenticatorData").value = data.response.authenticatorData;
+                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON;
+                    document.getElementById("signature").value = data.response.signature;
+                    document.getElementById("userHandle").value = data.response.userHandle;
+                    document.getElementById("type").value = data.type;
                     document.getElementById("form").submit();
                 }
             );
         }
 
         function authenticateDevice() {
+            document.getElementById("error").classList.add("hidden");
             webauthn.sign(
                 publicKey,
-                function (datas) {
+                function (data) {
                     document.getElementById("success").classList.remove("hidden");
-                    document.getElementById("data").value = JSON.stringify(datas);
+                    document.getElementById("id").value = data.id;
+                    document.getElementById("rawId").value = data.rawId;
+                    document.getElementById("authenticatorData").value = data.response.authenticatorData;
+                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON;
+                    document.getElementById("signature").value = data.response.signature;
+                    document.getElementById("userHandle").value = data.response.userHandle;
+                    document.getElementById("type").value = data.type;
                     document.getElementById("form").submit();
                 }
             );

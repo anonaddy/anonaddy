@@ -2,13 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Helpers\OpenPGPSigner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Swift_SwiftException;
+use Symfony\Component\Mime\Email;
 
 class DomainUnverifiedForSending extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
@@ -47,37 +46,20 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
      */
     public function toMail($notifiable)
     {
-        $openpgpsigner = null;
         $recipient = $notifiable->defaultRecipient;
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
-        if ($fingerprint) {
-            try {
-                $openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
-                $openpgpsigner->addRecipient($fingerprint);
-            } catch (Swift_SwiftException $e) {
-                info($e->getMessage());
-                $openpgpsigner = null;
-
-                $recipient->update(['should_encrypt' => false]);
-
-                $recipient->notify(new GpgKeyExpired);
-            }
-        }
-
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject("Your domain has been unverified for sending on AnonAddy")
             ->markdown('mail.domain_unverified_for_sending', [
                 'domain' => $this->domain,
-                'reason' => $this->reason
+                'reason' => $this->reason,
+                'recipientId' => $recipient->id,
+                'fingerprint' => $fingerprint
             ])
-            ->withSwiftMessage(function ($message) use ($openpgpsigner) {
+            ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', 'DUS:anonaddy');
-
-                if ($openpgpsigner) {
-                    $message->attachSigner($openpgpsigner);
-                }
             });
     }
 

@@ -410,7 +410,7 @@ If you've forgotten your username you can request a reminder by entering your em
 
 Please use the backup code that you were shown when you enabled 2FA.
 
-5. Errors with U2F device
+5. Errors with hardware security key
 
 If you have a YubiKey and are using Windows and have an issue with your personal password/PIN you may need to reset the key using the YubiKey manager software.
 

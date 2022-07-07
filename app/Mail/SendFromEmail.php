@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Helpers\AlreadyEncryptedSigner;
+use App\CustomMailDriver\Mime\Part\InlineImagePart;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\User;
@@ -13,12 +13,13 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Swift_Image;
-use Swift_Signers_DKIMSigner;
+use Symfony\Component\Mime\Email;
 
 class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 {
-    use Queueable, SerializesModels, CheckUserRules;
+    use Queueable;
+    use SerializesModels;
+    use CheckUserRules;
 
     protected $email;
     protected $user;
@@ -29,7 +30,6 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $emailHtml;
     protected $emailAttachments;
     protected $emailInlineAttachments;
-    protected $dkimSigner;
     protected $encryptedParts;
     protected $displayFrom;
     protected $fromEmail;
@@ -65,21 +65,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $returnPath = $this->alias->email;
 
         if ($this->alias->isCustomDomain()) {
-            if ($this->alias->aliasable->isVerifiedForSending()) {
-                $this->fromEmail = $this->alias->email;
-
-                if (config('anonaddy.dkim_signing_key')) {
-                    $this->dkimSigner = new Swift_Signers_DKIMSigner(config('anonaddy.dkim_signing_key'), $this->alias->domain, config('anonaddy.dkim_selector'));
-                    $this->dkimSigner->ignoreHeader('List-Unsubscribe');
-                    $this->dkimSigner->ignoreHeader('Return-Path');
-                    $this->dkimSigner->ignoreHeader('Feedback-ID');
-                    $this->dkimSigner->ignoreHeader('Content-Type');
-                    $this->dkimSigner->ignoreHeader('Content-Description');
-                    $this->dkimSigner->ignoreHeader('Content-Disposition');
-                    $this->dkimSigner->ignoreHeader('Content-Transfer-Encoding');
-                    $this->dkimSigner->ignoreHeader('MIME-Version');
-                }
-            } else {
+            if (! $this->alias->aliasable->isVerifiedForSending()) {
                 $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
             }
@@ -90,38 +76,28 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->email =  $this
             ->from($this->fromEmail, $this->displayFrom)
             ->subject(base64_decode($this->emailSubject))
-            ->withSwiftMessage(function ($message) use ($returnPath) {
-                $message->setReturnPath($returnPath);
+            ->withSymfonyMessage(function (Email $message) use ($returnPath) {
+                $message->returnPath($returnPath);
 
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', 'S:' . $this->alias->id . ':anonaddy');
 
                 // Message-ID is replaced on send from as it can leak parts of the real email
-                $message->setId(bin2hex(random_bytes(16)).'@'.$this->alias->domain);
-
-                if ($this->encryptedParts) {
-                    $alreadyEncryptedSigner = new AlreadyEncryptedSigner($this->encryptedParts);
-
-                    $message->attachSigner($alreadyEncryptedSigner);
-                }
-
-                if ($this->dkimSigner) {
-                    $message->attachSigner($this->dkimSigner);
-                }
+                $message->getHeaders()->remove('Message-ID');
+                $message->getHeaders()
+                            ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
                 if ($this->emailInlineAttachments) {
                     foreach ($this->emailInlineAttachments as $attachment) {
-                        $image = new Swift_Image(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+                        $part = new InlineImagePart(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
 
-                        $cids[] = 'cid:' . base64_decode($attachment['contentId']);
-                        $newCids[] = $message->embed($image);
+                        $part->asInline();
+
+                        $part->setContentId(base64_decode($attachment['contentId']));
+                        $part->setFileName(base64_decode($attachment['file_name']));
+
+                        $message->attachPart($part);
                     }
-
-                    $message->getHeaders()
-                            ->addTextHeader('X-Old-Cids', implode(',', $cids));
-
-                    $message->getHeaders()
-                            ->addTextHeader('X-New-Cids', implode(',', $newCids));
                 }
             });
 
@@ -155,10 +131,13 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->checkRules('Sends');
 
         $this->email->with([
-            'shouldBlock' => $this->size === 0
+            'shouldBlock' => $this->size === 0,
+            'encryptedParts' => $this->encryptedParts,
+            'needsDkimSignature' => $this->needsDkimSignature(),
+            'aliasDomain' => $this->alias->domain
         ]);
 
-        if ($this->alias->isCustomDomain() && !$this->dkimSigner) {
+        if ($this->alias->isCustomDomain() && ! $this->needsDkimSignature()) {
             $this->email->replyTo($this->alias->email, $this->displayFrom);
         }
 
@@ -205,5 +184,10 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'code' => 'An error has occurred, please check the logs.',
             'attempted_at' => now()
         ]);
+    }
+
+    private function needsDkimSignature()
+    {
+        return $this->alias->isCustomDomain() ? $this->alias->aliasable->isVerifiedForSending() : false;
     }
 }

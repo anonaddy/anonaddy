@@ -392,7 +392,7 @@
                 <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
                 <p class="mt-6">
-                    Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of security to your account beyond your username and password. There are <b>two options for 2FA</b> - Authentication App (e.g. Google Authenticator or another, Aegis, andOTP) or U2F Device Authentication (e.g. YubiKey, SoloKey, Nitrokey).
+                    Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of security to your account beyond your username and password. There are <b>two options for 2FA</b> - Authentication App (e.g. Google Authenticator or another, Aegis, andOTP) or Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey).
                 </p>
 
                 <p class="mt-4 pb-16">
@@ -516,19 +516,19 @@
                         <div class="pt-16">
 
                             <h3 class="font-bold text-xl">
-                                Enable Device Authentication (U2F)
+                                Enable Device Authentication (WebAuthn)
                             </h3>
 
                             <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
 
-                            <p class="my-6">U2F is a standard for universal two-factor authentication tokens. You can use any U2F key such as a Yubikey, Solokey, NitroKey etc.</p>
+                            <p class="my-6">WebAuthn is a new W3C global standard for secure authentication. You can use any hardware key such as a Yubikey, Solokey, NitroKey etc.</p>
 
                             <a
                             type="button"
                             href="{{ route('webauthn.create') }}"
                             class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
                             >
-                                Register U2F Device
+                                Register New Hardware Key
                             </a>
 
                         </div>

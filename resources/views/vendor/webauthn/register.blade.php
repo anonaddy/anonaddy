@@ -33,9 +33,13 @@
                         {{ trans('webauthn::messages.noButtonAdvise') }}
                     </p>
 
-                    <form method="POST" onsubmit="registerDevice();return false" class="mt-8" action="{{ route('webauthn.store') }}" id="form">
+                    <form method="POST" onsubmit="registerDevice();return false"  class="mt-8" action="{{ route('webauthn.store') }}" id="form">
                         @csrf
-                        <input type="hidden" name="register" id="register">
+                        <input type="hidden" name="id" id="id">
+                        <input type="hidden" name="rawId" id="rawId">
+                        <input type="hidden" name="response[attestationObject]" id="attestationObject">
+                        <input type="hidden" name="response[clientDataJSON]" id="clientDataJSON">
+                        <input type="hidden" name="type" id="type">
 
                         <label for="name" class="block text-grey-700 text-sm mb-2">
                             Name:
@@ -119,9 +123,13 @@
 
             webauthn.register(
                 publicKey,
-                function (datas) {
+                function (data) {
                     document.getElementById("success").classList.remove("hidden");
-                    document.getElementById("register").value = JSON.stringify(datas);
+                    document.getElementById("id").value = data.id;
+                    document.getElementById("rawId").value = data.rawId;
+                    document.getElementById("attestationObject").value = data.response.attestationObject;
+                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON;
+                    document.getElementById("type").value = data.type;
                     document.getElementById("form").submit();
                 }
             );

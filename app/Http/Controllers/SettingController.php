@@ -34,6 +34,9 @@ class SettingController extends Controller
 
         DeleteAccount::dispatch(user());
 
+        auth()->logout();
+        $request->session()->invalidate();
+
         return redirect()->route('login')
         ->with(['status' => 'Account deleted successfully!']);
     }

@@ -2,13 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Helpers\OpenPGPSigner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Swift_SwiftException;
+use Symfony\Component\Mime\Email;
 
 class DefaultRecipientUpdated extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
@@ -45,36 +44,17 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
      */
     public function toMail($notifiable)
     {
-        $openpgpsigner = null;
-        $fingerprint = $notifiable->should_encrypt ? $notifiable->fingerprint : null;
-
-        if ($fingerprint) {
-            try {
-                $openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
-                $openpgpsigner->addRecipient($fingerprint);
-            } catch (Swift_SwiftException $e) {
-                info($e->getMessage());
-                $openpgpsigner = null;
-
-                $notifiable->update(['should_encrypt' => false]);
-
-                $notifiable->notify(new GpgKeyExpired);
-            }
-        }
-
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject("Your default recipient has just been updated")
             ->markdown('mail.default_recipient_updated', [
                 'defaultRecipient' => $notifiable->email,
-                'newDefaultRecipient' => $this->newDefaultRecipient
+                'newDefaultRecipient' => $this->newDefaultRecipient,
+                'recipientId' => $notifiable->id,
+                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
             ])
-            ->withSwiftMessage(function ($message) use ($openpgpsigner) {
+            ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', 'DRU:anonaddy');
-
-                if ($openpgpsigner) {
-                    $message->attachSigner($openpgpsigner);
-                }
             });
     }
 

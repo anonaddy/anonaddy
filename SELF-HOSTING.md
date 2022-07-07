@@ -358,7 +358,7 @@ location = /robots.txt  { access_log off; log_not_found off; }
 error_page 404 /index.php;
 
 location ~ \.php$ {
-    fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
+    fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
     include fastcgi_params;
@@ -379,9 +379,9 @@ We won't restart nginx yet because it won't be able to find the SSL certificates
 
 ## Installing PHP
 
-We're going to install the latest version of PHP at the time of writing this - version 7.4
+We're going to install the latest version of PHP at the time of writing this - version 8.1
 
-First we need to add the following repository so we can install PHP8.0.
+First we need to add the following repository so we can install php8.1.
 
 ```bash
 sudo apt install software-properties-common
@@ -389,21 +389,21 @@ sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 ```
 
-Install PHP8.0 and check the version.
+Install php8.1 and check the version.
 
 ```bash
-sudo apt install php8.0-fpm
-php-fpm8.0 -v
+sudo apt install php8.1-fpm
+php-fpm8.1 -v
 ```
 
 Install some required extensions:
 
 ```bash
-sudo apt install php8.0-common php8.0-mysql php8.0-dev php8.0-gmp php8.0-mbstring php8.0-dom php8.0-gd php8.0-imagick php8.0-opcache php8.0-soap php8.0-zip php8.0-cli php8.0-curl php8.0-mailparse php8.0-gnupg php8.0-redis -y
+sudo apt install php8.1-common php8.1-mysql php8.1-dev php8.1-gmp php8.1-mbstring php8.1-dom php8.1-gd php8.1-imagick php8.1-opcache php8.1-soap php8.1-zip php8.1-cli php8.1-curl php8.1-mailparse php8.1-gnupg php8.1-redis -y
 ```
 
 ```bash
-sudo nano /etc/php/8.0/fpm/pool.d/www.conf
+sudo nano /etc/php/8.1/fpm/pool.d/www.conf
 ```
 
 ```
@@ -413,10 +413,10 @@ listen.owner = johndoe
 listen.group = johndoe
 ```
 
-Restart php8.0-fpm to reflect the changes.
+Restart php8.1-fpm to reflect the changes.
 
 ```bash
-sudo service php8.0-fpm restart
+sudo service php8.1-fpm restart
 ```
 
 ## Let's Encrypt

@@ -30,7 +30,7 @@ class EditDefaultRecipientRequest extends FormRequest
                 'email:rfc,dns',
                 'max:254',
                 'confirmed',
-                new RegisterUniqueRecipient,
+                new RegisterUniqueRecipient(),
                 'not_in:'.$this->user()->email
             ]
         ];

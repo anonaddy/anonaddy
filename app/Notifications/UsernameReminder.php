@@ -2,13 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Helpers\OpenPGPSigner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Swift_SwiftException;
+use Symfony\Component\Mime\Email;
 
 class UsernameReminder extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
@@ -33,35 +32,16 @@ class UsernameReminder extends Notification implements ShouldQueue, ShouldBeEncr
      */
     public function toMail($notifiable)
     {
-        $openpgpsigner = null;
-        $fingerprint = $notifiable->should_encrypt ? $notifiable->fingerprint : null;
-
-        if ($fingerprint) {
-            try {
-                $openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
-                $openpgpsigner->addRecipient($fingerprint);
-            } catch (Swift_SwiftException $e) {
-                info($e->getMessage());
-                $openpgpsigner = null;
-
-                $notifiable->update(['should_encrypt' => false]);
-
-                $notifiable->notify(new GpgKeyExpired);
-            }
-        }
-
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject("AnonAddy Username Reminder")
             ->markdown('mail.username_reminder', [
-                'username' => $notifiable->user->username
+                'username' => $notifiable->user->username,
+                'recipientId' => $notifiable->id,
+                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
             ])
-            ->withSwiftMessage(function ($message) use ($openpgpsigner) {
+            ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', 'UR:anonaddy');
-
-                if ($openpgpsigner) {
-                    $message->attachSigner($openpgpsigner);
-                }
             });
     }
 

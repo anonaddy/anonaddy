@@ -28,7 +28,7 @@ class StoreAliasRecipientRequest extends FormRequest
             'recipient_ids' => [
                 'array',
                 'max:10',
-                new VerifiedRecipientId
+                new VerifiedRecipientId()
             ]
         ];
     }

@@ -1,5 +1,27 @@
 <?php
 
+use App\Http\Controllers\Api\AccountDetailController;
+use App\Http\Controllers\Api\ActiveAliasController;
+use App\Http\Controllers\Api\ActiveDomainController;
+use App\Http\Controllers\Api\ActiveRuleController;
+use App\Http\Controllers\Api\ActiveUsernameController;
+use App\Http\Controllers\Api\AliasController;
+use App\Http\Controllers\Api\AliasRecipientController;
+use App\Http\Controllers\Api\AllowedRecipientController;
+use App\Http\Controllers\Api\AppVersionController;
+use App\Http\Controllers\Api\CatchAllDomainController;
+use App\Http\Controllers\Api\CatchAllUsernameController;
+use App\Http\Controllers\Api\DomainController;
+use App\Http\Controllers\Api\DomainDefaultRecipientController;
+use App\Http\Controllers\Api\DomainOptionController;
+use App\Http\Controllers\Api\EncryptedRecipientController;
+use App\Http\Controllers\Api\FailedDeliveryController;
+use App\Http\Controllers\Api\RecipientController;
+use App\Http\Controllers\Api\RecipientKeyController;
+use App\Http\Controllers\Api\ReorderRuleController;
+use App\Http\Controllers\Api\RuleController;
+use App\Http\Controllers\Api\UsernameController;
+use App\Http\Controllers\Api\UsernameDefaultRecipientController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,76 +39,109 @@ Route::group([
   'middleware' => ['auth:api', 'verified'],
   'prefix' => 'v1'
 ], function () {
-    Route::get('/aliases', 'Api\AliasController@index');
-    Route::get('/aliases/{id}', 'Api\AliasController@show');
-    Route::post('/aliases', 'Api\AliasController@store');
-    Route::patch('/aliases/{id}', 'Api\AliasController@update');
-    Route::patch('/aliases/{id}/restore', 'Api\AliasController@restore');
-    Route::delete('/aliases/{id}', 'Api\AliasController@destroy');
-    Route::delete('/aliases/{id}/forget', 'Api\AliasController@forget');
+    Route::controller(AliasController::class)->group(function () {
+        Route::get('/aliases', 'index');
+        Route::get('/aliases/{id}', 'show');
+        Route::post('/aliases', 'store');
+        Route::patch('/aliases/{id}', 'update');
+        Route::patch('/aliases/{id}/restore', 'restore');
+        Route::delete('/aliases/{id}', 'destroy');
+        Route::delete('/aliases/{id}/forget', 'forget');
+    });
 
-    Route::post('/active-aliases', 'Api\ActiveAliasController@store');
-    Route::delete('/active-aliases/{id}', 'Api\ActiveAliasController@destroy');
+    Route::controller(ActiveAliasController::class)->group(function () {
+        Route::post('/active-aliases', 'store');
+        Route::delete('/active-aliases/{id}', 'destroy');
+    });
 
-    Route::post('/alias-recipients', 'Api\AliasRecipientController@store');
+    Route::post('/alias-recipients', [AliasRecipientController::class, 'store']);
 
-    Route::get('/recipients', 'Api\RecipientController@index');
-    Route::get('/recipients/{id}', 'Api\RecipientController@show');
-    Route::post('/recipients', 'Api\RecipientController@store');
-    Route::delete('/recipients/{id}', 'Api\RecipientController@destroy');
+    Route::controller(RecipientController::class)->group(function () {
+        Route::get('/recipients', 'index');
+        Route::get('/recipients/{id}', 'show');
+        Route::post('/recipients', 'store');
+        Route::delete('/recipients/{id}', 'destroy');
+    });
 
-    Route::patch('/recipient-keys/{id}', 'Api\RecipientKeyController@update');
-    Route::delete('/recipient-keys/{id}', 'Api\RecipientKeyController@destroy');
+    Route::controller(RecipientKeyController::class)->group(function () {
+        Route::patch('/recipient-keys/{id}', 'update');
+        Route::delete('/recipient-keys/{id}', 'destroy');
+    });
 
-    Route::post('/encrypted-recipients', 'Api\EncryptedRecipientController@store');
-    Route::delete('/encrypted-recipients/{id}', 'Api\EncryptedRecipientController@destroy');
+    Route::controller(EncryptedRecipientController::class)->group(function () {
+        Route::post('/encrypted-recipients', 'store');
+        Route::delete('/encrypted-recipients/{id}', 'destroy');
+    });
 
-    Route::post('/allowed-recipients', 'Api\AllowedRecipientController@store');
-    Route::delete('/allowed-recipients/{id}', 'Api\AllowedRecipientController@destroy');
+    Route::controller(AllowedRecipientController::class)->group(function () {
+        Route::post('/allowed-recipients', 'store');
+        Route::delete('/allowed-recipients/{id}', 'destroy');
+    });
 
-    Route::get('/domains', 'Api\DomainController@index');
-    Route::get('/domains/{id}', 'Api\DomainController@show');
-    Route::post('/domains', 'Api\DomainController@store');
-    Route::patch('/domains/{id}', 'Api\DomainController@update');
-    Route::delete('/domains/{id}', 'Api\DomainController@destroy');
-    Route::patch('/domains/{id}/default-recipient', 'Api\DomainDefaultRecipientController@update');
+    Route::controller(DomainController::class)->group(function () {
+        Route::get('/domains', 'index');
+        Route::get('/domains/{id}', 'show');
+        Route::post('/domains', 'store');
+        Route::patch('/domains/{id}', 'update');
+        Route::delete('/domains/{id}', 'destroy');
+    });
 
-    Route::post('/active-domains', 'Api\ActiveDomainController@store');
-    Route::delete('/active-domains/{id}', 'Api\ActiveDomainController@destroy');
+    Route::patch('/domains/{id}/default-recipient', [DomainDefaultRecipientController::class, 'update']);
 
-    Route::post('/catch-all-domains', 'Api\CatchAllDomainController@store');
-    Route::delete('/catch-all-domains/{id}', 'Api\CatchAllDomainController@destroy');
+    Route::controller(ActiveDomainController::class)->group(function () {
+        Route::post('/active-domains', 'store');
+        Route::delete('/active-domains/{id}', 'destroy');
+    });
 
-    Route::get('/usernames', 'Api\UsernameController@index');
-    Route::get('/usernames/{id}', 'Api\UsernameController@show');
-    Route::post('/usernames', 'Api\UsernameController@store');
-    Route::patch('/usernames/{id}', 'Api\UsernameController@update');
-    Route::delete('/usernames/{id}', 'Api\UsernameController@destroy');
-    Route::patch('/usernames/{id}/default-recipient', 'Api\UsernameDefaultRecipientController@update');
+    Route::controller(CatchAllDomainController::class)->group(function () {
+        Route::post('/catch-all-domains', 'store');
+        Route::delete('/catch-all-domains/{id}', 'destroy');
+    });
 
-    Route::post('/active-usernames', 'Api\ActiveUsernameController@store');
-    Route::delete('/active-usernames/{id}', 'Api\ActiveUsernameController@destroy');
+    Route::controller(UsernameController::class)->group(function () {
+        Route::get('/usernames', 'index');
+        Route::get('/usernames/{id}', 'show');
+        Route::post('/usernames', 'store');
+        Route::patch('/usernames/{id}', 'update');
+        Route::delete('/usernames/{id}', 'destroy');
+    });
 
-    Route::post('/catch-all-usernames', 'Api\CatchAllUsernameController@store');
-    Route::delete('/catch-all-usernames/{id}', 'Api\CatchAllUsernameController@destroy');
+    Route::patch('/usernames/{id}/default-recipient', [UsernameDefaultRecipientController::class, 'update']);
 
-    Route::get('/rules', 'Api\RuleController@index');
-    Route::get('/rules/{id}', 'Api\RuleController@show');
-    Route::post('/rules', 'Api\RuleController@store');
-    Route::patch('/rules/{id}', 'Api\RuleController@update');
-    Route::delete('/rules/{id}', 'Api\RuleController@destroy');
-    Route::post('/reorder-rules', 'Api\ReorderRuleController@store');
+    Route::controller(ActiveUsernameController::class)->group(function () {
+        Route::post('/active-usernames', 'store');
+        Route::delete('/active-usernames/{id}', 'destroy');
+    });
 
-    Route::post('/active-rules', 'Api\ActiveRuleController@store');
-    Route::delete('/active-rules/{id}', 'Api\ActiveRuleController@destroy');
+    Route::controller(CatchAllUsernameController::class)->group(function () {
+        Route::post('/catch-all-usernames', 'store');
+        Route::delete('/catch-all-usernames/{id}', 'destroy');
+    });
 
-    Route::get('/failed-deliveries', 'Api\FailedDeliveryController@index');
-    Route::get('/failed-deliveries/{id}', 'Api\FailedDeliveryController@show');
-    Route::delete('/failed-deliveries/{id}', 'Api\FailedDeliveryController@destroy');
+    Route::controller(RuleController::class)->group(function () {
+        Route::get('/rules', 'index');
+        Route::get('/rules/{id}', 'show');
+        Route::post('/rules', 'store');
+        Route::patch('/rules/{id}', 'update');
+        Route::delete('/rules/{id}', 'destroy');
+    });
 
-    Route::get('/domain-options', 'Api\DomainOptionController@index');
+    Route::post('/reorder-rules', [ReorderRuleController::class, 'store']);
 
-    Route::get('/account-details', 'Api\AccountDetailController@index');
+    Route::controller(ActiveRuleController::class)->group(function () {
+        Route::post('/active-rules', 'store');
+        Route::delete('/active-rules/{id}', 'destroy');
+    });
 
-    Route::get('/app-version', 'Api\AppVersionController@index');
+    Route::controller(FailedDeliveryController::class)->group(function () {
+        Route::get('/failed-deliveries', 'index');
+        Route::get('/failed-deliveries/{id}', 'show');
+        Route::delete('/failed-deliveries/{id}', 'destroy');
+    });
+
+    Route::get('/domain-options', [DomainOptionController::class, 'index']);
+
+    Route::get('/account-details', [AccountDetailController::class, 'index']);
+
+    Route::get('/app-version', [AppVersionController::class, 'index']);
 });

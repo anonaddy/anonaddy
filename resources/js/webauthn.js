@@ -236,4 +236,14 @@ WebAuthn.prototype.setNotify = function (callback) {
   this._notifyCallback = callback
 }
 
+!(function (e, t) {
+  'object' == typeof exports && 'object' == typeof module
+    ? (module.exports = t)
+    : 'function' == typeof define && define.amd
+    ? define([], t)
+    : 'object' == typeof exports
+    ? (exports.WebAuthn = t)
+    : (e.WebAuthn = t)
+})(this, WebAuthn)
+
 window.WebAuthn = WebAuthn

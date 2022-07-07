@@ -3,51 +3,45 @@
 namespace App\CustomMailDriver;
 
 use Illuminate\Mail\MailManager;
+use InvalidArgumentException;
 
 class CustomMailManager extends MailManager
 {
     /**
-     * Create an instance of the Sendmail Swift Transport driver.
+     * Resolve the given mailer.
      *
-     * @param  array  $config
-     * @return \Swift_SendmailTransport
+     * @param string $name
+     * @return Mailer
      */
-    protected function createSendmailTransport(array $config)
+    protected function resolve($name): CustomMailer
     {
-        return new CustomSendmailTransport(
-            $config['path'] ?? $this->app['config']->get('mail.sendmail')
-        );
-    }
+        $config = $this->getConfig($name);
 
-    /**
-     * Create an instance of the SMTP Swift Transport driver.
-     *
-     * @param  array  $config
-     * @return \Swift_SmtpTransport
-     */
-    protected function createSmtpTransport(array $config)
-    {
-        // The Swift SMTP transport instance will allow us to use any SMTP backend
-        // for delivering mail such as Sendgrid, Amazon SES, or a custom server
-        // a developer has available. We will just pass this configured host.
-        $transport = new CustomSmtpTransport(
-            $config['host'],
-            $config['port']
-        );
-
-        if (! empty($config['encryption'])) {
-            $transport->setEncryption($config['encryption']);
+        if ($config === null) {
+            throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
         }
 
-        // Once we have the transport we will check for the presence of a username
-        // and password. If we have it we will set the credentials on the Swift
-        // transporter instance so that we'll properly authenticate delivery.
-        if (isset($config['username'])) {
-            $transport->setUsername($config['username']);
+        // Once we have created the mailer instance we will set a container instance
+        // on the mailer. This allows us to resolve mailer classes via containers
+        // for maximum testability on said classes instead of passing Closures.
+        $mailer = new CustomMailer(
+            $name,
+            $this->app['view'],
+            $this->createSymfonyTransport($config),
+            $this->app['events']
+        );
 
-            $transport->setPassword($config['password']);
+        if ($this->app->bound('queue')) {
+            $mailer->setQueue($this->app['queue']);
         }
 
-        return $this->configureSmtpTransport($transport, $config);
+        // Next we will set all of the global addresses on this mailer, which allows
+        // for easy unification of all "from" addresses as well as easy debugging
+        // of sent messages since these will be sent to a single email address.
+        foreach (['from', 'reply_to', 'to', 'return_path'] as $type) {
+            $this->setGlobalAddress($mailer, $config, $type);
+        }
+
+        return $mailer;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Api;
 
+use App\Helpers\GitVersionHelper as Version;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PragmaRX\Version\Package\Facade as Version;
 use Tests\TestCase;
 
 class AppVersionTest extends TestCase

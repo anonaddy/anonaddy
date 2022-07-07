@@ -11,7 +11,10 @@ use Illuminate\Support\Str;
 
 class Alias extends Model
 {
-    use SoftDeletes, HasUuid, HasEncryptedAttributes, HasFactory;
+    use SoftDeletes;
+    use HasUuid;
+    use HasEncryptedAttributes;
+    use HasFactory;
 
     public $incrementing = false;
 

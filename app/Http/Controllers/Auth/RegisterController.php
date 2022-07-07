@@ -62,16 +62,16 @@ class RegisterController extends Controller
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',
                 'unique:usernames,username',
-                new NotBlacklisted,
-                new NotDeletedUsername
+                new NotBlacklisted(),
+                new NotDeletedUsername()
             ],
             'email' => [
                 'required',
                 'email:rfc,dns',
                 'max:254',
                 'confirmed',
-                new RegisterUniqueRecipient,
-                new NotLocalRecipient
+                new RegisterUniqueRecipient(),
+                new NotLocalRecipient()
             ],
             'password' => ['required', 'min:8'],
         ], [

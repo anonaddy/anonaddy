@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\WebauthnKey;
+
 return [
 
     /*
@@ -15,30 +17,83 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Route Middleware
+    | Webauthn Guard
     |--------------------------------------------------------------------------
     |
-    | These middleware will be assigned to Webauthn routes, giving you
-    | the chance to add your own middleware to this list or change any of
-    | the existing middleware. Or, you can simply stick with this list.
+    | Here you may specify which authentication guard Webauthn will use while
+    | authenticating users. This value should correspond with one of your
+    | guards that is already present in your "auth" configuration file.
     |
     */
 
-    'middleware' => [
-        'web',
-        'auth',
-    ],
+    'guard' => 'web',
 
     /*
     |--------------------------------------------------------------------------
-    | Prefix path
+    | Username / Email
     |--------------------------------------------------------------------------
     |
-    | The uri prefix for all webauthn requests.
+    | This value defines which model attribute should be considered as your
+    | application's "username" field. Typically, this might be the email
+    | address of the users but you are free to change this value here.
+    |
+    */
+
+    'username' => 'email',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn Routes Prefix / Subdomain
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which prefix Webauthn will assign to all the routes
+    | that it registers with the application. If necessary, you may change
+    | subdomain under which all of the Webauthn routes will be available.
     |
     */
 
     'prefix' => 'webauthn',
+
+    'domain' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn Routes Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which middleware Webauthn will assign to the routes
+    | that it registers with the application. If necessary, you may change
+    | these middleware but typically this provided default is preferred.
+    |
+    */
+
+    'middleware' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn key model
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the model used to create Webauthn keys.
+    |
+    */
+
+    'model' => WebauthnKey::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting
+    |--------------------------------------------------------------------------
+    |
+    | By default, Laravel Webauthn will throttle logins to five requests per
+    | minute for every email and IP address combination. However, if you would
+    | like to specify a custom rate limiter to call then you may specify it here.
+    |
+    */
+
+    'limiters' => [
+        'login' => null,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -67,6 +122,8 @@ return [
     | - authenticate: when a user login, and has to validate Webauthn 2nd factor.
     | - register: when a user request to create a Webauthn key.
     |
+    | If the views are empty or null, then the route will not be registered.
+    |
     */
 
     'views' => [
@@ -83,7 +140,7 @@ return [
     |
     */
 
-    'sessionName' => 'webauthn_auth',
+    'session_name' => 'webauthn_auth',
 
     /*
     |--------------------------------------------------------------------------
@@ -226,6 +283,6 @@ return [
     |
     */
 
-    'userless' => 'null',
+    'userless' => null,
 
 ];

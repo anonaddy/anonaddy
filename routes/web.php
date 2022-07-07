@@ -1,5 +1,30 @@
 <?php
 
+use App\Http\Controllers\AliasExportController;
+use App\Http\Controllers\Auth\BackupCodeController;
+use App\Http\Controllers\Auth\ForgotUsernameController;
+use App\Http\Controllers\Auth\TwoFactorAuthController;
+use App\Http\Controllers\Auth\WebauthnController;
+use App\Http\Controllers\Auth\WebauthnEnabledKeyController;
+use App\Http\Controllers\BannerLocationController;
+use App\Http\Controllers\BrowserSessionController;
+use App\Http\Controllers\DeactivateAliasController;
+use App\Http\Controllers\DefaultAliasDomainController;
+use App\Http\Controllers\DefaultAliasFormatController;
+use App\Http\Controllers\DefaultRecipientController;
+use App\Http\Controllers\DomainVerificationController;
+use App\Http\Controllers\EmailSubjectController;
+use App\Http\Controllers\FromNameController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\RecipientVerificationController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ShowAliasController;
+use App\Http\Controllers\ShowDomainController;
+use App\Http\Controllers\ShowFailedDeliveryController;
+use App\Http\Controllers\ShowRecipientController;
+use App\Http\Controllers\ShowRuleController;
+use App\Http\Controllers\ShowUsernameController;
+use App\Http\Controllers\UseReplyToController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,43 +40,54 @@ use Illuminate\Support\Facades\Route;
 */
 
 Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
-Route::get('/username/reminder', 'Auth\ForgotUsernameController@show')->name('username.reminder.show');
-Route::post('/username/email', 'Auth\ForgotUsernameController@sendReminderEmail')->name('username.email');
 
-Route::post('/login/2fa', 'Auth\TwoFactorAuthController@authenticateTwoFactor')->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
 
-Route::get('/login/backup-code', 'Auth\BackupCodeController@index')->name('login.backup_code.index');
-Route::post('/login/backup-code', 'Auth\BackupCodeController@login')->name('login.backup_code.login');
+Route::controller(ForgotUsernameController::class)->group(function () {
+    Route::get('/username/reminder', 'show')->name('username.reminder.show');
+    Route::post('/username/email', 'sendReminderEmail')->name('username.email');
+});
+
+Route::post('/login/2fa', [TwoFactorAuthController::class, 'authenticateTwoFactor'])->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
+
+Route::controller(BackupCodeController::class)->group(function () {
+    Route::get('/login/backup-code', 'index')->name('login.backup_code.index');
+    Route::post('/login/backup-code', 'login')->name('login.backup_code.login');
+});
 
 Route::group([
     'middleware' => config('webauthn.middleware', []),
     'domain' => config('webauthn.domain', null),
     'prefix' => config('webauthn.prefix', 'webauthn'),
 ], function () {
-    Route::get('keys', 'Auth\WebauthnController@index')->name('webauthn.index');
-    Route::get('keys/create', 'Auth\WebauthnController@create')->name('webauthn.create');
-    Route::post('keys', 'Auth\WebauthnController@store')->name('webauthn.store');
-    Route::delete('keys/{id}', 'Auth\WebauthnController@destroy')->name('webauthn.destroy');
-    Route::post('enabled-keys', 'Auth\WebauthnEnabledKeyController@store')->name('webauthn.enabled_key.store');
-    Route::delete('enabled-keys/{id}', 'Auth\WebauthnEnabledKeyController@destroy')->name('webauthn.enabled_key.destroy');
+    Route::controller(WebauthnController::class)->group(function () {
+        Route::get('keys', 'index')->name('webauthn.index');
+        Route::get('keys/create', 'create')->name('webauthn.create');
+        Route::post('keys', 'store')->name('webauthn.store');
+        Route::delete('keys/{id}', 'destroy')->name('webauthn.destroy');
+    });
+
+    Route::controller(WebauthnEnabledKeyController::class)->group(function () {
+        Route::post('enabled-keys', 'store')->name('webauthn.enabled_key.store');
+        Route::delete('enabled-keys/{id}', 'destroy')->name('webauthn.enabled_key.destroy');
+    });
 });
 
 Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
-    Route::get('/', 'ShowAliasController@index')->name('aliases.index');
+    Route::get('/', [ShowAliasController::class, 'index'])->name('aliases.index');
 
-    Route::get('/recipients', 'ShowRecipientController@index')->name('recipients.index');
-    Route::post('/recipients/email/resend', 'RecipientVerificationController@resend');
+    Route::get('/recipients', [ShowRecipientController::class, 'index'])->name('recipients.index');
+    Route::post('/recipients/email/resend', [RecipientVerificationController::class, 'resend']);
 
-    Route::get('/domains', 'ShowDomainController@index')->name('domains.index');
-    Route::get('/domains/{id}/check-sending', 'DomainVerificationController@checkSending');
+    Route::get('/domains', [ShowDomainController::class, 'index'])->name('domains.index');
+    Route::get('/domains/{id}/check-sending', [DomainVerificationController::class, 'checkSending']);
 
-    Route::get('/usernames', 'ShowUsernameController@index')->name('usernames.index');
+    Route::get('/usernames', [ShowUsernameController::class, 'index'])->name('usernames.index');
 
-    Route::get('/deactivate/{alias}', 'DeactivateAliasController@deactivate')->name('deactivate');
+    Route::get('/deactivate/{alias}', [DeactivateAliasController::class, 'deactivate'])->name('deactivate');
 
-    Route::get('/rules', 'ShowRuleController@index')->name('rules.index');
+    Route::get('/rules', [ShowRuleController::class, 'index'])->name('rules.index');
 
-    Route::get('/failed-deliveries', 'ShowFailedDeliveryController@index')->name('failed_deliveries.index');
+    Route::get('/failed-deliveries', [ShowFailedDeliveryController::class, 'index'])->name('failed_deliveries.index');
 });
 
 
@@ -59,33 +95,39 @@ Route::group([
     'middleware' => ['auth', '2fa', 'webauthn'],
     'prefix' => 'settings'
 ], function () {
-    Route::get('/', 'SettingController@show')->name('settings.show');
-    Route::post('/account', 'SettingController@destroy')->name('account.destroy');
+    Route::controller(SettingController::class)->group(function () {
+        Route::get('/', 'show')->name('settings.show');
+        Route::post('/account', 'destroy')->name('account.destroy');
+    });
 
-    Route::post('/default-recipient', 'DefaultRecipientController@update')->name('settings.default_recipient');
-    Route::post('/edit-default-recipient', 'DefaultRecipientController@edit')->name('settings.edit_default_recipient');
+    Route::controller(DefaultRecipientController::class)->group(function () {
+        Route::post('/default-recipient', 'update')->name('settings.default_recipient');
+        Route::post('/edit-default-recipient', 'edit')->name('settings.edit_default_recipient');
+    });
 
-    Route::post('/default-alias-domain', 'DefaultAliasDomainController@update')->name('settings.default_alias_domain');
+    Route::post('/default-alias-domain', [DefaultAliasDomainController::class, 'update'])->name('settings.default_alias_domain');
 
-    Route::post('/default-alias-format', 'DefaultAliasFormatController@update')->name('settings.default_alias_format');
+    Route::post('/default-alias-format', [DefaultAliasFormatController::class, 'update'])->name('settings.default_alias_format');
 
-    Route::post('/from-name', 'FromNameController@update')->name('settings.from_name');
+    Route::post('/from-name', [FromNameController::class, 'update'])->name('settings.from_name');
 
-    Route::post('/email-subject', 'EmailSubjectController@update')->name('settings.email_subject');
+    Route::post('/email-subject', [EmailSubjectController::class, 'update'])->name('settings.email_subject');
 
-    Route::post('/banner-location', 'BannerLocationController@update')->name('settings.banner_location');
+    Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
 
-    Route::post('/use-reply-to', 'UseReplyToController@update')->name('settings.use_reply_to');
+    Route::post('/use-reply-to', [UseReplyToController::class, 'update'])->name('settings.use_reply_to');
 
-    Route::post('/password', 'PasswordController@update')->name('settings.password');
+    Route::post('/password', [PasswordController::class, 'update'])->name('settings.password');
 
-    Route::delete('/browser-sessions', 'BrowserSessionController@destroy')->name('browser-sessions.destroy');
+    Route::delete('/browser-sessions', [BrowserSessionController::class, 'destroy'])->name('browser-sessions.destroy');
 
-    Route::post('/2fa/enable', 'Auth\TwoFactorAuthController@store')->name('settings.2fa_enable');
-    Route::post('/2fa/regenerate', 'Auth\TwoFactorAuthController@update')->name('settings.2fa_regenerate');
-    Route::post('/2fa/disable', 'Auth\TwoFactorAuthController@destroy')->name('settings.2fa_disable');
+    Route::controller(TwoFactorAuthController::class)->group(function () {
+        Route::post('/2fa/enable', 'store')->name('settings.2fa_enable');
+        Route::post('/2fa/regenerate', 'update')->name('settings.2fa_regenerate');
+        Route::post('/2fa/disable', 'destroy')->name('settings.2fa_disable');
+    });
 
-    Route::post('/2fa/new-backup-code', 'Auth\BackupCodeController@update')->name('settings.new_backup_code');
+    Route::post('/2fa/new-backup-code', [BackupCodeController::class, 'update'])->name('settings.new_backup_code');
 
-    Route::get('/aliases/export', 'AliasExportController@export')->name('aliases.export');
+    Route::get('/aliases/export', [AliasExportController::class, 'export'])->name('aliases.export');
 });

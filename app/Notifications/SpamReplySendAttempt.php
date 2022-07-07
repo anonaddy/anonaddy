@@ -2,14 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Helpers\OpenPGPSigner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
-use Swift_SwiftException;
+use Symfony\Component\Mime\Email;
 
 class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBeEncrypted
 {
@@ -52,38 +51,19 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
      */
     public function toMail($notifiable)
     {
-        $openpgpsigner = null;
-        $fingerprint = $notifiable->should_encrypt ? $notifiable->fingerprint : null;
-
-        if ($fingerprint) {
-            try {
-                $openpgpsigner = OpenPGPSigner::newInstance(config('anonaddy.signing_key_fingerprint'), [], "~/.gnupg");
-                $openpgpsigner->addRecipient($fingerprint);
-            } catch (Swift_SwiftException $e) {
-                info($e->getMessage());
-                $openpgpsigner = null;
-
-                $notifiable->update(['should_encrypt' => false]);
-
-                $notifiable->notify(new GpgKeyExpired);
-            }
-        }
-
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('Attempted reply/send from alias has failed')
             ->markdown('mail.spam_reply_send_attempt', [
                 'aliasEmail' => $this->aliasEmail,
                 'recipient' => $this->recipient,
                 'destination' => $this->destination,
-                'authenticationResults' => $this->authenticationResults
+                'authenticationResults' => $this->authenticationResults,
+                'recipientId' => $notifiable->id,
+                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
             ])
-            ->withSwiftMessage(function ($message) use ($openpgpsigner) {
+            ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', 'SRSA:anonaddy');
-
-                if ($openpgpsigner) {
-                    $message->attachSigner($openpgpsigner);
-                }
             });
     }
 

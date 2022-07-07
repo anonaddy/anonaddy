@@ -12,7 +12,10 @@ use Illuminate\Queue\SerializesModels;
 
 class DeleteAccount implements ShouldQueue, ShouldBeEncrypted
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected $user;
 

@@ -13,7 +13,10 @@ use Illuminate\Notifications\Notifiable;
 
 class Recipient extends Model
 {
-    use Notifiable, HasUuid, HasEncryptedAttributes, HasFactory;
+    use Notifiable;
+    use HasUuid;
+    use HasEncryptedAttributes;
+    use HasFactory;
 
     public $incrementing = false;
 
@@ -140,7 +143,7 @@ class Recipient extends Model
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new CustomVerifyEmail);
+        $this->notify(new CustomVerifyEmail());
     }
 
     /**
@@ -150,7 +153,7 @@ class Recipient extends Model
      */
     public function sendUsernameReminderNotification()
     {
-        $this->notify(new UsernameReminder);
+        $this->notify(new UsernameReminder());
     }
 
     /**

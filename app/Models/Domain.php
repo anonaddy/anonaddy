@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\App;
 
 class Domain extends Model
 {
-    use HasUuid, HasEncryptedAttributes, HasFactory;
+    use HasUuid;
+    use HasEncryptedAttributes;
+    use HasFactory;
 
     public $incrementing = false;
 

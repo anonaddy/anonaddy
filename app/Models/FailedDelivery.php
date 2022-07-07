@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class FailedDelivery extends Model
 {
-    use HasUuid, HasEncryptedAttributes, HasFactory;
+    use HasUuid;
+    use HasEncryptedAttributes;
+    use HasFactory;
 
     public $incrementing = false;
 

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class DeletedUsername extends Model
 {
-    use HasEncryptedAttributes, HasFactory;
+    use HasEncryptedAttributes;
+    use HasFactory;
 
     public $incrementing = false;
 

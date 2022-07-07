@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Username extends Model
 {
-    use HasUuid, HasEncryptedAttributes, HasFactory;
+    use HasUuid;
+    use HasEncryptedAttributes;
+    use HasFactory;
 
     public $incrementing = false;
 

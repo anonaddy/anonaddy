@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
 
 class EmailData
@@ -28,7 +29,7 @@ class EmailData
         $this->attachments = [];
         $this->inlineAttachments = [];
         $this->size = $size;
-        $this->messageId = base64_encode($parser->getHeader('Message-ID'));
+        $this->messageId = base64_encode(Str::remove(['<', '>'], $parser->getHeader('Message-ID')));
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));

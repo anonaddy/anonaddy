@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Actions\RegisterKeyStore;
 use App\Facades\Webauthn as WebauthnFacade;
 use App\Models\WebauthnKey;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -10,10 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
-use LaravelWebauthn\Actions\RegisterKeyPrepare;
+use LaravelWebauthn\Actions\PrepareCreationData;
+use LaravelWebauthn\Actions\ValidateKeyCreation;
+use LaravelWebauthn\Contracts\RegisterViewResponse;
 use LaravelWebauthn\Http\Controllers\WebauthnKeyController as ControllersWebauthnController;
-use LaravelWebauthn\Services\Webauthn;
-use Webauthn\PublicKeyCredentialCreationOptions;
+use LaravelWebauthn\Http\Requests\WebauthnRegisterRequest;
 
 class WebauthnController extends ControllersWebauthnController
 {
@@ -23,13 +23,6 @@ class WebauthnController extends ControllersWebauthnController
     }
 
     /**
-     * PublicKey Creation session name.
-     *
-     * @var string
-     */
-    private const SESSION_PUBLICKEY_CREATION = 'webauthn.publicKeyCreation';
-
-    /**
      * Return the register data to attempt a Webauthn registration.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -37,48 +30,34 @@ class WebauthnController extends ControllersWebauthnController
      */
     public function create(Request $request)
     {
-        $publicKey = $this->app[RegisterKeyPrepare::class]($request->user());
+        $publicKey = app(PrepareCreationData::class)($request->user());
 
-        $request->session()->put(Webauthn::SESSION_PUBLICKEY_CREATION, $publicKey);
-
-        return view('vendor.webauthn.register')->with('publicKey', $publicKey);
+        return app(RegisterViewResponse::class)
+            ->setPublicKey($request, $publicKey);
     }
 
     /**
      * Validate and create the Webauthn request.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  WebauthnRegisterRequest  $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(WebauthnRegisterRequest $request)
     {
         $request->validate([
-            'register' => 'required|string',
             'name' => 'required|string|max:50'
         ]);
 
         try {
-            $publicKey = $request->session()->pull(self::SESSION_PUBLICKEY_CREATION);
-            if (! $publicKey instanceof PublicKeyCredentialCreationOptions) {
-                throw new ModelNotFoundException(trans('webauthn::errors.create_data_not_found'));
-            }
-
-            /** @var \LaravelWebauthn\Models\WebauthnKey|null */
-            $webauthnKey = $this->app[RegisterKeyStore::class](
+            app(ValidateKeyCreation::class)(
                 $request->user(),
-                $publicKey,
-                $request->input('register'),
+                $request->only(['id', 'rawId', 'response', 'type']),
                 $request->input('name')
             );
-
-            if ($webauthnKey !== null) {
-                $request->session()->put(Webauthn::SESSION_WEBAUTHNID_CREATED, $webauthnKey->id);
-            }
 
             user()->update([
                 'two_factor_enabled' => false
             ]);
-
 
             return $this->redirectAfterSuccessRegister();
         } catch (\Exception $e) {

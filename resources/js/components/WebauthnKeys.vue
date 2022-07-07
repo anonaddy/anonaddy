@@ -1,17 +1,18 @@
 <template>
   <div>
     <div class="mt-6">
-      <h3 class="font-bold text-xl">Device Authentication (U2F)</h3>
+      <h3 class="font-bold text-xl">Device Authentication (WebAuthn)</h3>
 
       <div class="my-4 w-24 border-b-2 border-grey-200"></div>
 
       <p class="my-6">
-        Webauthn Keys you have registered for 2nd factor authentication. To remove a key simply
-        click the delete button next to it. Disabling all keys will turn off 2FA on your account.
+        Hardware security keys you have registered for 2nd factor authentication. To remove a key
+        simply click the delete button next to it. Disabling all keys will turn off 2FA on your
+        account.
       </p>
 
       <div>
-        <p class="mb-0" v-if="keys.length === 0">You have not registered any Webauthn Keys.</p>
+        <p class="mb-0" v-if="keys.length === 0">You have not registered any hardware keys.</p>
 
         <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
           <div class="table-row">
@@ -19,7 +20,7 @@
             <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
             <div class="table-cell p-1 md:p-4 font-semibold">Enabled</div>
             <div class="table-cell p-1 md:p-4 text-right">
-              <a href="/webauthn/keys/create" class="text-indigo-700">Add New Device</a>
+              <a href="/webauthn/keys/create" class="text-indigo-700">Add New Key</a>
             </div>
           </div>
           <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
@@ -46,15 +47,15 @@
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
-          Remove U2F Device
+          Remove Hardware Key
         </h2>
         <p v-if="keys.length === 1" class="my-4 text-grey-700">
-          Once this device is removed, <b>Two-Factor Authentication</b> will be disabled on your
+          Once this key is removed, <b>Two-Factor Authentication</b> will be disabled on your
           account.
         </p>
         <p v-else class="my-4 text-grey-700">
-          Once this device is removed, <b>Two-Factor Authentication</b> will still be enabled as you
-          have other U2F devices associated with your account.
+          Once this key is removed, <b>Two-Factor Authentication</b> will still be enabled as you
+          have other hardware keys associated with your account.
         </p>
         <div class="mt-6">
           <button

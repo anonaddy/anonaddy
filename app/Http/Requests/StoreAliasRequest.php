@@ -38,7 +38,7 @@ class StoreAliasRequest extends FormRequest
                 'nullable',
                 'array',
                 'max:10',
-                new VerifiedRecipientId
+                new VerifiedRecipientId()
             ]
         ];
     }
@@ -52,7 +52,7 @@ class StoreAliasRequest extends FormRequest
                 return $query->where('local_part', $this->validationData()['local_part'])
                 ->where('domain', $this->validationData()['domain']);
             }),
-            new ValidAliasLocalPart
+            new ValidAliasLocalPart()
         ], function () {
             $format = $this->validationData()['format'] ?? 'random_characters';
             return $format === 'custom';

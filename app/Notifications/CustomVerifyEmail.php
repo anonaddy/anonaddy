@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
+use Symfony\Component\Mime\Email;
 
 class CustomVerifyEmail extends VerifyEmail implements ShouldQueue, ShouldBeEncrypted
 {
@@ -35,13 +36,13 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldQueue, ShouldBeEncr
         $feedbackId = $notifiable instanceof User ? 'VU:anonaddy' : 'VR:anonaddy';
         $recipientId = $notifiable instanceof User ? $notifiable->default_recipient_id : $notifiable->id;
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(Lang::get('Verify Email Address'))
             ->markdown('mail.verify_email', [
                 'verificationUrl' => $verificationUrl,
                 'recipientId' => $recipientId
             ])
-            ->withSwiftMessage(function ($message) use ($feedbackId) {
+            ->withSymfonyMessage(function (Email $message) use ($feedbackId) {
                 $message->getHeaders()
                         ->addTextHeader('Feedback-ID', $feedbackId);
             });

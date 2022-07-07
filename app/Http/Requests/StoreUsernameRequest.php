@@ -31,8 +31,8 @@ class StoreUsernameRequest extends FormRequest
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',
                 'unique:usernames,username',
-                new NotBlacklisted,
-                new NotDeletedUsername
+                new NotBlacklisted(),
+                new NotDeletedUsername()
             ],
         ];
     }

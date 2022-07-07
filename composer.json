@@ -7,32 +7,28 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
-        "asbiin/laravel-webauthn": "^2.0.0",
+        "php": "^8.0.2",
+        "asbiin/laravel-webauthn": "^3.0.0",
         "bacon/bacon-qr-code": "^2.0",
         "doctrine/dbal": "^3.0",
-        "fideloper/proxy": "^4.2",
-        "fruitcake/laravel-cors": "^2.0",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "^8.0",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/framework": "^9.11",
         "laravel/passport": "^10.0",
-        "laravel/tinker": "^2.0",
+        "laravel/tinker": "^2.7",
         "laravel/ui": "^3.0",
         "maatwebsite/excel": "^3.1",
         "mews/captcha": "^3.0.0",
         "php-mime-mail-parser/php-mime-mail-parser": "^7.0",
         "pragmarx/google2fa-laravel": "^2.0.0",
-        "pragmarx/version": "^1.2",
         "ramsey/uuid": "^4.0"
     },
     "require-dev": {
-        "beyondcode/laravel-dump-server": "^1.0",
-        "facade/ignition": "^2.3.6",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^3.0.0",
-        "mockery/mockery": "^1.3.1",
-        "nunomaduro/collision": "^5.0",
-        "phpunit/phpunit": "^9.3"
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^6.1",
+        "phpunit/phpunit": "^9.5.10",
+        "spatie/laravel-ignition": "^1.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -62,7 +58,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
-            "@php artisan version:absorb --ansi"
+            "@php artisan anonaddy:update-app-version"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
