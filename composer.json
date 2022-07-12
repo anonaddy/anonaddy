@@ -40,9 +40,11 @@
             "dont-discover": []
         }
     },
+    "exclude-from-classmap": ["vendor/egulias/email-validator/src/Validation/MessageIDValidation.php"],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "Egulias\\EmailValidator\\Validation\\": "app/CustomMailDriver/Validation/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }

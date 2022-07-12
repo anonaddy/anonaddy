@@ -162,6 +162,7 @@ class OpenPGPEncrypter
         $encryptedBody = $this->pgpEncryptString($signed, $this->recipientKey);
 
         $headers->setHeaderBody('Parameterized', 'Content-Type', 'multipart/encrypted');
+        $headers->setHeaderParameter('Content-Type', 'micalg', null);
         $headers->setHeaderParameter('Content-Type', 'protocol', 'application/pgp-encrypted');
         $headers->setHeaderParameter('Content-Type', 'boundary', $boundary);
 

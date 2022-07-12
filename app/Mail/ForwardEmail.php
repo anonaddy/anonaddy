@@ -181,7 +181,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
                 if ($this->originalSenderHeader) {
                     $message->getHeaders()
-                            ->addTextHeader('Sender', base64_decode($this->originalSenderHeader));
+                            ->addMailboxHeader('Sender', base64_decode($this->originalSenderHeader));
                 }
 
                 if ($this->emailInlineAttachments) {
