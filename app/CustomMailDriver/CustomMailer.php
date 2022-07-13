@@ -112,7 +112,9 @@ class CustomMailer extends Mailer
                 'To',
                 'Message-ID',
                 'Subject',
-                'Date'
+                'Date',
+                'Original-Sender',
+                'Sender'
             ])->toArray();
             $signedEmail = $dkimSigner->sign($symfonyMessage, $options);
             $symfonyMessage->setHeaders($signedEmail->getHeaders());
@@ -157,6 +159,12 @@ class CustomMailer extends Mailer
             if ($aliasTo = $message->getHeaders()->get('Alias-To')) {
                 $message->to($aliasTo->getValue());
                 $message->getHeaders()->remove('Alias-To');
+            }
+
+            // Add the original sender header here to prevent it altering the envelope from address
+            if ($originalSenderHeader = $message->getHeaders()->get('Original-Sender')) {
+                $message->getHeaders()->addMailboxHeader('Sender', $originalSenderHeader->getValue());
+                $message->getHeaders()->remove('Original-Sender');
             }
 
             return $this->transport->send($message, Envelope::create($envelopeMessage));
