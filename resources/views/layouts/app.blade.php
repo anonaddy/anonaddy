@@ -31,11 +31,13 @@
         <notifications position="bottom right" />
     </div>
 
-    <footer>
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
-        <div class="border-t border-grey-200 py-4 text-sm text-grey-500 text-center"><a href="https://github.com/anonaddy/anonaddy/releases/tag/v{{ App\Helpers\GitVersionHelper::version() }}" target="_blank" rel="nofollow noreferrer noopener" class="block sm:inline">v{{ App\Helpers\GitVersionHelper::version() }}</a></div>
-      </div>
-    </footer>
+    @if(App\Helpers\GitVersionHelper::version())
+        <footer>
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
+            <div class="border-t border-grey-200 py-4 text-sm text-grey-500 text-center"><a href="https://github.com/anonaddy/anonaddy/releases/tag/v{{ App\Helpers\GitVersionHelper::version() }}" target="_blank" rel="nofollow noreferrer noopener" class="block sm:inline">v{{ App\Helpers\GitVersionHelper::version() }}</a></div>
+        </div>
+        </footer>
+    @endif
 
     <!-- Scripts -->
     <script src="{{ mix('js/app.js') }}"></script>

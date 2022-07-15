@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Exceptions\CouldNotGetVersionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -33,7 +32,7 @@ class GitVersionHelper
 
         // Get version string from git
         $command = 'git describe --tags $(git rev-list --tags --max-count=1)';
-        $fail = false;
+
         if (class_exists('\Symfony\Component\Process\Process')) {
             try {
                 if (method_exists(Process::class, 'fromShellCommandline')) {
@@ -45,7 +44,8 @@ class GitVersionHelper
                 $process->mustRun();
                 $output = $process->getOutput();
             } catch (RuntimeException $e) {
-                $fail = true;
+                // Do nothing
+                $output = null;
             }
         } else {
             // Remember current directory
@@ -58,12 +58,6 @@ class GitVersionHelper
 
             // Change back
             chdir($dir);
-
-            $fail = $output === null;
-        }
-
-        if ($fail) {
-            throw new CouldNotGetVersionException();
         }
 
         return Str::of($output)->after('v')->trim();
