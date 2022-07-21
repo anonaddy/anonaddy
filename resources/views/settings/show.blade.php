@@ -679,7 +679,7 @@
 
         <div class="px-6 py-8 md:p-10 bg-white rounded-lg shadow mb-10">
 
-            <passport-personal-access-tokens />
+            <personal-access-tokens />
 
         </div>
 

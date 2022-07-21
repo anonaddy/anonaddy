@@ -29,16 +29,17 @@
         class="text-indigo-700"
         >Chrome / Brave</a
       >
-      to generate new aliases. Simply paste the token generated below into the browser extension to
-      get started. Your API access tokens are secret and should be treated like your password. For
-      more information please see the <a href="/docs" class="text-indigo-700">API documentation</a>.
+      to create new aliases. They can also be used with the mobile apps. Simply paste a token you've
+      created into the browser extension or mobile apps to get started. Your API access tokens are
+      secret and should be treated like your password. For more information please see the
+      <a href="/docs" class="text-indigo-700">API documentation</a>.
     </p>
 
     <button
       @click="openCreateTokenModal"
       class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
     >
-      Generate New Token
+      Create New Token
     </button>
 
     <div class="mt-6">
@@ -47,8 +48,8 @@
       <div class="my-4 w-24 border-b-2 border-grey-200"></div>
 
       <p class="my-6">
-        Tokens you have generated that can be used to access the API. To revoke an access token
-        simply click the delete button next to it.
+        Tokens you have created that can be used to access the API. To revoke an access token simply
+        click the delete button next to it.
       </p>
 
       <div>
@@ -60,7 +61,7 @@
           <div class="table-row">
             <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
             <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
-            <div class="table-cell p-1 md:p-4 font-semibold">Expires</div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Last Used</div>
             <div class="table-cell p-1 md:p-4"></div>
           </div>
           <div
@@ -70,7 +71,10 @@
           >
             <div class="table-cell p-1 md:p-4">{{ token.name }}</div>
             <div class="table-cell p-1 md:p-4">{{ token.created_at | timeAgo }}</div>
-            <div class="table-cell p-1 md:p-4">{{ token.expires_at | timeAgo }}</div>
+            <div v-if="token.last_used_at" class="table-cell p-1 md:p-4">
+              {{ token.last_used_at | timeAgo }}
+            </div>
+            <div v-else class="table-cell p-1 md:p-4">Not used yet</div>
             <div class="table-cell p-1 md:p-4 text-right">
               <a
                 class="text-red-500 font-bold cursor-pointer focus:outline-none"
@@ -118,7 +122,7 @@
             :class="loading ? 'cursor-not-allowed' : ''"
             :disabled="loading"
           >
-            Generate Token
+            Create Token
             <loader v-if="loading" />
           </button>
           <button
@@ -141,8 +145,10 @@
         </p>
         <textarea
           v-model="accessToken"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-sm"
-          rows="10"
+          @click="selectTokenTextArea"
+          id="token-text-area"
+          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-md break-all"
+          rows="1"
           readonly
         >
         </textarea>
@@ -226,8 +232,8 @@ export default {
 
   methods: {
     getTokens() {
-      axios.get('/oauth/personal-access-tokens').then(response => {
-        this.tokens = response.data
+      axios.get('/settings/personal-access-tokens').then(response => {
+        this.tokens = response.data.data
       })
     },
     store() {
@@ -236,7 +242,7 @@ export default {
       this.form.errors = []
 
       axios
-        .post('/oauth/personal-access-tokens', this.form)
+        .post('/settings/personal-access-tokens', this.form)
         .then(response => {
           this.loading = false
           this.form.name = ''
@@ -261,12 +267,19 @@ export default {
     revoke() {
       this.revokeTokenLoading = true
 
-      axios.delete(`/oauth/personal-access-tokens/${this.tokenToRevoke.id}`).then(response => {
-        this.revokeTokenLoading = false
-        this.revokeTokenModalOpen = false
-        this.tokenToRevoke = null
-        this.getTokens()
-      })
+      axios
+        .delete(`/settings/personal-access-tokens/${this.tokenToRevoke.id}`)
+        .then(response => {
+          this.revokeTokenLoading = false
+          this.revokeTokenModalOpen = false
+          this.tokenToRevoke = null
+          this.getTokens()
+        })
+        .catch(error => {
+          this.revokeTokenLoading = false
+          this.revokeTokenModalOpen = false
+          this.error()
+        })
     },
     openCreateTokenModal() {
       this.accessToken = null
@@ -277,6 +290,11 @@ export default {
     },
     closeRevokeTokenModal() {
       this.revokeTokenModalOpen = false
+    },
+    selectTokenTextArea() {
+      let textArea = document.getElementById('token-text-area')
+      textArea.focus()
+      textArea.select()
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

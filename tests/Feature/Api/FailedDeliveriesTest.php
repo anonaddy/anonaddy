@@ -13,7 +13,7 @@ class FailedDeliveriesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        parent::setUpPassport();
+        parent::setUpSanctum();
 
         $this->user->recipients()->save($this->user->defaultRecipient);
     }

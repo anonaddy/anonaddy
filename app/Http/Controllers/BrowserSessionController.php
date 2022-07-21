@@ -10,7 +10,7 @@ class BrowserSessionController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'current_password_sesssions' => 'password',
+            'current_password_sesssions' => 'current_password',
         ]);
 
         Auth::logoutOtherDevices($request->current_password_sesssions);

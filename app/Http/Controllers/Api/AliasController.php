@@ -21,9 +21,9 @@ class AliasController extends Controller
                 $direction = strpos($sort, '-') === 0 ? 'desc' : 'asc';
 
                 return $query->orderBy(ltrim($sort, '-'), $direction);
-                }, function ($query) {
-                    return $query->latest();
-                })
+            }, function ($query) {
+                return $query->latest();
+            })
             ->when($request->input('filter.active'), function ($query, $value) {
                 $active = $value === 'true' ? true : false;
 

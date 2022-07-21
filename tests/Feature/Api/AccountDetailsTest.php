@@ -12,7 +12,7 @@ class AccountDetailsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        parent::setUpPassport();
+        parent::setUpSanctum();
     }
 
     /** @test */

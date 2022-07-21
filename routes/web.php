@@ -3,6 +3,7 @@
 use App\Http\Controllers\AliasExportController;
 use App\Http\Controllers\Auth\BackupCodeController;
 use App\Http\Controllers\Auth\ForgotUsernameController;
+use App\Http\Controllers\Auth\PersonalAccessTokenController;
 use App\Http\Controllers\Auth\TwoFactorAuthController;
 use App\Http\Controllers\Auth\WebauthnController;
 use App\Http\Controllers\Auth\WebauthnEnabledKeyController;
@@ -128,6 +129,12 @@ Route::group([
     });
 
     Route::post('/2fa/new-backup-code', [BackupCodeController::class, 'update'])->name('settings.new_backup_code');
+
+    Route::controller(PersonalAccessTokenController::class)->group(function () {
+        Route::get('/personal-access-tokens', 'index')->name('personal_access_tokens.index');
+        Route::post('/personal-access-tokens', 'store')->name('personal_access_tokens.store');
+        Route::delete('/personal-access-tokens/{id}', 'destroy')->name('personal_access_tokens.destroy');
+    });
 
     Route::get('/aliases/export', [AliasExportController::class, 'export'])->name('aliases.export');
 });

@@ -33,8 +33,8 @@ Vue.component('rules', require('./pages/Rules.vue').default)
 Vue.component('failed-deliveries', require('./pages/FailedDeliveries.vue').default)
 
 Vue.component(
-  'passport-personal-access-tokens',
-  require('./components/passport/PersonalAccessTokens.vue').default
+  'personal-access-tokens',
+  require('./components/sanctum/PersonalAccessTokens.vue').default
 )
 Vue.component('webauthn-keys', require('./components/WebauthnKeys.vue').default)
 

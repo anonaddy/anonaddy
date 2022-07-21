@@ -43,7 +43,10 @@ class EmailData
             $this->encryptedParts = $parser->getAttachments();
         } else {
             foreach ($parser->getAttachments() as $attachment) {
-                if ($attachment->getContentDisposition() === 'inline') {
+                // Incorrect content type "text", set as text/plain
+                if ($attachment->getContentType() === 'text') {
+                    $this->text = base64_encode(stream_get_contents($attachment->getStream()));
+                } elseif ($attachment->getContentDisposition() === 'inline') {
                     $this->inlineAttachments[] = [
                         'stream' => base64_encode(stream_get_contents($attachment->getStream())),
                         'file_name' => base64_encode($attachment->getFileName()),

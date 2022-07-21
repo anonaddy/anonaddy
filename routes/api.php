@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-  'middleware' => ['auth:api', 'verified'],
+  'middleware' => ['auth:sanctum', 'verified'],
   'prefix' => 'v1'
 ], function () {
     Route::controller(AliasController::class)->group(function () {

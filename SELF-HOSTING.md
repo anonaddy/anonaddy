@@ -1086,7 +1086,7 @@ Then update your `.env` file.
 ANONADDY_DKIM_SIGNING_KEY=/var/lib/rspamd/dkim/example.com.default.key
 ```
 
-Then we will generate an app key, migrate the database, link the storage directory, restart the queue and install laravel passport.
+Then we will generate an app key, migrate the database, link the storage directory, clear the cache and restart the queue.
 
 ```bash
 php artisan key:generate
@@ -1097,39 +1097,7 @@ php artisan config:cache
 php artisan view:cache
 php artisan route:cache
 php artisan queue:restart
-
-php artisan passport:install
 ```
-
-Running `passport:install` will output details about a new personal access client, e.g.
-
-```bash
-Encryption keys generated successfully.
-Personal access client created successfully.
-Client ID: 1
-Client secret: MlVp37PNqtN9efBTw2wuenjMnMIlDuKBWK3GZQoJ
-Password grant client created successfully.
-Client ID: 2
-Client secret: ZTvhZCRZMdKUvmwqSmNAfWzAoaRatVWgbCVN2cR2
-```
-
-You need to update your `.env` file and add the details for the personal access client:
-
-```
-PASSPORT_PERSONAL_ACCESS_CLIENT_ID=client-id-value
-PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET=unhashed-client-secret-value
-```
-
-So I would enter:
-
-```
-PASSPORT_PERSONAL_ACCESS_CLIENT_ID=1
-PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET=MlVp37PNqtN9efBTw2wuenjMnMIlDuKBWK3GZQoJ
-```
-
-More information can be found in the Laravel documentation for Passport - [https://laravel.com/docs/8.x/passport](https://laravel.com/docs/8.x/passport)
-
-Then run `php artisan config:cache` again to reflect the changes.
 
 We also need to add a cronjob in order to run Laravel's schedules commands.
 
