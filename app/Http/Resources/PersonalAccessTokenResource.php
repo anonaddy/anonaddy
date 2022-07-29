@@ -14,8 +14,9 @@ class PersonalAccessTokenResource extends JsonResource
             'name' => $this->name,
             'abilities' => $this->abilities,
             'last_used_at' => $this->last_used_at?->toDateTimeString(),
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'expires_at' => $this->expires_at?->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
         ];
     }
 }

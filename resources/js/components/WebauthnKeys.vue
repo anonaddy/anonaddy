@@ -100,7 +100,6 @@ export default {
   mounted() {
     this.getWebauthnKeys()
   },
-
   methods: {
     getWebauthnKeys() {
       axios.get('/webauthn/keys').then(response => {

@@ -32,7 +32,13 @@
       to create new aliases. They can also be used with the mobile apps. Simply paste a token you've
       created into the browser extension or mobile apps to get started. Your API access tokens are
       secret and should be treated like your password. For more information please see the
-      <a href="/docs" class="text-indigo-700">API documentation</a>.
+      <a
+        href="https://app.anonaddy.com/docs"
+        target="_blank"
+        rel="nofollow noopener noreferrer"
+        class="text-indigo-700"
+        >API documentation</a
+      >.
     </p>
 
     <button
@@ -62,6 +68,7 @@
             <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
             <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
             <div class="table-cell p-1 md:p-4 font-semibold">Last Used</div>
+            <div class="table-cell p-1 md:p-4 font-semibold">Expires At</div>
             <div class="table-cell p-1 md:p-4"></div>
           </div>
           <div
@@ -75,6 +82,10 @@
               {{ token.last_used_at | timeAgo }}
             </div>
             <div v-else class="table-cell p-1 md:p-4">Not used yet</div>
+            <div v-if="token.expires_at" class="table-cell p-1 md:p-4">
+              {{ token.expires_at | formatDate }}
+            </div>
+            <div v-else class="table-cell p-1 md:p-4">Does not expire</div>
             <div class="table-cell p-1 md:p-4 text-right">
               <a
                 class="text-red-500 font-bold cursor-pointer focus:outline-none"
@@ -97,12 +108,13 @@
         </h2>
         <p class="mt-4 text-grey-700">
           What's this token going to be used for? Give it a short name so that you remember later.
+          You can also select an expiry date for the token if you wish.
         </p>
         <div class="mt-6">
-          <div v-if="form.errors.length > 0" class="mb-3 text-red-500">
+          <div v-if="isObject(form.errors)" class="mb-3 text-red-500">
             <ul>
-              <li v-for="error in form.errors" :key="error">
-                {{ error }}
+              <li v-for="error in form.errors" :key="error[0]">
+                {{ error[0] }}
               </li>
             </ul>
           </div>
@@ -111,11 +123,40 @@
             v-model="form.name"
             type="text"
             id="create-token-name"
-            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-6"
-            :class="form.errors.length > 0 ? 'border-red-500' : ''"
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-4"
+            :class="form.errors.name ? 'border-red-500' : ''"
             placeholder="e.g. Firefox extension"
             autofocus
           />
+          <label for="create-token-name" class="block text-grey-700 text-sm my-2">
+            Expiration:
+          </label>
+          <div class="block relative mb-6">
+            <select
+              v-model="form.expiration"
+              class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
+              :class="form.errors.expiration ? 'border border-red-500' : ''"
+            >
+              <option value="day">1 day</option>
+              <option value="week">1 week</option>
+              <option value="month">1 month</option>
+              <option value="year">1 year</option>
+              <option :value="null">No expiration</option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+            >
+              <svg
+                class="fill-current h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                />
+              </svg>
+            </div>
+          </div>
           <button
             @click="store"
             class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
@@ -220,7 +261,8 @@ export default {
       tokenToRevoke: null,
       form: {
         name: '',
-        errors: [],
+        expiration: null,
+        errors: {},
       },
       loading: false,
       revokeTokenLoading: false,
@@ -229,7 +271,11 @@ export default {
   mounted() {
     this.getTokens()
   },
-
+  watch: {
+    'form.expiration'() {
+      delete this.form.errors.expiration
+    },
+  },
   methods: {
     getTokens() {
       axios.get('/settings/personal-access-tokens').then(response => {
@@ -239,22 +285,23 @@ export default {
     store() {
       this.loading = true
       this.accessToken = null
-      this.form.errors = []
+      this.form.errors = {}
 
       axios
         .post('/settings/personal-access-tokens', this.form)
         .then(response => {
           this.loading = false
           this.form.name = ''
-          this.form.errors = []
+          this.form.expiration = null
+          this.form.errors = {}
 
           this.tokens.push(response.data.token)
           this.accessToken = response.data.accessToken
         })
         .catch(error => {
           this.loading = false
-          if (typeof error.response.data === 'object') {
-            this.form.errors = _.flatten(_.toArray(error.response.data.errors))
+          if (this.isObject(error.response.data)) {
+            this.form.errors = error.response.data.errors
           } else {
             this.error()
           }
@@ -295,6 +342,9 @@ export default {
       let textArea = document.getElementById('token-text-area')
       textArea.focus()
       textArea.select()
+    },
+    isObject(val) {
+      return _.isObject(val) && !_.isEmpty(val)
     },
     clipboardSuccess() {
       this.success('Copied to clipboard')

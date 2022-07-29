@@ -10,12 +10,20 @@ class PersonalAccessTokenController extends Controller
 {
     public function index()
     {
-        return PersonalAccessTokenResource::collection(user()->tokens);
+        return PersonalAccessTokenResource::collection(user()->tokens()->select(['id', 'tokenable_id', 'name', 'created_at', 'last_used_at', 'expires_at'])->get());
     }
 
     public function store(StorePersonalAccessTokenRequest $request)
     {
-        $token = user()->createToken($request->name);
+        // day, week, month, year or null
+        if ($request->expiration) {
+            $method = "add".ucfirst($request->expiration);
+            $expiration = now()->{$method}();
+        } else {
+            $expiration = null;
+        }
+
+        $token = user()->createToken($request->name, ['*'], $expiration);
 
         return [
             'token' => new PersonalAccessTokenResource($token->accessToken),

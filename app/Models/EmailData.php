@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
+use Symfony\Component\Mime\MimeTypes;
 
 class EmailData
 {
+    private static $mimeTypes;
+
     public function __construct(Parser $parser, $size)
     {
         $this->sender = $parser->getAddresses('from')[0]['address'];
@@ -43,23 +46,34 @@ class EmailData
             $this->encryptedParts = $parser->getAttachments();
         } else {
             foreach ($parser->getAttachments() as $attachment) {
-                // Incorrect content type "text", set as text/plain
-                if ($attachment->getContentType() === 'text') {
+                // Fix incorrect Content Types e.g. 'png', 'pdf', '.pdf', 'text'
+                $contentType = $attachment->getContentType();
+
+                if ($contentType === 'text') {
                     $this->text = base64_encode(stream_get_contents($attachment->getStream()));
-                } elseif ($attachment->getContentDisposition() === 'inline') {
-                    $this->inlineAttachments[] = [
-                        'stream' => base64_encode(stream_get_contents($attachment->getStream())),
-                        'file_name' => base64_encode($attachment->getFileName()),
-                        'mime' => base64_encode($attachment->getContentType()),
-                        'contentDisposition' => base64_encode($attachment->getContentDisposition()),
-                        'contentId' => base64_encode($attachment->getContentID()),
-                    ];
                 } else {
-                    $this->attachments[] = [
-                      'stream' => base64_encode(stream_get_contents($attachment->getStream())),
-                      'file_name' => base64_encode($attachment->getFileName()),
-                      'mime' => base64_encode($attachment->getContentType())
-                  ];
+                    if (! str_contains($contentType, '/')) {
+                        if (null === self::$mimeTypes) {
+                            self::$mimeTypes = new MimeTypes();
+                        }
+                        $contentType = self::$mimeTypes->getMimeTypes($contentType)[0] ?? 'application/octet-stream';
+                    }
+
+                    if ($attachment->getContentDisposition() === 'inline') {
+                        $this->inlineAttachments[] = [
+                            'stream' => base64_encode(stream_get_contents($attachment->getStream())),
+                            'file_name' => base64_encode($attachment->getFileName()),
+                            'mime' => base64_encode($contentType),
+                            'contentDisposition' => base64_encode($attachment->getContentDisposition()),
+                            'contentId' => base64_encode($attachment->getContentID()),
+                        ];
+                    } else {
+                        $this->attachments[] = [
+                          'stream' => base64_encode(stream_get_contents($attachment->getStream())),
+                          'file_name' => base64_encode($attachment->getFileName()),
+                          'mime' => base64_encode($contentType)
+                      ];
+                    }
                 }
             }
         }
