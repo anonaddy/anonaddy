@@ -9,8 +9,14 @@ class AppVersionController extends Controller
 {
     public function index()
     {
-        $parts = str(Version::version())->explode('.');
-
+        $ver = str(Version::version());
+        if (strlen($ver) == 0) {
+            $ver = getenv('ANONADDY_VERSION', true);
+            if ($ver == null) {
+                $ver = '';
+            }
+        }
+        $parts = $ver->explode('.');
         return response()->json([
             'version' => Version::version(),
             'major' => (int) isset($parts[0]) ? $parts[0] : null,
