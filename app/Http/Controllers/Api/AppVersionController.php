@@ -13,9 +13,9 @@ class AppVersionController extends Controller
 
         return response()->json([
             'version' => Version::version(),
-            'major' => (int) $parts[0],
-            'minor' => (int) $parts[1],
-            'patch' => (int) $parts[2]
+            'major' => (int) isset($parts[0]) ? $parts[0] : null,
+            'minor' => (int) isset($parts[1]) ? $parts[1] : null,
+            'patch' => (int) isset($parts[2]) ? $parts[2] : null,
         ]);
     }
 }

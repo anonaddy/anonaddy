@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "asbiin/laravel-webauthn",
-            "version": "3.0.1",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/asbiin/laravel-webauthn.git",
-                "reference": "1b6ad1b719ae70c850dffaa24d676b2f63b346b2"
+                "reference": "747df5ab7bf0f88bbb36f11c0f281464d6c29d0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/asbiin/laravel-webauthn/zipball/1b6ad1b719ae70c850dffaa24d676b2f63b346b2",
-                "reference": "1b6ad1b719ae70c850dffaa24d676b2f63b346b2",
+                "url": "https://api.github.com/repos/asbiin/laravel-webauthn/zipball/747df5ab7bf0f88bbb36f11c0f281464d6c29d0b",
+                "reference": "747df5ab7bf0f88bbb36f11c0f281464d6c29d0b",
                 "shasum": ""
             },
             "require": {
@@ -92,7 +92,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-06-01T11:51:23+00:00"
+            "time": "2022-07-30T09:08:07+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
