@@ -9,13 +9,14 @@ class AppVersionController extends Controller
 {
     public function index()
     {
-        $parts = str(Version::version())->explode('.');
+        $ver = Version::version();
+        $parts = $ver->explode('.');
 
         return response()->json([
-            'version' => Version::version(),
-            'major' => (int) isset($parts[0]) ? $parts[0] : null,
-            'minor' => (int) isset($parts[1]) ? $parts[1] : null,
-            'patch' => (int) isset($parts[2]) ? $parts[2] : null,
+            'version' => $ver,
+            'major' => isset($parts[0]) && $parts[0] !== '' ? (int) $parts[0] : 0,
+            'minor' => isset($parts[1]) ? (int) $parts[1] : 0,
+            'patch' => isset($parts[2]) ? (int) $parts[2] : 0,
         ]);
     }
 }

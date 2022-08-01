@@ -60,6 +60,10 @@ class GitVersionHelper
             chdir($dir);
         }
 
+        if (! $output) {
+            return str(getenv('ANONADDY_VERSION', true));
+        }
+
         return Str::of($output)->after('v')->trim();
     }
 }
