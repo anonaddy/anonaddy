@@ -61,7 +61,7 @@ class GitVersionHelper
         }
 
         if (! $output) {
-            return str(getenv('ANONADDY_VERSION', true));
+            return str(config('anonaddy.version'));
         }
 
         return Str::of($output)->after('v')->trim();
