@@ -67,7 +67,7 @@ class CustomMailer extends Mailer
             $recipient = Recipient::find($data['recipientId']);
 
             try {
-                $encrypter = new OpenPGPEncrypter(config('anonaddy.signing_key_fingerprint'), $data['fingerprint'], "~/.gnupg");
+                $encrypter = new OpenPGPEncrypter(config('anonaddy.signing_key_fingerprint'), $data['fingerprint'], "~/.gnupg", $recipient->protected_headers);
             } catch (RuntimeException $e) {
                 info($e->getMessage());
                 $encrypter = null;
@@ -78,7 +78,7 @@ class CustomMailer extends Mailer
             }
 
             if ($encrypter) {
-                $symfonyMessage = $encrypter->encrypt($symfonyMessage);
+                $symfonyMessage = $recipient->inline_encryption ? $encrypter->encryptInline($symfonyMessage) : $encrypter->encrypt($symfonyMessage);
             }
         }
 

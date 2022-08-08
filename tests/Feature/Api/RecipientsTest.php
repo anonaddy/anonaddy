@@ -307,4 +307,68 @@ class RecipientsTest extends TestCase
         $response->assertStatus(204);
         $this->assertFalse($this->user->recipients[0]->can_reply_send);
     }
+
+    /** @test */
+    public function user_can_turn_on_inline_encryption()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'inline_encryption' => false,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('POST', '/api/v1/inline-encrypted-recipients/', [
+            'id' => $recipient->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $response->getData()->data->inline_encryption);
+    }
+
+    /** @test */
+    public function user_can_turn_off_inline_encryption()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'inline_encryption' => true,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/inline-encrypted-recipients/'.$recipient->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->recipients[0]->inline_encryption);
+    }
+
+    /** @test */
+    public function user_can_turn_on_protected_headers()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'protected_headers' => false,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('POST', '/api/v1/protected-headers-recipients/', [
+            'id' => $recipient->id
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $response->getData()->data->protected_headers);
+    }
+
+    /** @test */
+    public function user_can_turn_off_protected_headers()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'protected_headers' => true,
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/protected-headers-recipients/'.$recipient->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->recipients[0]->protected_headers);
+    }
 }

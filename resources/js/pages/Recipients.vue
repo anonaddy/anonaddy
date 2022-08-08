@@ -60,6 +60,24 @@
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>
         </span>
+        <span v-else-if="props.column.label == 'Inline Encryption'">
+          PGP/Inline
+          <span
+            class="tooltip outline-none"
+            :data-tippy-content="`Use inline (PGP/Inline) instead of PGP/MIME encyption for forwarded messages. Please Note: This will ONLY encrypt and forward the plain text content!`"
+          >
+            <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+          </span>
+        </span>
+        <span v-else-if="props.column.label == 'Hide Subject'">
+          Hide Subject
+          <span
+            class="tooltip outline-none"
+            :data-tippy-content="`Enabling this setting will hide and encrypt the email subject using protected headers. Many mail clients are able to automatically decrypt and display the subject once the email arrives.`"
+          >
+            <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+          </span>
+        </span>
         <span v-else>
           {{ props.column.label }}
         </span>
@@ -149,6 +167,28 @@
           >
             Add public key
           </button>
+        </span>
+        <span
+          v-else-if="props.column.field === 'inline_encryption'"
+          class="flex justify-center items-center"
+        >
+          <Toggle
+            v-if="props.row.fingerprint"
+            v-model="rows[props.row.originalIndex].inline_encryption"
+            @on="turnOnInlineEncryption(props.row.id)"
+            @off="turnOffInlineEncryption(props.row.id)"
+          />
+        </span>
+        <span
+          v-else-if="props.column.field === 'protected_headers'"
+          class="flex justify-center items-center"
+        >
+          <Toggle
+            v-if="props.row.fingerprint"
+            v-model="rows[props.row.originalIndex].protected_headers"
+            @on="turnOnProtectedHeaders(props.row.id)"
+            @off="turnOffProtectedHeaders(props.row.id)"
+          />
         </span>
         <span v-else-if="props.column.field === 'email_verified_at'">
           <span
@@ -421,6 +461,20 @@ export default {
           field: 'should_encrypt',
           type: 'boolean',
           globalSearchDisabled: true,
+        },
+        {
+          label: 'Inline Encryption',
+          field: 'inline_encryption',
+          type: 'boolean',
+          globalSearchDisabled: true,
+          sortable: false,
+        },
+        {
+          label: 'Hide Subject',
+          field: 'protected_headers',
+          type: 'boolean',
+          globalSearchDisabled: true,
+          sortable: false,
         },
         {
           label: 'Verified',
@@ -697,6 +751,70 @@ export default {
     disallowRepliesSends(id) {
       axios
         .delete(`/api/v1/allowed-recipients/${id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
+    turnOnInlineEncryption(id) {
+      axios
+        .post(
+          `/api/v1/inline-encrypted-recipients`,
+          JSON.stringify({
+            id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response.status === 422) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
+        })
+    },
+    turnOffInlineEncryption(id) {
+      axios
+        .delete(`/api/v1/inline-encrypted-recipients/${id}`)
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          this.error()
+        })
+    },
+    turnOnProtectedHeaders(id) {
+      axios
+        .post(
+          `/api/v1/protected-headers-recipients`,
+          JSON.stringify({
+            id: id,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
+        .then(response => {
+          //
+        })
+        .catch(error => {
+          if (error.response.status === 422) {
+            this.error(error.response.data)
+          } else {
+            this.error()
+          }
+        })
+    },
+    turnOffProtectedHeaders(id) {
+      axios
+        .delete(`/api/v1/protected-headers-recipients/${id}`)
         .then(response => {
           //
         })

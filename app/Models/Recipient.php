@@ -32,6 +32,8 @@ class Recipient extends Model
         'user_id',
         'can_reply_send',
         'should_encrypt',
+        'inline_encryption',
+        'protected_headers',
         'fingerprint',
         'email_verified_at'
     ];
@@ -46,7 +48,9 @@ class Recipient extends Model
         'id' => 'string',
         'user_id' => 'string',
         'can_reply_send' => 'boolean',
-        'should_encrypt' => 'boolean'
+        'should_encrypt' => 'boolean',
+        'inline_encryption' => 'boolean',
+        'protected_headers' => 'boolean'
     ];
 
     public static function boot()

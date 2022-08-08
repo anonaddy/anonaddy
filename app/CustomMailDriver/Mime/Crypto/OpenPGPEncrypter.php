@@ -3,12 +3,14 @@
 namespace App\CustomMailDriver\Mime\Crypto;
 
 use App\CustomMailDriver\Mime\Part\EncryptedPart;
+use Illuminate\Support\Str;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mime\Email;
 
 class OpenPGPEncrypter
 {
     protected $gnupg = null;
+    protected $usesProtectedHeaders;
 
     /**
      * The signing hash algorithm. 'MD5', SHA1, or SHA256. SHA256 (the default) is highly recommended
@@ -52,12 +54,13 @@ class OpenPGPEncrypter
     protected $gnupgHome = null;
 
 
-    public function __construct($signingKey = null, $recipientKey = null, $gnupgHome = null)
+    public function __construct($signingKey = null, $recipientKey = null, $gnupgHome = null, $usesProtectedHeaders = false)
     {
         $this->initGNUPG();
         $this->signingKey    = $signingKey;
         $this->recipientKey = $recipientKey;
         $this->gnupgHome     = $gnupgHome;
+        $this->usesProtectedHeaders = $usesProtectedHeaders;
     }
 
     /**
@@ -132,8 +135,22 @@ class OpenPGPEncrypter
 
         $lines = preg_split('/(\r\n|\r|\n)/', rtrim($originalMessage));
 
-        for ($i=0; $i<count($lines); $i++) {
-            $lines[$i] = rtrim($lines[$i])."\r\n";
+        // Check if using protected headers or not
+        if ($this->usesProtectedHeaders) {
+            $protectedHeadersSet = false;
+            for ($i=0; $i<count($lines); $i++) {
+                if (! $protectedHeadersSet && Str::startsWith(strtolower($lines[$i]), 'content-type:')) {
+                    $lines[$i] = rtrim($lines[$i])."; protected-headers=\"v1\"\r\n";
+                    $headers->setHeaderBody('Text', 'Subject', '...');
+                    $protectedHeadersSet = true;
+                } else {
+                    $lines[$i] = rtrim($lines[$i])."\r\n";
+                }
+            }
+        } else {
+            for ($i=0; $i<count($lines); $i++) {
+                $lines[$i] = rtrim($lines[$i])."\r\n";
+            }
         }
 
         // Remove excess trailing newlines (RFC3156 section 5.4)
@@ -180,6 +197,39 @@ class OpenPGPEncrypter
         $body .= "--{$boundary}--";
 
         return $message->setBody(new EncryptedPart($body));
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return $this
+     *
+     * @throws RuntimeException
+     */
+    public function encryptInline(Email $message): Email
+    {
+        if (!$this->signingKey) {
+            foreach ($message->getFrom() as $key => $value) {
+                $this->addSignature($this->getKey($key, 'sign'));
+            }
+        }
+
+        if (!$this->signingKey) {
+            throw new RuntimeException('Signing has been enabled, but no signature has been added. Use autoAddSignature() or addSignature()');
+        }
+
+        if (!$this->recipientKey) {
+            throw new RuntimeException('Encryption has been enabled, but no recipients have been added. Use autoAddRecipients() or addRecipient()');
+        }
+
+        $text = $this->pgpEncryptAndSignString($message->getTextBody(), $this->recipientKey, $this->signingKey);
+
+        $headers = $message->getPreparedHeaders();
+        $headers->setHeaderBody('Parameterized', 'Content-Type', 'text/plain');
+        $headers->setHeaderParameter('Content-Type', 'charset', 'utf-8');
+        $message->setHeaders($headers);
+
+        return $message->setBody(new EncryptedPart($text));
     }
 
     /**
@@ -259,6 +309,37 @@ class OpenPGPEncrypter
         }
 
         throw new RuntimeException('Unable to encrypt message');
+    }
+
+    /**
+     * @param $plaintext
+     * @param $keyFingerprints
+     *
+     * @return string
+     *
+     * @throws RuntimeException
+     */
+    protected function pgpEncryptAndSignString($plaintext, $keyFingerprint, $signingKeyFingerprint)
+    {
+        if (isset($this->keyPassphrases[$signingKeyFingerprint]) && !$this->keyPassphrases[$signingKeyFingerprint]) {
+            $passPhrase = $this->keyPassphrases[$signingKeyFingerprint];
+        } else {
+            $passPhrase = null;
+        }
+
+        $this->gnupg->clearsignkeys();
+        $this->gnupg->addsignkey($signingKeyFingerprint, $passPhrase);
+        $this->gnupg->clearencryptkeys();
+        $this->gnupg->addencryptkey($keyFingerprint);
+        $this->gnupg->setarmor(1);
+
+        $encrypted = $this->gnupg->encryptsign($plaintext);
+
+        if ($encrypted) {
+            return $encrypted;
+        }
+
+        throw new RuntimeException('Unable to encrypt and sign message');
     }
 
     /**

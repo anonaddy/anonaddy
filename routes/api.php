@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\DomainDefaultRecipientController;
 use App\Http\Controllers\Api\DomainOptionController;
 use App\Http\Controllers\Api\EncryptedRecipientController;
 use App\Http\Controllers\Api\FailedDeliveryController;
+use App\Http\Controllers\Api\InlineEncryptedRecipientController;
+use App\Http\Controllers\Api\ProtectedHeadersRecipientController;
 use App\Http\Controllers\Api\RecipientController;
 use App\Http\Controllers\Api\RecipientKeyController;
 use App\Http\Controllers\Api\ReorderRuleController;
@@ -71,6 +73,16 @@ Route::group([
     Route::controller(EncryptedRecipientController::class)->group(function () {
         Route::post('/encrypted-recipients', 'store');
         Route::delete('/encrypted-recipients/{id}', 'destroy');
+    });
+
+    Route::controller(InlineEncryptedRecipientController::class)->group(function () {
+        Route::post('/inline-encrypted-recipients', 'store');
+        Route::delete('/inline-encrypted-recipients/{id}', 'destroy');
+    });
+
+    Route::controller(ProtectedHeadersRecipientController::class)->group(function () {
+        Route::post('/protected-headers-recipients', 'store');
+        Route::delete('/protected-headers-recipients/{id}', 'destroy');
     });
 
     Route::controller(AllowedRecipientController::class)->group(function () {
