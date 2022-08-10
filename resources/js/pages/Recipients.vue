@@ -64,7 +64,7 @@
           PGP/Inline
           <span
             class="tooltip outline-none"
-            :data-tippy-content="`Use inline (PGP/Inline) instead of PGP/MIME encyption for forwarded messages. Please Note: This will ONLY encrypt and forward the plain text content!`"
+            data-tippy-content="Use inline (PGP/Inline) instead of PGP/MIME encryption for forwarded messages. Please Note: This will ONLY encrypt and forward the plain text content!"
           >
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>
@@ -73,7 +73,7 @@
           Hide Subject
           <span
             class="tooltip outline-none"
-            :data-tippy-content="`Enabling this setting will hide and encrypt the email subject using protected headers. Many mail clients are able to automatically decrypt and display the subject once the email arrives.`"
+            data-tippy-content="Enabling this setting will hide and encrypt the email subject using protected headers. Many mail clients are able to automatically decrypt and display the subject once the email arrives."
           >
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>

@@ -19,8 +19,11 @@
                     <div class="mx-auto mt-6 w-24 border-b-2 border-grey-200"></div>
 
                     <div class="w-full flex flex-wrap mt-8">
+                    <p class="leading-normal mb-2 text-center">
+                            Before proceeding, please check your email <b>{{ user()->email }}</b> for a verification link. This link will expire after 1 hour.
+                        </p>
                         <p class="leading-normal mb-6 text-center">
-                            {{ __('Before proceeding, please check your email for a verification link.') }} This link will expire after 1 hour.
+                            If that email address is incorrect you can update it on the <a href="{{ route('settings.show') }}" class="text-indigo-700">settings page</a>.
                         </p>
 
                         <form method="POST" action="{{ route('verification.resend') }}" class="w-full">

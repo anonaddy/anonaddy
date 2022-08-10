@@ -110,7 +110,7 @@ class OpenPGPEncrypter
      */
     public function encrypt(Email $message): Email
     {
-        $originalMessage = $message->toString();
+        $originalMessage = clone $message;
 
         $headers = $message->getPreparedHeaders();
 
@@ -133,16 +133,23 @@ class OpenPGPEncrypter
             throw new RuntimeException('Signing has been enabled, but no signature has been added. Use autoAddSignature() or addSignature()');
         }
 
-        $lines = preg_split('/(\r\n|\r|\n)/', rtrim($originalMessage));
+        // If the email does not have any text part then we need to add a text/plain legacy display part
+        if ($this->usesProtectedHeaders && is_null($originalMessage->getTextBody())) {
+            $originalMessage->text($headers->get('Subject')->toString());
+        }
+
+        $lines = preg_split('/(\r\n|\r|\n)/', rtrim($originalMessage->toString()));
 
         // Check if using protected headers or not
         if ($this->usesProtectedHeaders) {
             $protectedHeadersSet = false;
             for ($i=0; $i<count($lines); $i++) {
-                if (! $protectedHeadersSet && Str::startsWith(strtolower($lines[$i]), 'content-type:')) {
+                if (Str::startsWith(strtolower($lines[$i]), 'content-type: text/plain') || Str::startsWith(strtolower($lines[$i]), 'content-type: multipart/')) {
                     $lines[$i] = rtrim($lines[$i])."; protected-headers=\"v1\"\r\n";
-                    $headers->setHeaderBody('Text', 'Subject', '...');
-                    $protectedHeadersSet = true;
+                    if (! $protectedHeadersSet) {
+                        $headers->setHeaderBody('Text', 'Subject', '...');
+                        $protectedHeadersSet = true;
+                    }
                 } else {
                     $lines[$i] = rtrim($lines[$i])."\r\n";
                 }
@@ -222,7 +229,9 @@ class OpenPGPEncrypter
             throw new RuntimeException('Encryption has been enabled, but no recipients have been added. Use autoAddRecipients() or addRecipient()');
         }
 
-        $text = $this->pgpEncryptAndSignString($message->getTextBody(), $this->recipientKey, $this->signingKey);
+        $body = $message->getTextBody() ?? '';
+
+        $text = $this->pgpEncryptAndSignString($body, $this->recipientKey, $this->signingKey);
 
         $headers = $message->getPreparedHeaders();
         $headers->setHeaderBody('Parameterized', 'Content-Type', 'text/plain');

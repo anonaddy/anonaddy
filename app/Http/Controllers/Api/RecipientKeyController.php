@@ -41,6 +41,8 @@ class RecipientKeyController extends Controller
 
         $recipient->update([
             'should_encrypt' => false,
+            'inline_encryption' => false,
+            'protected_headers' => false,
             'fingerprint' => null
         ]);
 

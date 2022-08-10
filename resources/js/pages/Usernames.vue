@@ -101,9 +101,7 @@
             />
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="tooltip outline-none" :data-tippy-content="props.row.description">{{
-              props.row.description | truncate(60)
-            }}</span>
+            <span class="outline-none">{{ props.row.description | truncate(60) }}</span>
             <icon
               name="edit"
               class="inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer ml-2"
