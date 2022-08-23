@@ -43,6 +43,8 @@ class RecipientKeyController extends Controller
             'should_encrypt' => false,
             'inline_encryption' => false,
             'protected_headers' => false,
+            'inline_encryption' => false,
+            'protected_headers' => false,
             'fingerprint' => null
         ]);
 

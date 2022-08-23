@@ -12,7 +12,7 @@
         />
         <icon
           v-if="search"
-          @click.native="search = ''"
+          @click="search = ''"
           name="close-circle"
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
@@ -34,7 +34,7 @@
 
     <vue-good-table
       v-if="initialDomains.length"
-      @on-search="debounceToolips"
+      v-on:search="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{
@@ -48,15 +48,15 @@
       }"
       styleClass="vgt-table"
     >
-      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+      <template #emptystate class="flex items-center justify-center h-24 text-lg text-grey-700">
         No domains found for that search!
-      </div>
-      <template slot="table-row" slot-scope="props">
+      </template>
+      <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
-          >{{ props.row.created_at | timeAgo }}
+          :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
+          >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'domain'">
           <span
@@ -65,7 +65,7 @@
             v-clipboard="() => rows[props.row.originalIndex].domain"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
-            >{{ props.row.domain | truncate(30) }}</span
+            >{{ $filters.truncate(props.row.domain, 30) }}</span
           >
         </span>
         <span v-else-if="props.column.field == 'description'">
@@ -86,20 +86,20 @@
             <icon
               name="close"
               class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-              @click.native="domainIdToEdit = domainDescriptionToEdit = ''"
+              @click="domainIdToEdit = domainDescriptionToEdit = ''"
             />
             <icon
               name="save"
               class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-              @click.native="editDomain(rows[props.row.originalIndex])"
+              @click="editDomain(rows[props.row.originalIndex])"
             />
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="outline-none">{{ props.row.description | truncate(60) }}</span>
+            <span class="outline-none">{{ $filters.truncate(props.row.description, 60) }}</span>
             <icon
               name="edit"
               class="inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer ml-2"
-              @click.native="
+              @click="
                 ;(domainIdToEdit = props.row.id), (domainDescriptionToEdit = props.row.description)
               "
             />
@@ -108,24 +108,24 @@
             <icon
               name="plus"
               class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click.native=";(domainIdToEdit = props.row.id), (domainDescriptionToEdit = '')"
+              @click=";(domainIdToEdit = props.row.id), (domainDescriptionToEdit = '')"
             />
           </div>
         </span>
         <span v-else-if="props.column.field === 'default_recipient'">
           <div v-if="props.row.default_recipient">
-            {{ props.row.default_recipient.email | truncate(30) }}
+            {{ $filters.truncate(props.row.default_recipient.email, 30) }}
             <icon
               name="edit"
               class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click.native="openDomainDefaultRecipientModal(props.row)"
+              @click="openDomainDefaultRecipientModal(props.row)"
             />
           </div>
           <div class="flex justify-center" v-else>
             <icon
               name="plus"
               class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click.native="openDomainDefaultRecipientModal(props.row)"
+              @click="openDomainDefaultRecipientModal(props.row)"
             />
           </div>
         </span>
@@ -234,7 +234,7 @@
           <icon
             name="trash"
             class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-            @click.native="openDeleteModal(props.row.id)"
+            @click="openDeleteModal(props.row.id)"
           />
         </span>
       </template>
@@ -265,12 +265,9 @@
     </div>
 
     <Modal :open="addDomainModalOpen" @close="closeCheckRecordsModal">
-      <div v-if="!domainToCheck" class="max-w-2xl w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Add new domain
-        </h2>
+      <template v-if="!domainToCheck" v-slot:title> Add new domain </template>
+      <template v-else v-slot:title> Check DNS records </template>
+      <template v-if="!domainToCheck" v-slot:content>
         <p class="mt-4 mb-2 text-grey-700">
           To verify ownership of the domain, please add the following TXT record and then click Add
           Domain below.
@@ -315,8 +312,8 @@
             Cancel
           </button>
         </div>
-      </div>
-      <div v-else class="max-w-2xl w-full bg-white rounded-lg shadow-2xl p-6">
+      </template>
+      <template v-else v-slot:content>
         <h2
           class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
         >
@@ -370,25 +367,22 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="domainDefaultRecipientModalOpen" @close="closeDomainDefaultRecipientModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Update Default Recipient
-        </h2>
+      <template v-slot:title> Update Default Recipient </template>
+      <template v-slot:content>
         <p class="my-4 text-grey-700">
           Select the default recipient for this domain. This overrides the default recipient in your
           account settings. Leave it empty if you would like to use the default recipient in your
           account settings.
         </p>
         <multiselect
-          v-model="defaultRecipient"
+          v-model="defaultRecipientId"
           :options="recipientOptions"
-          :multiple="false"
+          mode="single"
+          value-prop="id"
           :close-on-select="true"
           :clear-on-select="false"
           :searchable="false"
@@ -396,8 +390,6 @@
           placeholder="Select recipient"
           label="email"
           track-by="email"
-          :preselect-first="false"
-          :show-labels="false"
         >
         </multiselect>
         <div class="mt-6">
@@ -418,16 +410,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="deleteDomainModalOpen" @close="closeDeleteModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Delete domain
-        </h2>
+      <template v-slot:title> Delete domain </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Are you sure you want to delete this domain? This will also delete all aliases associated
           with this domain. You will no longer be able to receive any emails at this domain.
@@ -450,7 +438,7 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>
@@ -462,7 +450,7 @@ import { roundArrow } from 'tippy.js'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/dist/tippy.css'
 import tippy from 'tippy.js'
-import Multiselect from 'vue-multiselect'
+import Multiselect from '@vueform/multiselect'
 
 export default {
   props: {
@@ -507,7 +495,7 @@ export default {
       checkRecordsLoading: false,
       domainDefaultRecipientModalOpen: false,
       defaultRecipientDomainToEdit: {},
-      defaultRecipient: {},
+      defaultRecipientId: null,
       editDefaultRecipientLoading: false,
       errors: {},
       columns: [
@@ -667,20 +655,20 @@ export default {
     openDomainDefaultRecipientModal(domain) {
       this.domainDefaultRecipientModalOpen = true
       this.defaultRecipientDomainToEdit = domain
-      this.defaultRecipient = domain.default_recipient
+      this.defaultRecipientId = domain.default_recipient_id
     },
     closeDomainDefaultRecipientModal() {
       this.domainDefaultRecipientModalOpen = false
       this.defaultRecipientDomainToEdit = {}
-      this.defaultRecipient = {}
+      this.defaultRecipientId = null
     },
     openCheckRecordsModal(domain) {
       this.domainToCheck = domain
       this.addDomainModalOpen = true
     },
     closeCheckRecordsModal() {
-      this.domainToCheck = null
       this.addDomainModalOpen = false
+      _.delay(() => (this.domainToCheck = null), 300)
     },
     editDomain(domain) {
       if (this.domainDescriptionToEdit.length > 200) {
@@ -716,7 +704,7 @@ export default {
         .patch(
           `/api/v1/domains/${this.defaultRecipientDomainToEdit.id}/default-recipient`,
           JSON.stringify({
-            default_recipient: this.defaultRecipient ? this.defaultRecipient.id : '',
+            default_recipient: this.defaultRecipientId,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -724,17 +712,18 @@ export default {
         )
         .then(response => {
           let domain = _.find(this.rows, ['id', this.defaultRecipientDomainToEdit.id])
-          domain.default_recipient = this.defaultRecipient
+          domain.default_recipient = _.find(this.recipientOptions, ['id', this.defaultRecipientId])
+          domain.default_recipient_id = this.defaultRecipientId
 
           this.domainDefaultRecipientModalOpen = false
           this.editDefaultRecipientLoading = false
-          this.defaultRecipient = {}
+          this.defaultRecipientId = null
           this.success("Domain's default recipient updated")
         })
         .catch(error => {
           this.domainDefaultRecipientModalOpen = false
           this.editDefaultRecipientLoading = false
-          this.defaultRecipient = {}
+          this.defaultRecipientId = null
           this.error()
         })
     },

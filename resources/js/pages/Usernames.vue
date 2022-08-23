@@ -12,7 +12,7 @@
         />
         <icon
           v-if="search"
-          @click.native="search = ''"
+          @click="search = ''"
           name="close-circle"
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
@@ -34,7 +34,7 @@
 
     <vue-good-table
       v-if="initialUsernames.length"
-      @on-search="debounceToolips"
+      v-on:search="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{
@@ -48,15 +48,15 @@
       }"
       styleClass="vgt-table"
     >
-      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+      <template #emptystate class="flex items-center justify-center h-24 text-lg text-grey-700">
         No usernames found for that search!
-      </div>
-      <template slot="table-row" slot-scope="props">
+      </template>
+      <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
-          >{{ props.row.created_at | timeAgo }}
+          :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
+          >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'username'">
           <span
@@ -65,7 +65,7 @@
             v-clipboard="() => rows[props.row.originalIndex].username"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
-            >{{ props.row.username | truncate(30) }}</span
+            >{{ $filters.truncate(props.row.username, 30) }}</span
           >
           <span
             v-if="isDefault(props.row.id)"
@@ -92,20 +92,20 @@
             <icon
               name="close"
               class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-              @click.native="usernameIdToEdit = usernameDescriptionToEdit = ''"
+              @click="usernameIdToEdit = usernameDescriptionToEdit = ''"
             />
             <icon
               name="save"
               class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-              @click.native="editUsername(rows[props.row.originalIndex])"
+              @click="editUsername(rows[props.row.originalIndex])"
             />
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="outline-none">{{ props.row.description | truncate(60) }}</span>
+            <span class="outline-none">{{ $filters.truncate(props.row.description, 60) }}</span>
             <icon
               name="edit"
               class="inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer ml-2"
-              @click.native="
+              @click="
                 ;(usernameIdToEdit = props.row.id),
                   (usernameDescriptionToEdit = props.row.description)
               "
@@ -115,24 +115,24 @@
             <icon
               name="plus"
               class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click.native=";(usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = '')"
+              @click=";(usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = '')"
             />
           </div>
         </span>
         <span v-else-if="props.column.field === 'default_recipient'">
           <div v-if="props.row.default_recipient">
-            {{ props.row.default_recipient.email | truncate(30) }}
+            {{ $filters.truncate(props.row.default_recipient.email, 30) }}
             <icon
               name="edit"
               class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click.native="openUsernameDefaultRecipientModal(props.row)"
+              @click="openUsernameDefaultRecipientModal(props.row)"
             />
           </div>
           <div class="flex justify-center" v-else>
             <icon
               name="plus"
               class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click.native="openUsernameDefaultRecipientModal(props.row)"
+              @click="openUsernameDefaultRecipientModal(props.row)"
             />
           </div>
         </span>
@@ -158,7 +158,7 @@
             v-if="!isDefault(props.row.id)"
             name="trash"
             class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-            @click.native="openDeleteModal(props.row.id)"
+            @click="openDeleteModal(props.row.id)"
           />
         </span>
       </template>
@@ -187,12 +187,8 @@
     </div>
 
     <Modal :open="addUsernameModalOpen" @close="addUsernameModalOpen = false">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Add new username
-        </h2>
+      <template v-slot:title> Add new username </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Please choose usernames carefully as you can only add a maximum of
           {{ usernameCount }}. You can login with any of your usernames.
@@ -225,25 +221,22 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="usernameDefaultRecipientModalOpen" @close="closeUsernameDefaultRecipientModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Update Default Recipient
-        </h2>
+      <template v-slot:title> Update Default Recipient </template>
+      <template v-slot:content>
         <p class="my-4 text-grey-700">
           Select the default recipient for this username. This overrides the default recipient in
           your account settings. Leave it empty if you would like to use the default recipient in
           your account settings.
         </p>
         <multiselect
-          v-model="defaultRecipient"
+          v-model="defaultRecipientId"
           :options="recipientOptions"
-          :multiple="false"
+          mode="single"
+          value-prop="id"
           :close-on-select="true"
           :clear-on-select="false"
           :searchable="false"
@@ -251,8 +244,6 @@
           placeholder="Select recipient"
           label="email"
           track-by="email"
-          :preselect-first="false"
-          :show-labels="false"
         >
         </multiselect>
         <div class="mt-6">
@@ -273,16 +264,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="deleteUsernameModalOpen" @close="closeDeleteModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Delete username
-        </h2>
+      <template v-slot:title> Delete username </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Are you sure you want to delete this username? This will also delete all aliases
           associated with this username. You will no longer be able to receive any emails at this
@@ -307,7 +294,7 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>
@@ -319,7 +306,7 @@ import { roundArrow } from 'tippy.js'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/dist/tippy.css'
 import tippy from 'tippy.js'
-import Multiselect from 'vue-multiselect'
+import Multiselect from '@vueform/multiselect'
 
 export default {
   props: {
@@ -358,7 +345,7 @@ export default {
       deleteUsernameModalOpen: false,
       usernameDefaultRecipientModalOpen: false,
       defaultRecipientUsernameToEdit: {},
-      defaultRecipient: {},
+      defaultRecipientId: null,
       editDefaultRecipientLoading: false,
       errors: {},
       columns: [
@@ -492,12 +479,12 @@ export default {
     openUsernameDefaultRecipientModal(username) {
       this.usernameDefaultRecipientModalOpen = true
       this.defaultRecipientUsernameToEdit = username
-      this.defaultRecipient = username.default_recipient
+      this.defaultRecipientId = username.default_recipient_id
     },
     closeUsernameDefaultRecipientModal() {
       this.usernameDefaultRecipientModalOpen = false
       this.defaultRecipientUsernameToEdit = {}
-      this.defaultRecipient = {}
+      this.defaultRecipientId = null
     },
     editUsername(username) {
       if (this.usernameDescriptionToEdit.length > 200) {
@@ -532,7 +519,7 @@ export default {
         .patch(
           `/api/v1/usernames/${this.defaultRecipientUsernameToEdit.id}/default-recipient`,
           JSON.stringify({
-            default_recipient: this.defaultRecipient ? this.defaultRecipient.id : '',
+            default_recipient: this.defaultRecipientId,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -540,16 +527,21 @@ export default {
         )
         .then(response => {
           let username = _.find(this.rows, ['id', this.defaultRecipientUsernameToEdit.id])
-          username.default_recipient = this.defaultRecipient
+          username.default_recipient = _.find(this.recipientOptions, [
+            'id',
+            this.defaultRecipientId,
+          ])
+          username.default_recipient_id = this.defaultRecipientId
+
           this.usernameDefaultRecipientModalOpen = false
           this.editDefaultRecipientLoading = false
-          this.defaultRecipient = {}
+          this.defaultRecipientId = null
           this.success("Username's default recipient updated")
         })
         .catch(error => {
           this.usernameDefaultRecipientModalOpen = false
           this.editDefaultRecipientLoading = false
-          this.defaultRecipient = {}
+          this.defaultRecipientId = null
           this.error()
         })
     },

@@ -10,6 +10,7 @@
         "php": "^8.0.2",
         "asbiin/laravel-webauthn": "^3.0.0",
         "bacon/bacon-qr-code": "^2.0",
+        "chillerlan/php-qrcode": "^4.3",
         "doctrine/dbal": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.11",

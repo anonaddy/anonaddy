@@ -25,7 +25,7 @@
           </div>
           <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
             <div class="table-cell p-1 md:p-4">{{ key.name }}</div>
-            <div class="table-cell p-1 md:p-4">{{ key.created_at | timeAgo }}</div>
+            <div class="table-cell p-1 md:p-4">{{ $filters.timeAgo(key.created_at) }}</div>
             <div class="table-cell p-1 md:p-4">
               <Toggle v-model="key.enabled" @on="enableKey(key.id)" @off="disableKey(key.id)" />
             </div>
@@ -43,12 +43,8 @@
     </div>
 
     <Modal :open="deleteKeyModalOpen" @close="closeDeleteKeyModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Remove Hardware Key
-        </h2>
+      <template v-slot:title> Remove Hardware Key </template>
+      <template v-slot:content>
         <p v-if="keys.length === 1" class="my-4 text-grey-700">
           Once this key is removed, <b>Two-Factor Authentication</b> will be disabled on your
           account.
@@ -74,7 +70,7 @@
             Close
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>

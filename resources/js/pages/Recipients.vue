@@ -12,7 +12,7 @@
         />
         <icon
           v-if="search"
-          @click.native="search = ''"
+          @click="search = ''"
           name="close-circle"
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
@@ -33,7 +33,7 @@
     </div>
 
     <vue-good-table
-      @on-search="debounceToolips"
+      v-on:search="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{
@@ -47,10 +47,10 @@
       }"
       styleClass="vgt-table"
     >
-      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+      <template #emptystate class="flex items-center justify-center h-24 text-lg text-grey-700">
         No recipients found for that search!
-      </div>
-      <template slot="table-column" slot-scope="props">
+      </template>
+      <template #table-column="props">
         <span v-if="props.column.label == 'Key'">
           Key
           <span
@@ -82,12 +82,12 @@
           {{ props.column.label }}
         </span>
       </template>
-      <template slot="table-row" slot-scope="props">
+      <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
-          >{{ props.row.created_at | timeAgo }}
+          :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
+          >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'key'">
           {{ props.row.key }}
@@ -99,7 +99,7 @@
             v-clipboard="() => rows[props.row.originalIndex].email"
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
-            >{{ props.row.email | truncate(30) }}</span
+            >{{ $filters.truncate(props.row.email, 30) }}</span
           >
 
           <span
@@ -115,7 +115,7 @@
             v-if="props.row.aliases.length"
             class="tooltip outline-none"
             :data-tippy-content="aliasesTooltip(props.row.aliases, isDefault(props.row.id))"
-            >{{ props.row.aliases[0].email | truncate(40) }}
+            >{{ $filters.truncate(props.row.aliases[0].email, 40) }}
             <span
               v-if="isDefault(props.row.id) && aliasesUsingDefaultCount > 1"
               class="block text-grey-500 text-sm"
@@ -156,7 +156,7 @@
             <icon
               name="delete"
               class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-300 fill-current"
-              @click.native="openDeleteRecipientKeyModal(props.row)"
+              @click="openDeleteRecipientKeyModal(props.row)"
               data-tippy-content="Remove public key"
             />
           </span>
@@ -213,19 +213,15 @@
             v-if="!isDefault(props.row.id)"
             name="trash"
             class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-            @click.native="openDeleteModal(props.row)"
+            @click="openDeleteModal(props.row)"
           />
         </span>
       </template>
     </vue-good-table>
 
     <Modal :open="addRecipientModalOpen" @close="addRecipientModalOpen = false">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Add new recipient
-        </h2>
+      <template v-slot:title> Add new recipient </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Enter the individual email of the new recipient you'd like to add.
         </p>
@@ -261,16 +257,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="addRecipientKeyModalOpen" @close="closeRecipientKeyModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Add Public GPG Key
-        </h2>
+      <template v-slot:title> Add Public GPG Key </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">Enter your <b>PUBLIC</b> key data in the text area below.</p>
         <p class="mt-4 text-grey-700">Make sure to remove <b>Comment:</b> and <b>Version:</b></p>
         <div class="mt-6">
@@ -303,16 +295,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="deleteRecipientKeyModalOpen" @close="closeDeleteRecipientKeyModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Remove recipient public key
-        </h2>
+      <template v-slot:title> Remove recipient public key </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Are you sure you want to remove the public key for this recipient? It will also be removed
           from any other recipients using the same key.
@@ -335,16 +323,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="deleteRecipientModalOpen" @close="closeDeleteModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Delete recipient
-        </h2>
+      <template v-slot:title> Delete recipient </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">Are you sure you want to delete this recipient?</p>
         <div class="mt-6">
           <button
@@ -364,7 +348,7 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>
@@ -461,6 +445,7 @@ export default {
           field: 'should_encrypt',
           type: 'boolean',
           globalSearchDisabled: true,
+          sortable: false,
         },
         {
           label: 'Inline Encryption',

@@ -101,7 +101,7 @@ trait CheckUserRules
                     return ! Str::endsWith($variable, $value);
                 });
                 break;
-            // regex preg_match?
+                // regex preg_match?
         }
     }
 

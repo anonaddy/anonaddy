@@ -9,59 +9,58 @@ dayjs.extend(advancedFormat)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
-import PortalVue from 'portal-vue'
-import Clipboard from 'v-clipboard'
-import Notifications from 'vue-notification'
-import VueGoodTablePlugin from 'vue-good-table'
+import Clipboard from 'v-clipboard/src'
+import Notifications from '@kyvg/vue3-notification'
+import VueGoodTablePlugin from 'vue-good-table-next'
 
-Vue.use(PortalVue)
-Vue.use(Clipboard)
-Vue.use(Notifications)
-Vue.use(VueGoodTablePlugin)
-
-Vue.component('loader', require('./components/Loader.vue').default)
-Vue.component('dropdown', require('./components/DropdownNav.vue').default)
-Vue.component('icon', require('./components/Icon.vue').default)
-
-Vue.component('aliases', require('./pages/Aliases.vue').default)
-Vue.component('recipients', require('./pages/Recipients.vue').default)
-Vue.component('domains', require('./pages/Domains.vue').default)
-Vue.component('usernames', require('./pages/Usernames.vue').default)
-Vue.component('rules', require('./pages/Rules.vue').default)
-Vue.component('failed-deliveries', require('./pages/FailedDeliveries.vue').default)
-
-Vue.component(
-  'personal-access-tokens',
-  require('./components/sanctum/PersonalAccessTokens.vue').default
-)
-Vue.component('webauthn-keys', require('./components/WebauthnKeys.vue').default)
-
-Vue.filter('formatDate', value => {
-  return dayjs.utc(value).local().format('Do MMM YYYY')
-})
-
-Vue.filter('formatDateTime', value => {
-  return dayjs.utc(value).local().format('Do MMM YYYY h:mm A')
-})
-
-Vue.filter('timeAgo', value => {
-  return dayjs.utc(value).fromNow()
-})
-
-Vue.filter('truncate', (string, value) => {
-  if (value >= string.length) {
-    return string
-  }
-  return string.substring(0, value) + '...'
-})
-
-const app = new Vue({
-  el: '#app',
+const app = createApp({
   data() {
     return {
       mobileNavActive: false,
     }
   },
 })
+
+app.use(Clipboard)
+app.use(Notifications)
+app.use(VueGoodTablePlugin)
+
+app.component('loader', require('./components/Loader.vue').default)
+app.component('dropdown', require('./components/DropdownNav.vue').default)
+app.component('icon', require('./components/Icon.vue').default)
+
+app.component('aliases', require('./pages/Aliases.vue').default)
+app.component('recipients', require('./pages/Recipients.vue').default)
+app.component('domains', require('./pages/Domains.vue').default)
+app.component('usernames', require('./pages/Usernames.vue').default)
+app.component('rules', require('./pages/Rules.vue').default)
+app.component('failed-deliveries', require('./pages/FailedDeliveries.vue').default)
+
+app.component(
+  'personal-access-tokens',
+  require('./components/sanctum/PersonalAccessTokens.vue').default
+)
+app.component('webauthn-keys', require('./components/WebauthnKeys.vue').default)
+
+// Global filters
+app.config.globalProperties.$filters = {
+  formatDate(value) {
+    return dayjs.utc(value).local().format('Do MMM YYYY')
+  },
+  formatDateTime(value) {
+    return dayjs.utc(value).local().format('Do MMM YYYY h:mm A')
+  },
+  timeAgo(value) {
+    return dayjs.utc(value).fromNow()
+  },
+  truncate(value, length) {
+    if (length >= value.length) {
+      return value
+    }
+    return value.substring(0, length) + '...'
+  },
+}
+
+app.mount('#app')

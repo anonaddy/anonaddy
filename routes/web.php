@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AliasExportController;
+use App\Http\Controllers\Auth\ApiAuthenticationController;
 use App\Http\Controllers\Auth\BackupCodeController;
 use App\Http\Controllers\Auth\ForgotUsernameController;
 use App\Http\Controllers\Auth\PersonalAccessTokenController;
@@ -42,13 +43,16 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
 
+// Get API access token
+Route::post('api/auth/login', [ApiAuthenticationController::class, 'login']);
+Route::post('api/auth/mfa', [ApiAuthenticationController::class, 'mfa']);
 
 Route::controller(ForgotUsernameController::class)->group(function () {
     Route::get('/username/reminder', 'show')->name('username.reminder.show');
     Route::post('/username/email', 'sendReminderEmail')->name('username.email');
 });
 
-Route::post('/login/2fa', [TwoFactorAuthController::class, 'authenticateTwoFactor'])->name('login.2fa')->middleware(['2fa', 'throttle', 'auth']);
+Route::post('/login/2fa', [TwoFactorAuthController::class, 'authenticateTwoFactor'])->name('login.2fa')->middleware(['2fa', 'throttle:3,1', 'auth']);
 
 Route::controller(BackupCodeController::class)->group(function () {
     Route::get('/login/backup-code', 'index')->name('login.backup_code.index');

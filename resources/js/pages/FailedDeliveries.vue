@@ -12,7 +12,7 @@
         />
         <icon
           v-if="search"
-          @click.native="search = ''"
+          @click="search = ''"
           name="close-circle"
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
@@ -26,7 +26,7 @@
 
     <vue-good-table
       v-if="initialFailedDeliveries.length"
-      @on-search="debounceToolips"
+      v-on:search="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{
@@ -40,15 +40,15 @@
       }"
       styleClass="vgt-table"
     >
-      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+      <template #emptystate class="flex items-center justify-center h-24 text-lg text-grey-700">
         No failed deliveries found for that search!
-      </div>
-      <template slot="table-row" slot-scope="props">
+      </template>
+      <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
-          >{{ props.row.created_at | timeAgo }}
+          :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
+          >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'recipient'">
           <span
@@ -106,14 +106,14 @@
         <span
           v-else-if="props.column.field == 'attempted_at'"
           class="tooltip outline-none text-sm"
-          :data-tippy-content="rows[props.row.originalIndex].attempted_at | formatDateTime"
-          >{{ props.row.attempted_at | timeAgo }}
+          :data-tippy-content="$filters.formatDateTime(rows[props.row.originalIndex].attempted_at)"
+          >{{ $filters.timeAgo(props.row.attempted_at) }}
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <icon
             name="trash"
             class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-            @click.native="openDeleteModal(props.row.id)"
+            @click="openDeleteModal(props.row.id)"
           />
         </span>
       </template>
@@ -137,12 +137,8 @@
     </div>
 
     <Modal :open="deleteFailedDeliveryModalOpen" @close="closeDeleteModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Delete Failed Delivery
-        </h2>
+      <template v-slot:title> Delete Failed Delivery </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">Are you sure you want to delete this failed delivery?</p>
         <p class="mt-4 text-grey-700">
           Failed deliveries are automatically removed when they are more than 3 days old.
@@ -165,7 +161,7 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>

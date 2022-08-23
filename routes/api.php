@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ActiveUsernameController;
 use App\Http\Controllers\Api\AliasController;
 use App\Http\Controllers\Api\AliasRecipientController;
 use App\Http\Controllers\Api\AllowedRecipientController;
+use App\Http\Controllers\Api\ApiTokenDetailController;
 use App\Http\Controllers\Api\AppVersionController;
 use App\Http\Controllers\Api\CatchAllDomainController;
 use App\Http\Controllers\Api\CatchAllUsernameController;
@@ -156,4 +157,6 @@ Route::group([
     Route::get('/account-details', [AccountDetailController::class, 'index']);
 
     Route::get('/app-version', [AppVersionController::class, 'index']);
+
+    Route::get('api-token-details', [ApiTokenDetailController::class, 'show']);
 });

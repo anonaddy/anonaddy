@@ -31,20 +31,27 @@ html {
   @apply bg-yellow-100 border-yellow-600 text-yellow-800;
 }
 
-.multiselect .multiselect__tag {
+.multiselect .multiselect-dropdown::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+.multiselect .multiselect-dropdown::-webkit-scrollbar-thumb {
+  @apply bg-indigo-500 rounded-full;
+}
+
+.multiselect .multiselect-dropdown::-webkit-scrollbar-track {
+  @apply bg-indigo-50;
+}
+
+.multiselect .multiselect-tag {
   @apply bg-indigo-100 text-indigo-900;
 }
 
-.multiselect .multiselect__tag-icon:focus,
-.multiselect .multiselect__tag-icon:hover {
-  @apply bg-indigo-400;
+.multiselect .multiselect-option.is-selected {
+  @apply bg-indigo-100 text-indigo-900;
 }
 
-.multiselect .multiselect__option--highlight {
-  @apply bg-indigo-500;
-}
-
-.multiselect .multiselect__option--selected.multiselect__option--highlight {
+.multiselect .multiselect-option.is-selected:hover {
   @apply bg-red-500;
 }
 

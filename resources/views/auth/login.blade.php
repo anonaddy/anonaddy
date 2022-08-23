@@ -41,6 +41,11 @@
                                     {{ $errors->first('username') }}
                                 </p>
                             @endif
+                            @if ($errors->has('id'))
+                                <p class="text-red-500 text-xs italic mt-4">
+                                    {{ $errors->first('id') }}
+                                </p>
+                            @endif
                         </div>
 
                         <div class="flex flex-wrap mb-2">

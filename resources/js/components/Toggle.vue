@@ -1,19 +1,24 @@
 <template>
-  <button
+  <Switch
+    v-model="modelValue"
     @click="toggle"
-    type="button"
-    :aria-pressed="value.toString()"
-    :class="this.value ? 'bg-cyan-500' : 'bg-grey-300'"
-    class="relative inline-flex shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none"
+    :class="[
+      modelValue ? 'bg-cyan-500' : 'bg-grey-300',
+      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none',
+    ]"
   >
     <span class="sr-only">Use setting</span>
     <span
-      :class="this.value ? 'translate-x-5' : 'translate-x-0'"
-      class="relative inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition ease-in-out duration-200"
+      :class="[
+        modelValue ? 'translate-x-5' : 'translate-x-0',
+        'pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200',
+      ]"
     >
       <span
-        :class="this.value ? 'opacity-0 ease-out duration-100' : 'opacity-100 ease-in duration-200'"
-        class="absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
+        :class="[
+          modelValue ? 'opacity-0 ease-out duration-100' : 'opacity-100 ease-in duration-200',
+          'absolute inset-0 h-full w-full flex items-center justify-center transition-opacity',
+        ]"
         aria-hidden="true"
       >
         <svg class="h-3 w-3 text-grey-400" fill="none" viewBox="0 0 12 12">
@@ -27,8 +32,10 @@
         </svg>
       </span>
       <span
-        :class="this.value ? 'opacity-100 ease-in duration-200' : 'opacity-0 ease-out duration-100'"
-        class="absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
+        :class="[
+          modelValue ? 'opacity-100 ease-in duration-200' : 'opacity-0 ease-out duration-100',
+          'absolute inset-0 h-full w-full flex items-center justify-center transition-opacity',
+        ]"
         aria-hidden="true"
       >
         <svg class="h-3 w-3 text-cyan-500" fill="currentColor" viewBox="0 0 12 12">
@@ -38,16 +45,21 @@
         </svg>
       </span>
     </span>
-  </button>
+  </Switch>
 </template>
 
 <script>
+import { Switch } from '@headlessui/vue'
+
 export default {
-  props: ['value'],
+  props: ['modelValue'],
+  components: {
+    Switch,
+  },
   methods: {
     toggle() {
-      this.$emit('input', !this.value)
-      this.value ? this.$emit('off') : this.$emit('on')
+      this.$emit('update:modelValue', !this.modelValue)
+      this.modelValue ? this.$emit('off') : this.$emit('on')
     },
   },
 }

@@ -81,7 +81,6 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $recipient) {
-
                 // Handle bounces
                 if ($this->option('sender') === 'MAILER-DAEMON') {
                     $this->handleBounce($recipient['email']);
@@ -145,7 +144,6 @@ class ReceiveEmail extends Command
                 $verifiedRecipient = $user->getVerifiedRecipientByEmail($this->senderFrom);
 
                 if ($validEmailDestination && $verifiedRecipient?->can_reply_send) {
-
                     // Check if the Dmarc allow or spam headers are present from Rspamd
                     if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow') || $this->parser->getHeader('X-AnonAddy-Spam')) {
                         // Notify user and exit
@@ -295,7 +293,6 @@ class ReceiveEmail extends Command
 
             // Verify queue ID
             if (isset($dsn['X-postfix-queue-id'])) {
-
                 // First check in DB
                 $postfixQueueId = PostfixQueueId::firstWhere('queue_id', strtoupper($dsn['X-postfix-queue-id']));
 

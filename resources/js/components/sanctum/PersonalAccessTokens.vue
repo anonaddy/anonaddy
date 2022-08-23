@@ -77,13 +77,13 @@
             class="table-row even:bg-grey-50 odd:bg-white"
           >
             <div class="table-cell p-1 md:p-4">{{ token.name }}</div>
-            <div class="table-cell p-1 md:p-4">{{ token.created_at | timeAgo }}</div>
+            <div class="table-cell p-1 md:p-4">{{ $filters.timeAgo(token.created_at) }}</div>
             <div v-if="token.last_used_at" class="table-cell p-1 md:p-4">
-              {{ token.last_used_at | timeAgo }}
+              {{ $filters.timeAgo(token.last_used_at) }}
             </div>
             <div v-else class="table-cell p-1 md:p-4">Not used yet</div>
             <div v-if="token.expires_at" class="table-cell p-1 md:p-4">
-              {{ token.expires_at | formatDate }}
+              {{ $filters.formatDate(token.expires_at) }}
             </div>
             <div v-else class="table-cell p-1 md:p-4">Does not expire</div>
             <div class="table-cell p-1 md:p-4 text-right">
@@ -100,125 +100,122 @@
     </div>
 
     <Modal :open="createTokenModalOpen" @close="closeCreateTokenModal">
-      <div v-if="!accessToken" class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Create New Token
-        </h2>
-        <p class="mt-4 text-grey-700">
-          What's this token going to be used for? Give it a short name so that you remember later.
-          You can also select an expiry date for the token if you wish.
-        </p>
-        <div class="mt-6">
-          <div v-if="isObject(form.errors)" class="mb-3 text-red-500">
-            <ul>
-              <li v-for="error in form.errors" :key="error[0]">
-                {{ error[0] }}
-              </li>
-            </ul>
-          </div>
-          <label for="create-token-name" class="block text-grey-700 text-sm my-2"> Name: </label>
-          <input
-            v-model="form.name"
-            type="text"
-            id="create-token-name"
-            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-4"
-            :class="form.errors.name ? 'border-red-500' : ''"
-            placeholder="e.g. Firefox extension"
-            autofocus
-          />
-          <label for="create-token-name" class="block text-grey-700 text-sm my-2">
-            Expiration:
-          </label>
-          <div class="block relative mb-6">
-            <select
-              v-model="form.expiration"
-              class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
-              :class="form.errors.expiration ? 'border border-red-500' : ''"
-            >
-              <option value="day">1 day</option>
-              <option value="week">1 week</option>
-              <option value="month">1 month</option>
-              <option value="year">1 year</option>
-              <option :value="null">No expiration</option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-            >
-              <svg
-                class="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                />
-              </svg>
+      <template v-if="!accessToken" v-slot:title> Create New Token </template>
+      <template v-else v-slot:title> Personal Access Token </template>
+      <template v-slot:content>
+        <div v-show="!accessToken">
+          <p class="mt-4 text-grey-700">
+            What's this token going to be used for? Give it a short name so that you remember later.
+            You can also select an expiry date for the token if you wish.
+          </p>
+          <div class="mt-6">
+            <div v-if="isObject(form.errors)" class="mb-3 text-red-500">
+              <ul>
+                <li v-for="error in form.errors" :key="error[0]">
+                  {{ error[0] }}
+                </li>
+              </ul>
             </div>
+            <label for="create-token-name" class="block text-grey-700 text-sm my-2"> Name: </label>
+            <input
+              v-model="form.name"
+              type="text"
+              id="create-token-name"
+              class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 mb-4"
+              :class="form.errors.name ? 'border-red-500' : ''"
+              placeholder="e.g. Firefox extension"
+              autofocus
+            />
+            <label for="create-token-name" class="block text-grey-700 text-sm my-2">
+              Expiration:
+            </label>
+            <div class="block relative mb-6">
+              <select
+                v-model="form.expiration"
+                class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring"
+                :class="form.errors.expiration ? 'border border-red-500' : ''"
+              >
+                <option value="day">1 day</option>
+                <option value="week">1 week</option>
+                <option value="month">1 month</option>
+                <option value="year">1 year</option>
+                <option :value="null">No expiration</option>
+              </select>
+              <div
+                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+              >
+                <svg
+                  class="fill-current h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <button
+              @click="store"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+              :class="loading ? 'cursor-not-allowed' : ''"
+              :disabled="loading"
+            >
+              Create Token
+              <loader v-if="loading" />
+            </button>
+            <button
+              @click="closeCreateTokenModal"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            >
+              Close
+            </button>
           </div>
-          <button
-            @click="store"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
-            :class="loading ? 'cursor-not-allowed' : ''"
-            :disabled="loading"
-          >
-            Create Token
-            <loader v-if="loading" />
-          </button>
-          <button
-            @click="closeCreateTokenModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
-          >
-            Close
-          </button>
         </div>
-      </div>
-      <div v-else class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Personal Access Token
-        </h2>
-        <p class="my-4 text-grey-700">
-          This is your new personal access token. This is the only time the token will ever be
-          displayed, so please make a note of it in a safe place (e.g. password manager)!
-        </p>
-        <textarea
-          v-model="accessToken"
-          @click="selectTokenTextArea"
-          id="token-text-area"
-          class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-md break-all"
-          rows="1"
-          readonly
-        >
-        </textarea>
-        <div class="mt-6">
-          <button
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
-            v-clipboard="() => accessToken"
-            v-clipboard:success="clipboardSuccess"
-            v-clipboard:error="clipboardError"
+        <div v-show="accessToken">
+          <p class="my-4 text-grey-700">
+            This is your new personal access token. This is the only time the token will ever be
+            displayed, so please make a note of it in a safe place (e.g. password manager)!
+          </p>
+          <textarea
+            v-model="accessToken"
+            @click="selectTokenTextArea"
+            id="token-text-area"
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-md break-all"
+            rows="1"
+            readonly
           >
-            Copy To Clipboard
-          </button>
-          <button
-            @click="closeCreateTokenModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
-          >
-            Close
-          </button>
+          </textarea>
+          <div class="text-center">
+            <img :src="qrCode" class="inline-block" alt="QR Code" />
+            <p class="text-left text-sm text-grey-700">
+              You can scan this QR code to automatically login to the AnonAddy for Android mobile
+              app.
+            </p>
+          </div>
+          <div class="mt-6">
+            <button
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+              v-clipboard="() => accessToken"
+              v-clipboard:success="clipboardSuccess"
+              v-clipboard:error="clipboardError"
+            >
+              Copy To Clipboard
+            </button>
+            <button
+              @click="closeCreateTokenModal"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            >
+              Close
+            </button>
+          </div>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="revokeTokenModalOpen" @close="closeRevokeTokenModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Revoke API Access Token
-        </h2>
+      <template v-slot:title> ARevoke API Access Token </template>
+      <template v-slot:content>
         <p class="my-4 text-grey-700">
           Any browser extension, application or script using this API access token will no longer be
           able to access the API. This action cannot be undone.
@@ -240,7 +237,7 @@
             Close
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>
@@ -255,6 +252,7 @@ export default {
   data() {
     return {
       accessToken: null,
+      qrCode: null,
       createTokenModalOpen: false,
       revokeTokenModalOpen: false,
       tokens: [],
@@ -285,6 +283,7 @@ export default {
     store() {
       this.loading = true
       this.accessToken = null
+      this.qrCode = null
       this.form.errors = {}
 
       axios
@@ -297,6 +296,7 @@ export default {
 
           this.tokens.push(response.data.token)
           this.accessToken = response.data.accessToken
+          this.qrCode = response.data.qrCode
         })
         .catch(error => {
           this.loading = false
@@ -330,6 +330,7 @@ export default {
     },
     openCreateTokenModal() {
       this.accessToken = null
+      this.qrCode = null
       this.createTokenModalOpen = true
     },
     closeCreateTokenModal() {

@@ -297,8 +297,6 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_forget_alias()
     {
-        $this->withoutExceptionHandling();
-
         $alias = Alias::factory()->create([
             'user_id' => $this->user->id
         ]);
@@ -316,8 +314,6 @@ class AliasesTest extends TestCase
     /** @test */
     public function user_can_forget_shared_domain_alias()
     {
-        $this->withoutExceptionHandling();
-
         $sharedDomainAlias = Alias::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'anonaddy.me',

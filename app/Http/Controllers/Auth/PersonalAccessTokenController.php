@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePersonalAccessTokenRequest;
 use App\Http\Resources\PersonalAccessTokenResource;
+use chillerlan\QRCode\QRCode;
 
 class PersonalAccessTokenController extends Controller
 {
@@ -24,10 +25,12 @@ class PersonalAccessTokenController extends Controller
         }
 
         $token = user()->createToken($request->name, ['*'], $expiration);
+        $accessToken = explode('|', $token->plainTextToken, 2)[1];
 
         return [
             'token' => new PersonalAccessTokenResource($token->accessToken),
-            'accessToken' => explode('|', $token->plainTextToken, 2)[1]
+            'accessToken' => $accessToken,
+            'qrCode' => (new QRCode())->render(config('app.url') . "|" . $accessToken)
         ];
     }
 

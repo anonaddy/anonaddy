@@ -15,32 +15,30 @@
 
     <div v-if="initialRules.length" class="bg-white shadow">
       <draggable
-        tag="ul"
+        :component-data="{ name: 'flip-list' }"
+        item-key="id"
         v-model="rows"
-        v-bind="dragOptions"
+        :group="{ name: 'description' }"
+        ghost-class="ghost"
         handle=".handle"
         @change="reorderRules"
       >
-        <transition-group type="transition" name="flip-list">
-          <li
-            class="relative flex items-center py-3 px-5 border-b border-grey-100"
-            v-for="row in rows"
-            :key="row.name"
-          >
+        <template #item="{ element }">
+          <div class="relative flex items-center py-3 px-5 border-b border-grey-100">
             <div class="flex items-center w-3/5">
               <icon
                 name="menu"
                 class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
               />
 
-              <span class="m-4">{{ row.name }} </span>
+              <span class="m-4">{{ element.name }} </span>
             </div>
 
             <div class="w-1/5 relative flex">
               <Toggle
-                v-model="row.active"
-                @on="activateRule(row.id)"
-                @off="deactivateRule(row.id)"
+                v-model="element.active"
+                @on="activateRule(element.id)"
+                @off="deactivateRule(element.id)"
               />
             </div>
 
@@ -48,16 +46,16 @@
               <icon
                 name="edit"
                 class="block w-6 h-6 mr-3 text-grey-300 fill-current cursor-pointer"
-                @click.native="openEditModal(row)"
+                @click="openEditModal(element)"
               />
               <icon
                 name="trash"
                 class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                @click.native="openDeleteModal(row.id)"
+                @click="openDeleteModal(element.id)"
               />
             </div>
-          </li>
-        </transition-group>
+          </div>
+        </template>
       </draggable>
     </div>
 
@@ -81,12 +79,8 @@
     </div>
 
     <Modal :open="createRuleModalOpen" @close="createRuleModalOpen = false" :overflow="true">
-      <div class="max-w-2xl w-full bg-white rounded-lg shadow-2xl p-6 my-12">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Create new rule
-        </h2>
+      <template v-slot:title> Create new rule </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Rules work on all emails, including replies and also send froms. New conditions and
           actions will be added over time.
@@ -234,7 +228,7 @@
                     v-if="createRuleObject.conditions.length > 1"
                     name="trash"
                     class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                    @click.native="deleteCondition(createRuleObject, key)"
+                    @click="deleteCondition(createRuleObject, key)"
                   />
                 </div>
               </div>
@@ -248,7 +242,7 @@
                     <icon
                       name="close"
                       class="inline-block w-4 h-4 text-grey-900 fill-current cursor-pointer"
-                      @click.native="createRuleObject.conditions[key].values.splice(index, 1)"
+                      @click="createRuleObject.conditions[key].values.splice(index, 1)"
                     />
                   </span>
                   <span
@@ -377,7 +371,7 @@
                     v-if="createRuleObject.actions.length > 1"
                     name="trash"
                     class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                    @click.native="deleteAction(createRuleObject, key)"
+                    @click="deleteAction(createRuleObject, key)"
                   />
                 </div>
               </div>
@@ -449,16 +443,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="editRuleModalOpen" @close="closeEditModal" :overflow="true">
-      <div class="max-w-2xl w-full bg-white rounded-lg shadow-2xl p-6 my-12">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Edit rule
-        </h2>
+      <template v-slot:title> Edit rule </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Rules work on all emails, including replies and also send froms. New conditions and
           actions will be added over time.
@@ -603,7 +593,7 @@
                     v-if="editRuleObject.conditions.length > 1"
                     name="trash"
                     class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                    @click.native="deleteCondition(editRuleObject, key)"
+                    @click="deleteCondition(editRuleObject, key)"
                   />
                 </div>
               </div>
@@ -614,7 +604,7 @@
                     <icon
                       name="close"
                       class="inline-block w-4 h-4 text-grey-900 fill-current cursor-pointer"
-                      @click.native="editRuleObject.conditions[key].values.splice(index, 1)"
+                      @click="editRuleObject.conditions[key].values.splice(index, 1)"
                     />
                   </span>
                   <span
@@ -740,7 +730,7 @@
                     v-if="editRuleObject.actions.length > 1"
                     name="trash"
                     class="block ml-4 w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                    @click.native="deleteAction(editRuleObject, key)"
+                    @click="deleteAction(editRuleObject, key)"
                   />
                 </div>
               </div>
@@ -812,16 +802,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="deleteRuleModalOpen" @close="closeDeleteModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Delete rule
-        </h2>
+      <template v-slot:title> Delete rule </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">Are you sure you want to delete this rule?</p>
         <div class="mt-6">
           <button
@@ -841,7 +827,7 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>
@@ -944,14 +930,6 @@ export default {
   computed: {
     activeRules() {
       return _.filter(this.rows, rule => rule.active)
-    },
-    dragOptions() {
-      return {
-        animation: 0,
-        group: 'description',
-        disabled: false,
-        ghostClass: 'ghost',
-      }
     },
     rowsIds() {
       return _.map(this.rows, row => row.id)

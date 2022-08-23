@@ -27,7 +27,6 @@
 
         @yield('content')
 
-        <portal-target name="modals"></portal-target>
         <notifications position="bottom right" />
     </div>
 

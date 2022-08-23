@@ -99,6 +99,8 @@ class LoginTest extends TestCase
     /** @test */
     public function user_can_receive_username_reminder_email()
     {
+        $this->withoutMiddleware();
+
         Notification::fake();
 
         $recipient = $this->user->recipients[0];
@@ -116,6 +118,8 @@ class LoginTest extends TestCase
     /** @test */
     public function username_reminder_email_not_sent_for_unkown_email()
     {
+        $this->withoutMiddleware();
+
         Notification::fake();
 
         $this->post('/username/email', [

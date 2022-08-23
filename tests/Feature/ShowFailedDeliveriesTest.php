@@ -28,7 +28,6 @@ class ShowFailedDeliveriesTest extends TestCase
     /** @test */
     public function user_can_view_failed_deliveries_from_the_failed_deliveries_page()
     {
-        $this->withoutExceptionHandling();
         $failedDeliveries = FailedDelivery::factory()->count(3)->create([
             'user_id' => $this->user->id
         ]);

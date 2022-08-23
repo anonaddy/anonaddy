@@ -98,7 +98,7 @@
         />
         <icon
           v-if="search"
-          @click.native="search = ''"
+          @click="search = ''"
           name="close-circle"
           class="absolute right-0 inset-y-0 w-5 h-full text-grey-300 fill-current mr-2 flex items-center cursor-pointer"
         />
@@ -146,9 +146,9 @@
 
     <vue-good-table
       v-if="initialAliases.length"
-      @on-search="debounceToolips"
-      @on-page-change="debounceToolips"
-      @on-per-page-change="debounceToolips"
+      v-on:search="debounceToolips"
+      v-on:page-change="debounceToolips"
+      v-on:per-page-change="debounceToolips"
       :columns="columns"
       :rows="rows"
       :search-options="{
@@ -169,10 +169,10 @@
       }"
       styleClass="vgt-table"
     >
-      <div slot="emptystate" class="flex items-center justify-center h-24 text-lg text-grey-700">
+      <template #emptystate class="flex items-center justify-center h-24 text-lg text-grey-700">
         No aliases found for that search!
-      </div>
-      <template slot="table-row" slot-scope="props">
+      </template>
+      <template #table-row="props">
         <span v-if="props.column.field == 'created_at'" class="flex items-center">
           <span
             :class="`bg-${getAliasStatus(props.row).colour}-100`"
@@ -187,8 +187,8 @@
           </span>
           <span
             class="tooltip outline-none text-sm whitespace-nowrap"
-            :data-tippy-content="rows[props.row.originalIndex].created_at | formatDate"
-            >{{ props.row.created_at | timeAgo }}
+            :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
+            >{{ $filters.timeAgo(props.row.created_at) }}
           </span>
         </span>
         <span v-else-if="props.column.field == 'email'" class="block">
@@ -199,10 +199,10 @@
             v-clipboard:success="clipboardSuccess"
             v-clipboard:error="clipboardError"
             ><span class="font-semibold text-indigo-800">{{
-              getAliasLocalPart(props.row) | truncate(60)
+              $filters.truncate(getAliasLocalPart(props.row), 60)
             }}</span
             ><span v-if="getAliasLocalPart(props.row).length <= 60">{{
-              ('@' + props.row.domain) | truncate(60 - getAliasLocalPart(props.row).length)
+              $filters.truncate('@' + props.row.domain, 60 - getAliasLocalPart(props.row).length)
             }}</span>
           </span>
           <div v-if="aliasIdToEdit === props.row.id" class="flex items-center">
@@ -220,22 +220,22 @@
             <icon
               name="close"
               class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-              @click.native="aliasIdToEdit = aliasDescriptionToEdit = ''"
+              @click="aliasIdToEdit = aliasDescriptionToEdit = ''"
             />
             <icon
               name="save"
               class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-              @click.native="editAlias(rows[props.row.originalIndex])"
+              @click="editAlias(rows[props.row.originalIndex])"
             />
           </div>
           <div v-else-if="props.row.description" class="flex items-center">
             <span class="inline-block text-grey-400 text-sm py-1 border border-transparent">
-              {{ props.row.description | truncate(60) }}
+              {{ $filters.truncate(props.row.description, 60) }}
             </span>
             <icon
               name="edit"
               class="inline-block w-6 h-6 ml-2 text-grey-300 fill-current cursor-pointer"
-              @click.native="
+              @click="
                 ;(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = props.row.description)
               "
             />
@@ -279,7 +279,7 @@
           <icon
             name="edit"
             class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-            @click.native="openAliasRecipientsModal(props.row)"
+            @click="openAliasRecipientsModal(props.row)"
           />
         </span>
         <span
@@ -311,16 +311,18 @@
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <more-options>
             <div role="none">
-              <span
-                @click="openSendFromModal(props.row)"
-                class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
-                role="menuitem"
-              >
-                <icon name="send" class="block mr-3 w-5 h-5 text-grey-300 outline-none" />
-                Send From
-              </span>
+              <MenuItem>
+                <span
+                  @click="openSendFromModal(props.row)"
+                  class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
+                  role="menuitem"
+                >
+                  <icon name="send" class="block mr-3 w-5 h-5 text-grey-300 outline-none" />
+                  Send From
+                </span>
+              </MenuItem>
             </div>
-            <div v-if="props.row.deleted_at" role="none">
+            <MenuItem v-if="props.row.deleted_at">
               <span
                 @click="openRestoreModal(props.row.id)"
                 class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
@@ -332,8 +334,8 @@
                 />
                 Restore
               </span>
-            </div>
-            <div v-else role="none">
+            </MenuItem>
+            <MenuItem v-else>
               <span
                 @click="openDeleteModal(props.row)"
                 class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
@@ -345,8 +347,8 @@
                 />
                 Delete
               </span>
-            </div>
-            <div role="none">
+            </MenuItem>
+            <MenuItem>
               <span
                 @click="openForgetModal(props.row)"
                 class="group cursor-pointer flex items-center px-4 py-3 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900"
@@ -358,7 +360,7 @@
                 />
                 Forget
               </span>
-            </div>
+            </MenuItem>
           </more-options>
         </span>
       </template>
@@ -411,12 +413,8 @@
     </div>
 
     <Modal :open="generateAliasModalOpen" @close="generateAliasModalOpen = false">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Create new alias
-        </h2>
+      <template v-slot:title> Create new alias </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Other aliases e.g. alias@{{ subdomain }} can also be created automatically when they
           receive their first email.
@@ -524,6 +522,8 @@
         <multiselect
           id="alias_recipient_ids"
           v-model="generateAliasRecipientIds"
+          mode="tags"
+          value-prop="id"
           :options="recipientOptions"
           :multiple="true"
           :close-on-select="true"
@@ -533,8 +533,6 @@
           placeholder="Select recipient(s) (optional)..."
           label="email"
           track-by="email"
-          :preselect-first="false"
-          :show-labels="false"
         >
         </multiselect>
 
@@ -555,33 +553,29 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="editAliasRecipientsModalOpen" @close="closeAliasRecipientsModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Update Alias Recipients
-        </h2>
+      <template v-slot:title> Update Alias Recipients </template>
+      <template v-slot:content>
         <p class="my-4 text-grey-700">
           Select the recipients for this alias. You can choose multiple recipients. Leave it empty
           if you would like to use the default recipient.
         </p>
         <multiselect
           v-model="aliasRecipientsToEdit"
+          mode="tags"
+          value-prop="id"
           :options="recipientOptions"
           :multiple="true"
           :close-on-select="true"
           :clear-on-select="false"
           :searchable="true"
           :max="10"
-          placeholder="Select recipients"
+          placeholder="Select recipient(s)"
           label="email"
           track-by="email"
-          :preselect-first="false"
-          :show-labels="false"
         >
         </multiselect>
         <div class="mt-6">
@@ -602,16 +596,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="restoreAliasModalOpen" @close="closeRestoreModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Restore alias
-        </h2>
+      <template v-slot:title> Restore alias </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Are you sure you want to restore this alias? Once restored it will be
           <b>able to receive emails again</b>.
@@ -634,16 +624,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="deleteAliasModalOpen" @close="closeDeleteModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Delete alias
-        </h2>
+      <template v-slot:title> Delete alias </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Are you sure you want to delete <b class="break-words">{{ aliasToDelete.email }}</b
           >? You can restore it if you later change your mind. Once deleted,
@@ -668,16 +654,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="forgetAliasModalOpen" @close="closeForgetModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Forget alias
-        </h2>
+      <template v-slot:title> Forget alias </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Are you sure you want to forget <b class="break-words">{{ aliasToForget.email }}</b
           >? Forgetting an alias will disassociate it from your account.
@@ -705,16 +687,12 @@
             Cancel
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
 
     <Modal :open="sendFromAliasModalOpen" @close="closeSendFromModal">
-      <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl px-6 py-6">
-        <h2
-          class="font-semibold text-grey-900 text-2xl leading-tight border-b-2 border-grey-100 pb-4"
-        >
-          Send from alias
-        </h2>
+      <template v-slot:title> Send from alias </template>
+      <template v-slot:content>
         <p class="mt-4 text-grey-700">
           Use this to automatically create the correct address to send an email to in order to send
           an <b>email from this alias</b>.
@@ -811,7 +789,7 @@
             Close
           </button>
         </div>
-      </div>
+      </template>
     </Modal>
   </div>
 </template>
@@ -824,7 +802,8 @@ import { roundArrow } from 'tippy.js'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/dist/tippy.css'
 import tippy from 'tippy.js'
-import Multiselect from 'vue-multiselect'
+import Multiselect from '@vueform/multiselect'
+import { MenuItem } from '@headlessui/vue'
 
 export default {
   props: {
@@ -886,6 +865,7 @@ export default {
     Toggle,
     Multiselect,
     MoreOptions,
+    MenuItem,
   },
   data() {
     return {
@@ -1134,7 +1114,7 @@ export default {
     openAliasRecipientsModal(alias) {
       this.editAliasRecipientsModalOpen = true
       this.recipientsAliasToEdit = alias
-      this.aliasRecipientsToEdit = alias.recipients
+      this.aliasRecipientsToEdit = _.map(alias.recipients, recipient => recipient.id)
     },
     closeAliasRecipientsModal() {
       this.editAliasRecipientsModalOpen = false
@@ -1149,7 +1129,7 @@ export default {
           '/api/v1/alias-recipients',
           JSON.stringify({
             alias_id: this.recipientsAliasToEdit.id,
-            recipient_ids: _.map(this.aliasRecipientsToEdit, recipient => recipient.id),
+            recipient_ids: this.aliasRecipientsToEdit,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
@@ -1157,7 +1137,9 @@ export default {
         )
         .then(response => {
           let alias = _.find(this.rows, ['id', this.recipientsAliasToEdit.id])
-          alias.recipients = this.aliasRecipientsToEdit
+          alias.recipients = _.filter(this.recipientOptions, recipient =>
+            this.aliasRecipientsToEdit.includes(recipient.id)
+          )
 
           this.editAliasRecipientsModalOpen = false
           this.editAliasRecipientsLoading = false
@@ -1362,4 +1344,4 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="@vueform/multiselect/themes/default.css"></style>
