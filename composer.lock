@@ -1837,16 +1837,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.25.1",
+            "version": "v9.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "e8af8c2212e3717757ea7f459a655a2e9e771109"
+                "reference": "1ccfb91afee7a351b09ba1f1b97739096a3ad1cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/e8af8c2212e3717757ea7f459a655a2e9e771109",
-                "reference": "e8af8c2212e3717757ea7f459a655a2e9e771109",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/1ccfb91afee7a351b09ba1f1b97739096a3ad1cf",
+                "reference": "1ccfb91afee7a351b09ba1f1b97739096a3ad1cf",
                 "shasum": ""
             },
             "require": {
@@ -2013,7 +2013,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-08-16T16:36:05+00:00"
+            "time": "2022-08-23T19:00:07+00:00"
         },
         {
             "name": "laravel/sanctum",
@@ -7647,7 +7647,7 @@
         },
         {
             "name": "web-token/jwt-core",
-            "version": "v3.1.x-dev",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-token/jwt-core.git",
@@ -7711,7 +7711,7 @@
                 "symfony"
             ],
             "support": {
-                "source": "https://github.com/web-token/jwt-core/tree/v3.1"
+                "source": "https://github.com/web-token/jwt-core/tree/3.1.0"
             },
             "funding": [
                 {
@@ -7723,16 +7723,16 @@
         },
         {
             "name": "web-token/jwt-signature",
-            "version": "v3.0.7",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-token/jwt-signature.git",
-                "reference": "6006f38d2166414ff8d9ccc2f43dd5b1ecddc7ea"
+                "reference": "53dd6c8ad7b2d679721fe0d5b2b0b88c68c3dbce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/web-token/jwt-signature/zipball/6006f38d2166414ff8d9ccc2f43dd5b1ecddc7ea",
-                "reference": "6006f38d2166414ff8d9ccc2f43dd5b1ecddc7ea",
+                "url": "https://api.github.com/repos/web-token/jwt-signature/zipball/53dd6c8ad7b2d679721fe0d5b2b0b88c68c3dbce",
+                "reference": "53dd6c8ad7b2d679721fe0d5b2b0b88c68c3dbce",
                 "shasum": ""
             },
             "require": {
@@ -7788,7 +7788,7 @@
                 "symfony"
             ],
             "support": {
-                "source": "https://github.com/web-token/jwt-signature/tree/v3.0.7"
+                "source": "https://github.com/web-token/jwt-signature/tree/3.1.0"
             },
             "funding": [
                 {
@@ -7796,7 +7796,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2022-05-30T12:05:48+00:00"
+            "time": "2022-08-04T21:04:09+00:00"
         },
         {
             "name": "webmozart/assert",

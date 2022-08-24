@@ -1180,7 +1180,7 @@ export default {
             local_part: this.generateAliasLocalPart,
             description: this.generateAliasDescription,
             format: this.generateAliasFormat,
-            recipient_ids: _.map(this.generateAliasRecipientIds, recipient => recipient.id),
+            recipient_ids: this.generateAliasRecipientIds,
           }),
           {
             headers: { 'Content-Type': 'application/json' },
