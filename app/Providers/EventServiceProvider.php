@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Listeners\CheckIfShouldBlock;
+use App\Listeners\SendIncorrectOtpNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Mail\Events\MessageSending;
+use PragmaRX\Google2FALaravel\Events\LoginFailed;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         MessageSending::class => [
             CheckIfShouldBlock::class,
+        ],
+        LoginFailed::class => [
+            SendIncorrectOtpNotification::class
         ]
     ];
 

@@ -20,6 +20,11 @@ class TwoFactorAuthController extends Controller
         $this->authenticator = app(Authenticator::class)->boot($request);
     }
 
+    public function index()
+    {
+        return redirect('/');
+    }
+
     public function store(EnableTwoFactorAuthRequest $request)
     {
         if (!$this->twoFactor->verifyKey(user()->two_factor_secret, $request->two_factor_token)) {

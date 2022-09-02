@@ -52,6 +52,7 @@ Route::controller(ForgotUsernameController::class)->group(function () {
     Route::post('/username/email', 'sendReminderEmail')->name('username.email');
 });
 
+Route::get('/login/2fa', [TwoFactorAuthController::class, 'index'])->name('login.2fa.index')->middleware(['2fa', 'auth']);
 Route::post('/login/2fa', [TwoFactorAuthController::class, 'authenticateTwoFactor'])->name('login.2fa')->middleware(['2fa', 'throttle:3,1', 'auth']);
 
 Route::controller(BackupCodeController::class)->group(function () {
