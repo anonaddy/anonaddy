@@ -6,6 +6,7 @@
 /public/js
 /public/mix-manifest.json
 /storage/*.key
+/storage/debugbar
 /vendor
 /.idea
 /.vscode
