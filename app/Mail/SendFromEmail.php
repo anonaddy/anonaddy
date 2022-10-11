@@ -63,14 +63,13 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     public function build()
     {
         $returnPath = $this->alias->email;
+        $this->fromEmail = $this->alias->email;
 
         if ($this->alias->isCustomDomain()) {
             if (! $this->alias->aliasable->isVerifiedForSending()) {
                 $this->fromEmail = config('mail.from.address');
                 $returnPath = config('anonaddy.return_path');
             }
-        } else {
-            $this->fromEmail = $this->alias->email;
         }
 
         $this->email =  $this
