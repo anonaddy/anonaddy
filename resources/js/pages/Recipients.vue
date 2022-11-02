@@ -64,7 +64,7 @@
           PGP/Inline
           <span
             class="tooltip outline-none"
-            data-tippy-content="Use inline (PGP/Inline) instead of PGP/MIME encryption for forwarded messages. Please Note: This will ONLY encrypt and forward the plain text content!"
+            data-tippy-content="Use inline (PGP/Inline) instead of PGP/MIME encryption for forwarded messages. Please Note: Turn off if you wish to receive html or mixed type messages. Turn on for plain text ONLY"
           >
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>
