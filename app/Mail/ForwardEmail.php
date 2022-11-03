@@ -37,7 +37,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     protected $emailAttachments;
     protected $emailInlineAttachments;
     protected $deactivateUrl;
-    protected $bannerLocation;
+    protected $bannerLocationText;
+    protected $bannerLocationHtml;
     protected $fingerprint;
     protected $encryptedParts;
     protected $fromEmail;
@@ -88,7 +89,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         $this->fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
 
-        $this->bannerLocation = $this->isAlreadyEncrypted() ? 'off' : $this->alias->user->banner_location;
+        $this->bannerLocationText = $this->bannerLocationHtml = $this->isAlreadyEncrypted() ? 'off' : $this->alias->user->banner_location;
     }
 
     /**
@@ -215,6 +216,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         }
 
         if ($this->emailHtml) {
+            // Turn off the banner for the plain text version
+            $this->bannerLocationText = 'off';
+
             $this->email->view('emails.forward.html')->with([
                 'html' => base64_decode($this->emailHtml)
             ]);
@@ -240,7 +244,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->checkRules('Forwards');
 
         $this->email->with([
-            'location' => $this->bannerLocation,
+            'locationText' => $this->bannerLocationText,
+            'locationHtml' => $this->bannerLocationHtml,
             'deactivateUrl' => $this->deactivateUrl,
             'aliasEmail' => $this->alias->email,
             'aliasDomain' => $this->alias->domain,

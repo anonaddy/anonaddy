@@ -462,13 +462,15 @@ For full details please see the [self-hosting instructions file](SELF-HOSTING.md
 
 ## My sponsors
 
-Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev), [Patrick Dobler](https://github.com/patrickdobler), [Luca Steeb](https://github.com/steebchen) and [Laiteux](https://github.com/Laiteux) for supporting me by sponsoring the project on GitHub!
+Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev), [Patrick Dobler](https://github.com/patrickdobler), [Luca Steeb](https://github.com/steebchen), [Laiteux](https://github.com/Laiteux) and [narolinus](https://github.com/narolinus) for supporting me by sponsoring the project on GitHub!
 
 Also an extra special thanks to [CrazyMax](https://github.com/crazy-max) for sponsoring me and also creating and maintaining the awesome [AnonAddy Docker image](https://github.com/anonaddy/docker)!
 
 ## Thanks
 
-Thanks to [https://gitlab.com/mailcare/mailcare](https://gitlab.com/mailcare/mailcare) and [https://github.com/niftylettuce/forward-email](https://github.com/niftylettuce/forward-email) for their awesome open-source projects that helped me along the way.
+Huge thank you to [Stjin](https://twitter.com/Stjinchan) and [KhalidWar](https://github.com/KhalidWar) for their amazing mobile apps.
+
+Also to [https://gitlab.com/mailcare/mailcare](https://gitlab.com/mailcare/mailcare) and [https://github.com/niftylettuce/forward-email](https://github.com/niftylettuce/forward-email) for their awesome open-source projects that helped me along the way.
 
 ## License
 

@@ -1,21 +1,11 @@
-@if($location === 'top')
-This email was sent to {{ $aliasEmail }}{{ $aliasDescription ? ' (' . $aliasDescription . ')' : '' }} from {{ $fromEmail }}{!! $replacedSubject !!} and has been forwarded by AnonAddy.
-To deactivate this alias copy and paste the url below into your web browser.
-
-{{ $deactivateUrl }}
-
------
+@if($locationText === 'top')
+    @include('emails.forward.text_banner')
 
 
 @endif
 {!! $text !!}
-@if($location === 'bottom')
+@if($locationText === 'bottom')
 
 
------
-
-This email was sent to {{ $aliasEmail }}{{ $aliasDescription ? ' (' . $aliasDescription . ')' : '' }} from {{ $fromEmail }}{!! $replacedSubject !!} and has been forwarded by AnonAddy.
-To deactivate this alias copy and paste the url below into your web browser.
-
-{{ $deactivateUrl }}
+    @include('emails.forward.text_banner')
 @endif

@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
 
 class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
@@ -116,13 +117,13 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         if ($this->emailText) {
             $this->email->text('emails.reply.text')->with([
-                'text' => str_ireplace($this->sender, '', base64_decode($this->emailText))
+                'text' => $this->removeRealEmailAndBanner(base64_decode($this->emailText))
             ]);
         }
 
         if ($this->emailHtml) {
             $this->email->view('emails.reply.html')->with([
-                'html' => str_ireplace($this->sender, '', base64_decode($this->emailHtml))
+                'html' => $this->removeRealEmailAndBanner(base64_decode($this->emailHtml))
             ]);
         }
 
@@ -202,5 +203,10 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     private function needsDkimSignature()
     {
         return $this->alias->isCustomDomain() ? $this->alias->aliasable->isVerifiedForSending() : false;
+    }
+
+    private function removeRealEmailAndBanner($text)
+    {
+        return Str::of(str_ireplace($this->sender, '', $text))->replaceMatches('/(?s)(<!--banner-info-->).*?(<!--banner-info-->)/', '');
     }
 }

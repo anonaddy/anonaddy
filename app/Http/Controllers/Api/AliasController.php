@@ -19,8 +19,16 @@ class AliasController extends Controller
         $aliases = user()->aliases()->with('recipients')
             ->when($request->input('sort'), function ($query, $sort) {
                 $direction = strpos($sort, '-') === 0 ? 'desc' : 'asc';
+                $sort = ltrim($sort, '-');
 
-                return $query->orderBy(ltrim($sort, '-'), $direction);
+                if ($sort === 'created_at') {
+                    return $query->orderBy($sort, $direction);
+                }
+
+                // Secondary order by latest first
+                return $query
+                    ->orderBy($sort, $direction)
+                    ->orderBy('created_at', 'desc');
             }, function ($query) {
                 return $query->latest();
             })

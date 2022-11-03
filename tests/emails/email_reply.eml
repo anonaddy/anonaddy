@@ -10,11 +10,28 @@ Content-Type: multipart/mixed; boundary="----=_Part_10031_1199410393.15506779404
 Content-Type: text/html; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi,<br>
-<br>
-This is a test email.<br>
-<br>
-Will
+<table style="width:100%;">
+    <tbody>
+        <!--banner-info-->
+        <tr>
+            <td>
+                <div style="margin:0px auto;max-width:896px;padding:10px 20px;background-color:#f5f7fa;text-align:center;line-height:1.5;font-size:12px;width:100%;border-left: 3px solid #19216c;font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';color:#3e4c59;">
+                    This email was sent to <span style="font-weight:500;color:#19216c;">ebay@johndoe.anonaddy.com</span> (ebay.com) from <span style="font-weight:500;color:#19216c;">will@anonaddy.com</span><br>Click <a href="https://anonaddy.test/deactivate/xyz" style="color:#2d3a8c;text-decoration:underline;" target="_blank" rel="noreferrer noopener nofollow">here</a> to deactivate this alias
+                </div>
+            </td>
+        </tr>
+        <!--banner-info-->
+        <tr>
+            <td style="padding:10px 0;width:100%;">
+                Hi,<br>
+                <br>
+                This is a test email.<br>
+                <br>
+                Will
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 
 ------=_Part_10031_1199410393.1550677940425
