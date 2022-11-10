@@ -2,7 +2,7 @@
 
 # Attempted Reply/Send Failed
 
-An attempt to send or reply from your alias **{{ $aliasEmail }}** was just made from **{{ $recipient }}** which failed because it didn't pass authentication checks and could be a spoofed.
+An attempt to send or reply from your alias **{{ $aliasEmail }}** was just made from **{{ $recipient }}** which failed because it didn't pass authentication checks and could be spoofed.
 
 In order to send or reply from an alias there must be a valid DMARC policy present for **{{ \Illuminate\Support\Str::afterLast($recipient, '@') }}** and your message must be permitted by that DMARC policy.
 

@@ -103,13 +103,13 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         if ($this->emailText) {
             $this->email->text('emails.reply.text')->with([
-                'text' => $this->removeRealEmailAndBanner(base64_decode($this->emailText))
+                'text' => $this->removeRealEmailAndTextBanner(base64_decode($this->emailText))
             ]);
         }
 
         if ($this->emailHtml) {
             $this->email->view('emails.reply.html')->with([
-                'html' => $this->removeRealEmailAndBanner(base64_decode($this->emailHtml))
+                'html' => $this->removeRealEmailAndHtmlBanner(base64_decode($this->emailHtml))
             ]);
         }
 
@@ -191,8 +191,17 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         return $this->alias->isCustomDomain() ? $this->alias->aliasable->isVerifiedForSending() : false;
     }
 
-    private function removeRealEmailAndBanner($text)
+    private function removeRealEmailAndTextBanner($text)
     {
-        return Str::of(str_ireplace($this->sender, '', $text))->replaceMatches('/(?s)(<!--banner-info-->).*?(<!--banner-info-->)/', '');
+        return Str::of(str_ireplace($this->sender, '', $text))
+            ->replaceMatches('/(?s)(<!--banner-info-->).*?(<!--banner-info-->)/mi', '');
+    }
+
+    private function removeRealEmailAndHtmlBanner($html)
+    {
+        return Str::of(str_ireplace($this->sender, '', $html))
+            ->replaceMatches('/(?s)(<!--banner-info-->).*?(<!--banner-info-->)/mi', '')
+            // Outlook changing the ID to x_banner-info
+            ->replaceMatches('/(?s)(<tr id="(x_)?banner-info">).*?(<\/tr>)/mi', '');
     }
 }
