@@ -12,10 +12,10 @@ Content-Transfer-Encoding: quoted-printable
 
 <table style="width:100%;">
     <tbody>
-        <tr id="banner-info">
+        <tr>
             <td>
                 <div style="margin:0px auto;max-width:896px;padding:10px 20px;background-color:#f5f7fa;text-align:center;line-height:1.5;font-size:12px;width:100%;border-left: 3px solid #19216c;font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';color:#3e4c59;">
-                    This email was sent to <span style="font-weight:500;color:#19216c;">ebay@johndoe.anonaddy.com</span> (ebay.com) from <span style="font-weight:500;color:#19216c;">will@anonaddy.com</span><br>Click <a href="https://anonaddy.test/deactivate/xyz" style="color:#2d3a8c;text-decoration:underline;" target="_blank" rel="noreferrer noopener nofollow">here</a> to deactivate this alias
+                    This email was sent to <span style="font-weight:500;color:#19216c;">ebay@johndoe.anonaddy.com</span> (ebay.com) from <span style="font-weight:500;color:#19216c;">will@anonaddy.com</span><br>Click <a href="https://anonaddy-sh.test/deactivate/xyz" style="color:#2d3a8c;text-decoration:underline;" target="_blank" rel="noreferrer noopener nofollow">here</a> to deactivate this alias
                 </div>
             </td>
         </tr>

@@ -194,14 +194,14 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     private function removeRealEmailAndTextBanner($text)
     {
         return Str::of(str_ireplace($this->sender, '', $text))
-            ->replaceMatches('/(?s)(<!--banner-info-->).*?(<!--banner-info-->)/mi', '');
+            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '');
     }
 
     private function removeRealEmailAndHtmlBanner($html)
     {
+        // Reply may be HTML but have a plain text banner
         return Str::of(str_ireplace($this->sender, '', $html))
-            ->replaceMatches('/(?s)(<!--banner-info-->).*?(<!--banner-info-->)/mi', '')
-            // Outlook changing the ID to x_banner-info
-            ->replaceMatches('/(?s)(<tr id="(x_)?banner-info">).*?(<\/tr>)/mi', '');
+            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
+            ->replaceMatches("/(?s)(<tr((?!<tr).)*?" . preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/') . "(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mi", '');
     }
 }

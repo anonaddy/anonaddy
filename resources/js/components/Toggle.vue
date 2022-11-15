@@ -1,6 +1,5 @@
 <template>
   <Switch
-    v-model="modelValue"
     @click="toggle"
     :class="[
       modelValue ? 'bg-cyan-500' : 'bg-grey-300',
