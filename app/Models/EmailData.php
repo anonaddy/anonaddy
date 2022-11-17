@@ -10,9 +10,19 @@ class EmailData
 {
     private static $mimeTypes;
 
-    public function __construct(Parser $parser, $size)
+    public function __construct(Parser $parser, $sender, $size)
     {
-        $this->sender = $parser->getAddresses('from')[0]['address'];
+        if (isset($parser->getAddresses('from')[0]['address'])) {
+            if (filter_var($parser->getAddresses('from')[0]['address'], FILTER_VALIDATE_EMAIL)) {
+                $this->sender = $parser->getAddresses('from')[0]['address'];
+            }
+        }
+
+        // If we can't get a From header address then use the envelope from
+        if (! isset($this->sender)) {
+            $this->sender = $sender;
+        }
+
         $this->display_from = base64_encode($parser->getAddresses('from')[0]['display']);
         if (isset($parser->getAddresses('reply-to')[0])) {
             $this->reply_to_address = $parser->getAddresses('reply-to')[0]['address'];
@@ -36,7 +46,7 @@ class EmailData
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
-        $this->originalEnvelopeFrom = $this->sender;
+        $this->originalEnvelopeFrom = $sender;
         $this->originalFromHeader = base64_encode($parser->getHeader('From'));
         $this->originalReplyToHeader = base64_encode($parser->getHeader('Reply-To'));
         $this->originalSenderHeader = base64_encode($parser->getHeader('Sender'));

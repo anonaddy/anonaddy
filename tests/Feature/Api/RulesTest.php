@@ -260,9 +260,11 @@ class RulesTest extends TestCase
 
         $parser = $this->getParser(base_path('tests/emails/email.eml'));
 
+        $sender = 'will@anonaddy.com';
+
         $size = 1500;
 
-        $emailData = new EmailData($parser, $size);
+        $emailData = new EmailData($parser, $sender, $size);
 
         $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
 
@@ -320,9 +322,11 @@ class RulesTest extends TestCase
 
         $parser = $this->getParser(base_path('tests/emails/email.eml'));
 
+        $sender = 'will@anonaddy.com';
+
         $size = 1500;
 
-        $emailData = new EmailData($parser, $size);
+        $emailData = new EmailData($parser, $sender, $size);
 
         $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
 
@@ -404,9 +408,11 @@ class RulesTest extends TestCase
 
         $parser = $this->getParser(base_path('tests/emails/email.eml'));
 
+        $sender = 'will@anonaddy.com';
+
         $size = 1000;
 
-        $emailData = new EmailData($parser, $size);
+        $emailData = new EmailData($parser, $sender, $size);
 
         $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
 

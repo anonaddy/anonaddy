@@ -132,18 +132,22 @@ class Alias extends Model
      */
     public function verifiedRecipientsOrDefault()
     {
-        if ($this->verifiedRecipients()->count() === 0) {
+        $verifiedRecipients = $this
+            ->verifiedRecipients()
+            ->get();
+
+        if ($verifiedRecipients->count() === 0) {
             // If the alias is for a custom domain or username that has a default recipient set.
-            if (isset($this->aliasable->defaultRecipient)) {
-                return $this->aliasable->defaultRecipient();
+            if ($this->aliasable_id) {
+                if (isset($this->aliasable->defaultRecipient)) {
+                    return $this->aliasable->defaultRecipient();
+                }
             }
 
-            return $this->user->defaultRecipient();
+            return $this->user->hasVerifiedDefaultRecipient() ? $this->user->defaultRecipient() : collect();
         }
 
-        return $this
-                ->verifiedRecipients()
-                ->get();
+        return $verifiedRecipients;
     }
 
     /**

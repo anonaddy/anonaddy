@@ -114,7 +114,8 @@
                     document.getElementById("id").value = data.id;
                     document.getElementById("rawId").value = data.rawId;
                     document.getElementById("authenticatorData").value = data.response.authenticatorData;
-                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON;
+                    // Sort no padding issue
+                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON.replace('=', '');
                     document.getElementById("signature").value = data.response.signature;
                     document.getElementById("userHandle").value = data.response.userHandle;
                     document.getElementById("type").value = data.type;
@@ -132,7 +133,8 @@
                     document.getElementById("id").value = data.id;
                     document.getElementById("rawId").value = data.rawId;
                     document.getElementById("authenticatorData").value = data.response.authenticatorData;
-                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON;
+                    // Sort no padding issue
+                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON.replace('=', '');
                     document.getElementById("signature").value = data.response.signature;
                     document.getElementById("userHandle").value = data.response.userHandle;
                     document.getElementById("type").value = data.type;

@@ -218,4 +218,14 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
             ->replaceMatches("/(?s)(<tr((?!<tr).)*?" . preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/') . "(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mi", '');
     }
+
+    /**
+     * Override default buildSubject method that does not allow an empty subject.
+     */
+    protected function buildSubject($message)
+    {
+        $message->subject($this->subject);
+
+        return $this;
+    }
 }

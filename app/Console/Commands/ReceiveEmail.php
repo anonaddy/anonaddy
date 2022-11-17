@@ -141,9 +141,13 @@ class ReceiveEmail extends Command
                 // Check whether this email is a reply/send from or a new email to be forwarded.
                 $destination = Str::replaceLast('=', '@', $recipient['extension']);
                 $validEmailDestination = filter_var($destination, FILTER_VALIDATE_EMAIL);
-                $verifiedRecipient = $user->getVerifiedRecipientByEmail($this->senderFrom);
+                if ($validEmailDestination) {
+                    $verifiedRecipient = $user->getVerifiedRecipientByEmail($this->senderFrom);
+                } else {
+                    $verifiedRecipient = null;
+                }
 
-                if ($validEmailDestination && $verifiedRecipient?->can_reply_send) {
+                if ($verifiedRecipient?->can_reply_send) {
                     // Check if the Dmarc allow or spam headers are present from Rspamd
                     if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow') || $this->parser->getHeader('X-AnonAddy-Spam')) {
                         // Notify user and exit
@@ -152,18 +156,18 @@ class ReceiveEmail extends Command
                         exit(0);
                     }
 
-                    if ($this->parser->getHeader('In-Reply-To')) {
-                        $this->handleReply($user, $recipient);
+                    if ($this->parser->getHeader('In-Reply-To') && $alias) {
+                        $this->handleReply($user, $recipient, $alias);
                     } else {
-                        $this->handleSendFrom($user, $recipient, $aliasable ?? null);
+                        $this->handleSendFrom($user, $recipient, $alias ?? null, $aliasable ?? null);
                     }
-                } elseif ($validEmailDestination && $verifiedRecipient?->can_reply_send === false) {
+                } elseif ($verifiedRecipient?->can_reply_send === false) {
                     // Notify user that they have not allowed this recipient to reply and send from aliases
                     $verifiedRecipient->notify(new DisallowedReplySendAttempt($recipient, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
 
                     exit(0);
                 } else {
-                    $this->handleForward($user, $recipient, $aliasable ?? null);
+                    $this->handleForward($user, $recipient, $alias ?? null, $aliasable ?? null);
                 }
             }
         } catch (\Exception $e) {
@@ -184,60 +188,53 @@ class ReceiveEmail extends Command
         }
     }
 
-    protected function handleReply($user, $recipient)
+    protected function handleReply($user, $recipient, $alias)
     {
-        $alias = $user->aliases()->where('email', $recipient['local_part'] . '@' . $recipient['domain'])->first();
+        $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
 
-        if ($alias) {
-            $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
+        $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
-            $emailData = new EmailData($this->parser, $this->size);
+        $message = new ReplyToEmail($user, $alias, $emailData);
 
-            $message = new ReplyToEmail($user, $alias, $emailData);
-
-            Mail::to($sendTo)->queue($message);
-        }
+        Mail::to($sendTo)->queue($message);
     }
 
-    protected function handleSendFrom($user, $recipient, $aliasable)
+    protected function handleSendFrom($user, $recipient, $alias, $aliasable)
     {
-        $alias = $user->aliases()->withTrashed()->firstOrNew([
-            'email' => $recipient['local_part'] . '@' . $recipient['domain'],
-            'local_part' => $recipient['local_part'],
-            'domain' => $recipient['domain'],
-            'aliasable_id' => $aliasable->id ?? null,
-            'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
-        ]);
+        if (is_null($alias)) {
+            $alias = $user->aliases()->create([
+                'email' => $recipient['local_part'] . '@' . $recipient['domain'],
+                'local_part' => $recipient['local_part'],
+                'domain' => $recipient['domain'],
+                'aliasable_id' => $aliasable?->id,
+                'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
+            ]);
 
-        // This is a new alias but at a shared domain or the sender is not a verified recipient.
-        if (!isset($alias->id) && in_array($recipient['domain'], config('anonaddy.all_domains'))) {
-            exit(0);
+            // Hydrate all alias fields
+            $alias->refresh();
         }
-
-        $alias->save();
-        $alias->refresh();
 
         $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
 
-        $emailData = new EmailData($this->parser, $this->size);
+        $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
         $message = new SendFromEmail($user, $alias, $emailData);
 
         Mail::to($sendTo)->queue($message);
     }
 
-    protected function handleForward($user, $recipient, $aliasable)
+    protected function handleForward($user, $recipient, $alias, $aliasable)
     {
-        $alias = $user->aliases()->withTrashed()->firstOrNew([
-            'email' => $recipient['local_part'] . '@' . $recipient['domain'],
-            'local_part' => $recipient['local_part'],
-            'domain' => $recipient['domain'],
-            'aliasable_id' => $aliasable->id ?? null,
-            'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
-        ]);
+        if (is_null($alias)) {
+            // This is a new alias
+            $alias = new Alias([
+                'email' => $recipient['local_part'] . '@' . $recipient['domain'],
+                'local_part' => $recipient['local_part'],
+                'domain' => $recipient['domain'],
+                'aliasable_id' => $aliasable?->id,
+                'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
+            ]);
 
-        if (!isset($alias->id)) {
-            // This is a new alias.
             if ($user->hasExceededNewAliasLimit()) {
                 $this->error('4.2.1 New aliases per hour limit exceeded for user.');
 
@@ -250,26 +247,29 @@ class ReceiveEmail extends Command
                 $keys = explode('.', $recipient['extension']);
 
                 $recipientIds = $user
-                                    ->recipients()
-                                    ->oldest()
-                                    ->get()
-                                    ->filter(function ($item, $key) use ($keys) {
-                                        return in_array($key+1, $keys) && !is_null($item['email_verified_at']);
-                                    })
-                                    ->pluck('id')
-                                    ->take(10)
-                                    ->toArray();
+                    ->recipients()
+                    ->select(['id','email_verified_at'])
+                    ->oldest()
+                    ->get()
+                    ->filter(function ($item, $key) use ($keys) {
+                        return in_array($key + 1, $keys) && !is_null($item['email_verified_at']);
+                    })
+                    ->pluck('id')
+                    ->take(10)
+                    ->toArray();
+            }
+
+            $user->aliases()->save($alias);
+
+            // Hydrate all alias fields
+            $alias->refresh();
+
+            if (isset($recipientIds)) {
+                $alias->recipients()->sync($recipientIds);
             }
         }
 
-        $alias->save();
-        $alias->refresh();
-
-        if (isset($recipientIds)) {
-            $alias->recipients()->sync($recipientIds);
-        }
-
-        $emailData = new EmailData($this->parser, $this->size);
+        $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
         $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
             $message = new ForwardEmail($alias, $emailData, $recipient);

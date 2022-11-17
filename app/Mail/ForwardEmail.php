@@ -319,4 +319,14 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     {
         return $this->alias->isCustomDomain() ? $this->alias->aliasable->isVerifiedForSending() : false;
     }
+
+    /**
+     * Override default buildSubject method that does not allow an empty subject.
+     */
+    protected function buildSubject($message)
+    {
+        $message->subject($this->subject);
+
+        return $this;
+    }
 }
