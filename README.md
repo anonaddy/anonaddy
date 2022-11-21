@@ -351,7 +351,7 @@ Blocked emails do not count towards your bandwidth (e.g. an alias is inactive or
 
 ## How many emails can I receive before I go over my bandwidth limit?
 
-The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails and the Lite plan's 50MB would be almost 700 emails.
+The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,000 words in plain text. So the 10MB monthly allowance would be around 140 emails and the Lite plan's 100MB would be almost 1,400 emails.
 
 ## What happens if I go over my bandwidth limit in a given month?
 
