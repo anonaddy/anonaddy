@@ -22,7 +22,7 @@ class FailedDeliveryFactory extends Factory
     public function definition()
     {
         return [
-            'status' => '5.7.1',
+            'status' => '5.1.1',
             'code' => $this->faker->sentence(5)
         ];
     }
