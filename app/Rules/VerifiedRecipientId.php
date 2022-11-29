@@ -41,7 +41,7 @@ class VerifiedRecipientId implements Rule
         }
 
         foreach ($ids as $id) {
-            if (!in_array($id, $verifiedRecipientIds)) {
+            if (! in_array($id, $verifiedRecipientIds)) {
                 return false;
             }
         }

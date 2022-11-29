@@ -24,7 +24,7 @@ class UpdateEmailSubjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'email_subject' => 'nullable|string|max:50'
+            'email_subject' => 'nullable|string|max:50',
         ];
     }
 }

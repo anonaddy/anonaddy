@@ -79,10 +79,10 @@ class EmailData
                         ];
                     } else {
                         $this->attachments[] = [
-                          'stream' => base64_encode(stream_get_contents($attachment->getStream())),
-                          'file_name' => base64_encode($attachment->getFileName()),
-                          'mime' => base64_encode($contentType)
-                      ];
+                            'stream' => base64_encode(stream_get_contents($attachment->getStream())),
+                            'file_name' => base64_encode($attachment->getFileName()),
+                            'mime' => base64_encode($contentType),
+                        ];
                     }
                 }
             }

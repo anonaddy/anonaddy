@@ -9,7 +9,7 @@ trait HasUuid
     protected static function bootHasUuid()
     {
         static::creating(function ($model) {
-            if (!$model->id) {
+            if (! $model->id) {
                 $model->{$model->getKeyName()} = Uuid::uuid4();
             }
         });

@@ -36,12 +36,12 @@ class IncorrectOtpNotification extends Notification implements ShouldQueue, Shou
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
         return (new MailMessage())
-            ->subject("Failed Two Factor Authentication Login Attempt")
+            ->subject('Failed Two Factor Authentication Login Attempt')
             ->markdown('mail.failed_login_attempt', [
                 'recipientId' => $recipient->id,
                 'hasVerifiedEmail' => $recipient->hasVerifiedEmail(),
                 'fingerprint' => $fingerprint,
-                'username' => $notifiable->username
+                'username' => $notifiable->username,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

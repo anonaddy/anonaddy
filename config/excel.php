@@ -15,7 +15,7 @@ return [
         | Here you can specify how big the chunk should be.
         |
         */
-        'chunk_size'             => 1000,
+        'chunk_size' => 1000,
 
         /*
         |--------------------------------------------------------------------------
@@ -32,17 +32,17 @@ return [
         | Configure e.g. delimiter, enclosure and line ending for CSV exports.
         |
         */
-        'csv'                    => [
-            'delimiter'              => ',',
-            'enclosure'              => '"',
-            'line_ending'            => PHP_EOL,
-            'use_bom'                => false,
+        'csv' => [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'line_ending' => PHP_EOL,
+            'use_bom' => false,
             'include_separator_line' => false,
-            'excel_compatibility'    => false,
+            'excel_compatibility' => false,
         ],
     ],
 
-    'imports'            => [
+    'imports' => [
 
         'read_only' => true,
 
@@ -68,12 +68,12 @@ return [
         | Configure e.g. delimiter, enclosure and line ending for CSV imports.
         |
         */
-        'csv'         => [
-            'delimiter'              => ',',
-            'enclosure'              => '"',
-            'escape_character'       => '\\',
-            'contiguous'             => false,
-            'input_encoding'         => 'UTF-8',
+        'csv' => [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape_character' => '\\',
+            'contiguous' => false,
+            'input_encoding' => 'UTF-8',
         ],
     ],
 
@@ -88,21 +88,21 @@ return [
     |
     */
     'extension_detector' => [
-        'xlsx'     => Excel::XLSX,
-        'xlsm'     => Excel::XLSX,
-        'xltx'     => Excel::XLSX,
-        'xltm'     => Excel::XLSX,
-        'xls'      => Excel::XLS,
-        'xlt'      => Excel::XLS,
-        'ods'      => Excel::ODS,
-        'ots'      => Excel::ODS,
-        'slk'      => Excel::SLK,
-        'xml'      => Excel::XML,
+        'xlsx' => Excel::XLSX,
+        'xlsm' => Excel::XLSX,
+        'xltx' => Excel::XLSX,
+        'xltm' => Excel::XLSX,
+        'xls' => Excel::XLS,
+        'xlt' => Excel::XLS,
+        'ods' => Excel::ODS,
+        'ots' => Excel::ODS,
+        'slk' => Excel::SLK,
+        'xml' => Excel::XML,
         'gnumeric' => Excel::GNUMERIC,
-        'htm'      => Excel::HTML,
-        'html'     => Excel::HTML,
-        'csv'      => Excel::CSV,
-        'tsv'      => Excel::TSV,
+        'htm' => Excel::HTML,
+        'html' => Excel::HTML,
+        'csv' => Excel::CSV,
+        'tsv' => Excel::TSV,
 
         /*
         |--------------------------------------------------------------------------
@@ -113,7 +113,7 @@ return [
         | Available options: Excel::MPDF | Excel::TCPDF | Excel::DOMPDF
         |
         */
-        'pdf'      => Excel::DOMPDF,
+        'pdf' => Excel::DOMPDF,
     ],
 
     'value_binder' => [
@@ -163,7 +163,7 @@ return [
         | storing reading or downloading. Here you can customize that path.
         |
         */
-        'local_path'  => sys_get_temp_dir(),
+        'local_path' => sys_get_temp_dir(),
 
         /*
         |--------------------------------------------------------------------------
@@ -179,7 +179,7 @@ return [
         | in conjunction with queued imports and exports.
         |
         */
-        'remote_disk'   => null,
+        'remote_disk' => null,
         'remote_prefix' => null,
 
         /*

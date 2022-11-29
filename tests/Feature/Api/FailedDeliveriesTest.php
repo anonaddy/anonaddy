@@ -23,7 +23,7 @@ class FailedDeliveriesTest extends TestCase
     {
         // Arrange
         FailedDelivery::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -39,7 +39,7 @@ class FailedDeliveriesTest extends TestCase
     {
         // Arrange
         $failedDelivery = FailedDelivery::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -55,7 +55,7 @@ class FailedDeliveriesTest extends TestCase
     public function user_can_delete_failed_delivery()
     {
         $failedDelivery = FailedDelivery::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/failed-deliveries/'.$failedDelivery->id);

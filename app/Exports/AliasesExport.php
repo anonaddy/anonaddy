@@ -8,8 +8,8 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 class AliasesExport implements FromCollection, WithHeadings
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return user()->aliases()->withTrashed()->get();

@@ -33,6 +33,7 @@ class MessageIDValidation implements EmailValidation
             // }
         } catch (\Exception $invalid) {
             $this->error = new InvalidEmail(new ExceptionFound($invalid), '');
+
             return false;
         }
 

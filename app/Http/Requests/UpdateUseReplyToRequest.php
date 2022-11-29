@@ -24,7 +24,7 @@ class UpdateUseReplyToRequest extends FormRequest
     public function rules()
     {
         return [
-            'use_reply_to' => 'required|boolean'
+            'use_reply_to' => 'required|boolean',
         ];
     }
 }

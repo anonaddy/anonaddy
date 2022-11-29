@@ -200,7 +200,7 @@ return [
     |
     */
 
-    'blacklist' =>[
+    'blacklist' => [
         '.htaccess',
         '.htpasswd',
         '.well-known',
@@ -738,7 +738,7 @@ return [
         'you',
         'yourname',
         'yourusername',
-        'zlib'
+        'zlib',
     ],
 
     'wordlist' => [
@@ -8513,6 +8513,6 @@ return [
         'zookeeper',
         'zoologist',
         'zoology',
-        'zoom'
-    ]
+        'zoom',
+    ],
 ];

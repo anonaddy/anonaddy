@@ -36,7 +36,7 @@ class BackupCodeController extends Controller
 
         if (! Hash::check($request->backup_code, user()->two_factor_backup_code)) {
             return back()->withErrors([
-                'backup_code' => __('The backup code was invalid.')
+                'backup_code' => __('The backup code was invalid.'),
             ]);
         }
 
@@ -45,7 +45,7 @@ class BackupCodeController extends Controller
         user()->update([
             'two_factor_enabled' => false,
             'two_factor_secret' => $twoFactor->generateSecretKey(),
-            'two_factor_backup_code' => null
+            'two_factor_backup_code' => null,
         ]);
 
         user()->webauthnKeys()->delete();
@@ -60,7 +60,7 @@ class BackupCodeController extends Controller
     public function update()
     {
         user()->update([
-            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
         ]);
 
         return back()->with(['backupCode' => $code]);

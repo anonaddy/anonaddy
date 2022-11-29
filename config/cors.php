@@ -31,7 +31,7 @@ return [
         'Content-Type',
         'Expires',
         'Last-Modified',
-        'Pragma'
+        'Pragma',
     ],
 
     'max_age' => 0,

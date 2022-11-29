@@ -19,7 +19,7 @@ class PostfixQueueId extends Model
 
     protected $dates = [
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $casts = [

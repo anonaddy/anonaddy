@@ -27,27 +27,27 @@ class IndexAliasRequest extends FormRequest
         return [
             'page' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'page.number' => [
                 'nullable',
-                'integer'
+                'integer',
             ],
             'page.size' => [
                 'nullable',
                 'integer',
                 'max:100',
-                'min:1'
+                'min:1',
             ],
             'filter' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'filter.search' => [
                 'nullable',
                 'string',
                 'max:50',
-                'min:3'
+                'min:3',
             ],
             'filter.deleted' => [
                 'nullable',
@@ -86,8 +86,8 @@ class IndexAliasRequest extends FormRequest
                     '-created_at',
                     '-updated_at',
                     '-deleted_at',
-                ])
-            ]
+                ]),
+            ],
         ];
     }
 }

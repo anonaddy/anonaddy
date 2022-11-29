@@ -52,7 +52,7 @@ class DomainMxRecordsInvalid extends Notification implements ShouldQueue, Should
             ->markdown('mail.domain_mx_records_invalid', [
                 'domain' => $this->domain,
                 'recipientId' => $recipient->_id,
-                'fingerprint' => $fingerprint
+                'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

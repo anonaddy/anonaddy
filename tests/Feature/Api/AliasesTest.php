@@ -29,7 +29,7 @@ class AliasesTest extends TestCase
     {
         // Arrange
         Alias::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -45,12 +45,12 @@ class AliasesTest extends TestCase
     {
         // Arrange
         Alias::factory()->count(2)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         // Act
@@ -67,11 +67,11 @@ class AliasesTest extends TestCase
         // Arrange
         Alias::factory()->count(2)->create([
             'user_id' => $this->user->id,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -88,12 +88,12 @@ class AliasesTest extends TestCase
         // Arrange
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'active' => true
+            'active' => true,
         ]);
 
         Alias::factory()->count(2)->create([
             'user_id' => $this->user->id,
-            'active' => false
+            'active' => false,
         ]);
 
         // Act
@@ -109,7 +109,7 @@ class AliasesTest extends TestCase
     {
         // Arrange
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -127,7 +127,7 @@ class AliasesTest extends TestCase
         $response = $this->json('POST', '/api/v1/aliases', [
             'domain' => 'anonaddy.me',
             'description' => 'the description',
-            'local_part' => 'not-required-for-shared-alias'
+            'local_part' => 'not-required-for-shared-alias',
         ]);
 
         $response->assertStatus(201);
@@ -139,11 +139,11 @@ class AliasesTest extends TestCase
     public function user_can_generate_alias_with_recipients()
     {
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient2 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -151,8 +151,8 @@ class AliasesTest extends TestCase
             'description' => 'the description',
             'recipient_ids' => [
                 $recipient->id,
-                $recipient2->id
-            ]
+                $recipient2->id,
+            ],
         ]);
 
         $response->assertStatus(201);
@@ -167,7 +167,7 @@ class AliasesTest extends TestCase
             'domain' => 'anonaddy.me',
             'format' => 'uuid',
             'description' => 'the description',
-            'local_part' => 'not-required-for-shared-alias'
+            'local_part' => 'not-required-for-shared-alias',
         ]);
 
         $response->assertStatus(201);
@@ -180,43 +180,43 @@ class AliasesTest extends TestCase
     public function user_can_generate_new_alias_with_local_part()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
-            'domain' => $this->user->username . '.anonaddy.com',
+            'domain' => $this->user->username.'.anonaddy.com',
             'format' => 'custom',
             'description' => 'the description',
-            'local_part' => 'valid-local-part'
+            'local_part' => 'valid-local-part',
         ]);
 
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
         $this->assertEquals('valid-local-part', $response->getData()->data->local_part);
-        $this->assertEquals('valid-local-part@'.$this->user->username . '.anonaddy.com', $this->user->aliases[0]->email);
+        $this->assertEquals('valid-local-part@'.$this->user->username.'.anonaddy.com', $this->user->aliases[0]->email);
     }
 
     /** @test */
     public function user_can_generate_new_alias_with_local_part_and_extension()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
-            'domain' => $this->user->username . '.anonaddy.com',
+            'domain' => $this->user->username.'.anonaddy.com',
             'format' => 'custom',
             'description' => 'the description',
-            'local_part' => 'valid-local-part+extension'
+            'local_part' => 'valid-local-part+extension',
         ]);
 
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
         $this->assertEquals('valid-local-part', $response->getData()->data->local_part);
         $this->assertEquals('extension', $response->getData()->data->extension);
-        $this->assertEquals('valid-local-part@'.$this->user->username . '.anonaddy.com', $this->user->aliases[0]->email);
+        $this->assertEquals('valid-local-part@'.$this->user->username.'.anonaddy.com', $this->user->aliases[0]->email);
     }
 
     /** @test */
     public function user_cannot_generate_new_alias_with_invalid_local_part()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
-            'domain' => $this->user->username . '.anonaddy.com',
+            'domain' => $this->user->username.'.anonaddy.com',
             'format' => 'custom',
             'description' => 'the description',
-            'local_part' => 'invalid-local-part.'
+            'local_part' => 'invalid-local-part.',
         ]);
 
         $response->assertStatus(422);
@@ -230,7 +230,7 @@ class AliasesTest extends TestCase
         $response = $this->json('POST', '/api/v1/aliases', [
             'domain' => 'anonaddy.me',
             'description' => 'the description',
-            'format' => 'random_words'
+            'format' => 'random_words',
         ]);
 
         $response->assertStatus(201);
@@ -244,18 +244,18 @@ class AliasesTest extends TestCase
     {
         Username::factory()->create([
             'user_id' => $this->user->id,
-            'username' => 'john'
+            'username' => 'john',
         ]);
 
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'john.xyz',
-            'domain_verified_at' => now()
+            'domain_verified_at' => now(),
         ]);
 
         $response = $this->json('POST', '/api/v1/aliases', [
             'domain' => 'john.xyz',
-            'description' => 'the description'
+            'description' => 'the description',
         ]);
 
         $response->assertStatus(201);
@@ -268,11 +268,11 @@ class AliasesTest extends TestCase
     public function user_can_update_alias_description()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/aliases/'.$alias->id, [
-            'description' => 'The new description'
+            'description' => 'The new description',
         ]);
 
         $response->assertStatus(200);
@@ -284,7 +284,7 @@ class AliasesTest extends TestCase
     {
         $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'active' => true
+            'active' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/aliases/'.$alias->id);
@@ -298,7 +298,7 @@ class AliasesTest extends TestCase
     public function user_can_forget_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/aliases/'.$alias->id.'/forget');
@@ -307,7 +307,7 @@ class AliasesTest extends TestCase
         $this->assertEmpty($this->user->aliases()->withTrashed()->get());
 
         $this->assertDatabaseMissing('aliases', [
-            'id' => $alias->id
+            'id' => $alias->id,
         ]);
     }
 
@@ -324,7 +324,7 @@ class AliasesTest extends TestCase
             'emails_forwarded' => 10,
             'emails_blocked' => 1,
             'emails_replied' => 2,
-            'emails_sent' => 3
+            'emails_sent' => 3,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/aliases/'.$sharedDomainAlias->id.'/forget');
@@ -341,7 +341,7 @@ class AliasesTest extends TestCase
             'emails_blocked' => 0,
             'emails_replied' => 0,
             'emails_sent' => 0,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
     }
 
@@ -350,7 +350,7 @@ class AliasesTest extends TestCase
     {
         $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         $response = $this->json('PATCH', '/api/v1/aliases/'.$alias->id.'/restore');
@@ -364,11 +364,11 @@ class AliasesTest extends TestCase
     {
         $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'active' => false
+            'active' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/active-aliases/', [
-            'id' => $alias->id
+            'id' => $alias->id,
         ]);
 
         $response->assertStatus(200);
@@ -380,7 +380,7 @@ class AliasesTest extends TestCase
     {
         $alias = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'active' => true
+            'active' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/active-aliases/'.$alias->id);

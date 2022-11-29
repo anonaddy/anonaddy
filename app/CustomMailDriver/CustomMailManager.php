@@ -10,7 +10,7 @@ class CustomMailManager extends MailManager
     /**
      * Resolve the given mailer.
      *
-     * @param string $name
+     * @param  string  $name
      * @return Mailer
      */
     protected function resolve($name): CustomMailer

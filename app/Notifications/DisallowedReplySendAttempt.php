@@ -15,8 +15,11 @@ class DisallowedReplySendAttempt extends Notification implements ShouldQueue, Sh
     use Queueable;
 
     protected $aliasEmail;
+
     protected $recipient;
+
     protected $destination;
+
     protected $authenticationResults;
 
     /**
@@ -26,7 +29,7 @@ class DisallowedReplySendAttempt extends Notification implements ShouldQueue, Sh
      */
     public function __construct($alias, $recipient, $authenticationResults)
     {
-        $this->aliasEmail = $alias['local_part'] . '@' . $alias['domain'];
+        $this->aliasEmail = $alias['local_part'].'@'.$alias['domain'];
         $this->recipient = $recipient;
         $this->destination = Str::replaceLast('=', '@', $alias['extension']);
         $this->authenticationResults = $authenticationResults;
@@ -61,7 +64,7 @@ class DisallowedReplySendAttempt extends Notification implements ShouldQueue, Sh
                 'destination' => $this->destination,
                 'authenticationResults' => $this->authenticationResults,
                 'recipientId' => $notifiable->id,
-                'fingerprint' => $fingerprint
+                'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

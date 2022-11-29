@@ -26,7 +26,7 @@ class IndexRecipientRequest extends FormRequest
         return [
             'filter' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'filter.verified' => [
                 'nullable',

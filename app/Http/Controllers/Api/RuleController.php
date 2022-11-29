@@ -37,7 +37,7 @@ class RuleController extends Controller
             'operator' => $request->operator,
             'forwards' => $request->forwards ?? false,
             'replies' => $request->replies ?? false,
-            'sends' => $request->sends ?? false
+            'sends' => $request->sends ?? false,
         ]);
 
         return new RuleResource($rule->refresh());
@@ -62,7 +62,7 @@ class RuleController extends Controller
             'operator' => $request->operator,
             'forwards' => $request->forwards ?? false,
             'replies' => $request->replies ?? false,
-            'sends' => $request->sends ?? false
+            'sends' => $request->sends ?? false,
         ]);
 
         return new RuleResource($rule->refresh());

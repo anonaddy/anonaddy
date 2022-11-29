@@ -464,7 +464,7 @@ For full details please see the [self-hosting instructions file](SELF-HOSTING.md
 
 ## My sponsors
 
-Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev), [Patrick Dobler](https://github.com/patrickdobler), [Luca Steeb](https://github.com/steebchen), [Laiteux](https://github.com/Laiteux) and [narolinus](https://github.com/narolinus) for supporting me by sponsoring the project on GitHub!
+Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev), [Patrick Dobler](https://github.com/patrickdobler), [Luca Steeb](https://github.com/steebchen), [Laiteux](https://github.com/Laiteux), [narolinus](https://github.com/narolinus) and [Limon Monte](https://github.com/limonte) for supporting me by sponsoring the project on GitHub!
 
 Also an extra special thanks to [CrazyMax](https://github.com/crazy-max) for sponsoring me and also creating and maintaining the awesome [AnonAddy Docker image](https://github.com/anonaddy/docker)!
 

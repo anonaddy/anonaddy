@@ -29,16 +29,16 @@ class RuleFactory extends Factory
                     'type' => 'sender',
                     'match' => 'is exactly',
                     'values' => [
-                        'will@anonaddy.com'
-                    ]
-                ]
+                        'will@anonaddy.com',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
-                ]
-            ]
+                    'value' => 'New Subject!',
+                ],
+            ],
         ];
     }
 }

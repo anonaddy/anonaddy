@@ -12,6 +12,7 @@ use PragmaRX\Google2FALaravel\Support\Authenticator;
 class TwoFactorAuthController extends Controller
 {
     protected $twoFactor;
+
     protected $authenticator;
 
     public function __construct(Request $request)
@@ -27,7 +28,7 @@ class TwoFactorAuthController extends Controller
 
     public function store(EnableTwoFactorAuthRequest $request)
     {
-        if (!$this->twoFactor->verifyKey(user()->two_factor_secret, $request->two_factor_token)) {
+        if (! $this->twoFactor->verifyKey(user()->two_factor_secret, $request->two_factor_token)) {
             return redirect(url()->previous().'#two-factor')->withErrors(['two_factor_token' => 'The token you entered was incorrect']);
         }
 
@@ -35,7 +36,7 @@ class TwoFactorAuthController extends Controller
 
         user()->update([
             'two_factor_enabled' => true,
-            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
         ]);
 
         $this->authenticator->login();
@@ -56,13 +57,13 @@ class TwoFactorAuthController extends Controller
 
     public function destroy(Request $request)
     {
-        if (!Hash::check($request->current_password_2fa, user()->password)) {
+        if (! Hash::check($request->current_password_2fa, user()->password)) {
             return back()->withErrors(['current_password_2fa' => 'Current password incorrect']);
         }
 
         user()->update([
             'two_factor_enabled' => false,
-            'two_factor_secret' => $this->twoFactor->generateSecretKey()
+            'two_factor_secret' => $this->twoFactor->generateSecretKey(),
         ]);
 
         $this->authenticator->logout();

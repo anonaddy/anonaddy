@@ -29,7 +29,7 @@ class UsernamesTest extends TestCase
     {
         // Arrange
         Username::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -45,7 +45,7 @@ class UsernamesTest extends TestCase
     {
         // Arrange
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -61,7 +61,7 @@ class UsernamesTest extends TestCase
     public function user_can_create_username()
     {
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $response->assertStatus(201);
@@ -73,19 +73,19 @@ class UsernamesTest extends TestCase
     public function user_can_not_exceed_username_limit()
     {
         $this->json('POST', '/api/v1/usernames', [
-            'username' => 'username1'
+            'username' => 'username1',
         ]);
 
         $this->json('POST', '/api/v1/usernames', [
-            'username' => 'username2'
+            'username' => 'username2',
         ]);
 
         $this->json('POST', '/api/v1/usernames', [
-            'username' => 'username3'
+            'username' => 'username3',
         ]);
 
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $response->assertStatus(403);
@@ -98,11 +98,11 @@ class UsernamesTest extends TestCase
     {
         Username::factory()->create([
             'user_id' => $this->user->id,
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $response
@@ -114,11 +114,11 @@ class UsernamesTest extends TestCase
     public function user_can_not_create_username_that_has_been_deleted()
     {
         DeletedUsername::factory()->create([
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $response
@@ -132,7 +132,7 @@ class UsernamesTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => $user->username
+            'username' => $user->username,
         ]);
 
         $response
@@ -144,7 +144,7 @@ class UsernamesTest extends TestCase
     public function username_must_be_alpha_numeric()
     {
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => 'username01_'
+            'username' => 'username01_',
         ]);
 
         $response
@@ -156,7 +156,7 @@ class UsernamesTest extends TestCase
     public function username_must_be_less_than_max_length()
     {
         $response = $this->json('POST', '/api/v1/usernames', [
-            'username' => 'abcdefghijklmnopqrstu'
+            'username' => 'abcdefghijklmnopqrstu',
         ]);
 
         $response
@@ -169,11 +169,11 @@ class UsernamesTest extends TestCase
     {
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
-            'active' => false
+            'active' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/active-usernames/', [
-            'id' => $username->id
+            'id' => $username->id,
         ]);
 
         $response->assertStatus(200);
@@ -185,7 +185,7 @@ class UsernamesTest extends TestCase
     {
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
-            'active' => true
+            'active' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/active-usernames/'.$username->id);
@@ -199,11 +199,11 @@ class UsernamesTest extends TestCase
     {
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
-            'catch_all' => false
+            'catch_all' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/catch-all-usernames/', [
-            'id' => $username->id
+            'id' => $username->id,
         ]);
 
         $response->assertStatus(200);
@@ -215,7 +215,7 @@ class UsernamesTest extends TestCase
     {
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
-            'catch_all' => true
+            'catch_all' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/catch-all-usernames/'.$username->id);
@@ -228,11 +228,11 @@ class UsernamesTest extends TestCase
     public function user_can_update_usernames_description()
     {
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
-            'description' => 'The new description'
+            'description' => 'The new description',
         ]);
 
         $response->assertStatus(200);
@@ -243,7 +243,7 @@ class UsernamesTest extends TestCase
     public function user_can_delete_username()
     {
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/usernames/'.$username->id);
@@ -272,21 +272,21 @@ class UsernamesTest extends TestCase
     public function user_can_update_username_default_recipient()
     {
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $newDefaultRecipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id.'/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id
+            'default_recipient' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('usernames', [
             'id' => $username->id,
-            'default_recipient_id' => $newDefaultRecipient->id
+            'default_recipient_id' => $newDefaultRecipient->id,
         ]);
 
         $this->assertEquals($newDefaultRecipient->email, $username->refresh()->defaultRecipient->email);
@@ -296,22 +296,22 @@ class UsernamesTest extends TestCase
     public function user_cannot_update_username_default_recipient_with_unverified_recipient()
     {
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id.'/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id
+            'default_recipient' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(404);
         $this->assertDatabaseMissing('usernames', [
             'id' => $username->id,
-            'default_recipient_id' => $newDefaultRecipient->id
+            'default_recipient_id' => $newDefaultRecipient->id,
         ]);
     }
 
@@ -319,22 +319,22 @@ class UsernamesTest extends TestCase
     public function user_can_remove_username_default_recipient()
     {
         $defaultRecipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
-            'default_recipient_id' => $defaultRecipient->id
+            'default_recipient_id' => $defaultRecipient->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id.'/default-recipient', [
-            'default_recipient' => ''
+            'default_recipient' => '',
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('usernames', [
             'id' => $username->id,
-            'default_recipient_id' => null
+            'default_recipient_id' => null,
         ]);
 
         $this->assertNull($username->refresh()->defaultRecipient);

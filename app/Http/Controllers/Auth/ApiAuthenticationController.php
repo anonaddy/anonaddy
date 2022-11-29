@@ -28,7 +28,7 @@ class ApiAuthenticationController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'error' => 'The provided credentials are incorrect'
+                'error' => 'The provided credentials are incorrect',
             ], 401);
         }
 
@@ -37,18 +37,18 @@ class ApiAuthenticationController extends Controller
             return response()->json([
                 'message' => "OTP required, please make a request to /api/auth/mfa with the 'mfa_key', 'otp' and 'device_name' including a 'X-CSRF-TOKEN' header",
                 'mfa_key' => Crypt::encryptString($user->id.'|'.config('anonaddy.secret').'|'.Carbon::now()->addMinutes(5)->getTimestamp()),
-                'csrf_token' => csrf_token()
+                'csrf_token' => csrf_token(),
             ], 422);
         } elseif (Webauthn::enabled($user)) {
             // If WebAuthn is enabled then return currently unsupported message
             return response()->json([
-                'error' => 'WebAuthn authentication is not currently supported from the extension or mobile apps, please use an API key to login instead'
+                'error' => 'WebAuthn authentication is not currently supported from the extension or mobile apps, please use an API key to login instead',
             ], 403);
         }
 
         // If the user doesn't use 2FA then return the new API key
         return response()->json([
-            'api_key' => explode('|', $user->createToken($request->device_name)->plainTextToken, 2)[1]
+            'api_key' => explode('|', $user->createToken($request->device_name)->plainTextToken, 2)[1],
         ]);
     }
 
@@ -58,7 +58,7 @@ class ApiAuthenticationController extends Controller
             $mfaKey = Crypt::decryptString($request->mfa_key);
         } catch (DecryptException $e) {
             return response()->json([
-                'error' => 'Invalid mfa_key'
+                'error' => 'Invalid mfa_key',
             ], 401);
         }
         $parts = explode('|', $mfaKey, 3);
@@ -67,14 +67,14 @@ class ApiAuthenticationController extends Controller
 
         if (! $user || $parts[1] !== config('anonaddy.secret')) {
             return response()->json([
-                'error' => 'Invalid mfa_key'
+                'error' => 'Invalid mfa_key',
             ], 401);
         }
 
         // Check if the mfa_key has expired
         if (Carbon::now()->getTimestamp() > $parts[2]) {
             return response()->json([
-                'error' => 'mfa_key expired, please request a new one at /api/auth/login'
+                'error' => 'mfa_key expired, please request a new one at /api/auth/login',
             ], 401);
         }
 
@@ -85,7 +85,7 @@ class ApiAuthenticationController extends Controller
 
         if (! $timestamp) {
             return response()->json([
-                'error' => 'The \'One Time Password\' typed was wrong'
+                'error' => 'The \'One Time Password\' typed was wrong',
             ], 401);
         }
 
@@ -94,7 +94,7 @@ class ApiAuthenticationController extends Controller
         }
 
         return response()->json([
-            'api_key' => explode('|', $user->createToken($request->device_name)->plainTextToken, 2)[1]
+            'api_key' => explode('|', $user->createToken($request->device_name)->plainTextToken, 2)[1],
         ]);
     }
 }

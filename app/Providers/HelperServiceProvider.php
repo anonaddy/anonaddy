@@ -13,8 +13,8 @@ class HelperServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        require_once(app_path().'/Helpers/Helper.php');
-        require_once(app_path().'/Helpers/GitVersionHelper.php');
+        require_once app_path().'/Helpers/Helper.php';
+        require_once app_path().'/Helpers/GitVersionHelper.php';
     }
 
     /**

@@ -28,8 +28,8 @@ class UpdateDefaultAliasDomainRequest extends FormRequest
             'domain' => [
                 'required',
                 'string',
-                Rule::in($this->user()->domainOptions())
-            ]
+                Rule::in($this->user()->domainOptions()),
+            ],
         ];
     }
 }

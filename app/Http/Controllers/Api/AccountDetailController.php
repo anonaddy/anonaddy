@@ -10,7 +10,7 @@ class AccountDetailController extends Controller
     public function index()
     {
         return response()->json([
-            'data' => new UserResource(user())
+            'data' => new UserResource(user()),
         ]);
     }
 }

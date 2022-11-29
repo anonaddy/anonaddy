@@ -24,7 +24,7 @@ class UpdateBannerLocationRequest extends FormRequest
     public function rules()
     {
         return [
-            'banner_location' => 'required|string|in:top,bottom,off'
+            'banner_location' => 'required|string|in:top,bottom,off',
         ];
     }
 }

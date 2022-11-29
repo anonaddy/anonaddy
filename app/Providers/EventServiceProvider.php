@@ -25,8 +25,8 @@ class EventServiceProvider extends ServiceProvider
             CheckIfShouldBlock::class,
         ],
         LoginFailed::class => [
-            SendIncorrectOtpNotification::class
-        ]
+            SendIncorrectOtpNotification::class,
+        ],
     ];
 
     /**

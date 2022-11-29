@@ -33,7 +33,7 @@ class MoveAccountUsernameToUsernamesTable extends Migration
             foreach ($users as $user) {
                 $username = $user->usernames()->create([
                     'username' => $user->getAttributes()['username'],
-                    'catch_all' => $user->catch_all
+                    'catch_all' => $user->catch_all,
                 ]);
 
                 $user->update(['default_username_id' => $username->id]);
@@ -51,7 +51,7 @@ class MoveAccountUsernameToUsernamesTable extends Migration
                     ->whereIn('domain', $usernameSubdomains)
                     ->update([
                         'aliasable_id' => $username->id,
-                        'aliasable_type' => 'App\Models\Username'
+                        'aliasable_type' => 'App\Models\Username',
                     ]);
             }
         });

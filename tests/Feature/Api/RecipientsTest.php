@@ -22,7 +22,7 @@ class RecipientsTest extends TestCase
     {
         // Arrange
         Recipient::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -38,7 +38,7 @@ class RecipientsTest extends TestCase
     {
         // Arrange
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -54,7 +54,7 @@ class RecipientsTest extends TestCase
     public function user_can_create_new_recipient()
     {
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => 'johndoe@example.com'
+            'email' => 'johndoe@example.com',
         ]);
 
         $response->assertStatus(201);
@@ -66,11 +66,11 @@ class RecipientsTest extends TestCase
     {
         Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'johndoe@example.com'
+            'email' => 'johndoe@example.com',
         ]);
 
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => 'johndoe@example.com'
+            'email' => 'johndoe@example.com',
         ]);
 
         $response
@@ -83,11 +83,11 @@ class RecipientsTest extends TestCase
     {
         Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'johndoe@example.com'
+            'email' => 'johndoe@example.com',
         ]);
 
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => 'JOHNdoe@example.com'
+            'email' => 'JOHNdoe@example.com',
         ]);
 
         $response
@@ -101,7 +101,7 @@ class RecipientsTest extends TestCase
         $this->user->recipients()->save($this->user->defaultRecipient);
 
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => $this->user->email
+            'email' => $this->user->email,
         ]);
 
         $response
@@ -113,7 +113,7 @@ class RecipientsTest extends TestCase
     public function user_can_not_create_recipient_with_local_domain()
     {
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => 'johndoe@anonaddy.com'
+            'email' => 'johndoe@anonaddy.com',
         ]);
 
         $response
@@ -127,11 +127,11 @@ class RecipientsTest extends TestCase
         Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'example.com',
-            'domain_verified_at' => now()
+            'domain_verified_at' => now(),
         ]);
 
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => 'johndoe@example.com'
+            'email' => 'johndoe@example.com',
         ]);
 
         $response
@@ -143,7 +143,7 @@ class RecipientsTest extends TestCase
     public function new_recipient_must_have_valid_email()
     {
         $response = $this->json('POST', '/api/v1/recipients', [
-            'email' => 'johndoe@example.'
+            'email' => 'johndoe@example.',
         ]);
 
         $response
@@ -155,7 +155,7 @@ class RecipientsTest extends TestCase
     public function user_can_delete_recipient()
     {
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/recipients/'.$recipient->id);
@@ -185,11 +185,11 @@ class RecipientsTest extends TestCase
         $gnupg->deletekey('26A987650243B28802524E2F809FD0D502E2F695');
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/recipient-keys/'.$recipient->id, [
-            'key_data' => file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc'))
+            'key_data' => file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc')),
         ]);
 
         $response->assertStatus(200);
@@ -200,11 +200,11 @@ class RecipientsTest extends TestCase
     public function gpg_key_must_be_correct_format()
     {
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/recipient-keys/'.$recipient->id, [
-            'key_data' => 'Invalid Key Data'
+            'key_data' => 'Invalid Key Data',
         ]);
 
         $response
@@ -216,11 +216,11 @@ class RecipientsTest extends TestCase
     public function gpg_key_must_be_valid()
     {
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/recipient-keys/'.$recipient->id, [
-            'key_data' => file_get_contents(base_path('tests/keys/InvalidAnonAddyPublicKey.asc'))
+            'key_data' => file_get_contents(base_path('tests/keys/InvalidAnonAddyPublicKey.asc')),
         ]);
 
         $response
@@ -236,7 +236,7 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'should_encrypt' => true,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('DELETE', '/api/v1/recipient-keys/'.$recipient->id);
@@ -252,11 +252,11 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'should_encrypt' => false,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('POST', '/api/v1/encrypted-recipients/', [
-            'id' => $recipient->id
+            'id' => $recipient->id,
         ]);
 
         $response->assertStatus(200);
@@ -269,7 +269,7 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'should_encrypt' => true,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('DELETE', '/api/v1/encrypted-recipients/'.$recipient->id);
@@ -283,11 +283,11 @@ class RecipientsTest extends TestCase
     {
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'can_reply_send' => false
+            'can_reply_send' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/allowed-recipients/', [
-            'id' => $recipient->id
+            'id' => $recipient->id,
         ]);
 
         $response->assertStatus(200);
@@ -299,7 +299,7 @@ class RecipientsTest extends TestCase
     {
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'can_reply_send' => true
+            'can_reply_send' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/allowed-recipients/'.$recipient->id);
@@ -314,11 +314,11 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'inline_encryption' => false,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('POST', '/api/v1/inline-encrypted-recipients/', [
-            'id' => $recipient->id
+            'id' => $recipient->id,
         ]);
 
         $response->assertStatus(200);
@@ -331,7 +331,7 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'inline_encryption' => true,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('DELETE', '/api/v1/inline-encrypted-recipients/'.$recipient->id);
@@ -346,11 +346,11 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'protected_headers' => false,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('POST', '/api/v1/protected-headers-recipients/', [
-            'id' => $recipient->id
+            'id' => $recipient->id,
         ]);
 
         $response->assertStatus(200);
@@ -363,7 +363,7 @@ class RecipientsTest extends TestCase
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
             'protected_headers' => true,
-            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695'
+            'fingerprint' => '26A987650243B28802524E2F809FD0D502E2F695',
         ]);
 
         $response = $this->json('DELETE', '/api/v1/protected-headers-recipients/'.$recipient->id);

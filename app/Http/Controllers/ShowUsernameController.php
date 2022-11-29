@@ -12,7 +12,7 @@ class ShowUsernameController extends Controller
                 ->with('defaultRecipient:id,email')
                 ->withCount('aliases')
                 ->latest()
-                ->get()
+                ->get(),
         ]);
     }
 }

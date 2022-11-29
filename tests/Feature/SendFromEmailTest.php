@@ -54,7 +54,7 @@ class SendFromEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [$extension],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -89,12 +89,12 @@ class SendFromEmailTest extends TestCase
                 '--sender' => $this->user->email,
                 '--recipient' => [
                     'ebay+'.$extension1.'@johndoe.anonaddy.com',
-                    'ebay+'.$extension2.'@johndoe.anonaddy.com'
+                    'ebay+'.$extension2.'@johndoe.anonaddy.com',
                 ],
                 '--local_part' => ['ebay', 'ebay'],
                 '--extension' => [$extension1, $extension2],
                 '--domain' => ['johndoe.anonaddy.com', 'johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -119,7 +119,7 @@ class SendFromEmailTest extends TestCase
         $extension = 'contact=ebay.com';
 
         $this->assertDatabaseMissing('aliases', [
-            'email' => 'ebay@johndoe.anonaddy.com'
+            'email' => 'ebay@johndoe.anonaddy.com',
         ]);
 
         $this->artisan(
@@ -131,7 +131,7 @@ class SendFromEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [$extension],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 

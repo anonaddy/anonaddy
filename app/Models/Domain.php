@@ -20,14 +20,14 @@ class Domain extends Model
     protected $keyType = 'string';
 
     protected $encrypted = [
-        'description'
+        'description',
     ];
 
     protected $fillable = [
         'domain',
         'description',
         'active',
-        'catch_all'
+        'catch_all',
     ];
 
     protected $dates = [
@@ -35,7 +35,7 @@ class Domain extends Model
         'updated_at',
         'domain_verified_at',
         'domain_mx_validated_at',
-        'domain_sending_verified_at'
+        'domain_sending_verified_at',
     ];
 
     protected $casts = [
@@ -193,9 +193,9 @@ class Domain extends Model
             return true;
         }
 
-        return collect(dns_get_record($this->domain . '.', DNS_TXT))
+        return collect(dns_get_record($this->domain.'.', DNS_TXT))
             ->contains(function ($r) {
-                return trim($r['txt']) === 'aa-verify=' . sha1(config('anonaddy.secret') . user()->id . user()->domains->count());
+                return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
             });
     }
 
@@ -208,7 +208,7 @@ class Domain extends Model
             return true;
         }
 
-        $mx = collect(dns_get_record($this->domain . '.', DNS_MX))
+        $mx = collect(dns_get_record($this->domain.'.', DNS_MX))
             ->sortBy('pri')
             ->first();
 
@@ -237,39 +237,39 @@ class Domain extends Model
             ]);
         }
 
-        $spf = collect(dns_get_record($this->domain . '.', DNS_TXT))
+        $spf = collect(dns_get_record($this->domain.'.', DNS_TXT))
             ->contains(function ($r) {
-                return preg_match("/^(v=spf1).*(include:spf\." . config('anonaddy.domain') . "|mx).*(-|~)all$/", $r['txt']);
+                return preg_match("/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/', $r['txt']);
             });
 
-        if (!$spf) {
+        if (! $spf) {
             return response()->json([
                 'success' => false,
-                'message' => 'SPF record not found. This could be due to DNS caching, please try again later.'
+                'message' => 'SPF record not found. This could be due to DNS caching, please try again later.',
             ]);
         }
 
-        $dmarc = collect(dns_get_record('_dmarc.' . $this->domain . '.', DNS_TXT))
+        $dmarc = collect(dns_get_record('_dmarc.'.$this->domain.'.', DNS_TXT))
             ->contains(function ($r) {
-                return preg_match("/^(v=DMARC1).*(p=quarantine|reject).*/", $r['txt']);
+                return preg_match('/^(v=DMARC1).*(p=quarantine|reject).*/', $r['txt']);
             });
 
-        if (!$dmarc) {
+        if (! $dmarc) {
             return response()->json([
                 'success' => false,
-                'message' => 'DMARC record not found. This could be due to DNS caching, please try again later.'
+                'message' => 'DMARC record not found. This could be due to DNS caching, please try again later.',
             ]);
         }
 
-        $def = collect(dns_get_record('default._domainkey.' . $this->domain . '.', DNS_CNAME))
+        $def = collect(dns_get_record('default._domainkey.'.$this->domain.'.', DNS_CNAME))
             ->contains(function ($r) {
-                return $r['target'] === 'default._domainkey.' . config('anonaddy.domain');
+                return $r['target'] === 'default._domainkey.'.config('anonaddy.domain');
             });
 
-        if (!$def) {
+        if (! $def) {
             return response()->json([
                 'success' => false,
-                'message' => 'CNAME default._domainkey record not found. This could be due to DNS caching, please try again later.'
+                'message' => 'CNAME default._domainkey record not found. This could be due to DNS caching, please try again later.',
             ]);
         }
 
@@ -278,7 +278,7 @@ class Domain extends Model
         return response()->json([
             'success' => true,
             'message' => 'Records successfully verified.',
-            'data' => new DomainResource($this->fresh())
+            'data' => new DomainResource($this->fresh()),
         ]);
     }
 }

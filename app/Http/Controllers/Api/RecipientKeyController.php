@@ -21,13 +21,13 @@ class RecipientKeyController extends Controller
 
         $info = $this->gnupg->import($request->key_data);
 
-        if (!$info || !$info['fingerprint']) {
+        if (! $info || ! $info['fingerprint']) {
             return response('Key could not be imported', 404);
         }
 
         $recipient->update([
             'should_encrypt' => true,
-            'fingerprint' => $info['fingerprint']
+            'fingerprint' => $info['fingerprint'],
         ]);
 
         return new RecipientResource($recipient->fresh()->load('aliases'));
@@ -45,7 +45,7 @@ class RecipientKeyController extends Controller
             'protected_headers' => false,
             'inline_encryption' => false,
             'protected_headers' => false,
-            'fingerprint' => null
+            'fingerprint' => null,
         ]);
 
         return response('', 204);

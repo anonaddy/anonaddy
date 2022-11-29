@@ -31,7 +31,7 @@ class RulesTest extends TestCase
     {
         // Arrange
         Rule::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // At
@@ -47,7 +47,7 @@ class RulesTest extends TestCase
     {
         // Arrange
         $rule = Rule::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -69,34 +69,34 @@ class RulesTest extends TestCase
                     'type' => 'sender',
                     'match' => 'is exactly',
                     'values' => [
-                        'Test Email'
-                    ]
+                        'Test Email',
+                    ],
                 ],
                 [
                     'type' => 'sender',
                     'match' => 'starts with',
                     'values' => [
-                        'will'
-                    ]
+                        'will',
+                    ],
                 ],
                 [
                     'type' => 'alias',
                     'match' => 'is exactly',
                     'values' => [
-                        'ebay@johndoe.anonaddy.com'
-                    ]
-                ]
+                        'ebay@johndoe.anonaddy.com',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
+                    'value' => 'New Subject!',
                 ],
             ],
             'operator' => 'AND',
             'forwards' => true,
             'replies' => false,
-            'sends' => false
+            'sends' => false,
         ]);
 
         $response->assertStatus(201);
@@ -113,20 +113,20 @@ class RulesTest extends TestCase
                     'type' => 'invalid',
                     'match' => 'is exactly',
                     'values' => [
-                        'Test Email'
-                    ]
-                ]
+                        'Test Email',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
+                    'value' => 'New Subject!',
                 ],
             ],
             'operator' => 'AND',
             'forwards' => true,
             'replies' => false,
-            'sends' => false
+            'sends' => false,
         ]);
 
         $response->assertStatus(422);
@@ -137,7 +137,7 @@ class RulesTest extends TestCase
     {
         $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
-            'operator' => 'AND'
+            'operator' => 'AND',
         ]);
 
         $response = $this->json('PATCH', '/api/v1/rules/'.$rule->id, [
@@ -147,20 +147,20 @@ class RulesTest extends TestCase
                     'type' => 'subject',
                     'match' => 'is exactly',
                     'values' => [
-                        'Test Email'
-                    ]
-                ]
+                        'Test Email',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
+                    'value' => 'New Subject!',
                 ],
             ],
             'operator' => 'OR',
             'forwards' => true,
             'replies' => false,
-            'sends' => false
+            'sends' => false,
         ]);
 
         $response->assertStatus(200);
@@ -172,7 +172,7 @@ class RulesTest extends TestCase
     public function user_can_delete_rule()
     {
         $rule = Rule::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/rules/'.$rule->id);
@@ -186,11 +186,11 @@ class RulesTest extends TestCase
     {
         $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
-            'active' => false
+            'active' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/active-rules/', [
-            'id' => $rule->id
+            'id' => $rule->id,
         ]);
 
         $response->assertStatus(200);
@@ -202,7 +202,7 @@ class RulesTest extends TestCase
     {
         $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
-            'active' => true
+            'active' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/active-rules/'.$rule->id);
@@ -221,34 +221,34 @@ class RulesTest extends TestCase
                     'type' => 'subject',
                     'match' => 'is exactly',
                     'values' => [
-                        'Test Email'
-                    ]
+                        'Test Email',
+                    ],
                 ],
                 [
                     'type' => 'sender',
                     'match' => 'starts with',
                     'values' => [
-                        'will'
-                    ]
+                        'will',
+                    ],
                 ],
                 [
                     'type' => 'alias',
                     'match' => 'is exactly',
                     'values' => [
-                        'ebay@johndoe.anonaddy.com'
-                    ]
-                ]
+                        'ebay@johndoe.anonaddy.com',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
+                    'value' => 'New Subject!',
                 ],
             ],
             'operator' => 'AND',
             'forwards' => true,
             'replies' => false,
-            'sends' => false
+            'sends' => false,
         ]);
 
         $alias = Alias::factory()->create([
@@ -283,34 +283,34 @@ class RulesTest extends TestCase
                     'type' => 'subject',
                     'match' => 'is exactly',
                     'values' => [
-                        'Test Email'
-                    ]
+                        'Test Email',
+                    ],
                 ],
                 [
                     'type' => 'sender',
                     'match' => 'starts with',
                     'values' => [
-                        'will'
-                    ]
+                        'will',
+                    ],
                 ],
                 [
                     'type' => 'alias',
                     'match' => 'is exactly',
                     'values' => [
-                        'ebay@johndoe.anonaddy.com'
-                    ]
-                ]
+                        'ebay@johndoe.anonaddy.com',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
+                    'value' => 'New Subject!',
                 ],
             ],
             'operator' => 'AND',
             'forwards' => false,
             'replies' => true,
-            'sends' => true
+            'sends' => true,
         ]);
 
         $alias = Alias::factory()->create([
@@ -345,21 +345,21 @@ class RulesTest extends TestCase
                     'type' => 'alias',
                     'match' => 'is not',
                     'values' => [
-                        'woot@johndoe.anonaddy.com'
-                    ]
-                ]
+                        'woot@johndoe.anonaddy.com',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'Applied after'
+                    'value' => 'Applied after',
                 ],
             ],
             'operator' => 'AND',
             'forwards' => true,
             'replies' => false,
             'sends' => false,
-            'order' => 1
+            'order' => 1,
         ]);
 
         Rule::factory()->create([
@@ -369,34 +369,34 @@ class RulesTest extends TestCase
                     'type' => 'subject',
                     'match' => 'is',
                     'values' => [
-                        'Test Email'
-                    ]
+                        'Test Email',
+                    ],
                 ],
                 [
                     'type' => 'sender',
                     'match' => 'ends with',
                     'values' => [
-                        'anonaddy.com'
-                    ]
+                        'anonaddy.com',
+                    ],
                 ],
                 [
                     'type' => 'alias',
                     'match' => 'is',
                     'values' => [
-                        'ebay@johndoe.anonaddy.com'
-                    ]
-                ]
+                        'ebay@johndoe.anonaddy.com',
+                    ],
+                ],
             ],
             'actions' => [
                 [
                     'type' => 'subject',
-                    'value' => 'New Subject!'
+                    'value' => 'New Subject!',
                 ],
             ],
             'operator' => 'AND',
             'forwards' => true,
             'replies' => false,
-            'sends' => false
+            'sends' => false,
         ]);
 
         $alias = Alias::factory()->create([
@@ -426,25 +426,25 @@ class RulesTest extends TestCase
     {
         $ruleOne = Rule::factory()->create([
             'user_id' => $this->user->id,
-            'order' => 2
+            'order' => 2,
         ]);
 
         $ruleTwo = Rule::factory()->create([
             'user_id' => $this->user->id,
-            'order' => 0
+            'order' => 0,
         ]);
 
         $ruleThree = Rule::factory()->create([
             'user_id' => $this->user->id,
-            'order' => 1
+            'order' => 1,
         ]);
 
         $response = $this->json('POST', '/api/v1/reorder-rules/', [
             'ids' => [
                 $ruleOne->id,
                 $ruleTwo->id,
-                $ruleThree->id
-            ]
+                $ruleThree->id,
+            ],
         ]);
 
         $this->assertEquals(0, $ruleOne->refresh()->order);
@@ -472,14 +472,14 @@ class RulesTest extends TestCase
                         $part['headers']['from'] = $from->filter(function ($f) {
                             return filter_var($f['address'], FILTER_VALIDATE_EMAIL);
                         })->map(function ($f) {
-                            return $f['display'] . ' <' . $f['address'] . '>';
+                            return $f['display'].' <'.$f['address'].'>';
                         })->first();
 
                         $mimePart->setPart($part);
                     }
                 } catch (\Exception $e) {
-                    $part['headers']['from'] = str_replace("\\\"", "", $part['headers']['from']);
-                    $part['headers']['from'] = str_replace("\\", "", $part['headers']['from']);
+                    $part['headers']['from'] = str_replace('\\"', '', $part['headers']['from']);
+                    $part['headers']['from'] = str_replace('\\', '', $part['headers']['from']);
 
                     $mimePart->setPart($part);
                 }
@@ -504,7 +504,7 @@ class RulesTest extends TestCase
         if ($file == 'stream') {
             $fd = fopen('php://stdin', 'r');
             $this->rawEmail = '';
-            while (!feof($fd)) {
+            while (! feof($fd)) {
                 $this->rawEmail .= fread($fd, 1024);
             }
             fclose($fd);
@@ -512,6 +512,7 @@ class RulesTest extends TestCase
         } else {
             $parser->setPath($file);
         }
+
         return $parser;
     }
 }

@@ -22,7 +22,7 @@ class Webauthn extends ServicesWebauthn
     /**
      * Detect if user has a key that is enabled.
      *
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public static function hasKey(User $user): bool

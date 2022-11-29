@@ -24,7 +24,7 @@ class RecipientFactory extends Factory
         return [
             'user_id' => $this->faker->uuid,
             'email' => $this->faker->safeEmail,
-            'email_verified_at' => now()
+            'email_verified_at' => now(),
         ];
     }
 }

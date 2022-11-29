@@ -25,7 +25,7 @@ class NotBlacklisted implements Rule
      */
     public function passes($attribute, $value)
     {
-        return !in_array(strtolower($value), config('anonaddy.blacklist'));
+        return ! in_array(strtolower($value), config('anonaddy.blacklist'));
     }
 
     /**

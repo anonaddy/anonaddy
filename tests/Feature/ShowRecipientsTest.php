@@ -33,7 +33,7 @@ class ShowRecipientsTest extends TestCase
     public function user_can_view_recipients_from_the_recipients_page()
     {
         $recipients = Recipient::factory()->count(5)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->get('/recipients');
@@ -48,15 +48,15 @@ class ShowRecipientsTest extends TestCase
     {
         $a = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
+            'created_at' => Carbon::now()->subDays(15),
         ]);
         $b = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
+            'created_at' => Carbon::now()->subDays(5),
         ]);
         $c = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+            'created_at' => Carbon::now()->subDays(10),
         ]);
 
         $response = $this->get('/recipients');
@@ -72,14 +72,14 @@ class ShowRecipientsTest extends TestCase
     public function recipients_are_listed_with_aliases_count()
     {
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         Alias::factory()->count(3)->create(['user_id' => $this->user->id])
         ->each(function ($alias) use ($recipient) {
             AliasRecipient::create([
                 'alias' => $alias,
-                'recipient' => $recipient
+                'recipient' => $recipient,
             ]);
         });
 
@@ -99,11 +99,11 @@ class ShowRecipientsTest extends TestCase
 
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $response = $this->json('POST', '/recipients/email/resend', [
-            'recipient_id' => $recipient->id
+            'recipient_id' => $recipient->id,
         ]);
 
         $response->assertStatus(200);
@@ -119,7 +119,7 @@ class ShowRecipientsTest extends TestCase
     {
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $this->assertNull($recipient->refresh()->email_verified_at);
@@ -151,11 +151,11 @@ class ShowRecipientsTest extends TestCase
 
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $response = $this->json('POST', '/recipients/email/resend', [
-            'recipient_id' => $recipient->id
+            'recipient_id' => $recipient->id,
         ]);
 
         $response->assertStatus(200);
@@ -166,7 +166,7 @@ class ShowRecipientsTest extends TestCase
         );
 
         $response2 = $this->json('POST', '/recipients/email/resend', [
-            'recipient_id' => $recipient->id
+            'recipient_id' => $recipient->id,
         ]);
 
         $response2->assertStatus(429);

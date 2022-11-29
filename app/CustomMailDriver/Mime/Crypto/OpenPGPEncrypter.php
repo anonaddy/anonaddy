@@ -10,6 +10,7 @@ use Symfony\Component\Mime\Email;
 class OpenPGPEncrypter
 {
     protected $gnupg = null;
+
     protected $usesProtectedHeaders;
 
     /**
@@ -53,18 +54,17 @@ class OpenPGPEncrypter
      */
     protected $gnupgHome = null;
 
-
     public function __construct($signingKey = null, $recipientKey = null, $gnupgHome = null, $usesProtectedHeaders = false)
     {
         $this->initGNUPG();
-        $this->signingKey    = $signingKey;
+        $this->signingKey = $signingKey;
         $this->recipientKey = $recipientKey;
-        $this->gnupgHome     = $gnupgHome;
+        $this->gnupgHome = $gnupgHome;
         $this->usesProtectedHeaders = $usesProtectedHeaders;
     }
 
     /**
-     * @param string $micalg
+     * @param  string  $micalg
      */
     public function setMicalg($micalg)
     {
@@ -73,14 +73,14 @@ class OpenPGPEncrypter
 
     /**
      * @param $identifier
-     * @param null $passPhrase
+     * @param  null  $passPhrase
      *
      * @throws RuntimeException
      */
     public function addSignature($identifier, $keyFingerprint = null, $passPhrase = null)
     {
-        if (!$keyFingerprint) {
-            $keyFingerprint   = $this->getKey($identifier, 'sign');
+        if (! $keyFingerprint) {
+            $keyFingerprint = $this->getKey($identifier, 'sign');
         }
         $this->signingKey = $keyFingerprint;
 
@@ -97,13 +97,12 @@ class OpenPGPEncrypter
      */
     public function addKeyPassphrase($identifier, $passPhrase)
     {
-        $keyFingerprint                        = $this->getKey($identifier, 'sign');
+        $keyFingerprint = $this->getKey($identifier, 'sign');
         $this->keyPassphrases[$keyFingerprint] = $passPhrase;
     }
 
     /**
-     * @param Email $email
-     *
+     * @param  Email  $email
      * @return $this
      *
      * @throws RuntimeException
@@ -117,19 +116,19 @@ class OpenPGPEncrypter
         $boundary = strtr(base64_encode(random_bytes(6)), '+/', '-_');
 
         $headers->setHeaderBody('Parameterized', 'Content-Type', 'multipart/signed');
-        $headers->setHeaderParameter('Content-Type', 'micalg', sprintf("pgp-%s", strtolower($this->micalg)));
+        $headers->setHeaderParameter('Content-Type', 'micalg', sprintf('pgp-%s', strtolower($this->micalg)));
         $headers->setHeaderParameter('Content-Type', 'protocol', 'application/pgp-signature');
         $headers->setHeaderParameter('Content-Type', 'boundary', $boundary);
 
         $message->setHeaders($headers);
 
-        if (!$this->signingKey) {
+        if (! $this->signingKey) {
             foreach ($message->getFrom() as $key => $value) {
                 $this->addSignature($this->getKey($key, 'sign'));
             }
         }
 
-        if (!$this->signingKey) {
+        if (! $this->signingKey) {
             throw new RuntimeException('Signing has been enabled, but no signature has been added. Use autoAddSignature() or addSignature()');
         }
 
@@ -143,7 +142,7 @@ class OpenPGPEncrypter
         // Check if using protected headers or not
         if ($this->usesProtectedHeaders) {
             $protectedHeadersSet = false;
-            for ($i=0; $i<count($lines); $i++) {
+            for ($i = 0; $i < count($lines); $i++) {
                 if (Str::startsWith(strtolower($lines[$i]), 'content-type: text/plain') || Str::startsWith(strtolower($lines[$i]), 'content-type: multipart/')) {
                     $lines[$i] = rtrim($lines[$i])."; protected-headers=\"v1\"\r\n";
                     if (! $protectedHeadersSet) {
@@ -155,7 +154,7 @@ class OpenPGPEncrypter
                 }
             }
         } else {
-            for ($i=0; $i<count($lines); $i++) {
+            for ($i = 0; $i < count($lines); $i++) {
                 $lines[$i] = rtrim($lines[$i])."\r\n";
             }
         }
@@ -178,7 +177,7 @@ class OpenPGPEncrypter
 
         $signed = sprintf("%s\r\n%s", $message->getHeaders()->get('content-type')->toString(), $body);
 
-        if (!$this->recipientKey) {
+        if (! $this->recipientKey) {
             throw new RuntimeException('Encryption has been enabled, but no recipients have been added. Use autoAddRecipients() or addRecipient()');
         }
 
@@ -207,25 +206,24 @@ class OpenPGPEncrypter
     }
 
     /**
-     * @param Email $email
-     *
+     * @param  Email  $email
      * @return $this
      *
      * @throws RuntimeException
      */
     public function encryptInline(Email $message): Email
     {
-        if (!$this->signingKey) {
+        if (! $this->signingKey) {
             foreach ($message->getFrom() as $key => $value) {
                 $this->addSignature($this->getKey($key, 'sign'));
             }
         }
 
-        if (!$this->signingKey) {
+        if (! $this->signingKey) {
             throw new RuntimeException('Signing has been enabled, but no signature has been added. Use autoAddSignature() or addSignature()');
         }
 
-        if (!$this->recipientKey) {
+        if (! $this->recipientKey) {
             throw new RuntimeException('Encryption has been enabled, but no recipients have been added. Use autoAddRecipients() or addRecipient()');
         }
 
@@ -246,19 +244,19 @@ class OpenPGPEncrypter
      */
     protected function initGNUPG()
     {
-        if (!class_exists('gnupg')) {
+        if (! class_exists('gnupg')) {
             throw new RuntimeException('PHPMailerPGP requires the GnuPG class');
         }
 
-        if (!$this->gnupgHome && isset($_SERVER['HOME'])) {
-            $this->gnupgHome = $_SERVER['HOME'] . '/.gnupg';
+        if (! $this->gnupgHome && isset($_SERVER['HOME'])) {
+            $this->gnupgHome = $_SERVER['HOME'].'/.gnupg';
         }
 
-        if (!$this->gnupgHome && getenv('HOME')) {
-            $this->gnupgHome = getenv('HOME') . '/.gnupg';
+        if (! $this->gnupgHome && getenv('HOME')) {
+            $this->gnupgHome = getenv('HOME').'/.gnupg';
         }
 
-        if (!$this->gnupg) {
+        if (! $this->gnupg) {
             $this->gnupg = new \gnupg();
         }
 
@@ -268,14 +266,13 @@ class OpenPGPEncrypter
     /**
      * @param $plaintext
      * @param $keyFingerprint
-     *
      * @return string
      *
      * @throws RuntimeException
      */
     protected function pgpSignString($plaintext, $keyFingerprint)
     {
-        if (isset($this->keyPassphrases[$keyFingerprint]) && !$this->keyPassphrases[$keyFingerprint]) {
+        if (isset($this->keyPassphrases[$keyFingerprint]) && ! $this->keyPassphrases[$keyFingerprint]) {
             $passPhrase = $this->keyPassphrases[$keyFingerprint];
         } else {
             $passPhrase = null;
@@ -298,7 +295,6 @@ class OpenPGPEncrypter
     /**
      * @param $plaintext
      * @param $keyFingerprints
-     *
      * @return string
      *
      * @throws RuntimeException
@@ -323,14 +319,13 @@ class OpenPGPEncrypter
     /**
      * @param $plaintext
      * @param $keyFingerprints
-     *
      * @return string
      *
      * @throws RuntimeException
      */
     protected function pgpEncryptAndSignString($plaintext, $keyFingerprint, $signingKeyFingerprint)
     {
-        if (isset($this->keyPassphrases[$signingKeyFingerprint]) && !$this->keyPassphrases[$signingKeyFingerprint]) {
+        if (isset($this->keyPassphrases[$signingKeyFingerprint]) && ! $this->keyPassphrases[$signingKeyFingerprint]) {
             $passPhrase = $this->keyPassphrases[$signingKeyFingerprint];
         } else {
             $passPhrase = null;
@@ -354,14 +349,13 @@ class OpenPGPEncrypter
     /**
      * @param $identifier
      * @param $purpose
-     *
      * @return string
      *
      * @throws RuntimeException
      */
     protected function getKey($identifier, $purpose)
     {
-        $keys         = $this->gnupg->keyinfo($identifier);
+        $keys = $this->gnupg->keyinfo($identifier);
         $fingerprints = [];
 
         foreach ($keys as $key) {
@@ -388,6 +382,6 @@ class OpenPGPEncrypter
 
     protected function isValidKey($key, $purpose)
     {
-        return !($key['disabled'] || $key['expired'] || $key['revoked'] || ($purpose == 'sign' && !$key['can_sign']) || ($purpose == 'encrypt' && !$key['can_encrypt']));
+        return ! ($key['disabled'] || $key['expired'] || $key['revoked'] || ($purpose == 'sign' && ! $key['can_sign']) || ($purpose == 'encrypt' && ! $key['can_encrypt']));
     }
 }

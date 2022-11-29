@@ -18,10 +18,10 @@ class DeletedUsername extends Model
     public $timestamps = false;
 
     protected $encrypted = [
-        'username'
+        'username',
     ];
 
     protected $fillable = [
-        'username'
+        'username',
     ];
 }

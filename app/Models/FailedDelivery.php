@@ -19,7 +19,7 @@ class FailedDelivery extends Model
     protected $keyType = 'string';
 
     protected $encrypted = [
-        'sender'
+        'sender',
     ];
 
     protected $fillable = [
@@ -32,20 +32,20 @@ class FailedDelivery extends Model
         'email_type',
         'status',
         'code',
-        'attempted_at'
+        'attempted_at',
     ];
 
     protected $dates = [
         'attempted_at',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
         'recipient_id' => 'string',
-        'alias_id' => 'string'
+        'alias_id' => 'string',
     ];
 
     /**

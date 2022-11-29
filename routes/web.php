@@ -96,10 +96,9 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
     Route::get('/failed-deliveries', [ShowFailedDeliveryController::class, 'index'])->name('failed_deliveries.index');
 });
 
-
 Route::group([
     'middleware' => ['auth', '2fa', 'webauthn'],
-    'prefix' => 'settings'
+    'prefix' => 'settings',
 ], function () {
     Route::controller(SettingController::class)->group(function () {
         Route::get('/', 'show')->name('settings.show');

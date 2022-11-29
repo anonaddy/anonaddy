@@ -24,34 +24,63 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     use CheckUserRules;
 
     protected $email;
+
     protected $user;
+
     protected $alias;
+
     protected $sender;
+
     protected $originalCc;
+
     protected $originalTo;
+
     protected $displayFrom;
+
     protected $replyToAddress;
+
     protected $emailSubject;
+
     protected $emailText;
+
     protected $emailHtml;
+
     protected $emailAttachments;
+
     protected $emailInlineAttachments;
+
     protected $deactivateUrl;
+
     protected $bannerLocationText;
+
     protected $bannerLocationHtml;
+
     protected $fingerprint;
+
     protected $encryptedParts;
+
     protected $fromEmail;
+
     protected $size;
+
     protected $messageId;
+
     protected $listUnsubscribe;
+
     protected $inReplyTo;
+
     protected $references;
+
     protected $originalEnvelopeFrom;
+
     protected $originalFromHeader;
+
     protected $originalReplyToHeader;
+
     protected $originalSenderHeader;
+
     protected $authenticationResults;
+
     protected $recipientId;
 
     /**
@@ -87,7 +116,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->encryptedParts = $emailData->encryptedParts ?? null;
         $this->recipientId = $recipient->id;
 
-        $this->fingerprint = $recipient->should_encrypt && !$this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
+        $this->fingerprint = $recipient->should_encrypt && ! $this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
 
         $this->bannerLocationText = $this->bannerLocationHtml = $this->isAlreadyEncrypted() ? 'off' : $this->alias->user->banner_location;
     }
@@ -103,9 +132,9 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         if ($this->user->use_reply_to) {
             $this->fromEmail = $this->alias->email;
 
-            $replyToEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+            $replyToEmail = $this->alias->local_part.'+'.Str::replaceLast('@', '=', $this->replyToAddress).'@'.$this->alias->domain;
         } else {
-            $this->fromEmail = $this->alias->local_part . '+' . Str::replaceLast('@', '=', $this->replyToAddress) . '@' . $this->alias->domain;
+            $this->fromEmail = $this->alias->local_part.'+'.Str::replaceLast('@', '=', $this->replyToAddress).'@'.$this->alias->domain;
         }
 
         $returnPath = $this->alias->email;
@@ -121,14 +150,14 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             }
         }
 
-        $this->email =  $this
+        $this->email = $this
             ->from($this->fromEmail, base64_decode($this->displayFrom)." '".$this->sender."'")
             ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
             ->withSymfonyMessage(function (Email $message) use ($returnPath) {
                 $message->returnPath($returnPath);
 
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'F:' . $this->alias->id . ':anonaddy');
+                        ->addTextHeader('Feedback-ID', 'F:'.$this->alias->id.':anonaddy');
 
                 // This header is used to set the To: header as the alias just before sending.
                 $message->getHeaders()
@@ -211,7 +240,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         if ($this->emailText) {
             $this->email->text('emails.forward.text')->with([
-                'text' => base64_decode($this->emailText)
+                'text' => base64_decode($this->emailText),
             ]);
         }
 
@@ -220,14 +249,14 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             $this->bannerLocationText = 'off';
 
             $this->email->view('emails.forward.html')->with([
-                'html' => base64_decode($this->emailHtml)
+                'html' => base64_decode($this->emailHtml),
             ]);
         }
 
         // To prevent invalid view error where no text or html is present...
         if (! $this->emailHtml && ! $this->emailText) {
             $this->email->text('emails.forward.text')->with([
-                'text' => base64_decode($this->emailText)
+                'text' => base64_decode($this->emailText),
             ]);
         }
 
@@ -239,7 +268,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             );
         }
 
-        $this->replacedSubject = $this->user->email_subject ? ' with subject "' . base64_decode($this->emailSubject) . '"' : null;
+        $this->replacedSubject = $this->user->email_subject ? ' with subject "'.base64_decode($this->emailSubject).'"' : null;
 
         $this->checkRules('Forwards');
 
@@ -256,7 +285,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'fromEmail' => $this->sender,
             'replacedSubject' => $this->replacedSubject,
             'shouldBlock' => $this->size === 0,
-            'needsDkimSignature' => $this->needsDkimSignature()
+            'needsDkimSignature' => $this->needsDkimSignature(),
         ]);
 
         if (isset($replyToEmail)) {
@@ -306,7 +335,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'email_type' => 'F',
             'status' => null,
             'code' => 'An error has occurred, please check the logs.',
-            'attempted_at' => now()
+            'attempted_at' => now(),
         ]);
     }
 

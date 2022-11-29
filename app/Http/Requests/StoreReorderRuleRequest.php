@@ -28,8 +28,8 @@ class StoreReorderRuleRequest extends FormRequest
             'ids' => [
                 'required',
                 'array',
-                new ValidRuleId()
-            ]
+                new ValidRuleId(),
+            ],
         ];
     }
 }

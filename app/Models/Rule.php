@@ -24,12 +24,12 @@ class Rule extends Model
         'replies',
         'sends',
         'active',
-        'order'
+        'order',
     ];
 
     protected $dates = [
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $casts = [
@@ -40,7 +40,7 @@ class Rule extends Model
         'replies' => 'boolean',
         'sends' => 'boolean',
         'conditions' => 'array',
-        'actions' => 'array'
+        'actions' => 'array',
     ];
 
     /**

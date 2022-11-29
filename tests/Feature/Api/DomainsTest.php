@@ -22,7 +22,7 @@ class DomainsTest extends TestCase
     {
         // Arrange
         Domain::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -38,7 +38,7 @@ class DomainsTest extends TestCase
     {
         // Arrange
         $domain = Domain::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -54,7 +54,7 @@ class DomainsTest extends TestCase
     public function user_can_create_new_domain()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'random.com'
+            'domain' => 'random.com',
         ]);
 
         $response->assertStatus(201);
@@ -66,11 +66,11 @@ class DomainsTest extends TestCase
     {
         Domain::factory()->create([
             'user_id' => $this->user->id,
-            'domain' => 'random.com'
+            'domain' => 'random.com',
         ]);
 
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'random.com'
+            'domain' => 'random.com',
         ]);
 
         $response
@@ -82,7 +82,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_be_a_valid_fqdn()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'random.'
+            'domain' => 'random.',
         ]);
 
         $response
@@ -94,7 +94,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_not_include_protocol()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'https://random.com'
+            'domain' => 'https://random.com',
         ]);
 
         $response
@@ -106,7 +106,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_not_be_local()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => config('anonaddy.domain')
+            'domain' => config('anonaddy.domain'),
         ]);
 
         $response
@@ -118,7 +118,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_not_be_local_subdomain()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'subdomain'.config('anonaddy.domain')
+            'domain' => 'subdomain'.config('anonaddy.domain'),
         ]);
 
         $response
@@ -131,11 +131,11 @@ class DomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'active' => false
+            'active' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/active-domains/', [
-            'id' => $domain->id
+            'id' => $domain->id,
         ]);
 
         $response->assertStatus(200);
@@ -147,7 +147,7 @@ class DomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'active' => true
+            'active' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/active-domains/'.$domain->id);
@@ -161,11 +161,11 @@ class DomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'catch_all' => false
+            'catch_all' => false,
         ]);
 
         $response = $this->json('POST', '/api/v1/catch-all-domains/', [
-            'id' => $domain->id
+            'id' => $domain->id,
         ]);
 
         $response->assertStatus(200);
@@ -177,7 +177,7 @@ class DomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'catch_all' => true
+            'catch_all' => true,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/catch-all-domains/'.$domain->id);
@@ -190,11 +190,11 @@ class DomainsTest extends TestCase
     public function user_can_update_domain_description()
     {
         $domain = Domain::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
-            'description' => 'The new description'
+            'description' => 'The new description',
         ]);
 
         $response->assertStatus(200);
@@ -205,7 +205,7 @@ class DomainsTest extends TestCase
     public function user_can_delete_domain()
     {
         $domain = Domain::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('DELETE', '/api/v1/domains/'.$domain->id);
@@ -219,21 +219,21 @@ class DomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'domain_verified_at' => now()
+            'domain_verified_at' => now(),
         ]);
 
         $newDefaultRecipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id.'/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id
+            'default_recipient' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('domains', [
             'id' => $domain->id,
-            'default_recipient_id' => $newDefaultRecipient->id
+            'default_recipient_id' => $newDefaultRecipient->id,
         ]);
 
         $this->assertEquals($newDefaultRecipient->email, $domain->refresh()->defaultRecipient->email);
@@ -244,22 +244,22 @@ class DomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'domain_verified_at' => now()
+            'domain_verified_at' => now(),
         ]);
 
         $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id.'/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id
+            'default_recipient' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(404);
         $this->assertDatabaseMissing('domains', [
             'id' => $domain->id,
-            'default_recipient_id' => $newDefaultRecipient->id
+            'default_recipient_id' => $newDefaultRecipient->id,
         ]);
     }
 
@@ -267,7 +267,7 @@ class DomainsTest extends TestCase
     public function user_can_remove_domain_default_recipient()
     {
         $defaultRecipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $domain = Domain::factory()->create([
@@ -277,13 +277,13 @@ class DomainsTest extends TestCase
         ]);
 
         $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id.'/default-recipient', [
-            'default_recipient' => ''
+            'default_recipient' => '',
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('domains', [
             'id' => $domain->id,
-            'default_recipient_id' => null
+            'default_recipient_id' => null,
         ]);
 
         $this->assertNull($domain->refresh()->defaultRecipient);

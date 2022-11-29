@@ -30,7 +30,7 @@ class StoreAliasRequest extends FormRequest
             'domain' => [
                 'required',
                 'string',
-                Rule::in($this->user()->domainOptions())
+                Rule::in($this->user()->domainOptions()),
             ],
             'description' => 'nullable|max:200',
             'format' => 'nullable|in:random_characters,uuid,random_words,custom',
@@ -38,8 +38,8 @@ class StoreAliasRequest extends FormRequest
                 'nullable',
                 'array',
                 'max:10',
-                new VerifiedRecipientId()
-            ]
+                new VerifiedRecipientId(),
+            ],
         ];
     }
 
@@ -52,9 +52,10 @@ class StoreAliasRequest extends FormRequest
                 return $query->where('local_part', $this->validationData()['local_part'])
                 ->where('domain', $this->validationData()['domain']);
             }),
-            new ValidAliasLocalPart()
+            new ValidAliasLocalPart(),
         ], function () {
             $format = $this->validationData()['format'] ?? 'random_characters';
+
             return $format === 'custom';
         });
     }

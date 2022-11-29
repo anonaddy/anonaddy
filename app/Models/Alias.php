@@ -21,7 +21,7 @@ class Alias extends Model
     protected $keyType = 'string';
 
     protected $encrypted = [
-        'description'
+        'description',
     ];
 
     protected $fillable = [
@@ -38,13 +38,13 @@ class Alias extends Model
         'emails_forwarded',
         'emails_blocked',
         'emails_replied',
-        'emails_sent'
+        'emails_sent',
     ];
 
     protected $dates = [
         'created_at',
         'updated_at',
-        'deleted_at'
+        'deleted_at',
     ];
 
     protected $casts = [
@@ -52,7 +52,7 @@ class Alias extends Model
         'user_id' => 'string',
         'aliasable_id' => 'string',
         'aliasable_type' => 'string',
-        'active' => 'boolean'
+        'active' => 'boolean',
     ];
 
     public static function boot()

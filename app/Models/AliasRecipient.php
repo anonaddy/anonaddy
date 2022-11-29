@@ -20,7 +20,7 @@ class AliasRecipient extends Pivot
     protected $casts = [
         'id' => 'string',
         'alias_id' => 'string',
-        'recipient_id' => 'string'
+        'recipient_id' => 'string',
     ];
 
     public function setAliasAttribute($alias)

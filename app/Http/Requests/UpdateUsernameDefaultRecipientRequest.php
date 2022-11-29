@@ -24,7 +24,7 @@ class UpdateUsernameDefaultRecipientRequest extends FormRequest
     public function rules()
     {
         return [
-            'default_recipient' => 'nullable|string'
+            'default_recipient' => 'nullable|string',
         ];
     }
 }

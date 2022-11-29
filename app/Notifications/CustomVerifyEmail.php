@@ -40,7 +40,7 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldQueue, ShouldBeEncr
             ->subject(Lang::get('Verify Email Address'))
             ->markdown('mail.verify_email', [
                 'verificationUrl' => $verificationUrl,
-                'recipientId' => $recipientId
+                'recipientId' => $recipientId,
             ])
             ->withSymfonyMessage(function (Email $message) use ($feedbackId) {
                 $message->getHeaders()

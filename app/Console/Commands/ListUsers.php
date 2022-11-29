@@ -81,7 +81,7 @@ class ListUsers extends Command
                 'username' => $user->defaultUsername->username,
                 'bandwidth' => $user->bandwidth,
                 'created_at' => $user->created_at,
-                'updated_at' => $user->updated_at
+                'updated_at' => $user->updated_at,
             ];
         });
 

@@ -25,7 +25,7 @@ class SendIncorrectOtpNotification
             Cache::put("user:{$user->id}:failed-otp-notification", now()->toDateTimeString(), now()->addMinutes(5));
 
             // Log in auth.log
-            Log::channel('auth')->info('Failed OTP Notification sent: ' . $user->username);
+            Log::channel('auth')->info('Failed OTP Notification sent: '.$user->username);
 
             $user->notify(new IncorrectOtpNotification());
         }

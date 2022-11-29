@@ -24,7 +24,7 @@ class EnableTwoFactorAuthRequest extends FormRequest
     public function rules()
     {
         return [
-            'two_factor_token' => 'required|min:6'
+            'two_factor_token' => 'required|min:6',
         ];
     }
 }

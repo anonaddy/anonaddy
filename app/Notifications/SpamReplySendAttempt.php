@@ -15,8 +15,11 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
     use Queueable;
 
     protected $aliasEmail;
+
     protected $recipient;
+
     protected $destination;
+
     protected $authenticationResults;
 
     /**
@@ -26,7 +29,7 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
      */
     public function __construct($alias, $recipient, $authenticationResults)
     {
-        $this->aliasEmail = $alias['local_part'] . '@' . $alias['domain'];
+        $this->aliasEmail = $alias['local_part'].'@'.$alias['domain'];
         $this->recipient = $recipient;
         $this->destination = Str::replaceLast('=', '@', $alias['extension']);
         $this->authenticationResults = $authenticationResults;
@@ -59,7 +62,7 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
                 'destination' => $this->destination,
                 'authenticationResults' => $this->authenticationResults,
                 'recipientId' => $notifiable->id,
-                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
+                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

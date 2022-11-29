@@ -22,7 +22,7 @@ class ApiTokenDetailsTest extends TestCase
         $token = $user->createToken('New');
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token->plainTextToken,
+            'Authorization' => 'Bearer '.$token->plainTextToken,
         ])->json('GET', '/api/v1/api-token-details');
 
         $response->assertSuccessful();

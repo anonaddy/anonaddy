@@ -8,7 +8,6 @@ use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Notifications\Notifiable;
 
 class Recipient extends Model
@@ -24,7 +23,7 @@ class Recipient extends Model
 
     protected $encrypted = [
         'email',
-        'fingerprint'
+        'fingerprint',
     ];
 
     protected $fillable = [
@@ -35,13 +34,13 @@ class Recipient extends Model
         'inline_encryption',
         'protected_headers',
         'fingerprint',
-        'email_verified_at'
+        'email_verified_at',
     ];
 
     protected $dates = [
         'created_at',
         'updated_at',
-        'email_verified_at'
+        'email_verified_at',
     ];
 
     protected $casts = [
@@ -50,7 +49,7 @@ class Recipient extends Model
         'can_reply_send' => 'boolean',
         'should_encrypt' => 'boolean',
         'inline_encryption' => 'boolean',
-        'protected_headers' => 'boolean'
+        'protected_headers' => 'boolean',
     ];
 
     public static function boot()

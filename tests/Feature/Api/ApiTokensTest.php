@@ -26,7 +26,7 @@ class ApiTokensTest extends TestCase
     public function user_can_create_api_token()
     {
         $response = $this->post('/settings/personal-access-tokens', [
-            'name' => 'New'
+            'name' => 'New',
         ]);
 
         $response->assertStatus(200);
@@ -34,7 +34,7 @@ class ApiTokensTest extends TestCase
         $this->assertNotNull($response->getData()->accessToken);
         $this->assertDatabaseHas('personal_access_tokens', [
             'name' => 'New',
-            'tokenable_id' => $this->user->id
+            'tokenable_id' => $this->user->id,
         ]);
     }
 
@@ -51,7 +51,7 @@ class ApiTokensTest extends TestCase
         $this->assertDatabaseMissing('personal_access_tokens', [
             'name' => 'New',
             'tokenable_id' => $this->user->id,
-            'id' => $token->accessToken->id
+            'id' => $token->accessToken->id,
         ]);
     }
 }

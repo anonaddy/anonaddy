@@ -33,7 +33,7 @@ class ValidRuleId implements Rule
             ->toArray();
 
         foreach ($ids as $id) {
-            if (!in_array($id, $validRuleIds)) {
+            if (! in_array($id, $validRuleIds)) {
                 return false;
             }
         }

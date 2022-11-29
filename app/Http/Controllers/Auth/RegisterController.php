@@ -63,7 +63,7 @@ class RegisterController extends Controller
                 'max:20',
                 'unique:usernames,username',
                 new NotBlacklisted(),
-                new NotDeletedUsername()
+                new NotDeletedUsername(),
             ],
             'email' => [
                 'required',
@@ -71,7 +71,7 @@ class RegisterController extends Controller
                 'max:254',
                 'confirmed',
                 new RegisterUniqueRecipient(),
-                new NotLocalRecipient()
+                new NotLocalRecipient(),
             ],
             'password' => ['required', 'min:8'],
         ], [
@@ -94,12 +94,12 @@ class RegisterController extends Controller
 
         $recipient = Recipient::create([
             'email' => $data['email'],
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         $username = Username::create([
             'username' => $data['username'],
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         $twoFactor = app('pragmarx.google2fa');
@@ -109,7 +109,7 @@ class RegisterController extends Controller
             'default_username_id' => $username->id,
             'default_recipient_id' => $recipient->id,
             'password' => Hash::make($data['password']),
-            'two_factor_secret' => $twoFactor->generateSecretKey()
+            'two_factor_secret' => $twoFactor->generateSecretKey(),
         ]);
     }
 }

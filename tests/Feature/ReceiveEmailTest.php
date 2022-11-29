@@ -51,7 +51,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -59,7 +59,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
@@ -86,7 +86,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['EBAY'],
                 '--extension' => [''],
                 '--domain' => ['JOHNDOE.ANONADDY.COM'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -94,7 +94,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
@@ -119,7 +119,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['attachment'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -127,7 +127,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'attachment@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'attachment',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
@@ -152,7 +152,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay', 'amazon', 'paypal'],
                 '--extension' => ['', '', ''],
                 '--domain' => ['johndoe.anonaddy.com', 'johndoe.anonaddy.com', 'johndoe.anonaddy.com'],
-                '--size' => '1217'
+                '--size' => '1217',
             ]
         )->assertExitCode(0);
 
@@ -160,19 +160,19 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertDatabaseHas('aliases', [
             'email' => 'amazon@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'amazon',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertDatabaseHas('aliases', [
             'email' => 'paypal@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'paypal',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(3, $this->user->aliases()->count());
 
@@ -197,7 +197,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => ['2.3'],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '789'
+                '--size' => '789',
             ]
         )->assertExitCode(0);
 
@@ -205,7 +205,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -240,13 +240,13 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '559'
+                '--size' => '559',
             ]
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertCount(1, $this->user->aliases);
@@ -266,7 +266,7 @@ class ReceiveEmailTest extends TestCase
         $uuid = '86064c92-da41-443e-a2bf-5a7b0247842f';
 
         config([
-            'anonaddy.admin_username' => 'random'
+            'anonaddy.admin_username' => 'random',
         ]);
 
         Alias::factory()->create([
@@ -288,7 +288,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => [$uuid],
                 '--extension' => [''],
                 '--domain' => ['anonaddy.me'],
-                '--size' => '892'
+                '--size' => '892',
             ]
         )->assertExitCode(0);
 
@@ -296,7 +296,7 @@ class ReceiveEmailTest extends TestCase
             'local_part' => $uuid,
             'domain' => 'anonaddy.me',
             'email' => $uuid.'@anonaddy.me',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertCount(1, $this->user->aliases);
@@ -316,7 +316,7 @@ class ReceiveEmailTest extends TestCase
         $localPart = 'circus.waltz449';
 
         config([
-            'anonaddy.admin_username' => 'random'
+            'anonaddy.admin_username' => 'random',
         ]);
 
         Alias::factory()->create([
@@ -337,7 +337,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => [$localPart],
                 '--extension' => [''],
                 '--domain' => ['anonaddy.me'],
-                '--size' => '892'
+                '--size' => '892',
             ]
         )->assertExitCode(0);
 
@@ -345,7 +345,7 @@ class ReceiveEmailTest extends TestCase
             'local_part' => $localPart,
             'domain' => 'anonaddy.me',
             'email' => $localPart.'@anonaddy.me',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertCount(1, $this->user->aliases);
@@ -371,22 +371,22 @@ class ReceiveEmailTest extends TestCase
 
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'one@example.com'
+            'email' => 'one@example.com',
         ]);
 
         $recipient2 = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'two@example.com'
+            'email' => 'two@example.com',
         ]);
 
         AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient
+            'recipient' => $recipient,
         ]);
 
         AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient2
+            'recipient' => $recipient2,
         ]);
 
         $this->artisan(
@@ -398,13 +398,13 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '444'
+                '--size' => '444',
             ]
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
@@ -425,12 +425,12 @@ class ReceiveEmailTest extends TestCase
 
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'one@example.com'
+            'email' => 'one@example.com',
         ]);
 
         $recipient2 = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'two@example.com'
+            'email' => 'two@example.com',
         ]);
 
         $this->artisan(
@@ -442,14 +442,14 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => ['2.3'],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '444'
+                '--size' => '444',
             ]
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
             'extension' => '2.3',
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         Mail::assertQueued(ForwardEmail::class, function ($mail) use ($recipient) {
@@ -471,12 +471,12 @@ class ReceiveEmailTest extends TestCase
         Recipient::factory()->create([
             'user_id' => $this->user->id,
             'email' => 'one@example.com',
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $verifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'two@example.com'
+            'email' => 'two@example.com',
         ]);
 
         $this->artisan(
@@ -488,13 +488,13 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => ['2.3'],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '444'
+                '--size' => '444',
             ]
         )->assertExitCode(0);
 
         $this->assertDatabaseHas('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $alias = $this->user->aliases()->where('email', 'ebay@johndoe.'.config('anonaddy.domain'))->first();
@@ -526,13 +526,13 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
         $this->assertDatabaseMissing('aliases', [
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         Mail::assertNotQueued(ForwardEmail::class);
@@ -550,19 +550,19 @@ class ReceiveEmailTest extends TestCase
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
-            'domain' => 'johndoe.'.config('anonaddy.domain')
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
         ]);
 
         Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email' => 'will@anonaddy.com'
+            'email' => 'will@anonaddy.com',
         ]);
 
         $this->assertDatabaseHas('aliases', [
             'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'active' => true
+            'active' => true,
         ]);
 
         $this->artisan(
@@ -574,7 +574,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712'],
                 '--extension' => [''],
                 '--domain' => ['unsubscribe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -584,7 +584,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'active' => false
+            'active' => false,
         ]);
 
         Mail::assertNotQueued(ForwardEmail::class);
@@ -602,14 +602,14 @@ class ReceiveEmailTest extends TestCase
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
-            'domain' => 'johndoe.'.config('anonaddy.domain')
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
         ]);
 
         $this->assertDatabaseHas('aliases', [
             'id' => '8f36380f-df4e-4875-bb12-9c4448573712',
             'user_id' => $this->user->id,
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
-            'active' => true
+            'active' => true,
         ]);
 
         $this->artisan(
@@ -621,7 +621,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['8f36380f-df4e-4875-bb12-9c4448573712'],
                 '--extension' => [''],
                 '--domain' => ['unsubscribe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -631,7 +631,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'active' => true
+            'active' => true,
         ]);
 
         Mail::assertNotQueued(ForwardEmail::class);
@@ -655,7 +655,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['anonaddy.me'],
-                '--size' => '1346'
+                '--size' => '1346',
             ]
         )->assertExitCode(0);
 
@@ -663,7 +663,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@anonaddy.me',
             'local_part' => 'ebay',
             'domain' => 'anonaddy.me',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -683,7 +683,7 @@ class ReceiveEmailTest extends TestCase
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'domain' => 'example.com',
-            'domain_verified_at' => now()
+            'domain_verified_at' => now(),
         ]);
 
         $this->artisan(
@@ -695,7 +695,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['example.com'],
-                '--size' => '871'
+                '--size' => '871',
             ]
         )->assertExitCode(0);
 
@@ -705,7 +705,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -726,7 +726,7 @@ class ReceiveEmailTest extends TestCase
             'user_id' => $this->user->id,
             'domain' => 'example.com',
             'domain_verified_at' => now(),
-            'domain_sending_verified_at' => now()
+            'domain_sending_verified_at' => now(),
         ]);
 
         $this->artisan(
@@ -738,7 +738,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['example.com'],
-                '--size' => '871'
+                '--size' => '871',
             ]
         )->assertExitCode(0);
 
@@ -748,7 +748,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -767,7 +767,7 @@ class ReceiveEmailTest extends TestCase
 
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $this->artisan(
@@ -779,7 +779,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['janedoe.anonaddy.com'],
-                '--size' => '638'
+                '--size' => '638',
             ]
         )->assertExitCode(0);
 
@@ -789,7 +789,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@janedoe.anonaddy.com',
             'local_part' => 'ebay',
             'domain' => 'janedoe.anonaddy.com',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -817,7 +817,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -825,7 +825,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
@@ -855,7 +855,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -864,12 +864,12 @@ class ReceiveEmailTest extends TestCase
             'local_part' => 'ebay',
             'domain' => 'johndoe.'.config('anonaddy.domain'),
             'emails_forwarded' => 1,
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'bandwidth' => '9486760'
+            'bandwidth' => '9486760',
         ]);
 
         Notification::assertNotSentTo(
@@ -894,7 +894,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.me'],
-                '--size' => '1000'
+                '--size' => '1000',
             ]
         )->assertExitCode(0);
 
@@ -902,7 +902,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@johndoe.anonaddy.me',
             'local_part' => 'ebay',
             'domain' => 'johndoe.anonaddy.me',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
@@ -919,14 +919,14 @@ class ReceiveEmailTest extends TestCase
         Mail::assertNothingSent();
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
             'default_recipient_id' => $recipient->id,
             'domain' => 'example.com',
-            'domain_verified_at' => now()
+            'domain_verified_at' => now(),
         ]);
 
         $this->artisan(
@@ -938,7 +938,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['example.com'],
-                '--size' => '871'
+                '--size' => '871',
             ]
         )->assertExitCode(0);
 
@@ -948,7 +948,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@example.com',
             'local_part' => 'ebay',
             'domain' => 'example.com',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -966,13 +966,13 @@ class ReceiveEmailTest extends TestCase
         Mail::assertNothingSent();
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $username = Username::factory()->create([
             'user_id' => $this->user->id,
             'default_recipient_id' => $recipient->id,
-            'username' => 'janedoe'
+            'username' => 'janedoe',
         ]);
 
         $this->artisan(
@@ -984,7 +984,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['janedoe.anonaddy.com'],
-                '--size' => '559'
+                '--size' => '559',
             ]
         )->assertExitCode(0);
 
@@ -994,7 +994,7 @@ class ReceiveEmailTest extends TestCase
             'email' => 'ebay@janedoe.anonaddy.com',
             'local_part' => 'ebay',
             'domain' => 'janedoe.anonaddy.com',
-            'emails_blocked' => 0
+            'emails_blocked' => 0,
         ]);
 
         $this->assertEquals(1, $this->user->aliases()->count());
@@ -1024,7 +1024,7 @@ class ReceiveEmailTest extends TestCase
                 '--local_part' => ['ebay'],
                 '--extension' => [''],
                 '--domain' => ['johndoe.anonaddy.com'],
-                '--size' => '1346'
+                '--size' => '1346',
             ]
         )->assertExitCode(0);
 

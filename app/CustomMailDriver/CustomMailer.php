@@ -23,7 +23,7 @@ class CustomMailer extends Mailer
     /**
      * Send a new message using a view.
      *
-     * @param MailableContract|string|array  $view
+     * @param  MailableContract|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return SentMessage|null
@@ -67,7 +67,7 @@ class CustomMailer extends Mailer
             $recipient = Recipient::find($data['recipientId']);
 
             try {
-                $encrypter = new OpenPGPEncrypter(config('anonaddy.signing_key_fingerprint'), $data['fingerprint'], "~/.gnupg", $recipient->protected_headers);
+                $encrypter = new OpenPGPEncrypter(config('anonaddy.signing_key_fingerprint'), $data['fingerprint'], '~/.gnupg', $recipient->protected_headers);
             } catch (RuntimeException $e) {
                 info($e->getMessage());
                 $encrypter = null;
@@ -114,7 +114,7 @@ class CustomMailer extends Mailer
                 'Subject',
                 'Date',
                 'Original-Sender',
-                'Sender'
+                'Sender',
             ])->toArray();
             $signedEmail = $dkimSigner->sign($symfonyMessage, $options);
             $symfonyMessage->setHeaders($signedEmail->getHeaders());
@@ -130,10 +130,10 @@ class CustomMailer extends Mailer
 
                 try {
                     // Get Postfix Queue ID and save in DB
-                    $id = str_replace("\r\n", "", Str::after($sentMessage->getDebug(), 'Ok: queued as '));
+                    $id = str_replace("\r\n", '', Str::after($sentMessage->getDebug(), 'Ok: queued as '));
 
                     PostfixQueueId::create([
-                        'queue_id' => $id
+                        'queue_id' => $id,
                     ]);
                 } catch (QueryException $e) {
                     // duplicate entry

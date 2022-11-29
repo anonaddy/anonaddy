@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 trait CheckUserRules
 {
-    public function checkRules(String $emailType)
+    public function checkRules(string $emailType)
     {
         $method = "activeRulesFor{$emailType}Ordered";
         $this->user->{$method}->each(function ($rule) {
@@ -16,7 +16,7 @@ trait CheckUserRules
                 collect($rule->actions)->each(function ($action) {
                     $this->applyAction($action);
                 });
-            };
+            }
         });
     }
 
@@ -109,7 +109,7 @@ trait CheckUserRules
     {
         switch ($action['type']) {
             case 'subject':
-                $this->replacedSubject = ' with subject "' . base64_decode($this->emailSubject) . '"';
+                $this->replacedSubject = ' with subject "'.base64_decode($this->emailSubject).'"';
                 $this->email->subject = $action['value'];
                 break;
             case 'displayFrom':

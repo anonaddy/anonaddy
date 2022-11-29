@@ -46,13 +46,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'two_factor_enabled',
         'two_factor_secret',
-        'two_factor_backup_code'
+        'two_factor_backup_code',
     ];
 
     protected $encrypted = [
         'from_name',
         'email_subject',
-        'two_factor_secret'
+        'two_factor_secret',
     ];
 
     /**
@@ -64,7 +64,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
         'two_factor_secret',
-        'two_factor_backup_code'
+        'two_factor_backup_code',
     ];
 
     /**
@@ -78,13 +78,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_recipient_id' => 'string',
         'catch_all' => 'boolean',
         'two_factor_enabled' => 'boolean',
-        'use_reply_to' => 'boolean'
+        'use_reply_to' => 'boolean',
     ];
 
     protected $dates = [
         'created_at',
         'updated_at',
-        'email_verified_at'
+        'email_verified_at',
     ];
 
     /**
@@ -404,6 +404,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 }
 
                 $withoutExtension = preg_replace('/\+[\s\S]+(?=@)/', '', $recipient->email);
+
                 return strtolower($withoutExtension);
             })
             ->contains(strtolower($email));
@@ -455,7 +456,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
                         $recipientsUsingFingerprint->first()->update([
                             'should_encrypt' => false,
-                            'fingerprint' => null
+                            'fingerprint' => null,
                         ]);
                     }
                 });

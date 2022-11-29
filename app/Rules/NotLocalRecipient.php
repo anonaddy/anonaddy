@@ -36,7 +36,7 @@ class NotLocalRecipient implements Rule
 
         $count = collect(config('anonaddy.all_domains'))
             ->filter(function ($domain) use ($emailDomain) {
-                return $domain === $emailDomain || Str::endsWith($emailDomain, '.' . $domain);
+                return $domain === $emailDomain || Str::endsWith($emailDomain, '.'.$domain);
             })
             ->count();
 

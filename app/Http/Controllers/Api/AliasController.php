@@ -83,23 +83,23 @@ class AliasController extends Controller
             }
 
             $data = [
-                'email' => $localPart . '@' . $request->domain,
+                'email' => $localPart.'@'.$request->domain,
                 'local_part' => $localPart,
-                'extension' => $extension ?? null
+                'extension' => $extension ?? null,
             ];
         } else {
             if ($request->input('format', 'random_characters') === 'random_words') {
                 $localPart = user()->generateRandomWordLocalPart();
 
                 $data = [
-                    'email' => $localPart . '@' . $request->domain,
+                    'email' => $localPart.'@'.$request->domain,
                     'local_part' => $localPart,
                 ];
             } elseif ($request->input('format', 'random_characters') === 'random_characters') {
                 $localPart = user()->generateRandomCharacterLocalPart(8);
 
                 $data = [
-                    'email' => $localPart . '@' . $request->domain,
+                    'email' => $localPart.'@'.$request->domain,
                     'local_part' => $localPart,
                 ];
             } else {
@@ -107,12 +107,11 @@ class AliasController extends Controller
 
                 $data = [
                     'id' => $uuid,
-                    'email' => $uuid . '@' . $request->domain,
+                    'email' => $uuid.'@'.$request->domain,
                     'local_part' => $uuid,
                 ];
             }
         }
-
 
         // Check if domain is for username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))
@@ -195,7 +194,7 @@ class AliasController extends Controller
                 'emails_forwarded' => 0,
                 'emails_blocked' => 0,
                 'emails_replied' => 0,
-                'emails_sent' => 0
+                'emails_sent' => 0,
             ]);
 
             // Soft delete to prevent from being regenerated

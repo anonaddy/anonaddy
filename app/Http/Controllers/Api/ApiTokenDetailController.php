@@ -18,7 +18,7 @@ class ApiTokenDetailController extends Controller
         return response()->json([
             'name' => $token->name,
             'created_at' => $token->created_at?->toDateTimeString(),
-            'expires_at' => $token->expires_at?->toDateTimeString()
+            'expires_at' => $token->expires_at?->toDateTimeString(),
         ]);
     }
 }

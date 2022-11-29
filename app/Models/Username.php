@@ -18,7 +18,7 @@ class Username extends Model
     protected $keyType = 'string';
 
     protected $encrypted = [
-        'description'
+        'description',
     ];
 
     protected $fillable = [
@@ -31,7 +31,7 @@ class Username extends Model
 
     protected $dates = [
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $casts = [
@@ -39,7 +39,7 @@ class Username extends Model
         'user_id' => 'string',
         'active' => 'boolean',
         'catch_all' => 'boolean',
-        'default_recipient_id' => 'string'
+        'default_recipient_id' => 'string',
     ];
 
     public static function boot()
@@ -83,6 +83,7 @@ class Username extends Model
     {
         return $this->hasOne(Recipient::class, 'id', 'default_recipient_id');
     }
+
     /**
      * Set the usernames's default recipient.
      */

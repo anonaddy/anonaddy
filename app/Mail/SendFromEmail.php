@@ -23,17 +23,29 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
     use CheckUserRules;
 
     protected $email;
+
     protected $user;
+
     protected $alias;
+
     protected $sender;
+
     protected $emailSubject;
+
     protected $emailText;
+
     protected $emailHtml;
+
     protected $emailAttachments;
+
     protected $emailInlineAttachments;
+
     protected $encryptedParts;
+
     protected $displayFrom;
+
     protected $fromEmail;
+
     protected $size;
 
     /**
@@ -73,14 +85,14 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             }
         }
 
-        $this->email =  $this
+        $this->email = $this
             ->from($this->fromEmail, $this->displayFrom)
             ->subject(base64_decode($this->emailSubject))
             ->withSymfonyMessage(function (Email $message) use ($returnPath) {
                 $message->returnPath($returnPath);
 
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'S:' . $this->alias->id . ':anonaddy');
+                        ->addTextHeader('Feedback-ID', 'S:'.$this->alias->id.':anonaddy');
 
                 // Message-ID is replaced on send from as it can leak parts of the real email
                 $message->getHeaders()->remove('Message-ID');
@@ -103,20 +115,20 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
         if ($this->emailText) {
             $this->email->text('emails.reply.text')->with([
-                'text' => $this->removeRealEmailAndTextBanner(base64_decode($this->emailText))
+                'text' => $this->removeRealEmailAndTextBanner(base64_decode($this->emailText)),
             ]);
         }
 
         if ($this->emailHtml) {
             $this->email->view('emails.reply.html')->with([
-                'html' => $this->removeRealEmailAndHtmlBanner(base64_decode($this->emailHtml))
+                'html' => $this->removeRealEmailAndHtmlBanner(base64_decode($this->emailHtml)),
             ]);
         }
 
         // To prevent invalid view error where no text or html is present...
         if (! $this->emailHtml && ! $this->emailText) {
             $this->email->text('emails.reply.text')->with([
-                'text' => base64_decode($this->emailText)
+                'text' => base64_decode($this->emailText),
             ]);
         }
 
@@ -134,7 +146,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'shouldBlock' => $this->size === 0,
             'encryptedParts' => $this->encryptedParts,
             'needsDkimSignature' => $this->needsDkimSignature(),
-            'aliasDomain' => $this->alias->domain
+            'aliasDomain' => $this->alias->domain,
         ]);
 
         if ($this->alias->isCustomDomain() && ! $this->needsDkimSignature()) {
@@ -182,7 +194,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
             'email_type' => 'S',
             'status' => null,
             'code' => 'An error has occurred, please check the logs.',
-            'attempted_at' => now()
+            'attempted_at' => now(),
         ]);
     }
 
@@ -202,7 +214,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         // Reply may be HTML but have a plain text banner
         return Str::of(str_ireplace($this->sender, '', $html))
             ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
-            ->replaceMatches("/(?s)(<tr((?!<tr).)*?" . preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/') . "(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mi", '');
+            ->replaceMatches('/(?s)(<tr((?!<tr).)*?'.preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/')."(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mi", '');
     }
 
     /**

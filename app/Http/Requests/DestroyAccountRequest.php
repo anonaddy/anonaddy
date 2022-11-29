@@ -24,7 +24,7 @@ class DestroyAccountRequest extends FormRequest
     public function rules()
     {
         return [
-            'current_password_delete' => 'required|string'
+            'current_password_delete' => 'required|string',
         ];
     }
 }

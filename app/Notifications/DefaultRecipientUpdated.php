@@ -45,12 +45,12 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject("Your default recipient has just been updated")
+            ->subject('Your default recipient has just been updated')
             ->markdown('mail.default_recipient_updated', [
                 'defaultRecipient' => $notifiable->email,
                 'newDefaultRecipient' => $this->newDefaultRecipient,
                 'recipientId' => $notifiable->id,
-                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
+                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

@@ -28,20 +28,20 @@ class StoreRuleRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:50'
+                'max:50',
             ],
             'conditions' => [
                 'required',
                 'array',
-                'max:5'
+                'max:5',
             ],
             'conditions.*.type' => [
                 'required',
                 Rule::in([
                     'subject',
                     'sender',
-                    'alias'
-                ])
+                    'alias',
+                ]),
             ],
             'conditions.*.match' => [
                 'sometimes',
@@ -54,14 +54,14 @@ class StoreRuleRequest extends FormRequest
                     'starts with',
                     'does not start with',
                     'ends with',
-                    'does not end with'
-                ])
+                    'does not end with',
+                ]),
             ],
             'conditions.*.values' => [
                 'required',
                 'array',
                 'min:1',
-                'max:10'
+                'max:10',
             ],
             'conditions.*.values.*' => [
                 'distinct',
@@ -69,7 +69,7 @@ class StoreRuleRequest extends FormRequest
             'actions' => [
                 'required',
                 'array',
-                'max:5'
+                'max:5',
             ],
             'actions.*.type' => [
                 'required',
@@ -79,20 +79,20 @@ class StoreRuleRequest extends FormRequest
                     'encryption',
                     'banner',
                     'block',
-                    'webhook'
+                    'webhook',
                 ]),
             ],
             'actions.*.value' => [
                 'required',
-                'max:50'
+                'max:50',
             ],
             'operator' => [
                 'required',
-                'in:AND,OR'
+                'in:AND,OR',
             ],
             'forwards' => 'boolean',
             'replies' => 'boolean',
-            'sends' => 'boolean'
+            'sends' => 'boolean',
         ];
     }
 }

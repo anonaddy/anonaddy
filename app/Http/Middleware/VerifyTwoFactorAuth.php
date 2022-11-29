@@ -26,7 +26,7 @@ class VerifyTwoFactorAuth extends Middleware
 
         if (! Str::endsWith($request->url(), '/login/2fa')) {
             $request->session()->put([
-                'intended_path' => $request->fullUrl()
+                'intended_path' => $request->fullUrl(),
             ]);
         }
 

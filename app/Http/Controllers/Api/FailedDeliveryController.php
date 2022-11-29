@@ -9,7 +9,7 @@ class FailedDeliveryController extends Controller
 {
     public function index()
     {
-        $failedDeliveries = user()->failedDeliveries()->with(['recipient:id,email','alias:id,email'])->latest();
+        $failedDeliveries = user()->failedDeliveries()->with(['recipient:id,email', 'alias:id,email'])->latest();
 
         return FailedDeliveryResource::collection($failedDeliveries->get());
     }
@@ -18,7 +18,7 @@ class FailedDeliveryController extends Controller
     {
         $failedDelivery = user()->failedDeliveries()->findOrFail($id);
 
-        return new FailedDeliveryResource($failedDelivery->load(['recipient:id,email','alias:id,email']));
+        return new FailedDeliveryResource($failedDelivery->load(['recipient:id,email', 'alias:id,email']));
     }
 
     public function destroy($id)

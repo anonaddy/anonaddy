@@ -14,6 +14,7 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
     use Queueable;
 
     protected $domain;
+
     protected $reason;
 
     /**
@@ -50,12 +51,12 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
         return (new MailMessage())
-            ->subject("Your domain has been unverified for sending on AnonAddy")
+            ->subject('Your domain has been unverified for sending on AnonAddy')
             ->markdown('mail.domain_unverified_for_sending', [
                 'domain' => $this->domain,
                 'reason' => $this->reason,
                 'recipientId' => $recipient->id,
-                'fingerprint' => $fingerprint
+                'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

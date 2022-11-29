@@ -26,8 +26,8 @@ class UpdateRecipientKeyRequest extends FormRequest
         return [
             'key_data' => [
                 'string',
-                'regex:/-----BEGIN PGP PUBLIC KEY BLOCK-----([A-Za-z0-9+=\/\n]+)-----END PGP PUBLIC KEY BLOCK-----/i'
-            ]
+                'regex:/-----BEGIN PGP PUBLIC KEY BLOCK-----([A-Za-z0-9+=\/\n]+)-----END PGP PUBLIC KEY BLOCK-----/i',
+            ],
         ];
     }
 }

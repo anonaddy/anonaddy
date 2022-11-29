@@ -25,7 +25,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
-        "friendsofphp/php-cs-fixer": "^3.0.0",
+        "laravel/pint": "^1.2",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
@@ -71,7 +71,7 @@
             "@php artisan key:generate --ansi"
         ],
         "format": [
-            "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php"
+            "./vendor/bin/pint"
         ]
     }
 }

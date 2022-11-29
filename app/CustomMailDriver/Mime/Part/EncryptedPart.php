@@ -13,16 +13,20 @@ class EncryptedPart extends AbstractPart
     protected $_headers;
 
     private $body;
+
     private $charset;
+
     private $subtype;
+
     /**
      * @var ?string
      */
     private $disposition;
+
     private $seekable;
 
     /**
-     * @param resource|string $body
+     * @param  resource|string  $body
      */
     public function __construct($body, ?string $charset = 'utf-8', string $subtype = 'plain')
     {
@@ -30,7 +34,7 @@ class EncryptedPart extends AbstractPart
 
         parent::__construct();
 
-        if (!\is_string($body) && !\is_resource($body)) {
+        if (! \is_string($body) && ! \is_resource($body)) {
             throw new \TypeError(sprintf('The body of "%s" must be a string or a resource (got "%s").', self::class, get_debug_type($body)));
         }
 

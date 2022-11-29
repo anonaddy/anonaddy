@@ -19,7 +19,7 @@ class ApiAuthenticationTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create([
-            'password' => Hash::make('mypassword')
+            'password' => Hash::make('mypassword'),
         ]);
 
         $this->user->usernames()->save($this->user->defaultUsername);
@@ -35,7 +35,7 @@ class ApiAuthenticationTest extends TestCase
         $response = $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'mypassword',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response->assertSuccessful();
@@ -50,7 +50,7 @@ class ApiAuthenticationTest extends TestCase
         $response = $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'myincorrectpassword',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response->assertUnauthorized();
@@ -64,7 +64,7 @@ class ApiAuthenticationTest extends TestCase
         $response = $this->json('POST', '/api/auth/login', [
             'username' => 'doesnotexist',
             'password' => 'mypassword',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response->assertUnauthorized();
@@ -77,25 +77,25 @@ class ApiAuthenticationTest extends TestCase
         $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'incorrect1',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'incorrect2',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'incorrect3',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response = $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'incorrect4',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response->assertStatus(429);
@@ -116,13 +116,13 @@ class ApiAuthenticationTest extends TestCase
             'trustPath' => '{"type":"Webauthn\\TrustPath\\EmptyTrustPath"}',
             'aaguid' => '00000000-0000-0000-0000-000000000000',
             'credentialPublicKey' => 'xyz',
-            'counter' => 0
+            'counter' => 0,
         ]);
 
         $response = $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'mypassword',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response->assertForbidden();
@@ -137,13 +137,13 @@ class ApiAuthenticationTest extends TestCase
         $secret = app('pragmarx.google2fa')->generateSecretKey();
         $this->user->update([
             'two_factor_secret' => $secret,
-            'two_factor_enabled' => true
+            'two_factor_enabled' => true,
         ]);
 
         $response = $this->json('POST', '/api/auth/login', [
             'username' => 'johndoe',
             'password' => 'mypassword',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response->assertStatus(422);
@@ -158,7 +158,7 @@ class ApiAuthenticationTest extends TestCase
         ])->json('POST', '/api/auth/mfa', [
             'mfa_key' => $mfaKey,
             'otp' => '000000',
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response2->assertUnauthorized();
@@ -169,7 +169,7 @@ class ApiAuthenticationTest extends TestCase
         ])->json('POST', '/api/auth/mfa', [
             'mfa_key' => $mfaKey,
             'otp' => app('pragmarx.google2fa')->getCurrentOtp($secret),
-            'device_name' => 'Firefox'
+            'device_name' => 'Firefox',
         ]);
 
         $response3->assertSuccessful();

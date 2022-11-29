@@ -22,7 +22,7 @@ class LoginTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create([
-            'password' => Hash::make('mypassword')
+            'password' => Hash::make('mypassword'),
         ]);
         $this->user->recipients()->save($this->user->defaultRecipient);
 
@@ -36,7 +36,7 @@ class LoginTest extends TestCase
     {
         $response = $this->post('/login', [
             'username' => 'johndoe',
-            'password' => 'mypassword'
+            'password' => 'mypassword',
         ]);
 
         $response
@@ -48,12 +48,12 @@ class LoginTest extends TestCase
     public function user_can_login_with_any_username()
     {
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->post('/login', [
             'username' => $username->username,
-            'password' => 'mypassword'
+            'password' => 'mypassword',
         ]);
 
         $response
@@ -67,12 +67,12 @@ class LoginTest extends TestCase
         $this->user->update([
             'two_factor_enabled' => true,
             'two_factor_secret' => 'secret',
-            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
         ]);
 
         $response = $this->post('/login', [
             'username' => 'johndoe',
-            'password' => 'mypassword'
+            'password' => 'mypassword',
         ]);
 
         $response
@@ -88,7 +88,7 @@ class LoginTest extends TestCase
         $backupCodeView->assertSee('Login Using 2FA Backup Code');
 
         $backupCodeLogin = $this->post('/login/backup-code', [
-            'backup_code' => $code
+            'backup_code' => $code,
         ]);
 
         $backupCodeLogin
@@ -106,7 +106,7 @@ class LoginTest extends TestCase
         $recipient = $this->user->recipients[0];
 
         $this->post('/username/email', [
-            'email' => $recipient->email
+            'email' => $recipient->email,
         ]);
 
         Notification::assertSentTo(
@@ -123,7 +123,7 @@ class LoginTest extends TestCase
         Notification::fake();
 
         $this->post('/username/email', [
-            'email' => 'doesnotexist@example.com'
+            'email' => 'doesnotexist@example.com',
         ]);
 
         Notification::assertNothingSent();

@@ -26,7 +26,7 @@ class ShowUsernamesTest extends TestCase
     public function user_can_view_usernames_from_the_usernames_page()
     {
         $usernames = Username::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->get('/usernames');
@@ -41,15 +41,15 @@ class ShowUsernamesTest extends TestCase
     {
         $a = Username::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
+            'created_at' => Carbon::now()->subDays(15),
         ]);
         $b = Username::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
+            'created_at' => Carbon::now()->subDays(5),
         ]);
         $c = Username::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+            'created_at' => Carbon::now()->subDays(10),
         ]);
 
         $response = $this->get('/usernames');

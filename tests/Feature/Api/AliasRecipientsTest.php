@@ -22,16 +22,16 @@ class AliasRecipientsTest extends TestCase
     public function user_can_attach_recipient_to_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
-            'recipient_ids' => [$recipient->id]
+            'recipient_ids' => [$recipient->id],
         ]);
 
         $response->assertStatus(200);
@@ -43,24 +43,24 @@ class AliasRecipientsTest extends TestCase
     public function user_can_attach_multiple_recipients_to_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient1 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient2 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient3 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
-            'recipient_ids' => [$recipient1->id, $recipient2->id, $recipient3->id]
+            'recipient_ids' => [$recipient1->id, $recipient2->id, $recipient3->id],
         ]);
 
         $response->assertStatus(200);
@@ -71,29 +71,29 @@ class AliasRecipientsTest extends TestCase
     public function user_can_update_existing_recipients_for_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient1 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient1
+            'recipient' => $recipient1,
         ]);
 
         $recipient2 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient3 = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
-            'recipient_ids' => [$recipient2->id, $recipient3->id]
+            'recipient_ids' => [$recipient2->id, $recipient3->id],
         ]);
 
         $response->assertStatus(200);
@@ -104,17 +104,17 @@ class AliasRecipientsTest extends TestCase
     public function user_cannot_attach_unverified_recipient_to_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $unverifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
-            'recipient_ids' => [$unverifiedRecipient->id]
+            'recipient_ids' => [$unverifiedRecipient->id],
         ]);
 
         $response->assertStatus(422);
@@ -125,16 +125,16 @@ class AliasRecipientsTest extends TestCase
     public function user_cannot_attach_more_than_allowed_recipients_to_alias()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipients = Recipient::factory()->count(11)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->json('POST', '/api/v1/alias-recipients', [
             'alias_id' => $alias->id,
-            'recipient_ids' => $recipients->pluck('id')
+            'recipient_ids' => $recipients->pluck('id'),
         ]);
 
         $response->assertStatus(422);
@@ -145,16 +145,16 @@ class AliasRecipientsTest extends TestCase
     public function alias_recipient_record_is_deleted_if_recipient_is_deleted()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient
+            'recipient' => $recipient,
         ]);
 
         $this->assertEquals($alias->recipients[0]->email, $recipient->email);
@@ -163,7 +163,7 @@ class AliasRecipientsTest extends TestCase
         $this->assertCount(0, AliasRecipient::all());
         $this->assertDatabaseMissing('alias_recipients', [
             'alias_id' => $alias->id,
-            'recipient_id' => $recipient->id
+            'recipient_id' => $recipient->id,
         ]);
     }
 }

@@ -31,8 +31,8 @@ class EditDefaultRecipientRequest extends FormRequest
                 'max:254',
                 'confirmed',
                 new RegisterUniqueRecipient(),
-                'not_in:'.$this->user()->email
-            ]
+                'not_in:'.$this->user()->email,
+            ],
         ];
     }
 
@@ -44,7 +44,7 @@ class EditDefaultRecipientRequest extends FormRequest
     public function messages()
     {
         return [
-            'email.not_in' => 'That email is the same as the current one.'
+            'email.not_in' => 'That email is the same as the current one.',
         ];
     }
 }

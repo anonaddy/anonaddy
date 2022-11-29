@@ -44,8 +44,11 @@ class ReceiveEmail extends Command
      * @var string
      */
     protected $description = 'Receive email from postfix pipe';
+
     protected $parser;
+
     protected $senderFrom;
+
     protected $size;
 
     /**
@@ -87,7 +90,7 @@ class ReceiveEmail extends Command
                 }
 
                 // First determine if the alias already exists in the database
-                if ($alias = Alias::firstWhere('email', $recipient['local_part'] . '@' . $recipient['domain'])) {
+                if ($alias = Alias::firstWhere('email', $recipient['local_part'].'@'.$recipient['domain'])) {
                     $user = $alias->user;
 
                     if ($alias->aliasable_id) {
@@ -101,17 +104,18 @@ class ReceiveEmail extends Command
                     })
                     ->first();
 
-                    if (!empty($parentDomain)) {
+                    if (! empty($parentDomain)) {
                         // It is standard or username alias
-                        $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.' . $parentDomain)); // e.g. johndoe
+                        $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain)); // e.g. johndoe
 
                         if ($subdomain === 'unsubscribe') {
                             $this->handleUnsubscribe($recipient);
+
                             continue;
                         }
 
                         // Check if this is an username or standard alias
-                        if (!empty($subdomain)) {
+                        if (! empty($subdomain)) {
                             $username = Username::where('username', $subdomain)->first();
                             $user = $username->user;
                             $aliasable = $username;
@@ -124,13 +128,13 @@ class ReceiveEmail extends Command
                         }
                     }
 
-                    if (!isset($user) && !empty(config('anonaddy.admin_username'))) {
+                    if (! isset($user) && ! empty(config('anonaddy.admin_username'))) {
                         $user = Username::where('username', config('anonaddy.admin_username'))->first()?->user;
                     }
                 }
 
                 // If there is still no user or the user has no verified default recipient then continue.
-                if (!isset($user) || !$user->hasVerifiedDefaultRecipient()) {
+                if (! isset($user) || ! $user->hasVerifiedDefaultRecipient()) {
                     continue;
                 }
 
@@ -203,11 +207,11 @@ class ReceiveEmail extends Command
     {
         if (is_null($alias)) {
             $alias = $user->aliases()->create([
-                'email' => $recipient['local_part'] . '@' . $recipient['domain'],
+                'email' => $recipient['local_part'].'@'.$recipient['domain'],
                 'local_part' => $recipient['local_part'],
                 'domain' => $recipient['domain'],
                 'aliasable_id' => $aliasable?->id,
-                'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
+                'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null,
             ]);
 
             // Hydrate all alias fields
@@ -228,11 +232,11 @@ class ReceiveEmail extends Command
         if (is_null($alias)) {
             // This is a new alias
             $alias = new Alias([
-                'email' => $recipient['local_part'] . '@' . $recipient['domain'],
+                'email' => $recipient['local_part'].'@'.$recipient['domain'],
                 'local_part' => $recipient['local_part'],
                 'domain' => $recipient['domain'],
                 'aliasable_id' => $aliasable?->id,
-                'aliasable_type' => $aliasable ? 'App\\Models\\' . class_basename($aliasable) : null
+                'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null,
             ]);
 
             if ($user->hasExceededNewAliasLimit()) {
@@ -248,11 +252,11 @@ class ReceiveEmail extends Command
 
                 $recipientIds = $user
                     ->recipients()
-                    ->select(['id','email_verified_at'])
+                    ->select(['id', 'email_verified_at'])
                     ->oldest()
                     ->get()
                     ->filter(function ($item, $key) use ($keys) {
-                        return in_array($key + 1, $keys) && !is_null($item['email_verified_at']);
+                        return in_array($key + 1, $keys) && ! is_null($item['email_verified_at']);
                     })
                     ->pluck('id')
                     ->take(10)
@@ -296,7 +300,7 @@ class ReceiveEmail extends Command
                 // First check in DB
                 $postfixQueueId = PostfixQueueId::firstWhere('queue_id', strtoupper($dsn['X-postfix-queue-id']));
 
-                if (!$postfixQueueId) {
+                if (! $postfixQueueId) {
                     exit(0);
                 }
 
@@ -332,7 +336,7 @@ class ReceiveEmail extends Command
 
             // Try to find a user from the bounced email address
             if ($recipient = Recipient::select(['id', 'user_id', 'email', 'email_verified_at'])->get()->firstWhere('email', $bouncedEmailAddress)) {
-                if (!isset($user)) {
+                if (! isset($user)) {
                     $user = $recipient->user;
                 }
             }
@@ -350,11 +354,11 @@ class ReceiveEmail extends Command
                 if (isset($undeliveredMessageHeaders['Feedback-id'])) {
                     $parts = explode(':', $undeliveredMessageHeaders['Feedback-id']);
 
-                    if (in_array($parts[0], ['F', 'R', 'S']) && !isset($alias)) {
+                    if (in_array($parts[0], ['F', 'R', 'S']) && ! isset($alias)) {
                         $alias = Alias::find($parts[1]);
 
                         // Find the user from the alias if we don't have it from the recipient
-                        if (!isset($user) && isset($alias)) {
+                        if (! isset($user) && isset($alias)) {
                             $user = $alias->user;
                         }
                     }
@@ -385,7 +389,7 @@ class ReceiveEmail extends Command
                     'email_type' => $parts[0] ?? null,
                     'status' => $dsn['Status'] ?? null,
                     'code' => $diagnosticCode,
-                    'attempted_at' => $postfixQueueId->created_at
+                    'attempted_at' => $postfixQueueId->created_at,
                 ]);
 
                 if (isset($alias)) {
@@ -452,7 +456,7 @@ class ReceiveEmail extends Command
                 'email' => $item,
                 'local_part' => strtolower($this->option('local_part')[$key]),
                 'extension' => $this->option('extension')[$key],
-                'domain' => strtolower($this->option('domain')[$key])
+                'domain' => strtolower($this->option('domain')[$key]),
             ];
         });
     }
@@ -472,7 +476,7 @@ class ReceiveEmail extends Command
                 try {
                     mailparse_rfc822_parse_addresses($value);
                 } catch (\Exception $e) {
-                    $part['headers']['from'] = str_replace("\\", "", $part['headers']['from']);
+                    $part['headers']['from'] = str_replace('\\', '', $part['headers']['from']);
                     $mimePart->setPart($part);
                 }
             }
@@ -483,7 +487,7 @@ class ReceiveEmail extends Command
         if ($file == 'stream') {
             $fd = fopen('php://stdin', 'r');
             $this->rawEmail = '';
-            while (!feof($fd)) {
+            while (! feof($fd)) {
                 $this->rawEmail .= fread($fd, 1024);
             }
             fclose($fd);
@@ -491,6 +495,7 @@ class ReceiveEmail extends Command
         } else {
             $parser->setPath($file);
         }
+
         return $parser;
     }
 
@@ -508,7 +513,7 @@ class ReceiveEmail extends Command
                     $result[$key] = trim($matches[2]);
                 }
             } elseif (preg_match('/^\s+(.+)\s*/', $line) && isset($key)) {
-                $result[$key] .= ' ' . $line;
+                $result[$key] .= ' '.$line;
             }
         }
 
@@ -521,7 +526,7 @@ class ReceiveEmail extends Command
             return 'hard';
         }
 
-        if (preg_match("/(:?spam|unsolicited|blacklisting|blacklisted|blacklist|554|mail content denied|reject for policy reason|mail rejected by destination domain|security issue)/i", $code)) {
+        if (preg_match('/(:?spam|unsolicited|blacklisting|blacklisted|blacklist|554|mail content denied|reject for policy reason|mail rejected by destination domain|security issue)/i', $code)) {
             return 'spam';
         }
 

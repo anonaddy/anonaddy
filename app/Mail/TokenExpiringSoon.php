@@ -16,6 +16,7 @@ class TokenExpiringSoon extends Mailable implements ShouldQueue, ShouldBeEncrypt
     use SerializesModels;
 
     protected $user;
+
     protected $recipient;
 
     /**
@@ -37,11 +38,11 @@ class TokenExpiringSoon extends Mailable implements ShouldQueue, ShouldBeEncrypt
     public function build()
     {
         return $this
-            ->subject("Your AnonAddy API token expires soon")
+            ->subject('Your AnonAddy API token expires soon')
             ->markdown('mail.token_expiring_soon', [
                 'user' => $this->user,
                 'recipientId' => $this->recipient->id,
-                'fingerprint' => $this->recipient->should_encrypt ? $this->recipient->fingerprint : null
+                'fingerprint' => $this->recipient->should_encrypt ? $this->recipient->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

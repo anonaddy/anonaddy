@@ -19,7 +19,7 @@ class WebauthnController extends ControllersWebauthnController
 {
     public function index()
     {
-        return user()->webauthnKeys()->latest()->select(['id','name','enabled','created_at'])->get()->values();
+        return user()->webauthnKeys()->latest()->select(['id', 'name', 'enabled', 'created_at'])->get()->values();
     }
 
     /**
@@ -45,7 +45,7 @@ class WebauthnController extends ControllersWebauthnController
     public function store(WebauthnRegisterRequest $request)
     {
         $request->validate([
-            'name' => 'required|string|max:50'
+            'name' => 'required|string|max:50',
         ]);
 
         try {
@@ -56,7 +56,7 @@ class WebauthnController extends ControllersWebauthnController
             );
 
             user()->update([
-                'two_factor_enabled' => false
+                'two_factor_enabled' => false,
             ]);
 
             return $this->redirectAfterSuccessRegister();
@@ -72,7 +72,7 @@ class WebauthnController extends ControllersWebauthnController
     /**
      * Return the redirect destination after a successfull register.
      *
-     * @param WebauthnKey $webauthnKey
+     * @param  WebauthnKey  $webauthnKey
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     protected function redirectAfterSuccessRegister()
@@ -83,7 +83,7 @@ class WebauthnController extends ControllersWebauthnController
         }
 
         user()->update([
-            'two_factor_backup_code' => bcrypt($code = Str::random(40))
+            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
         ]);
 
         return Redirect::intended('/settings')->with(['backupCode' => $code]);
@@ -92,7 +92,7 @@ class WebauthnController extends ControllersWebauthnController
     /**
      * Remove an existing Webauthn key.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, $webauthnKeyId)

@@ -37,7 +37,7 @@ class RegistrationTest extends TestCase
             ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('usernames', [
-            'username' => 'johndoe'
+            'username' => 'johndoe',
         ]);
 
         $user = Username::where('username', 'johndoe')->first()->user;
@@ -62,7 +62,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'Ω'
+            'username' => 'Ω',
         ]);
     }
 
@@ -106,7 +106,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'john_doe'
+            'username' => 'john_doe',
         ]);
     }
 
@@ -123,7 +123,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['email']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'johndoe'
+            'username' => 'johndoe',
         ]);
     }
 
@@ -134,12 +134,12 @@ class RegistrationTest extends TestCase
 
         Recipient::factory()->create([
             'user_id' => $user->id,
-            'email' => 'johndoe@example.com'
+            'email' => 'johndoe@example.com',
         ]);
 
         Username::factory()->create([
             'user_id' => $user->id,
-            'username' => 'johndoe'
+            'username' => 'johndoe',
         ]);
 
         $response = $this->post('/register', [
@@ -160,7 +160,7 @@ class RegistrationTest extends TestCase
 
         Username::factory()->create([
             'user_id' => $user->id,
-            'username' => 'johndoe'
+            'username' => 'johndoe',
         ]);
 
         $response = $this->post('/register', [
@@ -188,7 +188,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'www'
+            'username' => 'www',
         ]);
     }
 
@@ -206,7 +206,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'www'
+            'username' => 'www',
         ]);
     }
 
@@ -226,7 +226,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'johndoe'
+            'username' => 'johndoe',
         ]);
     }
 
@@ -246,7 +246,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
 
         $this->assertDatabaseMissing('users', [
-            'username' => 'johndoe'
+            'username' => 'johndoe',
         ]);
     }
 }

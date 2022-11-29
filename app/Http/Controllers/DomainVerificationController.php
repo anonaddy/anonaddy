@@ -17,7 +17,7 @@ class DomainVerificationController extends Controller
         if (! $domain->checkMxRecords()) {
             return response()->json([
                 'success' => false,
-                'message' => 'MX record not found or does not have correct priority. This could be due to DNS caching, please try again later.'
+                'message' => 'MX record not found or does not have correct priority. This could be due to DNS caching, please try again later.',
             ]);
         }
 

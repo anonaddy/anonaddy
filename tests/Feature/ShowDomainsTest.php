@@ -26,7 +26,7 @@ class ShowDomainsTest extends TestCase
     public function user_can_view_domains_from_the_domains_page()
     {
         $domains = Domain::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->get('/domains');
@@ -41,15 +41,15 @@ class ShowDomainsTest extends TestCase
     {
         $a = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
+            'created_at' => Carbon::now()->subDays(15),
         ]);
         $b = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
+            'created_at' => Carbon::now()->subDays(5),
         ]);
         $c = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+            'created_at' => Carbon::now()->subDays(10),
         ]);
 
         $response = $this->get('/domains');
@@ -66,7 +66,7 @@ class ShowDomainsTest extends TestCase
     {
         $domain = Domain::factory()->create([
             'user_id' => $this->user->id,
-            'domain' => 'example.com'
+            'domain' => 'example.com',
         ]);
 
         $response = $this->get('/domains/'.$domain->id.'/check-sending');

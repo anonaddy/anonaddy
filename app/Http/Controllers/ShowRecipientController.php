@@ -9,7 +9,7 @@ class ShowRecipientController extends Controller
         $recipients = user()->recipients()->with([
             'aliases:id,aliasable_id,email',
             'domainsUsingAsDefault.aliases:id,aliasable_id,email',
-            'usernamesUsingAsDefault.aliases:id,aliasable_id,email'
+            'usernamesUsingAsDefault.aliases:id,aliasable_id,email',
         ])->latest()->get();
 
         $recipients->each(function ($recipient) {
@@ -38,7 +38,7 @@ class ShowRecipientController extends Controller
             'recipients' => $recipients,
             'aliasesUsingDefault' => user()->aliasesUsingDefault()->take(5)->get(),
             'aliasesUsingDefaultCount' => user()->aliasesUsingDefault()->count(),
-            'user' => user()->load('defaultUsername')
+            'user' => user()->load('defaultUsername'),
         ]);
     }
 }

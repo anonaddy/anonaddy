@@ -10,7 +10,7 @@ class ShowRuleController extends Controller
             'rules' => user()
                 ->rules()
                 ->orderBy('order')
-                ->get()
+                ->get(),
         ]);
     }
 }

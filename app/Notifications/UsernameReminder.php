@@ -33,11 +33,11 @@ class UsernameReminder extends Notification implements ShouldQueue, ShouldBeEncr
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject("AnonAddy Username Reminder")
+            ->subject('AnonAddy Username Reminder')
             ->markdown('mail.username_reminder', [
                 'username' => $notifiable->user->username,
                 'recipientId' => $notifiable->id,
-                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
+                'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

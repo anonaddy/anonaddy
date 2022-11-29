@@ -32,8 +32,8 @@ class StoreRecipientRequest extends FormRequest
                 'max:254',
                 'email:rfc',
                 new UniqueRecipient(),
-                new NotLocalRecipient()
-            ]
+                new NotLocalRecipient(),
+            ],
         ];
     }
 }

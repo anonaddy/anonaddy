@@ -29,7 +29,7 @@ class ShowFailedDeliveriesTest extends TestCase
     public function user_can_view_failed_deliveries_from_the_failed_deliveries_page()
     {
         $failedDeliveries = FailedDelivery::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $response = $this->get('/failed-deliveries');
@@ -44,15 +44,15 @@ class ShowFailedDeliveriesTest extends TestCase
     {
         $a = FailedDelivery::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
+            'created_at' => Carbon::now()->subDays(15),
         ]);
         $b = FailedDelivery::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
+            'created_at' => Carbon::now()->subDays(5),
         ]);
         $c = FailedDelivery::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+            'created_at' => Carbon::now()->subDays(10),
         ]);
 
         $response = $this->get('/failed-deliveries');

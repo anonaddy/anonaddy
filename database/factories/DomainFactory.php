@@ -23,7 +23,7 @@ class DomainFactory extends Factory
     {
         return [
             'user_id' => $this->faker->uuid,
-            'domain' => $this->faker->domainName.$this->faker->randomNumber(3)
+            'domain' => $this->faker->domainName.$this->faker->randomNumber(3),
         ];
     }
 }

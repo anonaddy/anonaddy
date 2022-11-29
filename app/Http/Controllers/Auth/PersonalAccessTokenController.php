@@ -18,7 +18,7 @@ class PersonalAccessTokenController extends Controller
     {
         // day, week, month, year or null
         if ($request->expiration) {
-            $method = "add".ucfirst($request->expiration);
+            $method = 'add'.ucfirst($request->expiration);
             $expiration = now()->{$method}();
         } else {
             $expiration = null;
@@ -30,7 +30,7 @@ class PersonalAccessTokenController extends Controller
         return [
             'token' => new PersonalAccessTokenResource($token->accessToken),
             'accessToken' => $accessToken,
-            'qrCode' => (new QRCode())->render(config('app.url') . "|" . $accessToken)
+            'qrCode' => (new QRCode())->render(config('app.url').'|'.$accessToken),
         ];
     }
 

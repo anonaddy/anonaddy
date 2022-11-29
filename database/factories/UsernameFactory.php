@@ -23,7 +23,7 @@ class UsernameFactory extends Factory
     {
         return [
             'user_id' => $this->faker->uuid,
-            'username' => $this->faker->userName.$this->faker->randomNumber(3)
+            'username' => $this->faker->userName.$this->faker->randomNumber(3),
         ];
     }
 }

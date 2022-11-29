@@ -10,7 +10,7 @@ trait HasEncryptedAttributes
     {
         $value = parent::getAttribute($key);
 
-        if (!is_null($value) && in_array($key, $this->encrypted)) {
+        if (! is_null($value) && in_array($key, $this->encrypted)) {
             $value = Crypt::decrypt($value);
         }
 
@@ -19,7 +19,7 @@ trait HasEncryptedAttributes
 
     public function setAttribute($key, $value)
     {
-        if (!is_null($value) && in_array($key, $this->encrypted)) {
+        if (! is_null($value) && in_array($key, $this->encrypted)) {
             $value = Crypt::encrypt($value);
         }
 
@@ -35,6 +35,7 @@ trait HasEncryptedAttributes
                 $attributes[$key] = Crypt::decrypt($attributes[$key]);
             }
         }
+
         return $attributes;
     }
 }

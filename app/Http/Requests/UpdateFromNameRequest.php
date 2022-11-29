@@ -24,7 +24,7 @@ class UpdateFromNameRequest extends FormRequest
     public function rules()
     {
         return [
-            'from_name' => 'nullable|string|max:50'
+            'from_name' => 'nullable|string|max:50',
         ];
     }
 }

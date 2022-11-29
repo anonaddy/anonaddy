@@ -38,19 +38,19 @@ class SettingsTest extends TestCase
     public function user_can_update_default_recipient()
     {
         $newDefaultRecipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
 
         $response = $this->post('/settings/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id
+            'default_recipient' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'default_recipient_id' => $newDefaultRecipient->id
+            'default_recipient_id' => $newDefaultRecipient->id,
         ]);
     }
 
@@ -59,13 +59,13 @@ class SettingsTest extends TestCase
     {
         $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
 
         $response = $this->post('/settings/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id
+            'default_recipient' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(404);
@@ -78,13 +78,13 @@ class SettingsTest extends TestCase
         $defaultAliasDomain = $this->user->username.'.anonaddy.me';
 
         $response = $this->post('/settings/default-alias-domain', [
-            'domain' => $defaultAliasDomain
+            'domain' => $defaultAliasDomain,
         ]);
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'default_alias_domain' => $defaultAliasDomain
+            'default_alias_domain' => $defaultAliasDomain,
         ]);
     }
 
@@ -92,14 +92,14 @@ class SettingsTest extends TestCase
     public function user_cannot_update_default_alias_domain_if_invalid()
     {
         $response = $this->post('/settings/default-alias-domain', [
-            'domain' => 'invalid.anonaddy.me'
+            'domain' => 'invalid.anonaddy.me',
         ]);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['domain']);
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'default_alias_domain' => null
+            'default_alias_domain' => null,
         ]);
     }
 
@@ -109,13 +109,13 @@ class SettingsTest extends TestCase
         $defaultAliasFormat = 'random_words';
 
         $response = $this->post('/settings/default-alias-format', [
-            'format' => $defaultAliasFormat
+            'format' => $defaultAliasFormat,
         ]);
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'default_alias_format' => $defaultAliasFormat
+            'default_alias_format' => $defaultAliasFormat,
         ]);
     }
 
@@ -123,14 +123,14 @@ class SettingsTest extends TestCase
     public function user_cannot_update_default_alias_format_if_invalid()
     {
         $response = $this->post('/settings/default-alias-format', [
-            'format' => 'invalid_format'
+            'format' => 'invalid_format',
         ]);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['format']);
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'default_alias_format' => null
+            'default_alias_format' => null,
         ]);
     }
 
@@ -140,7 +140,7 @@ class SettingsTest extends TestCase
         $this->assertNull($this->user->from_name);
 
         $response = $this->post('/settings/from-name', [
-            'from_name' => 'John Doe'
+            'from_name' => 'John Doe',
         ]);
 
         $response->assertStatus(302);
@@ -153,7 +153,7 @@ class SettingsTest extends TestCase
         $this->assertNull($this->user->from_name);
 
         $response = $this->post('/settings/from-name', [
-            'from_name' => ''
+            'from_name' => '',
         ]);
 
         $response->assertStatus(302);
@@ -166,7 +166,7 @@ class SettingsTest extends TestCase
         $this->assertNull($this->user->email_subject);
 
         $response = $this->post('/settings/email-subject', [
-            'email_subject' => 'The subject'
+            'email_subject' => 'The subject',
         ]);
 
         $response->assertStatus(302);
@@ -179,7 +179,7 @@ class SettingsTest extends TestCase
         $this->assertNull($this->user->email_subject);
 
         $response = $this->post('/settings/email-subject', [
-            'email_subject' => ''
+            'email_subject' => '',
         ]);
 
         $response->assertStatus(302);
@@ -192,7 +192,7 @@ class SettingsTest extends TestCase
         $this->assertEquals('top', $this->user->banner_location);
 
         $response = $this->post('/settings/banner-location', [
-            'banner_location' => 'bottom'
+            'banner_location' => 'bottom',
         ]);
 
         $response->assertStatus(302);
@@ -205,7 +205,7 @@ class SettingsTest extends TestCase
         $this->assertEquals('top', $this->user->banner_location);
 
         $response = $this->post('/settings/banner-location', [
-            'banner_location' => 'side'
+            'banner_location' => 'side',
         ]);
 
         $response->assertStatus(302);
@@ -220,7 +220,7 @@ class SettingsTest extends TestCase
         $this->assertFalse($this->user->use_reply_to);
 
         $response = $this->post('/settings/use-reply-to/', [
-            'use_reply_to' => true
+            'use_reply_to' => true,
         ]);
 
         $response->assertStatus(302);
@@ -235,7 +235,7 @@ class SettingsTest extends TestCase
         $this->assertTrue($this->user->use_reply_to);
 
         $response = $this->post('/settings/use-reply-to/', [
-            'use_reply_to' => false
+            'use_reply_to' => false,
         ]);
 
         $response->assertStatus(302);
@@ -246,7 +246,7 @@ class SettingsTest extends TestCase
     public function user_can_generate_new_backup_code()
     {
         $this->user->update([
-            'two_factor_backup_code' => bcrypt(Str::random(40))
+            'two_factor_backup_code' => bcrypt(Str::random(40)),
         ]);
 
         $currentBackupCode = $this->user->two_factor_backup_code;
@@ -267,12 +267,12 @@ class SettingsTest extends TestCase
 
         $this->user->update(['password' => Hash::make('mypassword')]);
 
-        if (!Hash::check('mypassword', $this->user->password)) {
+        if (! Hash::check('mypassword', $this->user->password)) {
             $this->fail('Password does not match');
         }
 
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $uuidAlias = Alias::factory()->create([
@@ -283,42 +283,41 @@ class SettingsTest extends TestCase
             'emails_forwarded' => 10,
             'emails_blocked' => 1,
             'emails_replied' => 2,
-            'emails_sent' => 3
+            'emails_sent' => 3,
         ]);
         $uuidAlias->update(['local_part' => $uuidAlias->id]);
 
-
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient
+            'recipient' => $recipient,
         ]);
 
         $domain = Domain::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $aliasWithCustomDomain = Alias::factory()->create([
             'user_id' => $this->user->id,
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Models\Domain'
+            'aliasable_type' => 'App\Models\Domain',
         ]);
 
         $username = Username::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $aliasWithUsername = Alias::factory()->create([
             'user_id' => $this->user->id,
             'aliasable_id' => $username->id,
-            'aliasable_type' => 'App\Models\Username'
+            'aliasable_type' => 'App\Models\Username',
         ]);
 
         $response = $this->post('/settings/account', [
-            'current_password_delete' => 'mypassword'
+            'current_password_delete' => 'mypassword',
         ]);
 
         $response->assertRedirect('/login');
@@ -335,7 +334,7 @@ class SettingsTest extends TestCase
 
         $this->assertDatabaseMissing('aliases', [
             'id' => $alias->id,
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $this->assertDatabaseHas('aliases', [
@@ -347,21 +346,21 @@ class SettingsTest extends TestCase
             'emails_blocked' => 0,
             'emails_replied' => 0,
             'emails_sent' => 0,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         $this->assertDatabaseMissing('aliases', [
             'id' => $aliasWithCustomDomain->id,
             'user_id' => $this->user->id,
             'aliasable_id' => $domain->id,
-            'aliasable_type' => 'App\Models\Domain'
+            'aliasable_type' => 'App\Models\Domain',
         ]);
 
         $this->assertDatabaseMissing('aliases', [
             'id' => $aliasWithUsername->id,
             'user_id' => $this->user->id,
             'aliasable_id' => $username->id,
-            'aliasable_type' => 'App\Models\Username'
+            'aliasable_type' => 'App\Models\Username',
         ]);
 
         $this->assertDatabaseMissing('recipients', [
@@ -376,7 +375,7 @@ class SettingsTest extends TestCase
 
         $this->assertDatabaseMissing('usernames', [
             'id' => $username->id,
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $this->assertEquals(DeletedUsername::first()->username, $this->user->username);
@@ -390,12 +389,12 @@ class SettingsTest extends TestCase
 
         $this->user->update(['password' => Hash::make('mypassword')]);
 
-        if (!Hash::check('mypassword', $this->user->password)) {
+        if (! Hash::check('mypassword', $this->user->password)) {
             $this->fail('Password does not match');
         }
 
         $response = $this->post('/settings/account', [
-            'current_password_delete' => 'wrongpassword'
+            'current_password_delete' => 'wrongpassword',
         ]);
 
         $response->assertStatus(302);
@@ -404,29 +403,29 @@ class SettingsTest extends TestCase
         $this->assertNull(DeletedUsername::first());
 
         $this->assertDatabaseHas('users', [
-            'id' => $this->user->id
+            'id' => $this->user->id,
         ]);
 
         $this->assertDatabaseHas('usernames', [
-            'username' => $this->user->username
+            'username' => $this->user->username,
         ]);
     }
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function user_can_download_aliases_export()
     {
         Excel::fake();
 
         Alias::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'deleted_at' => now(),
-            'active' => false
+            'active' => false,
         ]);
 
         Alias::factory()->create();
@@ -436,6 +435,7 @@ class SettingsTest extends TestCase
 
         Excel::assertDownloaded('aliases-'.now()->toDateString().'.csv', function (AliasesExport $export) {
             $this->assertCount(4, $export->collection());
+
             return $export->collection()->contains(function ($alias) {
                 return $alias['user_id'] === $this->user->id;
             });

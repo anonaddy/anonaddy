@@ -26,7 +26,7 @@ class ApiAuthenticationMfaRequest extends FormRequest
         return [
             'mfa_key' => 'required|string|max:500',
             'otp' => 'required|string|min:6|max:6',
-            'device_name' => 'required|string|max:50'
+            'device_name' => 'required|string|max:50',
         ];
     }
 }

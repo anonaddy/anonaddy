@@ -30,7 +30,7 @@ class UserTest extends TestCase
     public function user_can_get_aliases_from_relationship()
     {
         $aliases = Alias::factory()->count(10)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $aliases->assertEquals($this->user->aliases);
@@ -40,7 +40,7 @@ class UserTest extends TestCase
     public function user_can_only_get_their_own_aliases_from_relationship()
     {
         $aliases = Alias::factory()->count(5)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         Alias::factory()->count(10)->create();
@@ -53,19 +53,19 @@ class UserTest extends TestCase
     {
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'emails_forwarded' => 5
+            'emails_forwarded' => 5,
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_forwarded' => 3,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_forwarded' => 2,
-            'active' => false
+            'active' => false,
         ]);
 
         $this->assertEquals(10, $this->user->totalEmailsForwarded());
@@ -76,19 +76,19 @@ class UserTest extends TestCase
     {
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'emails_blocked' => 3
+            'emails_blocked' => 3,
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_blocked' => 4,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_blocked' => 1,
-            'active' => false
+            'active' => false,
         ]);
 
         $this->assertEquals(8, $this->user->totalEmailsBlocked());
@@ -99,19 +99,19 @@ class UserTest extends TestCase
     {
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'emails_replied' => 2
+            'emails_replied' => 2,
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_replied' => 4,
-            'deleted_at' => now()
+            'deleted_at' => now(),
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
             'emails_replied' => 1,
-            'active' => false
+            'active' => false,
         ]);
 
         $this->assertEquals(7, $this->user->totalEmailsReplied());
@@ -121,30 +121,30 @@ class UserTest extends TestCase
     public function user_can_get_aliases_using_default_recipient()
     {
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $aliasNotUsingDefault = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         AliasRecipient::create([
             'alias' => $aliasNotUsingDefault,
-            'recipient' => $recipient
-        ]);
-
-        Alias::factory()->create([
-            'user_id' => $this->user->id
+            'recipient' => $recipient,
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'deleted_at' => now()
         ]);
 
         Alias::factory()->create([
             'user_id' => $this->user->id,
-            'active' => false
+            'deleted_at' => now(),
+        ]);
+
+        Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
         ]);
 
         $this->assertCount(2, $this->user->aliasesUsingDefault);
@@ -158,7 +158,7 @@ class UserTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'bandwidth' => 10485760
+            'bandwidth' => 10485760,
         ]);
 
         $this->assertEquals(10, $this->user->bandwidth_mb);
@@ -171,7 +171,7 @@ class UserTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'bandwidth' => 7324019
+            'bandwidth' => 7324019,
         ]);
 
         $this->assertEquals(6.98, $this->user->bandwidth_mb);
@@ -190,7 +190,7 @@ class UserTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'bandwidth' => 100943820
+            'bandwidth' => 100943820,
         ]);
 
         $this->assertTrue($this->user->nearBandwidthLimit());

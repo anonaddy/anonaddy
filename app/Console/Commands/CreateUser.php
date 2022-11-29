@@ -49,40 +49,41 @@ class CreateUser extends Command
     {
         $validator = Validator::make([
             'username' => $this->argument('username'),
-            'email' => $this->argument('email')], [
-            'username' => [
-                'required',
-                'regex:/^[a-zA-Z0-9]*$/',
-                'max:20',
-                'unique:usernames,username',
-                new NotDeletedUsername()
-            ],
-            'email' => [
-                'required',
-                'email:rfc,dns',
-                'max:254',
-                new RegisterUniqueRecipient(),
-                new NotLocalRecipient()
-            ],
-        ]);
+            'email' => $this->argument('email'), ], [
+                'username' => [
+                    'required',
+                    'regex:/^[a-zA-Z0-9]*$/',
+                    'max:20',
+                    'unique:usernames,username',
+                    new NotDeletedUsername(),
+                ],
+                'email' => [
+                    'required',
+                    'email:rfc,dns',
+                    'max:254',
+                    new RegisterUniqueRecipient(),
+                    new NotLocalRecipient(),
+                ],
+            ]);
 
         if ($validator->fails()) {
             $errors = $validator->errors();
             foreach ($errors->all() as $message) {
                 $this->error($message);
             }
+
             return 1;
         }
         $userId = Uuid::uuid4();
 
         $recipient = Recipient::create([
             'email' => $this->argument('email'),
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         $username = Username::create([
             'username' => $this->argument('username'),
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         $twoFactor = app('pragmarx.google2fa');
@@ -92,7 +93,7 @@ class CreateUser extends Command
             'default_username_id' => $username->id,
             'default_recipient_id' => $recipient->id,
             'password' => Hash::make($userId),
-            'two_factor_secret' => $twoFactor->generateSecretKey()
+            'two_factor_secret' => $twoFactor->generateSecretKey(),
         ]);
 
         event(new Registered($user));

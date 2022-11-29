@@ -26,7 +26,7 @@ class ApiAuthenticationLoginRequest extends FormRequest
         return [
             'username' => 'required|string',
             'password' => 'required|string',
-            'device_name' => 'required|string|max:50'
+            'device_name' => 'required|string|max:50',
         ];
     }
 }

@@ -10,9 +10,9 @@ class ShowAliasController extends Controller
             ->aliases()
             ->withTrashed()
             ->toBase()
-            ->selectRaw("ifnull(sum(emails_forwarded),0) as forwarded")
-            ->selectRaw("ifnull(sum(emails_blocked),0) as blocked")
-            ->selectRaw("ifnull(sum(emails_replied),0) as replies")
+            ->selectRaw('ifnull(sum(emails_forwarded),0) as forwarded')
+            ->selectRaw('ifnull(sum(emails_blocked),0) as blocked')
+            ->selectRaw('ifnull(sum(emails_replied),0) as replies')
             ->first();
 
         return view('aliases.index', [
@@ -22,7 +22,7 @@ class ShowAliasController extends Controller
                 ->aliases()
                 ->with([
                     'recipients:id,email',
-                    'aliasable.defaultRecipient:id,email'
+                    'aliasable.defaultRecipient:id,email',
                 ])
                 ->latest()
                 ->get(),

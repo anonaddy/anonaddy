@@ -32,7 +32,7 @@ class StoreUsernameRequest extends FormRequest
                 'max:20',
                 'unique:usernames,username',
                 new NotBlacklisted(),
-                new NotDeletedUsername()
+                new NotDeletedUsername(),
             ],
         ];
     }

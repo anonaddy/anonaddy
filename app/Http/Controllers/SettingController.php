@@ -22,13 +22,13 @@ class SettingController extends Controller
             'user' => user(),
             'recipientOptions' => user()->verifiedRecipients,
             'authSecret' => user()->two_factor_secret,
-            'qrCode' => $qrCode
+            'qrCode' => $qrCode,
         ]);
     }
 
     public function destroy(DestroyAccountRequest $request)
     {
-        if (!Hash::check($request->current_password_delete, user()->password)) {
+        if (! Hash::check($request->current_password_delete, user()->password)) {
             return back()->withErrors(['current_password_delete' => 'Incorrect password entered']);
         }
 

@@ -23,7 +23,7 @@ class FailedDeliveryFactory extends Factory
     {
         return [
             'status' => '5.1.1',
-            'code' => $this->faker->sentence(5)
+            'code' => $this->faker->sentence(5),
         ];
     }
 }

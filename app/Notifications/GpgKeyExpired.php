@@ -33,9 +33,9 @@ class GpgKeyExpired extends Notification implements ShouldQueue, ShouldBeEncrypt
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject("Your GPG key has expired on AnonAddy")
+            ->subject('Your GPG key has expired on AnonAddy')
             ->markdown('mail.gpg_key_expired', [
-                'recipient' => $notifiable
+                'recipient' => $notifiable,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

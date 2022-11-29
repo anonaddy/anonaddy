@@ -44,7 +44,7 @@ class CheckDomainsMxValidation extends Command
             try {
                 if (! $domain->checkMxRecords()) {
                     // Notify user via email only if domain's MX previously were valid
-                    if (!is_null($domain->domain_mx_validated_at)) {
+                    if (! is_null($domain->domain_mx_validated_at)) {
                         $domain->user->notify(new DomainMxRecordsInvalid($domain->domain));
                     }
 

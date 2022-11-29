@@ -29,7 +29,7 @@ class ShowAliasesTest extends TestCase
     {
         // Arrange
         $aliases = Alias::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         // Act
@@ -47,15 +47,15 @@ class ShowAliasesTest extends TestCase
         // Arrange
         $a = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(15)
+            'created_at' => Carbon::now()->subDays(15),
         ]);
         $b = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(5)
+            'created_at' => Carbon::now()->subDays(5),
         ]);
         $c = Alias::factory()->create([
             'user_id' => $this->user->id,
-            'created_at' => Carbon::now()->subDays(10)
+            'created_at' => Carbon::now()->subDays(10),
         ]);
 
         // Act
@@ -73,12 +73,12 @@ class ShowAliasesTest extends TestCase
     public function deleted_aliases_are_not_listed()
     {
         Alias::factory()->count(3)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         Alias::factory()->count(2)->create([
             'user_id' => $this->user->id,
-            'deleted_at' => Carbon::now()->subDays(5)
+            'deleted_at' => Carbon::now()->subDays(5),
         ]);
 
         $response = $this->get('/');
@@ -91,16 +91,16 @@ class ShowAliasesTest extends TestCase
     public function aliases_are_listed_with_recipients()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $aliasRecipient = AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient
+            'recipient' => $recipient,
         ]);
 
         $response = $this->get('/');
@@ -114,26 +114,26 @@ class ShowAliasesTest extends TestCase
     public function aliases_are_listed_with_only_verified_recipient_options()
     {
         $alias = Alias::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $recipient = Recipient::factory()->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $unverifiedRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $aliasRecipient = AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $recipient
+            'recipient' => $recipient,
         ]);
 
         AliasRecipient::create([
             'alias' => $alias,
-            'recipient' => $unverifiedRecipient
+            'recipient' => $unverifiedRecipient,
         ]);
 
         $response = $this->get('/');

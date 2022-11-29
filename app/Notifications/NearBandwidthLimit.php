@@ -14,6 +14,7 @@ class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEn
     use Queueable;
 
     protected $month;
+
     protected $reset;
 
     /**
@@ -57,7 +58,7 @@ class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEn
             'month' => $this->month,
             'reset' => $this->reset,
             'recipientId' => $recipient->id,
-            'fingerprint' => $fingerprint
+            'fingerprint' => $fingerprint,
         ])
         ->withSymfonyMessage(function (Email $message) {
             $message->getHeaders()

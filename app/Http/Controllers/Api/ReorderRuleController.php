@@ -14,7 +14,7 @@ class ReorderRuleController extends Controller
             $rule = Rule::findOrFail($id);
 
             $rule->update([
-                'order' => $key
+                'order' => $key,
             ]);
         });
 

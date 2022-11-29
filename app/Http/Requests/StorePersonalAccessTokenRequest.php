@@ -27,14 +27,14 @@ class StorePersonalAccessTokenRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:50'
+                'max:50',
             ],
             'expiration' => [
                 'nullable',
                 'string',
                 'max:5',
-                'in:day,week,month,year'
-            ]
+                'in:day,week,month,year',
+            ],
         ];
     }
 }

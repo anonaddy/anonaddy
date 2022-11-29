@@ -22,13 +22,14 @@ class AliasFactory extends Factory
     public function definition()
     {
         $localPart = $this->faker->userName.$this->faker->randomNumber(2);
+
         return [
             'user_id' => $this->faker->uuid,
             'email' => $localPart.'@'.$this->faker->word.'.'.config('anonaddy.domain'),
             'local_part' => $localPart,
             'domain' => 'johndoe.'.config('anonaddy.domain'),
             'active' => true,
-            'description' => $this->faker->sentence
+            'description' => $this->faker->sentence,
         ];
     }
 }

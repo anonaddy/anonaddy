@@ -24,7 +24,7 @@ class UpdateUsernameRequest extends FormRequest
     public function rules()
     {
         return [
-            'description' => 'nullable|max:200'
+            'description' => 'nullable|max:200',
         ];
     }
 }

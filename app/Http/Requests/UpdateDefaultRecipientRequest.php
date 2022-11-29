@@ -24,7 +24,7 @@ class UpdateDefaultRecipientRequest extends FormRequest
     public function rules()
     {
         return [
-            'default_recipient' => 'required|string'
+            'default_recipient' => 'required|string',
         ];
     }
 }

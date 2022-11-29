@@ -19,8 +19,8 @@ class VerifyWebauthn
     /**
      * Create a Webauthn.
      *
-     * @param \Illuminate\Contracts\Config\Repository $config
-     * @param \Illuminate\Contracts\Auth\Factory $auth
+     * @param  \Illuminate\Contracts\Config\Repository  $config
+     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      */
     public function __construct(AuthFactory $auth)
     {

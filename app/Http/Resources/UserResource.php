@@ -12,10 +12,10 @@ class UserResource extends JsonResource
             ->aliases()
             ->withTrashed()
             ->toBase()
-            ->selectRaw("ifnull(sum(emails_forwarded),0) as forwarded")
-            ->selectRaw("ifnull(sum(emails_blocked),0) as blocked")
-            ->selectRaw("ifnull(sum(emails_replied),0) as replied")
-            ->selectRaw("ifnull(sum(emails_sent),0) as sent")
+            ->selectRaw('ifnull(sum(emails_forwarded),0) as forwarded')
+            ->selectRaw('ifnull(sum(emails_blocked),0) as blocked')
+            ->selectRaw('ifnull(sum(emails_replied),0) as replied')
+            ->selectRaw('ifnull(sum(emails_sent),0) as sent')
             ->first();
 
         return [

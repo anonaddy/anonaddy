@@ -13,7 +13,9 @@ class FailedDeliveryNotification extends Notification implements ShouldQueue, Sh
     use Queueable;
 
     protected $aliasEmail;
+
     protected $originalSender;
+
     protected $originalSubject;
 
     /**
@@ -48,13 +50,13 @@ class FailedDeliveryNotification extends Notification implements ShouldQueue, Sh
     public function toMail($notifiable)
     {
         return (new MailMessage())
-                    ->subject("New failed delivery on AnonAddy")
+                    ->subject('New failed delivery on AnonAddy')
                     ->markdown('mail.failed_delivery_notification', [
                         'aliasEmail' => $this->aliasEmail,
                         'originalSender' => $this->originalSender,
                         'originalSubject' => $this->originalSubject,
                         'recipientId' => $notifiable->id,
-                        'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null
+                        'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
                     ])
                     ->withSymfonyMessage(function ($message) {
                         $message->getHeaders()
