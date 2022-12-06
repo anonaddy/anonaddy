@@ -358,7 +358,7 @@ The average email is about 76800 bytes (75KB), this is roughly equivalent to 7,0
 
 ## What happens if I go over my bandwidth limit in a given month?
 
-If you get close to your limit (over 80%) you'll be sent an email letting you know. If you continue and go over your limit the server will start discarding emails until your bandwidth resets the next month or you upgrade your plan.
+If you get close to your limit (over 80%) you'll be sent an email letting you know. If you continue and go over your limit the server will respond to any delivery attempts to your aliases with the following: `552 5.2.2 Recipient address rejected: User over quota` until your bandwidth resets the next month or you upgrade your plan.
 
 ## Can I login using an additional username?
 

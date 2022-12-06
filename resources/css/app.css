@@ -83,7 +83,7 @@ html {
   @apply overflow-x-auto w-full relative;
 }
 .aliases .vgt-responsive {
-  min-height: 220px;
+  min-height: 260px;
 }
 .vgt-text-disabled {
   @apply text-grey-300;
