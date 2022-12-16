@@ -115,22 +115,11 @@ class OpenPGPEncrypter
 
         $boundary = strtr(base64_encode(random_bytes(6)), '+/', '-_');
 
-        $headers->setHeaderBody('Parameterized', 'Content-Type', 'multipart/signed');
-        $headers->setHeaderParameter('Content-Type', 'micalg', sprintf('pgp-%s', strtolower($this->micalg)));
-        $headers->setHeaderParameter('Content-Type', 'protocol', 'application/pgp-signature');
+        $headers->setHeaderBody('Parameterized', 'Content-Type', 'multipart/encrypted');
+        $headers->setHeaderParameter('Content-Type', 'protocol', 'application/pgp-encrypted');
         $headers->setHeaderParameter('Content-Type', 'boundary', $boundary);
 
         $message->setHeaders($headers);
-
-        if (! $this->signingKey) {
-            foreach ($message->getFrom() as $key => $value) {
-                $this->addSignature($this->getKey($key, 'sign'));
-            }
-        }
-
-        if (! $this->signingKey) {
-            throw new RuntimeException('Signing has been enabled, but no signature has been added. Use autoAddSignature() or addSignature()');
-        }
 
         // If the email does not have any text part then we need to add a text/plain legacy display part
         if ($this->usesProtectedHeaders && is_null($originalMessage->getTextBody())) {
@@ -160,34 +149,10 @@ class OpenPGPEncrypter
         }
 
         // Remove excess trailing newlines (RFC3156 section 5.4)
-        $signedBody = rtrim(implode('', $lines))."\r\n";
+        $originalBody = rtrim(implode('', $lines))."\r\n";
 
-        $signature = $this->pgpSignString($signedBody, $this->signingKey);
-
-        // Fixes DKIM signature incorrect body hash for custom domains
-        $body = "This is an OpenPGP/MIME signed message (RFC 4880 and 3156)\r\n\r\n";
-        $body .= "--{$boundary}\r\n";
-        $body .= $signedBody."\r\n";
-        $body .= "--{$boundary}\r\n";
-        $body .= "Content-Type: application/pgp-signature; name=\"signature.asc\"\r\n";
-        $body .= "Content-Description: OpenPGP digital signature\r\n";
-        $body .= "Content-Disposition: attachment; filename=\"signature.asc\"\r\n\r\n";
-        $body .= $signature."\r\n\r\n";
-        $body .= "--{$boundary}--";
-
-        $signed = sprintf("%s\r\n%s", $message->getHeaders()->get('content-type')->toString(), $body);
-
-        if (! $this->recipientKey) {
-            throw new RuntimeException('Encryption has been enabled, but no recipients have been added. Use autoAddRecipients() or addRecipient()');
-        }
-
-        //Create body from signed message
-        $encryptedBody = $this->pgpEncryptString($signed, $this->recipientKey);
-
-        $headers->setHeaderBody('Parameterized', 'Content-Type', 'multipart/encrypted');
-        $headers->setHeaderParameter('Content-Type', 'micalg', null);
-        $headers->setHeaderParameter('Content-Type', 'protocol', 'application/pgp-encrypted');
-        $headers->setHeaderParameter('Content-Type', 'boundary', $boundary);
+        // Create encrypted body from original message
+        $encryptedBody = $this->pgpEncryptAndSignString($originalBody, $this->recipientKey, $this->signingKey);
 
         // Fixes DKIM signature incorrect body hash for custom domains
         $body = "This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)\r\n\r\n";
@@ -265,65 +230,12 @@ class OpenPGPEncrypter
 
     /**
      * @param $plaintext
-     * @param $keyFingerprint
-     * @return string
-     *
-     * @throws RuntimeException
-     */
-    protected function pgpSignString($plaintext, $keyFingerprint)
-    {
-        if (isset($this->keyPassphrases[$keyFingerprint]) && ! $this->keyPassphrases[$keyFingerprint]) {
-            $passPhrase = $this->keyPassphrases[$keyFingerprint];
-        } else {
-            $passPhrase = null;
-        }
-
-        $this->gnupg->clearsignkeys();
-        $this->gnupg->addsignkey($keyFingerprint, $passPhrase);
-        $this->gnupg->setsignmode(\gnupg::SIG_MODE_DETACH);
-        $this->gnupg->setarmor(1);
-
-        $signed = $this->gnupg->sign($plaintext);
-
-        if ($signed) {
-            return $signed;
-        }
-
-        throw new RuntimeException('Unable to sign message (perhaps the secret key is encrypted with a passphrase?)');
-    }
-
-    /**
-     * @param $plaintext
      * @param $keyFingerprints
      * @return string
      *
      * @throws RuntimeException
      */
-    protected function pgpEncryptString($plaintext, $keyFingerprint)
-    {
-        $this->gnupg->clearencryptkeys();
-
-        $this->gnupg->addencryptkey($keyFingerprint);
-
-        $this->gnupg->setarmor(1);
-
-        $encrypted = $this->gnupg->encrypt($plaintext);
-
-        if ($encrypted) {
-            return $encrypted;
-        }
-
-        throw new RuntimeException('Unable to encrypt message');
-    }
-
-    /**
-     * @param $plaintext
-     * @param $keyFingerprints
-     * @return string
-     *
-     * @throws RuntimeException
-     */
-    protected function pgpEncryptAndSignString($plaintext, $keyFingerprint, $signingKeyFingerprint)
+    protected function pgpEncryptAndSignString($text, $keyFingerprint, $signingKeyFingerprint)
     {
         if (isset($this->keyPassphrases[$signingKeyFingerprint]) && ! $this->keyPassphrases[$signingKeyFingerprint]) {
             $passPhrase = $this->keyPassphrases[$signingKeyFingerprint];
@@ -337,7 +249,7 @@ class OpenPGPEncrypter
         $this->gnupg->addencryptkey($keyFingerprint);
         $this->gnupg->setarmor(1);
 
-        $encrypted = $this->gnupg->encryptsign($plaintext);
+        $encrypted = $this->gnupg->encryptsign($text);
 
         if ($encrypted) {
             return $encrypted;

@@ -189,7 +189,7 @@ return [
     |
     */
 
-    'dkim_selector' => env('ANONADDY_DKIM_SELECTOR'),
+    'dkim_selector' => env('ANONADDY_DKIM_SELECTOR', 'default'),
 
     /*
     |--------------------------------------------------------------------------
