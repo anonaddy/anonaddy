@@ -33,9 +33,17 @@ class RecipientController extends Controller
 
     public function store(StoreRecipientRequest $request)
     {
-        $recipient = user()->recipients()->create(['email' => strtolower($request->email)]);
+        $payload = ['email' => strtolower($request->email)];
 
-        $recipient->sendEmailVerificationNotification();
+        if (config('anonaddy.auto_verify_new_recipients')) {
+            $payload['email_verified_at'] = now();
+        }
+
+        $recipient = user()->recipients()->create($payload);
+
+        if (!config('anonaddy.auto_verify_new_recipients')) {
+            $recipient->sendEmailVerificationNotification();
+        }
 
         return new RecipientResource($recipient->refresh()->load('aliases'));
     }

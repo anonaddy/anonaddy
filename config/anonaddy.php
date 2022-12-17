@@ -193,6 +193,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Auto Verify New Recipients
+    |--------------------------------------------------------------------------
+    |
+    | If enabled, new recipients will be verified automatically
+    |
+    */
+
+    'auto_verify_new_recipients' => env('ANONADDY_AUTO_VERIFY_NEW_RECIPIENTS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Username Blacklist
     |--------------------------------------------------------------------------
     |
