@@ -62,6 +62,21 @@ class RecipientsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_create_auto_verified_recipient()
+    {
+        Bus::fake();
+        config(['anonaddy.auto_verify_new_recipients' => true]);
+
+        $response = $this->json('POST', '/api/v1/recipients', [
+            'email' => 'johndoe@example.com',
+        ]);
+
+        $response->assertCreated();
+        $this->assertNotEmpty(Recipient::find($response->json('data.id'))->email_verified_at);
+        Bus::assertNotDispatched(CustomVerifyEmail::class);
+    }
+
+    /** @test */
     public function user_can_not_create_the_same_recipient()
     {
         Recipient::factory()->create([
