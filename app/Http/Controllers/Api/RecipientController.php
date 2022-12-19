@@ -33,15 +33,15 @@ class RecipientController extends Controller
 
     public function store(StoreRecipientRequest $request)
     {
-        $payload = ['email' => strtolower($request->email)];
+        $data = ['email' => strtolower($request->email)];
 
         if (config('anonaddy.auto_verify_new_recipients')) {
-            $payload['email_verified_at'] = now();
+            $data['email_verified_at'] = now();
         }
 
-        $recipient = user()->recipients()->create($payload);
+        $recipient = user()->recipients()->create($data);
 
-        if (!config('anonaddy.auto_verify_new_recipients')) {
+        if (! config('anonaddy.auto_verify_new_recipients')) {
             $recipient->sendEmailVerificationNotification();
         }
 

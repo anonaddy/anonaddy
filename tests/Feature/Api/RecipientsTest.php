@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Domain;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RecipientsTest extends TestCase
@@ -64,7 +65,10 @@ class RecipientsTest extends TestCase
     /** @test */
     public function user_can_create_auto_verified_recipient()
     {
-        Bus::fake();
+        Notification::fake();
+
+        Notification::assertNothingSent();
+
         config(['anonaddy.auto_verify_new_recipients' => true]);
 
         $response = $this->json('POST', '/api/v1/recipients', [
@@ -72,8 +76,15 @@ class RecipientsTest extends TestCase
         ]);
 
         $response->assertCreated();
-        $this->assertNotEmpty(Recipient::find($response->json('data.id'))->email_verified_at);
-        Bus::assertNotDispatched(CustomVerifyEmail::class);
+
+        $recipient = Recipient::find($response->json('data.id'));
+
+        $this->assertNotEmpty($recipient->email_verified_at);
+
+        Notification::assertNotSentTo(
+            $recipient,
+            CustomVerifyEmail::class
+        );
     }
 
     /** @test */
