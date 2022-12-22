@@ -11,7 +11,7 @@ dayjs.extend(utc)
 
 import { createApp } from 'vue'
 
-import Clipboard from 'v-clipboard/src'
+import Clipboard from 'v-clipboard'
 import Notifications from '@kyvg/vue3-notification'
 import VueGoodTablePlugin from 'vue-good-table-next'
 
