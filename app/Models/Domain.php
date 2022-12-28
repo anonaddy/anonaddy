@@ -191,7 +191,7 @@ class Domain extends Model
      */
     public function checkVerification()
     {
-        if (App::environment('testing')) {
+        if (App::environment('testing') || config('anonaddy.auto_verify_new_domains')) {
             return true;
         }
 

@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Domain;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\App;
 use Tests\TestCase;
 
 class DomainsTest extends TestCase
@@ -59,6 +60,21 @@ class DomainsTest extends TestCase
 
         $response->assertStatus(201);
         $this->assertEquals('random.com', $response->getData()->data->domain);
+    }
+
+    /** @test */
+    public function user_can_create_new_domain_with_aa_auto_verify()
+    {
+        $this->app->detectEnvironment(fn() => 'not_testing');
+        config()->set('anonaddy.auto_verify_new_domains', true);
+
+        $response = $this->json('POST', '/api/v1/domains', [
+            'domain' => 'random.com',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertEquals('random.com', $response->getData()->data->domain);
+        $this->assertNotEmpty($response->getData()->data->domain_verified_at);
     }
 
     /** @test */
