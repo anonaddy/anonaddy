@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
             $defaultSize = $defaultSize ?? 100;
             $paginationMethod = 'paginate'; // 'simplePaginate' or 'paginate';
 
-            $size = (int) request()->input('page.size', $defaultSize);
+            $size = (int) is_null(request()->input('page.size')) ? $defaultSize : request()->input('page.size');
 
             $size = $size > $maxResults ? $maxResults : $size;
 
@@ -51,10 +51,10 @@ class AppServiceProvider extends ServiceProvider
         Collection::macro('jsonPaginate', function (int $maxResults = null, int $defaultSize = null, $page = null) {
             $maxResults = $maxResults ?? 100;
             $defaultSize = $defaultSize ?? 100;
-            $size = (int) request()->input('page.size', $defaultSize);
+            $size = (int) is_null(request()->input('page.size')) ? $defaultSize : request()->input('page.size');
             $size = $size > $maxResults ? $maxResults : $size;
 
-            $page = (int) request()->input('page.number', 1);
+            $page = (int) is_null(request()->input('page.number')) ? 1 : request()->input('page.number');
 
             return new LengthAwarePaginator(
                 $this->forPage($page, $size),
