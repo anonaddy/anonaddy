@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <Modal :open="createRuleModalOpen" @close="createRuleModalOpen = false" :overflow="true">
+    <Modal :open="createRuleModalOpen" @close="createRuleModalOpen = false" :overflow="true" :maxWidth="'sm:max-w-2xl'">
       <template v-slot:title> Create new rule </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700">
@@ -446,7 +446,7 @@
       </template>
     </Modal>
 
-    <Modal :open="editRuleModalOpen" @close="closeEditModal" :overflow="true">
+    <Modal :open="editRuleModalOpen" @close="closeEditModal" :overflow="true" :maxWidth="'sm:max-w-2xl'">
       <template v-slot:title> Edit rule </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700">
