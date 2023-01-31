@@ -59,6 +59,8 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
     protected $encryptedParts;
 
+    protected $receivedHeaders;
+
     protected $fromEmail;
 
     protected $size;
@@ -114,6 +116,7 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->originalSenderHeader = $emailData->originalSenderHeader;
         $this->authenticationResults = $emailData->authenticationResults;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
+        $this->receivedHeaders = $emailData->receivedHeaders;
         $this->recipientId = $recipient->id;
 
         $this->fingerprint = $recipient->should_encrypt && ! $this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
@@ -186,6 +189,18 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 if ($this->references) {
                     $message->getHeaders()
                             ->addTextHeader('References', base64_decode($this->references));
+                }
+
+                if ($this->receivedHeaders) {
+                    if (is_array($this->receivedHeaders)) {
+                        foreach ($this->receivedHeaders as $receivedHeader) {
+                            $message->getHeaders()
+                                    ->addTextHeader('Received', $receivedHeader);
+                        }
+                    } else {
+                        $message->getHeaders()
+                                    ->addTextHeader('Received', $this->receivedHeaders);
+                    }
                 }
 
                 if ($this->authenticationResults) {

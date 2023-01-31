@@ -115,6 +115,7 @@ class CustomMailer extends Mailer
                 'Date',
                 'Original-Sender',
                 'Sender',
+                'Received',
             ])->toArray();
             $signedEmail = $dkimSigner->sign($symfonyMessage, $options);
             $symfonyMessage->setHeaders($signedEmail->getHeaders());

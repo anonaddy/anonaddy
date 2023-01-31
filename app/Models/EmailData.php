@@ -51,6 +51,7 @@ class EmailData
         $this->originalReplyToHeader = base64_encode($parser->getHeader('Reply-To'));
         $this->originalSenderHeader = base64_encode($parser->getHeader('Sender'));
         $this->authenticationResults = $parser->getHeader('X-AnonAddy-Authentication-Results');
+        $this->receivedHeaders = $parser->getRawHeader('Received');
 
         if ($parser->getParts()[1]['content-type'] === 'multipart/encrypted') {
             $this->encryptedParts = $parser->getAttachments();
