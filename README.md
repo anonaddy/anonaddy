@@ -476,4 +476,4 @@ Also to [https://gitlab.com/mailcare/mailcare](https://gitlab.com/mailcare/mailc
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+GNU Affero General Public License v3.0. Please see [License File](LICENSE.md) for more information.

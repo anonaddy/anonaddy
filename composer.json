@@ -5,7 +5,7 @@
     "keywords": [
         "email"
     ],
-    "license": "MIT",
+    "license": "AGPL-3.0-or-later",
     "require": {
         "php": "^8.0.2",
         "asbiin/laravel-webauthn": "^3.0.0",
