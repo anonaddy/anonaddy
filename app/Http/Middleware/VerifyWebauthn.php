@@ -20,7 +20,6 @@ class VerifyWebauthn
      * Create a Webauthn.
      *
      * @param  \Illuminate\Contracts\Config\Repository  $config
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      */
     public function __construct(AuthFactory $auth)
     {
@@ -31,7 +30,6 @@ class VerifyWebauthn
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $guard
      * @return mixed
      */

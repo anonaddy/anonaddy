@@ -25,7 +25,6 @@ class WebauthnController extends ControllersWebauthnController
     /**
      * Return the register data to attempt a Webauthn registration.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return RegisterViewResponse
      */
     public function create(Request $request)
@@ -39,7 +38,6 @@ class WebauthnController extends ControllersWebauthnController
     /**
      * Validate and create the Webauthn request.
      *
-     * @param  WebauthnRegisterRequest  $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function store(WebauthnRegisterRequest $request)
@@ -92,7 +90,6 @@ class WebauthnController extends ControllersWebauthnController
     /**
      * Remove an existing Webauthn key.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, $webauthnKeyId)

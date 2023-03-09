@@ -24,7 +24,6 @@ class CustomMailer extends Mailer
      * Send a new message using a view.
      *
      * @param  MailableContract|string|array  $view
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return SentMessage|null
      */
@@ -149,7 +148,6 @@ class CustomMailer extends Mailer
     /**
      * Send a Symfony Email instance.
      *
-     * @param  \Symfony\Component\Mime\Email  $message
      * @return \Symfony\Component\Mailer\SentMessage|null
      */
     protected function sendSymfonyMessage(Email $message)

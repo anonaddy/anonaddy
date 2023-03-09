@@ -383,8 +383,12 @@ For some reason Apple seems to think these emails are spam/phishing and returns 
 If you are having issues with emails being rejected as "possibly spammy" by Google, iCloud or Microsoft then please try the following steps if you can:
 
 1. **Replace the email subject** by going to your settings in AnonAddy
-2. Try adding a GPP key and **enabling encryption**. This will prevent the email's content being scanned and reduce the change of it being rejected.
+2. Try adding a GPG key and **enabling encryption**. This will prevent the email's content being scanned and reduce the chance of it being rejected.
 3. Enable the option to hide and encrypt the email subject
+4. Try disabling the banner information on forwarded emails
+5. Try adding the alias email (and/or domain) to your contact list (address book) or safe senders list if possible
+
+For Outlook, Hotmail or MSN you can find instructions on how to add a domain to your safe senders list [here](https://support.microsoft.com/en-gb/office/safe-senders-in-outlook-com-470d4ee6-e3b6-402b-8cd9-a6f00eda7339).
 
 I will also soon be adding an option to change the format of the display from part of the "From:" header.
 

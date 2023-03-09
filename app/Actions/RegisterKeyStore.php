@@ -15,12 +15,6 @@ class RegisterKeyStore extends ActionsRegisterKeyStore
 {
     /**
      * Register a new key.
-     *
-     * @param  Authenticatable  $user
-     * @param  PublicKeyCredentialCreationOptions  $publicKey
-     * @param  string  $data
-     * @param  string  $keyName
-     * @return WebauthnKey|null
      */
     public function __invoke(Authenticatable $user, PublicKeyCredentialCreationOptions $publicKey, string $data, string $keyName): ?WebauthnKey
     {

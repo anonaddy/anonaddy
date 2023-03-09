@@ -61,7 +61,12 @@ Route::controller(BackupCodeController::class)->group(function () {
 });
 
 Route::group([
-    'middleware' => config('webauthn.middleware', []),
+    'middleware' => array_filter(array_merge(
+        config('webauthn.middleware', ['web']),
+        [
+            config('webauthn.auth_middleware', 'auth').':'.config('webauthn.guard', 'web'),
+        ]
+    )),
     'domain' => config('webauthn.domain', null),
     'prefix' => config('webauthn.prefix', 'webauthn'),
 ], function () {

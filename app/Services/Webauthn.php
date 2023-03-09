@@ -10,9 +10,6 @@ class Webauthn extends ServicesWebauthn
 {
     /**
      * Test if the user has one or more webauthn key.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return bool
      */
     public static function enabled(User $user): bool
     {
@@ -21,9 +18,6 @@ class Webauthn extends ServicesWebauthn
 
     /**
      * Detect if user has a key that is enabled.
-     *
-     * @param  User  $user
-     * @return bool
      */
     public static function hasKey(User $user): bool
     {

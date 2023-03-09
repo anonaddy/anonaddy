@@ -72,7 +72,6 @@ class OpenPGPEncrypter
     }
 
     /**
-     * @param $identifier
      * @param  null  $passPhrase
      *
      * @throws RuntimeException
@@ -90,9 +89,6 @@ class OpenPGPEncrypter
     }
 
     /**
-     * @param $identifier
-     * @param $passPhrase
-     *
      * @throws RuntimeException
      */
     public function addKeyPassphrase($identifier, $passPhrase)
@@ -259,8 +255,6 @@ class OpenPGPEncrypter
     }
 
     /**
-     * @param $identifier
-     * @param $purpose
      * @return string
      *
      * @throws RuntimeException

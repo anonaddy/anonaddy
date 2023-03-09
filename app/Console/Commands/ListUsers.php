@@ -95,7 +95,6 @@ class ListUsers extends Command
     /**
      * Display the user information on the console.
      *
-     * @param  array  $users
      * @return void
      */
     protected function displayUsers(array $users)
@@ -135,7 +134,6 @@ class ListUsers extends Command
     /**
      * Parse the column list.
      *
-     * @param  array  $columns
      * @return array
      */
     protected function parseColumns(array $columns)
