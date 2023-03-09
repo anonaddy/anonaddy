@@ -88,29 +88,28 @@ class AliasController extends Controller
                 'extension' => $extension ?? null,
             ];
         } else {
-            if ($request->input('format', 'random_characters') === 'random_words') {
-                $localPart = user()->generateRandomWordLocalPart();
-
-                $data = [
-                    'email' => $localPart.'@'.$request->domain,
-                    'local_part' => $localPart,
-                ];
-            } elseif ($request->input('format', 'random_characters') === 'random_characters') {
-                $localPart = user()->generateRandomCharacterLocalPart(8);
-
-                $data = [
-                    'email' => $localPart.'@'.$request->domain,
-                    'local_part' => $localPart,
-                ];
-            } else {
-                $uuid = Uuid::uuid4();
-
-                $data = [
-                    'id' => $uuid,
-                    'email' => $uuid.'@'.$request->domain,
-                    'local_part' => $uuid,
-                ];
+            $format = $request->input('format');
+            // If the request doesn't have format, use user's default alias format
+            if (! $format) {
+                $format = user()->default_alias_format ?? 'random_characters';
             }
+
+            $data = [];
+
+            if ($format === 'random_words') {
+                // Random Words
+                $localPart = user()->generateRandomWordLocalPart();
+            } elseif ($format === 'uuid') {
+                // UUID
+                $localPart = Uuid::uuid4();
+                $data['id'] = $localPart;
+            } else {
+                // Random Characters
+                $localPart = user()->generateRandomCharacterLocalPart(8);
+            }
+
+            $data['email'] = $localPart.'@'.$request->domain;
+            $data['local_part'] = $localPart;
         }
 
         // Check if domain is for username or custom domain
