@@ -1595,16 +1595,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.4.3",
+            "version": "2.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "67c26b443f348a51926030c83481b85718457d3d"
+                "reference": "3cf1b6d4f0c820a2cf8bcaec39fc698f3443b5cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/67c26b443f348a51926030c83481b85718457d3d",
-                "reference": "67c26b443f348a51926030c83481b85718457d3d",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/3cf1b6d4f0c820a2cf8bcaec39fc698f3443b5cf",
+                "reference": "3cf1b6d4f0c820a2cf8bcaec39fc698f3443b5cf",
                 "shasum": ""
             },
             "require": {
@@ -1694,7 +1694,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.4.3"
+                "source": "https://github.com/guzzle/psr7/tree/2.4.4"
             },
             "funding": [
                 {
@@ -1710,7 +1710,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-10-26T14:07:24+00:00"
+            "time": "2023-03-09T13:19:02+00:00"
         },
         {
             "name": "guzzlehttp/uri-template",
@@ -2999,25 +2999,25 @@
         },
         {
             "name": "mews/captcha",
-            "version": "3.2.10",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mewebstudio/captcha.git",
-                "reference": "9aa77b818d46df8f46be16c2aea61a8fe77cb5e6"
+                "reference": "8c439263d0ba42e6c05e4d1f3bee0a2b97e675d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/9aa77b818d46df8f46be16c2aea61a8fe77cb5e6",
-                "reference": "9aa77b818d46df8f46be16c2aea61a8fe77cb5e6",
+                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/8c439263d0ba42e6c05e4d1f3bee0a2b97e675d5",
+                "reference": "8c439263d0ba42e6c05e4d1f3bee0a2b97e675d5",
                 "shasum": ""
             },
             "require": {
                 "ext-gd": "*",
-                "illuminate/config": "~5|^6|^7|^8|^9",
-                "illuminate/filesystem": "~5|^6|^7|^8|^9",
-                "illuminate/hashing": "~5|^6|^7|^8|^9",
-                "illuminate/session": "~5|^6|^7|^8|^9",
-                "illuminate/support": "~5|^6|^7|^8|^9",
+                "illuminate/config": "~5|^6|^7|^8|^9|^10.0",
+                "illuminate/filesystem": "~5|^6|^7|^8|^9|^10.0",
+                "illuminate/hashing": "~5|^6|^7|^8|^9|^10.0",
+                "illuminate/session": "~5|^6|^7|^8|^9|^10.0",
+                "illuminate/support": "~5|^6|^7|^8|^9|^10.0",
                 "intervention/image": "~2.5",
                 "php": "^7.2|^8.0"
             },
@@ -3066,9 +3066,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mewebstudio/captcha/issues",
-                "source": "https://github.com/mewebstudio/captcha/tree/3.2.10"
+                "source": "https://github.com/mewebstudio/captcha/tree/3.3.0"
             },
-            "time": "2022-12-14T08:58:32+00:00"
+            "time": "2023-03-14T08:30:02+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -7896,7 +7896,7 @@
         },
         {
             "name": "web-token/jwt-core",
-            "version": "3.1.6",
+            "version": "3.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-token/jwt-core.git",
@@ -7960,7 +7960,7 @@
                 "symfony"
             ],
             "support": {
-                "source": "https://github.com/web-token/jwt-core/tree/3.1.6"
+                "source": "https://github.com/web-token/jwt-core/tree/3.1.7"
             },
             "funding": [
                 {
@@ -7972,7 +7972,7 @@
         },
         {
             "name": "web-token/jwt-signature",
-            "version": "3.1.6",
+            "version": "3.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-token/jwt-signature.git",
@@ -8037,7 +8037,7 @@
                 "symfony"
             ],
             "support": {
-                "source": "https://github.com/web-token/jwt-signature/tree/3.1.6"
+                "source": "https://github.com/web-token/jwt-signature/tree/3.1.7"
             },
             "funding": [
                 {

@@ -31,6 +31,194 @@ html {
   @apply bg-yellow-100 border-yellow-600 text-yellow-800;
 }
 
+/* Multiselect default syling start */
+.multiselect {
+  @apply relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-grey-300 rounded bg-white text-base leading-snug outline-none;
+}
+.multiselect.is-disabled {
+  @apply cursor-default bg-grey-100;
+}
+.multiselect.is-open {
+  @apply rounded-b-none;
+}
+.multiselect.is-open-top {
+  @apply rounded-t-none;
+}
+.multiselect.is-active {
+  @apply ring ring-green-500 ring-opacity-30;
+}
+
+.multiselect-wrapper {
+  @apply relative mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none;
+}
+
+.multiselect-single-label {
+  @apply flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 pr-16 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-single-label-text {
+  @apply overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full;
+}
+
+.multiselect-multiple-label {
+  @apply flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-search {
+  @apply w-full absolute inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-tags {
+  @apply flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 rtl:pl-0 rtl:pr-2;
+}
+
+.multiselect-tag {
+  @apply bg-green-500 text-white text-sm font-semibold py-0.5 pl-2 rounded mr-1 mb-1 flex items-center whitespace-nowrap rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1;
+}
+.multiselect-tag.is-disabled {
+  @apply pr-2 opacity-50 rtl:pl-2;
+}
+
+.multiselect-tag-remove {
+  @apply flex items-center justify-center p-1 mx-0.5 rounded-sm hover:bg-black hover:bg-opacity-10;
+}
+
+.multiselect-tag-remove-icon {
+  @apply bg-multiselect-remove bg-center bg-no-repeat opacity-30 inline-block w-3 h-3;
+}
+
+.multiselect-tag-remove:hover .multiselect-tag-remove-icon {
+  @apply opacity-60;
+}
+
+.multiselect-tags-search-wrapper {
+  @apply inline-block relative mx-1 mb-1 flex-grow flex-shrink h-full;
+}
+
+.multiselect-tags-search {
+  @apply absolute inset-0 border-0 outline-none focus:ring-0 appearance-none p-0 text-base font-sans box-border w-full;
+}
+
+.multiselect-tags-search-copy {
+  @apply invisible whitespace-pre-wrap inline-block h-px;
+}
+
+.multiselect-placeholder {
+  @apply flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-grey-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-caret {
+  @apply bg-multiselect-caret bg-center bg-no-repeat w-2.5 h-4 py-px box-content mr-3.5 relative z-10 opacity-40 flex-shrink-0 flex-grow-0 transition-transform transform pointer-events-none rtl:mr-0 rtl:ml-3.5;
+}
+.multiselect-caret.is-open {
+  @apply rotate-180 pointer-events-auto;
+}
+
+.multiselect-clear {
+  @apply pr-3.5 relative z-10 opacity-40 transition duration-300 flex-shrink-0 flex-grow-0 flex hover:opacity-80 rtl:pr-0 rtl:pl-3.5;
+}
+
+.multiselect-clear-icon {
+  @apply bg-multiselect-remove bg-center bg-no-repeat w-2.5 h-4 py-px box-content inline-block;
+}
+
+.multiselect-spinner {
+  @apply bg-multiselect-spinner bg-center bg-no-repeat w-4 h-4 z-10 mr-3.5 animate-spin flex-shrink-0 flex-grow-0 rtl:mr-0 rtl:ml-3.5;
+}
+
+.multiselect-inifite {
+  @apply flex items-center justify-center w-full;
+}
+
+.multiselect-inifite-spinner {
+  @apply bg-multiselect-spinner bg-center bg-no-repeat w-4 h-4 z-10 animate-spin flex-shrink-0 flex-grow-0 m-3.5;
+}
+
+.multiselect-dropdown {
+  @apply max-h-60 absolute -left-px -right-px bottom-0 transform translate-y-full border border-grey-300 -mt-px overflow-y-scroll z-50 bg-white flex flex-col rounded-b;
+}
+.multiselect-dropdown.is-top {
+  @apply -translate-y-full top-px bottom-auto rounded-b-none rounded-t;
+}
+.multiselect-dropdown.is-hidden {
+  @apply hidden;
+}
+
+.multiselect-options {
+  @apply flex flex-col p-0 m-0 list-none;
+}
+
+.multiselect-group {
+  @apply p-0 m-0;
+}
+
+.multiselect-group-label {
+  @apply flex text-sm box-border items-center justify-start text-left py-1 px-3 font-semibold bg-grey-200 cursor-default leading-normal;
+}
+.multiselect-group-label.is-pointable {
+  @apply cursor-pointer;
+}
+.multiselect-group-label.is-pointed {
+  @apply bg-grey-300 text-grey-700;
+}
+.multiselect-group-label.is-selected {
+  @apply bg-green-600 text-white;
+}
+.multiselect-group-label.is-disabled {
+  @apply bg-grey-100 text-grey-300 cursor-not-allowed;
+}
+.multiselect-group-label.is-selected.is-pointed {
+  @apply bg-green-600 text-white opacity-90;
+}
+.multiselect-group-label.is-selected.is-disabled {
+  @apply text-green-100 bg-green-600 bg-opacity-50 cursor-not-allowed;
+}
+
+.multiselect-group-options {
+  @apply p-0 m-0;
+}
+
+.multiselect-option {
+  @apply flex items-center justify-start box-border text-left cursor-pointer text-base leading-snug py-2 px-3;
+}
+.multiselect-option.is-pointed {
+  @apply text-grey-800 bg-grey-100;
+}
+.multiselect-option.is-selected {
+  @apply text-white bg-green-500;
+}
+.multiselect-option.is-disabled {
+  @apply text-grey-300 cursor-not-allowed;
+}
+.multiselect-option.is-selected.is-pointed {
+  @apply text-white bg-green-500 opacity-90;
+}
+.multiselect-option.is-selected.is-disabled {
+  @apply text-green-100 bg-green-500 bg-opacity-50 cursor-not-allowed;
+}
+
+.multiselect-no-options {
+  @apply py-2 px-3 text-grey-600 bg-white text-left rtl:text-right;
+}
+
+.multiselect-no-results {
+  @apply py-2 px-3 text-grey-600 bg-white text-left rtl:text-right;
+}
+
+.multiselect-fake-input {
+  @apply bg-transparent absolute left-0 right-0 -bottom-px w-full h-px border-0 p-0 appearance-none outline-none text-transparent;
+}
+
+.multiselect-assistive-text {
+  @apply absolute -m-px w-px h-px overflow-hidden;
+  clip: rect(0 0 0 0);
+}
+
+.multiselect-spacer {
+  @apply h-9 py-px box-content;
+}
+/* Multiselect default syling end */
+
 .multiselect .multiselect-dropdown::-webkit-scrollbar {
   @apply w-2 h-2;
 }

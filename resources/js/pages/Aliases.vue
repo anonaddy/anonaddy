@@ -519,7 +519,7 @@
         <p v-show="errors.generateAliasRecipientIds" class="mb-3 text-red-500 text-sm">
           {{ errors.generateAliasRecipientIds }}
         </p>
-        <multiselect
+        <Multiselect
           id="alias_recipient_ids"
           v-model="generateAliasRecipientIds"
           mode="tags"
@@ -534,7 +534,7 @@
           label="email"
           track-by="email"
         >
-        </multiselect>
+        </Multiselect>
 
         <div class="mt-6">
           <button
@@ -563,7 +563,7 @@
           Select the recipients for this alias. You can choose multiple recipients. Leave it empty
           if you would like to use the default recipient.
         </p>
-        <multiselect
+        <Multiselect
           v-model="aliasRecipientsToEdit"
           mode="tags"
           value-prop="id"
@@ -577,7 +577,7 @@
           label="email"
           track-by="email"
         >
-        </multiselect>
+        </Multiselect>
         <div class="mt-6">
           <button
             type="button"
@@ -1343,5 +1343,3 @@ export default {
   },
 }
 </script>
-
-<style src="@vueform/multiselect/themes/default.css"></style>

@@ -232,7 +232,7 @@
           your account settings. Leave it empty if you would like to use the default recipient in
           your account settings.
         </p>
-        <multiselect
+        <Multiselect
           v-model="defaultRecipientId"
           :options="recipientOptions"
           mode="single"
@@ -245,7 +245,7 @@
           label="email"
           track-by="email"
         >
-        </multiselect>
+        </Multiselect>
         <div class="mt-6">
           <button
             type="button"
