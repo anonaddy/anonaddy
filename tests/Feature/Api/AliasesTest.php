@@ -157,7 +157,7 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(201);
         $this->assertCount(2, $this->user->aliases[0]->recipients);
-        $this->assertEquals($recipient->email, $this->user->aliases[0]->recipients[0]->email);
+        $this->assertContains($recipient->email, $this->user->aliases[0]->recipients->pluck('email'));
     }
 
     /** @test */
