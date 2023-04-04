@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AliasExportController;
+use App\Http\Controllers\AliasImportController;
 use App\Http\Controllers\Auth\ApiAuthenticationController;
 use App\Http\Controllers\Auth\BackupCodeController;
 use App\Http\Controllers\Auth\ForgotUsernameController;
@@ -146,4 +147,6 @@ Route::group([
     });
 
     Route::get('/aliases/export', [AliasExportController::class, 'export'])->name('aliases.export');
+
+    Route::post('/aliases/import', [AliasImportController::class, 'import'])->name('aliases.import');
 });

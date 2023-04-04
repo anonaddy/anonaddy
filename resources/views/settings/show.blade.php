@@ -694,6 +694,38 @@
 
             <div class="mb-6">
                 <h3 class="font-bold text-xl">
+                    Import Aliases
+                </h3>
+
+                <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                <p class="mt-6">You can import aliases for <b>your custom domains</b> by uploading a CSV file. Please note this is <b>only available for custom domains</b>.</p>
+
+
+                <p class="mt-4">Aliases that <b>already exist</b> will not be imported.</p>
+                <p class="mt-4">The import is <b>limited to 1,000 rows (aliases)</b>. Please ensure you use multiple CSV files if you need to import more than this.</p>
+                <p class="mt-4">Please use the template file provided below. Only CSV files are supported.</p>
+                <p class="mt-4">The import will take a few minutes. You will <b>receive an email</b> once it is complete.</p>
+                <p class="mt-4"><a href="/import-aliases-template.csv" rel="nofollow noopener noreferrer" class="text-indigo-700 cursor-pointer">Click here to download the CSV import template</a></p>
+            </div>
+
+            <form action="{{ route('aliases.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <input type="file" name="aliases_import" required />
+                    @if ($errors->has('aliases_import'))
+                        <p class="text-red-500 text-xs italic mt-4">
+                            {{ $errors->first('aliases_import') }}
+                        </p>
+                    @endif
+                    <div class="mt-4">
+                        <button type="submit" class="bg-cyan-400 block w-full text-center hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">Import Alias Data</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="my-6">
+                <h3 class="font-bold text-xl">
                     Export Aliases
                 </h3>
 

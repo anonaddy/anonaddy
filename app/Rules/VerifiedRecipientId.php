@@ -8,14 +8,25 @@ class VerifiedRecipientId implements Rule
 {
     protected $user;
 
+    protected $verifiedRecipientIds;
+
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(array $verifiedRecipientIds = null)
     {
         $this->user = user();
+
+        if (! is_null($verifiedRecipientIds)) {
+            $this->verifiedRecipientIds = $verifiedRecipientIds;
+        } else {
+            $this->verifiedRecipientIds = $this->user
+            ->verifiedRecipients()
+            ->pluck('id')
+            ->toArray();
+        }
     }
 
     /**
@@ -27,21 +38,12 @@ class VerifiedRecipientId implements Rule
      */
     public function passes($attribute, $ids)
     {
-        $verifiedRecipientIds = $this->user
-            ->verifiedRecipients()
-            ->select('id')
-            ->get()
-            ->map(function ($recipient) {
-                return $recipient->id;
-            })
-            ->toArray();
-
         if (! is_array($ids)) {
             return false;
         }
 
         foreach ($ids as $id) {
-            if (! in_array($id, $verifiedRecipientIds)) {
+            if (!in_array($id, $this->verifiedRecipientIds)) {
                 return false;
             }
         }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exports\AliasesExport;
+use App\Imports\AliasesImport;
 use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\DeletedUsername;
@@ -11,6 +12,7 @@ use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -414,6 +416,32 @@ class SettingsTest extends TestCase
     /**
      * @test
      */
+    public function user_can_import_aliases_for_custom_domains()
+    {
+        Excel::fake();
+
+        Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'domain' => 'example.com',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->post('/settings/aliases/import', [
+                'aliases_import' => new UploadedFile(base_path('tests/files/import-aliases-template.csv'), 'import-aliases-template.csv', 'csv', null, true),
+            ]);
+
+        $response->assertStatus(302);
+
+        $response->assertSessionDoesntHaveErrors(['aliases_import']);
+
+        Excel::assertQueued('import-aliases-template.csv', function (AliasesImport $import) {
+            return $import->getDomains()->first()->domain === 'example.com' && $import->getRecipientIds()[0] === $this->user->default_recipient_id;
+        });
+    }
+
+    /**
+    * @test
+    */
     public function user_can_download_aliases_export()
     {
         Excel::fake();
