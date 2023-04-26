@@ -160,73 +160,73 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 $message->returnPath($returnPath);
 
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'F:'.$this->alias->id.':anonaddy');
+                    ->addTextHeader('Feedback-ID', 'F:'.$this->alias->id.':anonaddy');
 
                 // This header is used to set the To: header as the alias just before sending.
                 $message->getHeaders()
-                        ->addTextHeader('Alias-To', $this->alias->email);
+                    ->addTextHeader('Alias-To', $this->alias->email);
 
                 $message->getHeaders()->remove('Message-ID');
 
                 if ($this->messageId) {
                     $message->getHeaders()
-                            ->addIdHeader('Message-ID', base64_decode($this->messageId));
+                        ->addIdHeader('Message-ID', base64_decode($this->messageId));
                 } else {
                     $message->getHeaders()
-                            ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+                        ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
                 }
 
                 if ($this->listUnsubscribe) {
                     $message->getHeaders()
-                            ->addTextHeader('List-Unsubscribe', base64_decode($this->listUnsubscribe));
+                        ->addTextHeader('List-Unsubscribe', base64_decode($this->listUnsubscribe));
                 }
 
                 if ($this->inReplyTo) {
                     $message->getHeaders()
-                            ->addTextHeader('In-Reply-To', base64_decode($this->inReplyTo));
+                        ->addTextHeader('In-Reply-To', base64_decode($this->inReplyTo));
                 }
 
                 if ($this->references) {
                     $message->getHeaders()
-                            ->addTextHeader('References', base64_decode($this->references));
+                        ->addTextHeader('References', base64_decode($this->references));
                 }
 
                 if ($this->receivedHeaders) {
                     if (is_array($this->receivedHeaders)) {
                         foreach ($this->receivedHeaders as $receivedHeader) {
                             $message->getHeaders()
-                                    ->addTextHeader('Received', $receivedHeader);
+                                ->addTextHeader('Received', $receivedHeader);
                         }
                     } else {
                         $message->getHeaders()
-                                    ->addTextHeader('Received', $this->receivedHeaders);
+                            ->addTextHeader('Received', $this->receivedHeaders);
                     }
                 }
 
                 if ($this->authenticationResults) {
                     $message->getHeaders()
-                            ->addTextHeader('X-AnonAddy-Authentication-Results', $this->authenticationResults);
+                        ->addTextHeader('X-AnonAddy-Authentication-Results', $this->authenticationResults);
                 }
 
                 $message->getHeaders()
-                        ->addTextHeader('X-AnonAddy-Original-Sender', $this->sender);
+                    ->addTextHeader('X-AnonAddy-Original-Sender', $this->sender);
 
                 $message->getHeaders()
-                        ->addTextHeader('X-AnonAddy-Original-Envelope-From', $this->originalEnvelopeFrom);
+                    ->addTextHeader('X-AnonAddy-Original-Envelope-From', $this->originalEnvelopeFrom);
 
                 if ($this->originalFromHeader) {
                     $message->getHeaders()
-                            ->addTextHeader('X-AnonAddy-Original-From-Header', base64_decode($this->originalFromHeader));
+                        ->addTextHeader('X-AnonAddy-Original-From-Header', base64_decode($this->originalFromHeader));
                 }
 
                 if ($this->originalReplyToHeader) {
                     $message->getHeaders()
-                            ->addTextHeader('X-AnonAddy-Original-Reply-To-Header', base64_decode($this->originalReplyToHeader));
+                        ->addTextHeader('X-AnonAddy-Original-Reply-To-Header', base64_decode($this->originalReplyToHeader));
                 }
 
                 if ($this->originalSenderHeader) {
                     $message->getHeaders()
-                            ->addTextHeader('Original-Sender', base64_decode($this->originalSenderHeader));
+                        ->addTextHeader('Original-Sender', base64_decode($this->originalSenderHeader));
                 }
 
                 if ($this->emailInlineAttachments) {
@@ -244,12 +244,12 @@ class ForwardEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
                 if ($this->originalCc) {
                     $message->getHeaders()
-                            ->addTextHeader('X-AnonAddy-Original-Cc', $this->originalCc);
+                        ->addTextHeader('X-AnonAddy-Original-Cc', $this->originalCc);
                 }
 
                 if ($this->originalTo) {
                     $message->getHeaders()
-                            ->addTextHeader('X-AnonAddy-Original-To', $this->originalTo);
+                        ->addTextHeader('X-AnonAddy-Original-To', $this->originalTo);
                 }
             });
 

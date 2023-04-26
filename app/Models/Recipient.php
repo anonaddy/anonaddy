@@ -37,12 +37,6 @@ class Recipient extends Model
         'email_verified_at',
     ];
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'email_verified_at',
-    ];
-
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
@@ -50,6 +44,9 @@ class Recipient extends Model
         'should_encrypt' => 'boolean',
         'inline_encryption' => 'boolean',
         'protected_headers' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'email_verified_at' => 'datetime',
     ];
 
     public static function boot()

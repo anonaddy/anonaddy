@@ -7,7 +7,7 @@ use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Notifications\CustomVerifyEmail;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 class ShowRecipientsTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -25,7 +25,7 @@ class ShowRecipientsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->actingAs($this->user);
     }
 
@@ -76,12 +76,12 @@ class ShowRecipientsTest extends TestCase
         ]);
 
         Alias::factory()->count(3)->create(['user_id' => $this->user->id])
-        ->each(function ($alias) use ($recipient) {
-            AliasRecipient::create([
-                'alias' => $alias,
-                'recipient' => $recipient,
-            ]);
-        });
+            ->each(function ($alias) use ($recipient) {
+                AliasRecipient::create([
+                    'alias' => $alias,
+                    'recipient' => $recipient,
+                ]);
+            });
 
         $response = $this->get('/recipients');
 

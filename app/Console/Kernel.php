@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('anonaddy:clear-failed-deliveries')->daily();
         $schedule->command('anonaddy:clear-postfix-queue-ids')->hourly();
         $schedule->command('auth:clear-resets')->daily();
+        $schedule->command('cache:prune-stale-tags')->hourly();
     }
 
     /**

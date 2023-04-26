@@ -99,10 +99,10 @@ class ReceiveEmail extends Command
                 } else {
                     // Does not exist, must be a standard, username or custom domain alias
                     $parentDomain = collect(config('anonaddy.all_domains'))
-                    ->filter(function ($name) use ($recipient) {
-                        return Str::endsWith($recipient['domain'], $name);
-                    })
-                    ->first();
+                        ->filter(function ($name) use ($recipient) {
+                            return Str::endsWith($recipient['domain'], $name);
+                        })
+                        ->first();
 
                     if (! empty($parentDomain)) {
                         // It is standard or username alias

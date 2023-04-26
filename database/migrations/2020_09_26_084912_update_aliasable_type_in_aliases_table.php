@@ -13,12 +13,12 @@ class UpdateAliasableTypeInAliasesTable extends Migration
     public function up()
     {
         Alias::withTrashed()
-        ->where('aliasable_type', 'App\AdditionalUsername')
-        ->update(['aliasable_type' => 'App\Models\AdditionalUsername']);
+            ->where('aliasable_type', 'App\AdditionalUsername')
+            ->update(['aliasable_type' => 'App\Models\AdditionalUsername']);
 
         Alias::withTrashed()
-        ->where('aliasable_type', 'App\Domain')
-        ->update(['aliasable_type' => 'App\Models\Domain']);
+            ->where('aliasable_type', 'App\Domain')
+            ->update(['aliasable_type' => 'App\Models\Domain']);
     }
 
     /**
@@ -29,11 +29,11 @@ class UpdateAliasableTypeInAliasesTable extends Migration
     public function down()
     {
         Alias::withTrashed()
-        ->where('aliasable_type', 'App\Models\AdditionalUsername')
-        ->update(['aliasable_type' => 'App\AdditionalUsername']);
+            ->where('aliasable_type', 'App\Models\AdditionalUsername')
+            ->update(['aliasable_type' => 'App\AdditionalUsername']);
 
         Alias::withTrashed()
-        ->where('aliasable_type', 'App\Models\Domain')
-        ->update(['aliasable_type' => 'App\Domain']);
+            ->where('aliasable_type', 'App\Models\Domain')
+            ->update(['aliasable_type' => 'App\Domain']);
     }
 }

@@ -1,4 +1,4 @@
-alias,description,recipient_ids
-abc@example.com,My awesome alias!,477b1a7f-280e-4153-9178-76862b2e0404
+alias,description,recipients
+abc@example.com,My awesome alias!,recipient1@example.com
 no-description@example.com,,
-xyz@example.com,"Alias with 2 recipients, use a comma separated list of IDs.","477b1a7f-280e-4153-9178-76862b2e0404,9040f2c0-e330-4650-9e7c-96d51b6c5d17"
+xyz@example.com,"Alias with 2 recipients, use a comma separated list of recipient emails.","recipient1@example.com,recipient2@example.com"

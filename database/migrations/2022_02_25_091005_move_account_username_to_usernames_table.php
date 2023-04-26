@@ -65,8 +65,8 @@ class MoveAccountUsernameToUsernamesTable extends Migration
 
         // Update all additional username aliases aliasable_type
         Alias::withTrashed()
-        ->where('aliasable_type', 'App\Models\AdditionalUsername')
-        ->update(['aliasable_type' => 'App\Models\Username']);
+            ->where('aliasable_type', 'App\Models\AdditionalUsername')
+            ->update(['aliasable_type' => 'App\Models\Username']);
 
         // Drop the username and catch_all column from the users table
         Schema::table('users', function (Blueprint $table) {
@@ -93,8 +93,8 @@ class MoveAccountUsernameToUsernamesTable extends Migration
 
         // Update all usernames back to additional username
         Alias::withTrashed()
-        ->where('aliasable_type', 'App\Models\Username')
-        ->update(['aliasable_type' => 'App\Models\AdditionalUsername']);
+            ->where('aliasable_type', 'App\Models\Username')
+            ->update(['aliasable_type' => 'App\Models\AdditionalUsername']);
 
         // Repopulate the username column and delete the defaultUsername from the usernames table
         User::select(['id', 'username', 'default_username_id', 'catch_all'])->chunk(200, function ($users) {

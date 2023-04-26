@@ -29,17 +29,14 @@ class Username extends Model
         'catch_all',
     ];
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
-
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
         'active' => 'boolean',
         'catch_all' => 'boolean',
         'default_recipient_id' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public static function boot()

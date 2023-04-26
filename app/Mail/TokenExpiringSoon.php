@@ -46,7 +46,7 @@ class TokenExpiringSoon extends Mailable implements ShouldQueue, ShouldBeEncrypt
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'TES:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'TES:anonaddy');
             });
     }
 }

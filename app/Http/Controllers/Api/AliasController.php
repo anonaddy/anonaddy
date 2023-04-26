@@ -114,10 +114,10 @@ class AliasController extends Controller
 
         // Check if domain is for username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))
-                    ->filter(function ($name) use ($request) {
-                        return Str::endsWith($request->domain, $name);
-                    })
-                    ->first();
+            ->filter(function ($name) use ($request) {
+                return Str::endsWith($request->domain, $name);
+            })
+            ->first();
 
         $aliasable = null;
 

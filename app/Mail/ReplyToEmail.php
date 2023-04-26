@@ -98,21 +98,21 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 $message->returnPath($returnPath);
 
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'R:'.$this->alias->id.':anonaddy');
+                    ->addTextHeader('Feedback-ID', 'R:'.$this->alias->id.':anonaddy');
 
                 // Message-ID is replaced on replies as it can leak parts of the real email
                 $message->getHeaders()->remove('Message-ID');
                 $message->getHeaders()
-                            ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+                    ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
                 if ($this->inReplyTo) {
                     $message->getHeaders()
-                            ->addTextHeader('In-Reply-To', base64_decode($this->inReplyTo));
+                        ->addTextHeader('In-Reply-To', base64_decode($this->inReplyTo));
                 }
 
                 if ($this->references) {
                     $message->getHeaders()
-                            ->addTextHeader('References', base64_decode($this->references));
+                        ->addTextHeader('References', base64_decode($this->references));
                 }
 
                 if ($this->emailInlineAttachments) {

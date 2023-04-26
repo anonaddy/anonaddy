@@ -7,7 +7,7 @@ use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
 use App\Notifications\CustomVerifyEmail;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     /** @test */
     public function user_can_register_successfully()
@@ -69,7 +69,7 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_can_verify_email_successfully()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create()->fresh();
         $user->email_verified_at = null;
         $user->save();
 
@@ -130,7 +130,7 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_email()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create()->fresh();
 
         Recipient::factory()->create([
             'user_id' => $user->id,
@@ -156,7 +156,7 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_cannot_register_with_existing_username()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create()->fresh();
 
         Username::factory()->create([
             'user_id' => $user->id,

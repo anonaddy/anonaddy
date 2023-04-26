@@ -3,28 +3,22 @@
 namespace App\Rules;
 
 use App\Models\DeletedUsername;
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class NotDeletedUsername implements Rule
+class NotDeletedUsername implements ValidationRule
 {
     /**
-     * Create a new rule instance.
+     * Indicates whether the rule should be implicit.
      *
-     * @return void
+     * @var bool
      */
-    public function __construct()
-    {
-        //
-    }
+    public $implicit = true;
 
     /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * Run the validation rule.
      */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $deletedUsernames = DeletedUsername::select('username')
             ->get()
@@ -33,16 +27,8 @@ class NotDeletedUsername implements Rule
             })
             ->toArray();
 
-        return ! in_array(strtolower($value), $deletedUsernames);
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'The :attribute has already been taken.';
+        if (in_array(strtolower($value), $deletedUsernames)) {
+            $fail('The :attribute has already been taken.');
+        }
     }
 }

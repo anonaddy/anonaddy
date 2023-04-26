@@ -3,13 +3,13 @@
 namespace Tests\Feature\Api;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ApiTokensTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -17,7 +17,7 @@ class ApiTokensTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         Sanctum::actingAs($this->user, [], 'web');
         $this->user->recipients()->save($this->user->defaultRecipient);
     }

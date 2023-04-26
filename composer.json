@@ -7,14 +7,14 @@
     ],
     "license": "AGPL-3.0-or-later",
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "asbiin/laravel-webauthn": "^3.0.0",
         "bacon/bacon-qr-code": "^2.0",
         "chillerlan/php-qrcode": "^4.3",
         "doctrine/dbal": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.11",
-        "laravel/sanctum": "^3.0",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.0",
         "maatwebsite/excel": "^3.1",
@@ -27,9 +27,9 @@
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.2",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0",
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.0",
+        "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-ray": "^1.29"
     },
     "config": {
@@ -56,7 +56,7 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [

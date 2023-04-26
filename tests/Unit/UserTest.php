@@ -6,12 +6,12 @@ use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -19,7 +19,7 @@ class UserTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->usernames()->save($this->user->defaultUsername);
         $this->user->defaultUsername->username = 'johndoe';

@@ -11,7 +11,7 @@ class PersonalAccessTokenController extends Controller
 {
     public function index()
     {
-        return PersonalAccessTokenResource::collection(user()->tokens()->select(['id', 'tokenable_id', 'name', 'created_at', 'last_used_at', 'expires_at'])->get());
+        return PersonalAccessTokenResource::collection(user()->tokens()->select(['id', 'tokenable_id', 'name', 'created_at', 'last_used_at', 'expires_at', 'updated_at', 'created_at'])->get());
     }
 
     public function store(StorePersonalAccessTokenRequest $request)

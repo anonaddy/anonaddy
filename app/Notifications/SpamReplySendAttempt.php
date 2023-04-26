@@ -66,7 +66,7 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'SRSA:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'SRSA:anonaddy');
             });
     }
 

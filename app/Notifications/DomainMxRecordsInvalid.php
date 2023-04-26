@@ -56,7 +56,7 @@ class DomainMxRecordsInvalid extends Notification implements ShouldQueue, Should
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'DMI:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'DMI:anonaddy');
             });
     }
 

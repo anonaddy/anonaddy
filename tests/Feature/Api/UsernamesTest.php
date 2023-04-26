@@ -6,12 +6,12 @@ use App\Models\DeletedUsername;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class UsernamesTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {
@@ -129,7 +129,7 @@ class UsernamesTest extends TestCase
     /** @test */
     public function must_be_unique_across_users_and_usernames_tables()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create()->fresh();
 
         $response = $this->json('POST', '/api/v1/usernames', [
             'username' => $user->username,

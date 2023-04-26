@@ -10,7 +10,7 @@ use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
 use App\Notifications\NearBandwidthLimit;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 class ReceiveEmailTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -26,7 +26,7 @@ class ReceiveEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->usernames()->save($this->user->defaultUsername);
 

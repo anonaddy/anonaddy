@@ -44,7 +44,7 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldQueue, ShouldBeEncr
             ])
             ->withSymfonyMessage(function (Email $message) use ($feedbackId) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', $feedbackId);
+                    ->addTextHeader('Feedback-ID', $feedbackId);
             });
     }
 

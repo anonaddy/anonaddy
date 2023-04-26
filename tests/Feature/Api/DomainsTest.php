@@ -4,12 +4,12 @@ namespace Tests\Feature\Api;
 
 use App\Models\Domain;
 use App\Models\Recipient;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class DomainsTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {

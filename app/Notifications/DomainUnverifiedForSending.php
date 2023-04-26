@@ -60,7 +60,7 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'DUS:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'DUS:anonaddy');
             });
     }
 

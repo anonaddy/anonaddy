@@ -41,7 +41,7 @@ class UsernameReminder extends Notification implements ShouldQueue, ShouldBeEncr
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'UR:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'UR:anonaddy');
             });
     }
 

@@ -6,7 +6,7 @@ use App\Models\Alias;
 use App\Models\User;
 use App\Notifications\AliasesImportedNotification;
 use App\Rules\ValidAliasLocalPart;
-use App\Rules\VerifiedRecipientId;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Log;
@@ -32,23 +32,26 @@ use Ramsey\Uuid\Uuid;
 
 class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChunkReading, ShouldQueue, SkipsOnFailure, SkipsEmptyRows, SkipsOnError, WithLimit, WithColumnLimit, WithEvents
 {
-    use Importable, SkipsFailures, SkipsErrors, RemembersRowNumber;
+    use Queueable, Importable, SkipsFailures, SkipsErrors, RemembersRowNumber;
 
     protected $user;
 
     protected $domains;
 
-    protected $verifiedRecipientIds;
+    protected $verfiedRecipientEmailAndIds;
 
     public function __construct(User $user)
     {
         $this->user = $user;
         $this->domains = $user->domains()->select(['id', 'domain'])->get();
 
-        $this->verifiedRecipientIds = $user
+        $this->verfiedRecipientEmailAndIds = $user
             ->verifiedRecipients()
-            ->pluck('id')
-            ->toArray();
+            ->select(['email', 'id'])
+            ->get()
+            ->mapWithKeys(function ($recipient) {
+                return [$recipient->email => $recipient->id];
+            });
     }
 
     /**
@@ -89,12 +92,13 @@ class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChun
 
     public function prepareForValidation($data)
     {
-        // Ensure the alias is all lowercase
-        $data['alias'] = strtolower($data['alias']);
+        // Ensure the alias is all lowercase and whitespace has been trimmed
+        $data['alias'] = trim(strtolower($data['alias']));
         // Add for validation
         $data['domain'] = Str::afterLast($data['alias'], '@');
         $data['local_part'] = Str::beforeLast($data['alias'], '@');
         $data['extension'] = null;
+        $data['recipient_ids'] = null;
 
         if (! is_null($data['description'])) {
             // Make sure it is a string
@@ -108,12 +112,29 @@ class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChun
             $data['email'] = $data['local_part'].'@'.$data['domain'];
         }
 
-        // Convert recipient IDs to an array
-        if ($data['recipient_ids']) {
-            $data['recipient_ids'] = explode(',', $data['recipient_ids']);
+        // Map emails to an array of corresponding recipient IDs
+        if ($data['recipients']) {
+            $recipients = explode(',', $data['recipients']);
+
+            foreach ($recipients as $recipient) {
+                if (isset($this->verfiedRecipientEmailAndIds[$recipient])) {
+                    $data['recipient_ids'][] = $this->verfiedRecipientEmailAndIds[$recipient];
+                }
+            }
         }
 
-        return $data;
+        // Return only required array keys
+        return collect($data)
+            ->only([
+                'alias',
+                'email',
+                'local_part',
+                'extension',
+                'domain',
+                'description',
+                'recipient_ids',
+            ])
+            ->all();
     }
 
     public function rules(): array
@@ -156,7 +177,9 @@ class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChun
                 'nullable',
                 'array',
                 'max:10',
-                new VerifiedRecipientId($this->verifiedRecipientIds), // Pass through so it doesn't get called for every row!
+            ],
+            'recipient_ids.*' => [
+                'uuid',
             ],
         ];
     }
@@ -195,7 +218,7 @@ class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChun
         $totalImported = $totalRows - $totalNotImported;
 
         // Notify user with email.
-        $import->user->notify(new AliasesImportedNotification($totalRows, $totalImported, $totalNotImported, $totalFailures, $totalErrors));
+        $import->getUser()->notify(new AliasesImportedNotification($totalRows, $totalImported, $totalNotImported, $totalFailures, $totalErrors));
     }
 
     public static function importFailed(ImportFailed $event)
@@ -224,6 +247,11 @@ class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChun
         return [(new WithoutOverlapping($this->user->id))->releaseAfter(180)->expireAfter(600)]; // release after 3 minutes and expire after 10
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
     // For testing
     public function getDomains()
     {
@@ -233,6 +261,8 @@ class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChun
     // For testing
     public function getRecipientIds()
     {
-        return $this->verifiedRecipientIds;
+        return $this->verfiedRecipientEmailAndIds
+            ->values()
+            ->all();
     }
 }

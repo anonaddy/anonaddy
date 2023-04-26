@@ -76,9 +76,9 @@ class RegisterController extends Controller
         ], [
             'captcha.captcha' => 'The text entered was incorrect, please try again.',
         ])
-        ->sometimes('captcha', 'required|captcha', function () {
-            return ! App::environment('testing');
-        });
+            ->sometimes('captcha', 'required|captcha', function () {
+                return ! App::environment('testing');
+            });
     }
 
     /**

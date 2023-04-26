@@ -6,13 +6,13 @@ use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class ShowAliasesTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -20,7 +20,7 @@ class ShowAliasesTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->actingAs($this->user);
     }
 

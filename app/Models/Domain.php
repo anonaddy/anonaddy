@@ -6,6 +6,7 @@ use App\Http\Resources\DomainResource;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -32,20 +33,17 @@ class Domain extends Model
         'catch_all',
     ];
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'domain_verified_at',
-        'domain_mx_validated_at',
-        'domain_sending_verified_at',
-    ];
-
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
         'active' => 'boolean',
         'catch_all' => 'boolean',
         'default_recipient_id' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'domain_verified_at' => 'datetime',
+        'domain_mx_validated_at' => 'datetime',
+        'domain_sending_verified_at' => 'datetime',
     ];
 
     public static function boot()
@@ -60,9 +58,11 @@ class Domain extends Model
     /**
      * Set the domain's name.
      */
-    public function setDomainAttribute($value)
+    protected function domain(): Attribute
     {
-        $this->attributes['domain'] = strtolower($value);
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
     }
 
     /**
@@ -197,9 +197,9 @@ class Domain extends Model
 
         try {
             return collect(dns_get_record($this->domain.'.', DNS_TXT))
-            ->contains(function ($r) {
-                return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
-            });
+                ->contains(function ($r) {
+                    return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
+                });
         } catch (Exception $e) {
             Log::info('DNS Get TXT Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 

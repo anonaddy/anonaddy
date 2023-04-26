@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,18 +42,15 @@ class Alias extends Model
         'emails_sent',
     ];
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
         'aliasable_id' => 'string',
         'aliasable_type' => 'string',
         'active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public static function boot()
@@ -72,19 +70,25 @@ class Alias extends Model
         });
     }
 
-    public function setLocalPartAttribute($value)
+    protected function localPart(): Attribute
     {
-        $this->attributes['local_part'] = strtolower($value);
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
     }
 
-    public function setDomainAttribute($value)
+    protected function domain(): Attribute
     {
-        $this->attributes['domain'] = strtolower($value);
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
     }
 
-    public function setEmailAttribute($value)
+    protected function email(): Attribute
     {
-        $this->attributes['email'] = strtolower($value);
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
     }
 
     /**

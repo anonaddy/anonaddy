@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Username;
 use App\Notifications\UsernameReminder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -23,7 +23,7 @@ class LoginTest extends TestCase
 
         $this->user = User::factory()->create([
             'password' => Hash::make('mypassword'),
-        ]);
+        ])->fresh();
         $this->user->recipients()->save($this->user->defaultRecipient);
 
         $this->user->usernames()->save($this->user->defaultUsername);

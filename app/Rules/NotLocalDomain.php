@@ -2,46 +2,32 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Str;
 
-class NotLocalDomain implements Rule
+class NotLocalDomain implements ValidationRule
 {
     /**
-     * Create a new rule instance.
+     * Indicates whether the rule should be implicit.
      *
-     * @return void
+     * @var bool
      */
-    public function __construct()
-    {
-        //
-    }
+    public $implicit = true;
 
     /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * Run the validation rule.
      */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $count = collect(config('anonaddy.all_domains'))
-        ->filter(function ($name) use ($value) {
-            return Str::endsWith(strtolower($value), $name);
-        })
-        ->count();
+            ->filter(function ($name) use ($value) {
+                return Str::endsWith(strtolower($value), $name);
+            })
+            ->count();
 
-        return $count === 0;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'The domain cannot be a local one.';
+        if ($count !== 0) {
+            $fail('The domain cannot be a local one.');
+        }
     }
 }

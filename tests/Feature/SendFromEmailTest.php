@@ -5,13 +5,13 @@ namespace Tests\Feature;
 use App\Mail\SendFromEmail;
 use App\Models\Alias;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class SendFromEmailTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -19,7 +19,7 @@ class SendFromEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->defaultRecipient->email = 'will@anonaddy.com';
         $this->user->defaultRecipient->save();

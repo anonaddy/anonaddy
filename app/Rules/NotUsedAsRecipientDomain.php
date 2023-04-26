@@ -3,47 +3,34 @@
 namespace App\Rules;
 
 use App\Models\Recipient;
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Str;
 
-class NotUsedAsRecipientDomain implements Rule
+class NotUsedAsRecipientDomain implements ValidationRule
 {
     /**
-     * Create a new rule instance.
+     * Indicates whether the rule should be implicit.
      *
-     * @return void
+     * @var bool
      */
-    public function __construct()
-    {
-        //
-    }
+    public $implicit = true;
 
     /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * Run the validation rule.
      */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        return ! Recipient::whereNotNull('email_verified_at')
+        $recipientDomains = Recipient::whereNotNull('email_verified_at')
             ->select('email')
             ->get()
             ->map(function ($recipient) {
                 return Str::afterLast($recipient->email, '@');
             })
-            ->unique()
-            ->contains($value);
-    }
+            ->unique();
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'The domain must not already be used by a verified recipient.';
+        if ($recipientDomains->contains($value)) {
+            $fail('The domain must not already be used by a verified recipient.');
+        }
     }
 }

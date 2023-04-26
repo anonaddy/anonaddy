@@ -6,14 +6,14 @@ use App\Mail\ForwardEmail;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\Rule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
 use Tests\TestCase;
 
 class RulesTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {

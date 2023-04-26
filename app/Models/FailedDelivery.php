@@ -35,17 +35,14 @@ class FailedDelivery extends Model
         'attempted_at',
     ];
 
-    protected $dates = [
-        'attempted_at',
-        'created_at',
-        'updated_at',
-    ];
-
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
         'recipient_id' => 'string',
         'alias_id' => 'string',
+        'attempted_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**

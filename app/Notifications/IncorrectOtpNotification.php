@@ -45,7 +45,7 @@ class IncorrectOtpNotification extends Notification implements ShouldQueue, Shou
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'FLA:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'FLA:anonaddy');
             });
     }
 

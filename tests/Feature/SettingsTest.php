@@ -11,7 +11,7 @@ use App\Models\Domain;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -20,7 +20,7 @@ use Tests\TestCase;
 
 class SettingsTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -28,7 +28,7 @@ class SettingsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->actingAs($this->user);
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->usernames()->save($this->user->defaultUsername);
@@ -440,8 +440,8 @@ class SettingsTest extends TestCase
     }
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function user_can_download_aliases_export()
     {
         Excel::fake();

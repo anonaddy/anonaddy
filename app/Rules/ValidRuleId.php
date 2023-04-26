@@ -2,52 +2,32 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class ValidRuleId implements Rule
+class ValidRuleId implements ValidationRule
 {
-    protected $user;
+    /**
+     * Indicates whether the rule should be implicit.
+     *
+     * @var bool
+     */
+    public $implicit = true;
 
     /**
-     * Create a new rule instance.
-     *
-     * @return void
+     * Run the validation rule.
      */
-    public function __construct()
+    public function validate(string $attribute, mixed $ids, Closure $fail): void
     {
-        $this->user = user();
-    }
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $ids
-     * @return bool
-     */
-    public function passes($attribute, $ids)
-    {
-        $validRuleIds = $this->user
+        $validRuleIds = user()
             ->rules()
             ->pluck('id')
             ->toArray();
 
         foreach ($ids as $id) {
             if (! in_array($id, $validRuleIds)) {
-                return false;
+                $fail('Invalid Rule ID.');
             }
         }
-
-        return true;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'Invalid Rule ID.';
     }
 }

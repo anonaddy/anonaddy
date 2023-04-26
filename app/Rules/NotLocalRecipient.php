@@ -3,35 +3,29 @@
 namespace App\Rules;
 
 use App\Models\Domain;
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Str;
 
-class NotLocalRecipient implements Rule
+class NotLocalRecipient implements ValidationRule
 {
     /**
-     * Create a new rule instance.
+     * Indicates whether the rule should be implicit.
      *
-     * @return void
+     * @var bool
      */
-    public function __construct()
-    {
-        //
-    }
+    public $implicit = true;
 
     /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * Run the validation rule.
      */
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $emailDomain = strtolower(Str::afterLast($value, '@'));
 
         // Make sure the recipient domain is not added as a verified custom domain
         if (Domain::whereNotNull('domain_verified_at')->pluck('domain')->contains($emailDomain)) {
-            return false;
+            $fail('The recipient cannot use a domain that is already used by a custom domain.');
         }
 
         $count = collect(config('anonaddy.all_domains'))
@@ -40,16 +34,8 @@ class NotLocalRecipient implements Rule
             })
             ->count();
 
-        return $count === 0;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'The recipient cannot use a local domain or be an alias.';
+        if ($count !== 0) {
+            $fail('The recipient cannot use a local domain or be an alias.');
+        }
     }
 }

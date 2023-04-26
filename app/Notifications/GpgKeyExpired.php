@@ -39,7 +39,7 @@ class GpgKeyExpired extends Notification implements ShouldQueue, ShouldBeEncrypt
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'GKE:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'GKE:anonaddy');
             });
     }
 

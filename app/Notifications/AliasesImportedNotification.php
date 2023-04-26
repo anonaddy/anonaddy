@@ -75,7 +75,7 @@ class AliasesImportedNotification extends Notification implements ShouldQueue, S
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'AIF:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'AIF:anonaddy');
             });
     }
 

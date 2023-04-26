@@ -40,20 +40,20 @@ class CheckDomainsMxValidation extends Command
     public function handle()
     {
         Domain::all()
-        ->each(function ($domain) {
-            try {
-                if (! $domain->checkMxRecords()) {
-                    // Notify user via email only if domain's MX previously were valid
-                    if (! is_null($domain->domain_mx_validated_at)) {
-                        $domain->user->notify(new DomainMxRecordsInvalid($domain->domain));
-                    }
+            ->each(function ($domain) {
+                try {
+                    if (! $domain->checkMxRecords()) {
+                        // Notify user via email only if domain's MX previously were valid
+                        if (! is_null($domain->domain_mx_validated_at)) {
+                            $domain->user->notify(new DomainMxRecordsInvalid($domain->domain));
+                        }
 
-                    $domain->domain_mx_validated_at = null;
-                    $domain->save();
+                        $domain->domain_mx_validated_at = null;
+                        $domain->save();
+                    }
+                } catch (\Exception $e) {
+                    //
                 }
-            } catch (\Exception $e) {
-                //
-            }
-        });
+            });
     }
 }

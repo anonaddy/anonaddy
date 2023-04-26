@@ -92,12 +92,12 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                 $message->returnPath($returnPath);
 
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'S:'.$this->alias->id.':anonaddy');
+                    ->addTextHeader('Feedback-ID', 'S:'.$this->alias->id.':anonaddy');
 
                 // Message-ID is replaced on send from as it can leak parts of the real email
                 $message->getHeaders()->remove('Message-ID');
                 $message->getHeaders()
-                            ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
+                    ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
 
                 if ($this->emailInlineAttachments) {
                     foreach ($this->emailInlineAttachments as $attachment) {

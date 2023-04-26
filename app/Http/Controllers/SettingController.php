@@ -38,6 +38,6 @@ class SettingController extends Controller
         $request->session()->invalidate();
 
         return redirect()->route('login')
-        ->with(['status' => 'Account deleted successfully!']);
+            ->with(['status' => 'Account deleted successfully!']);
     }
 }

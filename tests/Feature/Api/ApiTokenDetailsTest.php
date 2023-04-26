@@ -3,12 +3,12 @@
 namespace Tests\Feature\Api;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class ApiTokenDetailsTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {
@@ -18,7 +18,7 @@ class ApiTokenDetailsTest extends TestCase
     /** @test */
     public function user_can_get_account_details()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create()->fresh();
         $token = $user->createToken('New');
 
         $response = $this->withHeaders([

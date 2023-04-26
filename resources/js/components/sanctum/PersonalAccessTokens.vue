@@ -214,7 +214,7 @@
     </Modal>
 
     <Modal :open="revokeTokenModalOpen" @close="closeRevokeTokenModal">
-      <template v-slot:title> ARevoke API Access Token </template>
+      <template v-slot:title> Revoke API Access Token </template>
       <template v-slot:content>
         <p class="my-4 text-grey-700">
           Any browser extension, application or script using this API access token will no longer be

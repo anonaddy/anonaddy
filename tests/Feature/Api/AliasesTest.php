@@ -6,12 +6,12 @@ use App\Models\Alias;
 use App\Models\Domain;
 use App\Models\Recipient;
 use App\Models\Username;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class AliasesTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {

@@ -2,12 +2,11 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class VerifiedRecipientId implements Rule
+class VerifiedRecipientId implements ValidationRule
 {
-    protected $user;
-
     protected $verifiedRecipientIds;
 
     /**
@@ -17,47 +16,30 @@ class VerifiedRecipientId implements Rule
      */
     public function __construct(array $verifiedRecipientIds = null)
     {
-        $this->user = user();
-
         if (! is_null($verifiedRecipientIds)) {
             $this->verifiedRecipientIds = $verifiedRecipientIds;
         } else {
-            $this->verifiedRecipientIds = $this->user
-            ->verifiedRecipients()
-            ->pluck('id')
-            ->toArray();
+            $this->verifiedRecipientIds = user()
+                ->verifiedRecipients()
+                ->pluck('id')
+                ->toArray();
         }
     }
 
     /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $ids
-     * @return bool
+     * Run the validation rule.
      */
-    public function passes($attribute, $ids)
+    public function validate(string $attribute, mixed $ids, Closure $fail): void
     {
+        // Multiple calls to $fail simply add more validation errors, they don't stop processing.
         if (! is_array($ids)) {
-            return false;
-        }
-
-        foreach ($ids as $id) {
-            if (!in_array($id, $this->verifiedRecipientIds)) {
-                return false;
+            $fail('Invalid Recipient');
+        } else {
+            foreach ($ids as $id) {
+                if (! in_array($id, $this->verifiedRecipientIds)) {
+                    $fail('Invalid Recipient');
+                }
             }
         }
-
-        return true;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'Invalid Recipient.';
     }
 }

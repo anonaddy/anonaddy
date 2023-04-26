@@ -54,7 +54,7 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'DRU:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'DRU:anonaddy');
             });
     }
 

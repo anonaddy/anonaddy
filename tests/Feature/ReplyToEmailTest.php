@@ -6,13 +6,13 @@ use App\Mail\ReplyToEmail;
 use App\Models\Alias;
 use App\Models\Recipient;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class ReplyToEmailTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected $user;
 
@@ -20,7 +20,7 @@ class ReplyToEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         $this->user->recipients()->save($this->user->defaultRecipient);
         $this->user->defaultRecipient->email = 'will@anonaddy.com';
         $this->user->defaultRecipient->save();

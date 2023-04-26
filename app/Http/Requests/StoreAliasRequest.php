@@ -50,7 +50,7 @@ class StoreAliasRequest extends FormRequest
             'max:50',
             Rule::unique('aliases')->where(function ($query) {
                 return $query->where('local_part', $this->validationData()['local_part'])
-                ->where('domain', $this->validationData()['domain']);
+                    ->where('domain', $this->validationData()['domain']);
             }),
             new ValidAliasLocalPart(),
         ], function () {

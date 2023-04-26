@@ -98,7 +98,7 @@ class ResetPasswordController extends Controller
     protected function sendResetFailedResponse(Request $request, $response)
     {
         return back()
-                    ->withInput($request->only('username'))
-                    ->withErrors(['username' => trans($response)]);
+            ->withInput($request->only('username'))
+            ->withErrors(['username' => trans($response)]);
     }
 }

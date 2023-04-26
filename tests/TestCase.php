@@ -42,7 +42,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUpSanctum(): void
     {
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create()->fresh();
         Sanctum::actingAs($this->user, []);
     }
 }

@@ -27,11 +27,6 @@ class Rule extends Model
         'order',
     ];
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
-
     protected $casts = [
         'id' => 'string',
         'user_id' => 'string',
@@ -41,6 +36,8 @@ class Rule extends Model
         'sends' => 'boolean',
         'conditions' => 'array',
         'actions' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**

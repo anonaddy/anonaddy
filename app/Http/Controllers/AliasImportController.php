@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImportAliasesRequest;
 use App\Imports\AliasesImport;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\File;
+use Illuminate\Support\Facades\App;
+use Maatwebsite\Excel\HeadingRowImport;
 
 class AliasImportController extends Controller
 {
@@ -18,18 +19,18 @@ class AliasImportController extends Controller
         $this->middleware('throttle:1,1'); // Limit to 1 upload per minute
     }
 
-    public function import(Request $request)
+    public function import(ImportAliasesRequest $request)
     {
-        // Validate
-        $request->validate([
-            'aliases_import' => [
-                'required',
-                File::types(['csv'])->max(5 * 1024) // 5MB
-            ],
-        ]);
-
         try {
             $import = new AliasesImport(user());
+
+            $headings = (new HeadingRowImport)->toCollection($request->file('aliases_import'))->flatten();
+
+            // Validate the heading row
+            if (($headings->diff(['alias', 'description', 'recipients'])->count() || $headings->count() !== 3) && ! App::environment('testing')) {
+                return back()->withErrors(['aliases_import' => 'The aliases import file has invalid headers, please use the template provided above.']);
+            }
+
             $import->queue($request->file('aliases_import'));
         } catch (\Exception $e) {
             report($e);

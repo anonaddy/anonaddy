@@ -7,6 +7,7 @@ use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -79,28 +80,29 @@ class User extends Authenticatable implements MustVerifyEmail
         'catch_all' => 'boolean',
         'two_factor_enabled' => 'boolean',
         'use_reply_to' => 'boolean',
-    ];
-
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'email_verified_at',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'email_verified_at' => 'datetime',
     ];
 
     /**
      * Get the user's default email.
      */
-    public function getEmailAttribute()
+    protected function email(): Attribute
     {
-        return $this->defaultRecipient->email;
+        return Attribute::make(
+            get: fn () => $this->defaultRecipient->email,
+        );
     }
 
     /**
      * Get the user's default email verified_at.
      */
-    public function getEmailVerifiedAtAttribute()
+    protected function emailVerifiedAt(): Attribute
     {
-        return $this->defaultRecipient->email_verified_at;
+        return Attribute::make(
+            get: fn () => $this->defaultRecipient->email_verified_at,
+        );
     }
 
     /**
@@ -114,9 +116,11 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the user's default username.
      */
-    public function getUsernameAttribute()
+    protected function username(): Attribute
     {
-        return $this->defaultUsername->username;
+        return Attribute::make(
+            get: fn () => $this->defaultUsername->username,
+        );
     }
 
     /**
@@ -140,9 +144,11 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the user's bandwidth in MB.
      */
-    public function getBandwidthMbAttribute()
+    protected function bandwidthMb(): Attribute
     {
-        return round($this->bandwidth / 1024 / 1024, 2);
+        return Attribute::make(
+            get: fn () => round($this->bandwidth / 1024 / 1024, 2),
+        );
     }
 
     /**

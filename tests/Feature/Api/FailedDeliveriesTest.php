@@ -3,12 +3,12 @@
 namespace Tests\Feature\Api;
 
 use App\Models\FailedDelivery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class FailedDeliveriesTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {
@@ -61,6 +61,6 @@ class FailedDeliveriesTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/failed-deliveries/'.$failedDelivery->id);
 
         $response->assertStatus(204);
-        $this->assertEmpty($this->user->failedDelivery);
+        $this->assertEmpty($this->user->failedDeliveries);
     }
 }

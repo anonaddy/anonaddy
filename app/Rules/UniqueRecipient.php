@@ -3,32 +3,24 @@
 namespace App\Rules;
 
 use App\Models\Recipient;
-use Illuminate\Contracts\Validation\Rule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class UniqueRecipient implements Rule
+class UniqueRecipient implements ValidationRule
 {
-    protected $user;
+    /**
+     * Indicates whether the rule should be implicit.
+     *
+     * @var bool
+     */
+    public $implicit = true;
 
     /**
-     * Create a new rule instance.
-     *
-     * @return void
+     * Run the validation rule.
      */
-    public function __construct()
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $this->user = user();
-    }
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
-    {
-        $items = Recipient::where('user_id', $this->user->id)
+        $items = Recipient::where('user_id', user()->id)
             ->orWhere('email_verified_at', '!=', null)
             ->select('email')
             ->get()
@@ -38,16 +30,8 @@ class UniqueRecipient implements Rule
                 }
             });
 
-        return count($items) === 0;
-    }
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'A recipient with that email already exists.';
+        if (count($items) !== 0) {
+            $fail('A recipient with that email already exists.');
+        }
     }
 }

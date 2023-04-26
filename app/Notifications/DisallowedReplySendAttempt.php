@@ -68,7 +68,7 @@ class DisallowedReplySendAttempt extends Notification implements ShouldQueue, Sh
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()
-                        ->addTextHeader('Feedback-ID', 'DRSA:anonaddy');
+                    ->addTextHeader('Feedback-ID', 'DRSA:anonaddy');
             });
     }
 
