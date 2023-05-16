@@ -14,20 +14,29 @@ class FailedDeliveryNotification extends Notification implements ShouldQueue, Sh
 
     protected $aliasEmail;
 
+    protected $recipientEmail;
+
     protected $originalSender;
 
     protected $originalSubject;
+
+    protected $isStored;
+
+    protected $storeFailedDeliveries;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($aliasEmail, $originalSender, $originalSubject)
+    public function __construct($aliasEmail, $originalSender, $originalSubject, $isStored = false, $storeFailedDeliveries = false, $recipientEmail = null)
     {
         $this->aliasEmail = $aliasEmail;
+        $this->recipientEmail = $recipientEmail;
         $this->originalSender = $originalSender;
         $this->originalSubject = $originalSubject;
+        $this->isStored = $isStored;
+        $this->storeFailedDeliveries = $storeFailedDeliveries;
     }
 
     /**
@@ -53,8 +62,11 @@ class FailedDeliveryNotification extends Notification implements ShouldQueue, Sh
             ->subject('New failed delivery on AnonAddy')
             ->markdown('mail.failed_delivery_notification', [
                 'aliasEmail' => $this->aliasEmail,
+                'recipientEmail' => $this->recipientEmail ?? $notifiable->email,
                 'originalSender' => $this->originalSender,
                 'originalSubject' => $this->originalSubject,
+                'isStored' => $this->isStored,
+                'storeFailedDeliveries' => $this->storeFailedDeliveries,
                 'recipientId' => $notifiable->id,
                 'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])

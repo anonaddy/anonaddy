@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "@headlessui/vue": "^1.6.7",
-        "@kyvg/vue3-notification": "^2.3.4",
+        "@kyvg/vue3-notification": "^2.3.1",
         "@vueform/multiselect": "^2.3.2",
         "autoprefixer": "^10.4.1",
         "axios": "^1.0.0",

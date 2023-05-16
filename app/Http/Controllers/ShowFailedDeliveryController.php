@@ -10,7 +10,7 @@ class ShowFailedDeliveryController extends Controller
             'failedDeliveries' => user()
                 ->failedDeliveries()
                 ->with(['recipient:id,email', 'alias:id,email'])
-                ->select(['alias_id', 'bounce_type', 'code', 'attempted_at', 'created_at', 'id', 'recipient_id', 'remote_mta', 'sender'])
+                ->select(['alias_id', 'bounce_type', 'code', 'attempted_at', 'created_at', 'id', 'recipient_id', 'remote_mta', 'sender', 'is_stored'])
                 ->latest()
                 ->get(),
         ]);

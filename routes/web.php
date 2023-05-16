@@ -16,6 +16,7 @@ use App\Http\Controllers\DefaultAliasDomainController;
 use App\Http\Controllers\DefaultAliasFormatController;
 use App\Http\Controllers\DefaultRecipientController;
 use App\Http\Controllers\DomainVerificationController;
+use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\EmailSubjectController;
 use App\Http\Controllers\FromNameController;
 use App\Http\Controllers\PasswordController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\ShowFailedDeliveryController;
 use App\Http\Controllers\ShowRecipientController;
 use App\Http\Controllers\ShowRuleController;
 use App\Http\Controllers\ShowUsernameController;
+use App\Http\Controllers\StoreFailedDeliveryController;
 use App\Http\Controllers\UseReplyToController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -100,6 +102,7 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
     Route::get('/rules', [ShowRuleController::class, 'index'])->name('rules.index');
 
     Route::get('/failed-deliveries', [ShowFailedDeliveryController::class, 'index'])->name('failed_deliveries.index');
+    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index'])->name('downloadable_failed_delivery.index');
 });
 
 Route::group([
@@ -125,6 +128,8 @@ Route::group([
     Route::post('/email-subject', [EmailSubjectController::class, 'update'])->name('settings.email_subject');
 
     Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
+
+    Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
 
     Route::post('/use-reply-to', [UseReplyToController::class, 'update'])->name('settings.use_reply_to');
 

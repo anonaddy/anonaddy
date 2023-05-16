@@ -110,6 +110,14 @@
           >{{ $filters.timeAgo(props.row.attempted_at) }}
         </span>
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
+          <a
+            v-if="props.row.is_stored"
+            :href="'failed-deliveries/' + props.row.id + '/download'"
+            class="mr-4 tooltip"
+            data-tippy-content="Download Email"
+          >
+            <icon name="download" class="block w-6 h-6 text-grey-300 cursor-pointer" />
+          </a>
           <icon
             name="trash"
             class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
@@ -141,7 +149,9 @@
       <template v-slot:content>
         <p class="mt-4 text-grey-700">Are you sure you want to delete this failed delivery?</p>
         <p class="mt-4 text-grey-700">
-          Failed deliveries are automatically removed when they are more than 3 days old.
+          Failed deliveries are <b>automatically removed</b> when they are more than
+          <b>7 days old</b>. Deleting a failed delivery also deletes the email if it has been
+          stored.
         </p>
         <div class="mt-6">
           <button

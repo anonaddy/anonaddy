@@ -245,6 +245,32 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_enable_store_failed_deliveries()
+    {
+        $this->user->update(['store_failed_deliveries' => false]);
+
+        $response = $this->post('/settings/store-failed-deliveries/', [
+            'store_failed_deliveries' => true,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertTrue($this->user->store_failed_deliveries);
+    }
+
+    /** @test */
+    public function user_can_disable_store_failed_deliveries()
+    {
+        $this->assertTrue($this->user->store_failed_deliveries);
+
+        $response = $this->post('/settings/store-failed-deliveries/', [
+            'store_failed_deliveries' => false,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertFalse($this->user->store_failed_deliveries);
+    }
+
+    /** @test */
     public function user_can_generate_new_backup_code()
     {
         $this->user->update([

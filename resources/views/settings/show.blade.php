@@ -279,6 +279,50 @@
                 </button>
             </form>
 
+            <form method="POST" action="{{ route('settings.store_failed_deliveries') }}" class="pt-16">
+                @csrf
+
+                <div class="mb-6">
+
+                    <h3 class="font-bold text-xl">
+                        Store Failed Deliveries
+                    </h3>
+
+                    <div class="mt-4 w-24 border-b-2 border-grey-200"></div>
+
+                    <p class="mt-6">This setting allows you to choose whether or not AnonAddy should <b>temporarily store</b> failed delivery attempts, this ensures that <b>emails are not lost</b> if they are rejected by your recipients as they can be downloaded from the failed deliveries page. Failed deliveries are <b>automatically deleted after 7 days</b>.</p>
+
+                    <div class="mt-6 flex flex-wrap mb-4">
+                        <label for="store_failed_deliveries" class="block text-grey-700 text-sm mb-2">
+                            {{ __('Store Failed Deliveries') }}:
+                        </label>
+
+                        <div class="block relative w-full">
+                            <select id="store_failed_deliveries" class="block appearance-none w-full text-grey-700 bg-grey-100 p-3 pr-8 rounded shadow focus:ring" name="store_failed_deliveries" required>
+                                <option value="1" {{ $user->store_failed_deliveries === true ? 'selected' : '' }}>Enabled</option>
+                                <option value="0" {{ $user->store_failed_deliveries === false ? 'selected' : '' }}>Disabled</option>
+
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
+
+                        @if ($errors->has('store_failed_deliveries'))
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('store_failed_deliveries') }}
+                            </p>
+                        @endif
+                    </div>
+
+                </div>
+
+                <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none">
+                    Update Store Failed Deliveries
+                </button>
+
+            </form>
+
             <form id="update-password" method="POST" action="{{ route('settings.password') }}" class="pt-16">
                 @csrf
 

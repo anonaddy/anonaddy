@@ -125,7 +125,7 @@ class AliasesTest extends TestCase
     public function user_can_generate_new_alias()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
-            'domain' => 'anonaddy.me',
+            'domain' => 'Anonaddy.me',
             'description' => 'the description',
             'local_part' => 'not-required-for-shared-alias',
         ]);

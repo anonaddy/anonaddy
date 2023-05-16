@@ -7,6 +7,7 @@ use App\Traits\HasUuid;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class FailedDelivery extends Model
 {
@@ -23,9 +24,11 @@ class FailedDelivery extends Model
     ];
 
     protected $fillable = [
+        'id',
         'user_id',
         'recipient_id',
         'alias_id',
+        'is_stored',
         'bounce_type',
         'remote_mta',
         'sender',
@@ -40,10 +43,22 @@ class FailedDelivery extends Model
         'user_id' => 'string',
         'recipient_id' => 'string',
         'alias_id' => 'string',
+        'is_stored' => 'boolean',
         'attempted_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        FailedDelivery::deleting(function ($failedDelivery) {
+            if ($failedDelivery->is_stored) {
+                Storage::disk('local')->delete($failedDelivery->id.'.eml');
+            }
+        });
+    }
 
     /**
      * Prepare a date for array / JSON serialization.
