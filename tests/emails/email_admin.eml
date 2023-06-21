@@ -1,0 +1,28 @@
+Date: Wed, 20 Feb 2019 15:00:00 +0100 (CET)
+From: Will <will@anonaddy.com>
+To: <ebay@anonaddy.me>
+Subject: Test Email
+Content-Type: multipart/mixed; boundary="----=_Part_10031_1199410393.1550677940425"
+
+------=_Part_10031_1199410393.1550677940425
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hi,<br>
+<br>
+This is a test email.<br>
+<br>
+Will
+
+
+------=_Part_10031_1199410393.1550677940425
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+This is a test email.
+
+Will
+
+------=_Part_10031_1199410393.1550677940425--

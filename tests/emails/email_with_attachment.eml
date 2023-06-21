@@ -1,0 +1,54 @@
+Date: Wed, 20 Feb 2019 15:00:00 +0100 (CET)
+From: Will <will@anonaddy.com>
+To: attachment@johndoe.anonaddy.com
+Subject: With Attachment
+Content-Type: multipart/mixed; boundary="----=_Part_10031_1199410393.1550677940425"
+
+This is a multi-part message in MIME format.
+------=_Part_10031_1199410393.1550677940425
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+This is the attachment
+
+------=_Part_10031_1199410393.1550677940425
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<b>This is the attachment<b>
+
+------=_Part_10031_1199410393.1550677940425
+Content-Type: image/png; name="favicon-32x32.png"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="favicon-32x32.png"
+
+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
+dPJCNZUAAAAASUVORK5CYII=
+------=_Part_10031_1199410393.1550677940425--

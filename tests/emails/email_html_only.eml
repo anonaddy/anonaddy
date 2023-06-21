@@ -1,0 +1,14 @@
+Date: Wed, 20 Feb 2019 15:00:00 +0100 (CET)
+From: Will <will@anonaddy.com>
+To: <ebay@johndoe.anonaddy.com>
+Subject: Test HTML Email
+List-Unsubscribe: <mailto:unsubscribe@example.com>
+Message-ID: 3edc902304c446bb9cb904623c9e59fb
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Hi,<br>
+<br>
+This is a test email.<br>
+<br>
+Will
