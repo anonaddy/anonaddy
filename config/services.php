@@ -41,7 +41,6 @@ return [
         ],
     ],
 
-<<<<<<< HEAD
     'authentik' => [
         'base_url' => env('AUTHENTIK_BASE_URL'),
         'client_id' => env('AUTHENTIK_CLIENT_ID'),
@@ -52,6 +51,4 @@ return [
     ],
 
 
-=======
->>>>>>> upstream/master
 ];

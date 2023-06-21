@@ -21,12 +21,9 @@
         "mews/captcha": "^3.0.0",
         "php-mime-mail-parser/php-mime-mail-parser": "^8.0",
         "pragmarx/google2fa-laravel": "^2.0.0",
-<<<<<<< HEAD
         "ramsey/uuid": "^4.0",
-        "socialiteproviders/authentik": "^5.0"
-=======
+        "socialiteproviders/authentik": "^5.0",
         "ramsey/uuid": "^4.0"
->>>>>>> upstream/master
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

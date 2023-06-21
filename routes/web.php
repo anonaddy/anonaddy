@@ -30,10 +30,7 @@ use App\Http\Controllers\ShowRuleController;
 use App\Http\Controllers\ShowUsernameController;
 use App\Http\Controllers\StoreFailedDeliveryController;
 use App\Http\Controllers\UseReplyToController;
-<<<<<<< HEAD
 use App\Http\Controllers\AuthentikController;
-=======
->>>>>>> upstream/master
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -48,7 +45,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-<<<<<<< HEAD
 #Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
 Route::get('/auth/redirect', function () {
     return Socialite::driver('authentik')->redirect();
@@ -58,9 +54,6 @@ Route::get('/auth/callback', [AuthentikController::class, 'callback']);
 
 Route::post('/auth/logout', [AuthentikController::class, 'logout'])->name('logout');
 
-=======
-Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
->>>>>>> upstream/master
 
 // Get API access token
 Route::post('api/auth/login', [ApiAuthenticationController::class, 'login']);
