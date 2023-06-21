@@ -49,9 +49,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_enabled',
         'two_factor_secret',
         'two_factor_backup_code',
+<<<<<<< HEAD
         'authentik_id',
 	    'authentik_token',
 	    'authentik_refresh_token',
+=======
+>>>>>>> upstream/master
     ];
 
     protected $encrypted = [

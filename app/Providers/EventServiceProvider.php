@@ -26,9 +26,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         LoginFailed::class => [
             SendIncorrectOtpNotification::class,
+<<<<<<< HEAD
 	],
 	\SocialiteProviders\Manager\SocialiteWasCalled::class => [
             \SocialiteProviders\Authentik\AuthentikExtendSocialite::class.'@handle',
+=======
+>>>>>>> upstream/master
         ],
     ];
 

@@ -175,7 +175,10 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\HelperServiceProvider::class,
         App\Providers\CustomMailServiceProvider::class,
+<<<<<<< HEAD
 	\SocialiteProviders\Manager\ServiceProvider::class,
+=======
+>>>>>>> upstream/master
 
     ])->toArray(),
 

@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "5454ff48d1393072eb005864d181e150",
+=======
+    "content-hash": "9157f77755c349a041b1255e99adc1aa",
+>>>>>>> upstream/master
     "packages": [
         {
             "name": "asbiin/laravel-webauthn",
@@ -2200,6 +2204,7 @@
             "time": "2023-01-30T18:31:20+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "laravel/socialite",
             "version": "v5.6.3",
             "source": {
@@ -2270,6 +2275,8 @@
             "time": "2023-06-06T13:42:43+00:00"
         },
         {
+=======
+>>>>>>> upstream/master
             "name": "laravel/tinker",
             "version": "v2.8.1",
             "source": {
@@ -2856,6 +2863,7 @@
             "time": "2022-04-17T13:12:02+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "league/oauth1-client",
             "version": "v1.10.1",
             "source": {
@@ -2932,6 +2940,8 @@
             "time": "2022-04-15T14:02:14+00:00"
         },
         {
+=======
+>>>>>>> upstream/master
             "name": "maatwebsite/excel",
             "version": "3.1.48",
             "source": {
@@ -5116,6 +5126,7 @@
             "time": "2023-04-15T23:01:58+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "socialiteproviders/authentik",
             "version": "5.0.0",
             "source": {
@@ -5240,6 +5251,8 @@
             "time": "2023-01-26T23:11:27+00:00"
         },
         {
+=======
+>>>>>>> upstream/master
             "name": "spomky-labs/cbor-php",
             "version": "3.0.2",
             "source": {
