@@ -1,0 +1,641 @@
+@tailwind base;
+
+/* Add custom base styles here... */
+html {
+  @apply font-sans;
+  font-size: 16px;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+@tailwind components;
+
+/* Add custom components here... */
+
+/* purgecss start ignore */
+.vue-notification-wrapper .vue-notification {
+  @apply text-sm mb-4 mr-4 mt-0 ml-0;
+}
+
+.vue-notification-wrapper .vue-notification.success {
+  @apply bg-green-100 border-green-600 text-green-800;
+}
+
+.vue-notification-wrapper .vue-notification.error {
+  @apply bg-red-100 border-red-600 text-red-800;
+}
+
+.vue-notification-wrapper .vue-notification.warn {
+  @apply bg-yellow-100 border-yellow-600 text-yellow-800;
+}
+
+/* Multiselect default syling start */
+.multiselect {
+  @apply relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-grey-300 rounded bg-white text-base leading-snug outline-none;
+}
+.multiselect.is-disabled {
+  @apply cursor-default bg-grey-100;
+}
+.multiselect.is-open {
+  @apply rounded-b-none;
+}
+.multiselect.is-open-top {
+  @apply rounded-t-none;
+}
+.multiselect.is-active {
+  @apply ring ring-green-500 ring-opacity-30;
+}
+
+.multiselect-wrapper {
+  @apply relative mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none;
+}
+
+.multiselect-single-label {
+  @apply flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 pr-16 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-single-label-text {
+  @apply overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full;
+}
+
+.multiselect-multiple-label {
+  @apply flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-search {
+  @apply w-full absolute inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-tags {
+  @apply flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 rtl:pl-0 rtl:pr-2;
+}
+
+.multiselect-tag {
+  @apply bg-green-500 text-white text-sm font-semibold py-0.5 pl-2 rounded mr-1 mb-1 flex items-center whitespace-nowrap rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1;
+}
+.multiselect-tag.is-disabled {
+  @apply pr-2 opacity-50 rtl:pl-2;
+}
+
+.multiselect-tag-remove {
+  @apply flex items-center justify-center p-1 mx-0.5 rounded-sm hover:bg-black hover:bg-opacity-10;
+}
+
+.multiselect-tag-remove-icon {
+  @apply bg-multiselect-remove bg-center bg-no-repeat opacity-30 inline-block w-3 h-3;
+}
+
+.multiselect-tag-remove:hover .multiselect-tag-remove-icon {
+  @apply opacity-60;
+}
+
+.multiselect-tags-search-wrapper {
+  @apply inline-block relative mx-1 mb-1 flex-grow flex-shrink h-full;
+}
+
+.multiselect-tags-search {
+  @apply absolute inset-0 border-0 outline-none focus:ring-0 appearance-none p-0 text-base font-sans box-border w-full;
+}
+
+.multiselect-tags-search-copy {
+  @apply invisible whitespace-pre-wrap inline-block h-px;
+}
+
+.multiselect-placeholder {
+  @apply flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-grey-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5;
+}
+
+.multiselect-caret {
+  @apply bg-multiselect-caret bg-center bg-no-repeat w-2.5 h-4 py-px box-content mr-3.5 relative z-10 opacity-40 flex-shrink-0 flex-grow-0 transition-transform transform pointer-events-none rtl:mr-0 rtl:ml-3.5;
+}
+.multiselect-caret.is-open {
+  @apply rotate-180 pointer-events-auto;
+}
+
+.multiselect-clear {
+  @apply pr-3.5 relative z-10 opacity-40 transition duration-300 flex-shrink-0 flex-grow-0 flex hover:opacity-80 rtl:pr-0 rtl:pl-3.5;
+}
+
+.multiselect-clear-icon {
+  @apply bg-multiselect-remove bg-center bg-no-repeat w-2.5 h-4 py-px box-content inline-block;
+}
+
+.multiselect-spinner {
+  @apply bg-multiselect-spinner bg-center bg-no-repeat w-4 h-4 z-10 mr-3.5 animate-spin flex-shrink-0 flex-grow-0 rtl:mr-0 rtl:ml-3.5;
+}
+
+.multiselect-inifite {
+  @apply flex items-center justify-center w-full;
+}
+
+.multiselect-inifite-spinner {
+  @apply bg-multiselect-spinner bg-center bg-no-repeat w-4 h-4 z-10 animate-spin flex-shrink-0 flex-grow-0 m-3.5;
+}
+
+.multiselect-dropdown {
+  @apply max-h-60 absolute -left-px -right-px bottom-0 transform translate-y-full border border-grey-300 -mt-px overflow-y-scroll z-50 bg-white flex flex-col rounded-b;
+}
+.multiselect-dropdown.is-top {
+  @apply -translate-y-full top-px bottom-auto rounded-b-none rounded-t;
+}
+.multiselect-dropdown.is-hidden {
+  @apply hidden;
+}
+
+.multiselect-options {
+  @apply flex flex-col p-0 m-0 list-none;
+}
+
+.multiselect-group {
+  @apply p-0 m-0;
+}
+
+.multiselect-group-label {
+  @apply flex text-sm box-border items-center justify-start text-left py-1 px-3 font-semibold bg-grey-200 cursor-default leading-normal;
+}
+.multiselect-group-label.is-pointable {
+  @apply cursor-pointer;
+}
+.multiselect-group-label.is-pointed {
+  @apply bg-grey-300 text-grey-700;
+}
+.multiselect-group-label.is-selected {
+  @apply bg-green-600 text-white;
+}
+.multiselect-group-label.is-disabled {
+  @apply bg-grey-100 text-grey-300 cursor-not-allowed;
+}
+.multiselect-group-label.is-selected.is-pointed {
+  @apply bg-green-600 text-white opacity-90;
+}
+.multiselect-group-label.is-selected.is-disabled {
+  @apply text-green-100 bg-green-600 bg-opacity-50 cursor-not-allowed;
+}
+
+.multiselect-group-options {
+  @apply p-0 m-0;
+}
+
+.multiselect-option {
+  @apply flex items-center justify-start box-border text-left cursor-pointer text-base leading-snug py-2 px-3;
+}
+.multiselect-option.is-pointed {
+  @apply text-grey-800 bg-grey-100;
+}
+.multiselect-option.is-selected {
+  @apply text-white bg-green-500;
+}
+.multiselect-option.is-disabled {
+  @apply text-grey-300 cursor-not-allowed;
+}
+.multiselect-option.is-selected.is-pointed {
+  @apply text-white bg-green-500 opacity-90;
+}
+.multiselect-option.is-selected.is-disabled {
+  @apply text-green-100 bg-green-500 bg-opacity-50 cursor-not-allowed;
+}
+
+.multiselect-no-options {
+  @apply py-2 px-3 text-grey-600 bg-white text-left rtl:text-right;
+}
+
+.multiselect-no-results {
+  @apply py-2 px-3 text-grey-600 bg-white text-left rtl:text-right;
+}
+
+.multiselect-fake-input {
+  @apply bg-transparent absolute left-0 right-0 -bottom-px w-full h-px border-0 p-0 appearance-none outline-none text-transparent;
+}
+
+.multiselect-assistive-text {
+  @apply absolute -m-px w-px h-px overflow-hidden;
+  clip: rect(0 0 0 0);
+}
+
+.multiselect-spacer {
+  @apply h-9 py-px box-content;
+}
+/* Multiselect default syling end */
+
+.multiselect .multiselect-dropdown::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+.multiselect .multiselect-dropdown::-webkit-scrollbar-thumb {
+  @apply bg-indigo-500 rounded-full;
+}
+
+.multiselect .multiselect-dropdown::-webkit-scrollbar-track {
+  @apply bg-indigo-50;
+}
+
+.multiselect .multiselect-tag {
+  @apply bg-indigo-100 text-indigo-900;
+}
+
+.multiselect .multiselect-option.is-selected {
+  @apply bg-indigo-100 text-indigo-900;
+}
+
+.multiselect .multiselect-option.is-selected:hover {
+  @apply bg-red-500;
+}
+
+/* Vue good-table */
+.vgt-table.striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(51, 68, 109, 0.03);
+}
+.vgt-right-align {
+  @apply text-left;
+}
+.vgt-left-align {
+  @apply text-left;
+}
+.vgt-center-align {
+  @apply text-center;
+}
+.vgt-pull-left {
+  @apply float-left !important;
+}
+.vgt-pull-right {
+  @apply float-right !important;
+}
+.vgt-clearfix::after {
+  @apply block;
+  content: '';
+  clear: both;
+}
+.vgt-responsive {
+  @apply overflow-x-auto w-full relative;
+}
+.aliases .vgt-responsive {
+  min-height: 260px;
+}
+.vgt-text-disabled {
+  @apply text-grey-300;
+}
+.vgt-wrap {
+  @apply shadow relative;
+}
+.sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+.vgt-fixed-header {
+  @apply absolute z-10 w-full overflow-x-auto;
+}
+table.vgt-table {
+  @apply text-base border-collapse bg-white w-full max-w-full table-auto;
+}
+table.vgt-table td {
+  @apply p-3 border-b border-grey-100;
+}
+table.vgt-table tbody tr {
+  @apply h-20;
+}
+table.vgt-table tr.clickable {
+  @apply cursor-pointer;
+}
+table.vgt-table tr.clickable:hover {
+  @apply bg-grey-50;
+}
+.vgt-table th {
+  @apply p-3 align-middle relative;
+}
+.vgt-table th.sortable button {
+  @apply absolute appearance-none border-none top-0 left-0 w-full h-full;
+  background: 0 0;
+}
+.vgt-table th.sortable button:focus {
+  outline: 0;
+}
+.vgt-table th.sortable button:after {
+  @apply absolute h-0 w-0;
+  content: '';
+  right: 6px;
+  top: 50%;
+  margin-top: -7px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid theme('colors.grey.300');
+}
+.vgt-table th.sortable button:before {
+  @apply absolute h-0 w-0;
+  content: '';
+  right: 6px;
+  top: 50%;
+  margin-bottom: -7px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid theme('colors.grey.300');
+}
+.vgt-table th.line-numbers,
+.vgt-table th.vgt-checkbox-col {
+  padding: 0 0.75em 0 0.75em;
+  color: #606266;
+  border-right: 1px solid #dcdfe6;
+  word-wrap: break-word;
+  width: 25px;
+  text-align: center;
+  background: linear-gradient(#f4f5f8, #f1f3f6);
+}
+.vgt-table th.filter-th {
+  @apply p-3;
+}
+.vgt-table th.vgt-row-header {
+  @apply border-t-2 border-b-2 border-grey-100 bg-white;
+}
+.vgt-table th.vgt-row-header .triangle {
+  width: 24px;
+  height: 24px;
+  border-radius: 15%;
+  position: relative;
+  margin: 0 8px;
+}
+.vgt-table th.vgt-row-header .triangle:after {
+  content: '';
+  position: absolute;
+  display: block;
+  left: 50%;
+  top: 50%;
+  margin-top: -6px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid #606266;
+  margin-left: -3px;
+  transition: 0.3s ease transform;
+}
+.vgt-table th.vgt-row-header .triangle.expand:after {
+  transform: rotate(90deg);
+}
+.vgt-table thead th {
+  @apply text-grey-400 align-bottom pr-6 bg-white cursor-pointer;
+  border-bottom: 1px solid #dcdfe6;
+}
+.vgt-table thead th.vgt-checkbox-col {
+  @apply align-middle;
+}
+.vgt-table thead th.sorting-asc,
+.vgt-table thead th.sorting-desc {
+  @apply text-grey-800;
+}
+.vgt-table thead th.sorting-asc button:after {
+  border-bottom: 5px solid theme('colors.cyan.400');
+}
+.vgt-table thead th.sorting-desc button:before {
+  border-top: 5px solid theme('colors.cyan.400');
+}
+.vgt-input,
+.vgt-select {
+  @apply w-full leading-none block text-sm font-normal text-grey-400 bg-white border;
+  height: 40px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-image: none;
+  transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+.vgt-input::placeholder,
+.vgt-select::placeholder {
+  @apply text-grey-500 opacity-25;
+}
+.vgt-input:focus,
+.vgt-select:focus {
+  @apply outline-none border-cyan-500;
+}
+.vgt-loading {
+  @apply absolute w-full z-10;
+  margin-top: 117px;
+}
+.vgt-loading__content {
+  background-color: #c0dfff;
+  color: theme('colors.cyan.400');
+  padding: 7px 30px;
+  border-radius: 3px;
+}
+.vgt-inner-wrap.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.vgt-table.bordered td,
+.vgt-table.bordered th {
+  border: 1px solid #dcdfe6;
+}
+.vgt-table.bordered th.vgt-row-header {
+  border-bottom: 3px solid #dcdfe6;
+}
+.vgt-table.condensed td,
+.vgt-table.condensed th.vgt-row-header {
+  padding: 0.4em 0.4em 0.4em 0.4em;
+}
+@media (max-width: 576px) {
+  .vgt-compact * {
+    box-sizing: border-box;
+  }
+  .vgt-compact tbody,
+  .vgt-compact td,
+  .vgt-compact tr {
+    display: block;
+    width: 100%;
+  }
+  .vgt-compact thead {
+    display: none;
+  }
+  .vgt-compact tr {
+    margin-bottom: 15px;
+  }
+  .vgt-compact td {
+    text-align: right;
+    position: relative;
+  }
+  .vgt-compact td:before {
+    content: attr(data-label);
+    position: relative;
+    float: left;
+    left: 0;
+    width: 40%;
+    padding-left: 10px;
+    font-weight: 700;
+    text-align: left;
+  }
+  .vgt-compact th.line-numbers {
+    width: 100% !important;
+    display: block;
+    padding: 0.3em 1em !important;
+  }
+}
+.vgt-global-search {
+  padding: 5px 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  border: 1px solid #dcdfe6;
+  border-bottom: 0;
+  background: linear-gradient(#f4f5f8, #f1f3f6);
+}
+.vgt-global-search form {
+  display: flex;
+}
+.vgt-global-search form label {
+  margin-top: 3px;
+}
+.vgt-global-search__input {
+  position: relative;
+  padding-left: 40px;
+  flex-grow: 1;
+}
+.vgt-global-search__input .input__icon {
+  position: absolute;
+  left: 0;
+  max-width: 32px;
+}
+.vgt-global-search__input .input__icon .magnifying-glass {
+  margin-top: 3px;
+  margin-left: 8px;
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #494949;
+  position: relative;
+  border-radius: 50%;
+}
+.vgt-global-search__input .input__icon .magnifying-glass:before {
+  content: '';
+  display: block;
+  position: absolute;
+  right: -7px;
+  bottom: -5px;
+  background: #494949;
+  width: 8px;
+  height: 4px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+}
+.vgt-global-search__actions {
+  margin-left: 10px;
+}
+.vgt-selection-info-row {
+  background: #fdf9e8;
+  padding: 5px 16px;
+  font-size: 13px;
+  border-top: 1px solid #dcdfe6;
+  border-left: 1px solid #dcdfe6;
+  border-right: 1px solid #dcdfe6;
+  color: #d3aa3b;
+  font-weight: 700;
+}
+.vgt-selection-info-row a {
+  font-weight: 700;
+  display: inline-block;
+  margin-left: 10px;
+}
+.vgt-wrap__actions-footer {
+  @apply border border-grey-100;
+}
+.vgt-wrap__footer {
+  @apply p-4 text-grey-400 bg-white;
+}
+.vgt-wrap__footer .footer__row-count__label,
+.vgt-wrap__footer .footer__row-count__select {
+  @apply inline-block align-middle bg-white;
+}
+.vgt-wrap__footer .footer__row-count__label {
+  @apply text-sm text-grey-500;
+}
+.vgt-wrap__footer .footer__row-count__select {
+  @apply w-auto p-0 border-0 border-r-0 h-auto text-sm ml-2 text-grey-500 font-bold;
+}
+.vgt-wrap__footer .footer__row-count__select:focus {
+  @apply outline-none border-cyan-500;
+}
+.vgt-wrap__footer .footer__navigation {
+  @apply text-sm;
+}
+.vgt-wrap__footer .footer__navigation > button:first-of-type {
+  margin-right: 16px;
+}
+.vgt-wrap__footer .footer__navigation__info,
+.vgt-wrap__footer .footer__navigation__page-btn,
+.vgt-wrap__footer .footer__navigation__page-info {
+  @apply inline-block align-middle;
+}
+.vgt-wrap__footer .footer__navigation__page-btn {
+  @apply no-underline text-grey-500 font-bold whitespace-nowrap;
+}
+.vgt-wrap__footer .footer__navigation__page-btn:focus {
+  @apply outline-none border-0;
+}
+.vgt-wrap__footer .footer__navigation__page-btn:hover {
+  cursor: pointer;
+}
+.vgt-wrap__footer .footer__navigation__page-btn.disabled,
+.vgt-wrap__footer .footer__navigation__page-btn.disabled:hover {
+  @apply opacity-50 cursor-not-allowed;
+}
+.vgt-wrap__footer .footer__navigation__page-btn.disabled .chevron.left:after,
+.vgt-wrap__footer .footer__navigation__page-btn.disabled:hover .chevron.left:after {
+  border-right-color: #606266;
+}
+.vgt-wrap__footer .footer__navigation__page-btn.disabled .chevron.right:after,
+.vgt-wrap__footer .footer__navigation__page-btn.disabled:hover .chevron.right:after {
+  border-left-color: #606266;
+}
+.vgt-wrap__footer .footer__navigation__page-btn span {
+  @apply inline-block align-middle text-sm;
+}
+.vgt-wrap__footer .footer__navigation__page-btn .chevron {
+  @apply h-6 w-6 relative align-middle my-0 mx-2;
+  border-radius: 15%;
+}
+.vgt-wrap__footer .footer__navigation__page-btn .chevron:after {
+  @apply absolute block;
+  content: '';
+  left: 50%;
+  top: 50%;
+  margin-top: -6px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+.vgt-wrap__footer .footer__navigation__page-btn .chevron.left::after {
+  border-right: 6px solid theme('colors.cyan.400');
+  margin-left: -3px;
+}
+.vgt-wrap__footer .footer__navigation__page-btn .chevron.right::after {
+  border-left: 6px solid theme('colors.cyan.400');
+  margin-left: -3px;
+}
+.vgt-wrap__footer .footer__navigation__info,
+.vgt-wrap__footer .footer__navigation__page-info {
+  @apply text-grey-600 my-0 mx-4;
+}
+.vgt-wrap__footer .footer__navigation__page-info span {
+  display: inline-block;
+  vertical-align: middle;
+}
+.vgt-wrap__footer .footer__navigation__page-info__current-entry {
+  @apply text-center w-8 inline-block my-0 mx-1 font-bold border border-grey-200;
+}
+@media only screen and (max-width: 750px) {
+  .vgt-wrap__footer .footer__navigation__info {
+    @apply hidden;
+  }
+  .vgt-wrap__footer .footer__navigation__page-btn {
+    @apply ml-4;
+  }
+}
+/* purgecss end ignore */
+
+@tailwind utilities;
+
+/* Add custom utilities here... */

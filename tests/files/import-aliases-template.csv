@@ -1,0 +1,4 @@
+alias,description,recipients
+abc@example.com,My awesome alias!,recipient1@example.com
+no-description@example.com,,
+xyz@example.com,"Alias with 2 recipients, use a comma separated list of recipient emails.","recipient1@example.com,recipient2@example.com"
