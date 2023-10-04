@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -17,9 +17,8 @@ class ApiTokensTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create()->fresh();
+        $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
         Sanctum::actingAs($this->user, [], 'web');
-        $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
     /** @test */
@@ -27,12 +26,31 @@ class ApiTokensTest extends TestCase
     {
         $response = $this->post('/settings/personal-access-tokens', [
             'name' => 'New',
+            'password' => 'mypassword',
         ]);
 
         $response->assertStatus(200);
 
         $this->assertNotNull($response->getData()->accessToken);
         $this->assertDatabaseHas('personal_access_tokens', [
+            'name' => 'New',
+            'tokenable_id' => $this->user->id,
+        ]);
+    }
+
+    /** @test */
+    public function user_cannot_create_api_token_with_incorrect_password()
+    {
+        $response = $this->post('/settings/personal-access-tokens', [
+            'name' => 'New',
+            'password' => 'wrongpassword',
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHasErrors('password');
+
+        $this->assertDatabaseMissing('personal_access_tokens', [
             'name' => 'New',
             'tokenable_id' => $this->user->id,
         ]);

@@ -15,14 +15,16 @@ use App\Http\Controllers\DeactivateAliasController;
 use App\Http\Controllers\DefaultAliasDomainController;
 use App\Http\Controllers\DefaultAliasFormatController;
 use App\Http\Controllers\DefaultRecipientController;
+use App\Http\Controllers\DefaultUsernameController;
+use App\Http\Controllers\DisplayFromFormatController;
 use App\Http\Controllers\DomainVerificationController;
 use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\EmailSubjectController;
 use App\Http\Controllers\FromNameController;
 use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\RecipientVerificationController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShowAliasController;
+use App\Http\Controllers\ShowDashboardController;
 use App\Http\Controllers\ShowDomainController;
 use App\Http\Controllers\ShowFailedDeliveryController;
 use App\Http\Controllers\ShowRecipientController;
@@ -75,27 +77,42 @@ Route::group([
 ], function () {
     Route::controller(WebauthnController::class)->group(function () {
         Route::get('keys', 'index')->name('webauthn.index');
-        Route::get('keys/create', 'create')->name('webauthn.create');
+        //Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
         Route::post('keys', 'store')->name('webauthn.store');
-        Route::delete('keys/{id}', 'destroy')->name('webauthn.destroy');
+        Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
+        Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');
     });
 
     Route::controller(WebauthnEnabledKeyController::class)->group(function () {
         Route::post('enabled-keys', 'store')->name('webauthn.enabled_key.store');
-        Route::delete('enabled-keys/{id}', 'destroy')->name('webauthn.enabled_key.destroy');
+        Route::post('enabled-keys/{id}', 'destroy')->name('webauthn.enabled_key.destroy');
     });
 });
 
 Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
-    Route::get('/', [ShowAliasController::class, 'index'])->name('aliases.index');
+    Route::get('/', [ShowDashboardController::class, 'index'])->name('dashboard.index');
 
-    Route::get('/recipients', [ShowRecipientController::class, 'index'])->name('recipients.index');
-    Route::post('/recipients/email/resend', [RecipientVerificationController::class, 'resend']);
+    Route::controller(ShowAliasController::class)->group(function () {
+        Route::get('/aliases', 'index')->name('aliases.index');
+        Route::get('/aliases/{id}/edit', 'edit')->name('aliases.edit');
+    });
 
-    Route::get('/domains', [ShowDomainController::class, 'index'])->name('domains.index');
+    Route::controller(ShowRecipientController::class)->group(function () {
+        Route::get('/recipients', 'index')->name('recipients.index');
+        Route::get('/recipients/{id}/edit', 'edit')->name('recipients.edit');
+        Route::post('/recipients/alias-count', 'aliasCount')->name('recipients.alias_count');
+    });
+
+    Route::controller(ShowDomainController::class)->group(function () {
+        Route::get('/domains', 'index')->name('domains.index');
+        Route::get('/domains/{id}/edit', 'edit')->name('domains.edit');
+    });
     Route::get('/domains/{id}/check-sending', [DomainVerificationController::class, 'checkSending']);
 
-    Route::get('/usernames', [ShowUsernameController::class, 'index'])->name('usernames.index');
+    Route::controller(ShowUsernameController::class)->group(function () {
+        Route::get('/usernames', 'index')->name('usernames.index');
+        Route::get('/usernames/{id}/edit', 'edit')->name('usernames.edit');
+    });
 
     Route::get('/deactivate/{alias}', [DeactivateAliasController::class, 'deactivate'])->name('deactivate');
 
@@ -111,6 +128,10 @@ Route::group([
 ], function () {
     Route::controller(SettingController::class)->group(function () {
         Route::get('/', 'show')->name('settings.show');
+        Route::get('/security', 'security')->name('settings.security');
+        Route::get('/api', 'api')->name('settings.api');
+        Route::get('/data', 'data')->name('settings.data');
+        Route::get('/account', 'account')->name('settings.account');
         Route::post('/account', 'destroy')->name('account.destroy');
     });
 
@@ -119,9 +140,13 @@ Route::group([
         Route::post('/edit-default-recipient', 'edit')->name('settings.edit_default_recipient');
     });
 
+    Route::post('/default-username', [DefaultUsernameController::class, 'update'])->name('settings.default_username');
+
     Route::post('/default-alias-domain', [DefaultAliasDomainController::class, 'update'])->name('settings.default_alias_domain');
 
     Route::post('/default-alias-format', [DefaultAliasFormatController::class, 'update'])->name('settings.default_alias_format');
+
+    Route::post('/display-from-format', [DisplayFromFormatController::class, 'update'])->name('settings.display_from_format');
 
     Route::post('/from-name', [FromNameController::class, 'update'])->name('settings.from_name');
 
@@ -135,7 +160,7 @@ Route::group([
 
     Route::post('/password', [PasswordController::class, 'update'])->name('settings.password');
 
-    Route::delete('/browser-sessions', [BrowserSessionController::class, 'destroy'])->name('browser-sessions.destroy');
+    Route::delete('/browser-sessions', [BrowserSessionController::class, 'destroy'])->name('settings.browser_sessions');
 
     Route::controller(TwoFactorAuthController::class)->group(function () {
         Route::post('/2fa/enable', 'store')->name('settings.2fa_enable');

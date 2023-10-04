@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\DisplayFromFormat;
+use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
@@ -17,11 +19,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable;
-    use HasUuid;
-    use HasEncryptedAttributes;
     use HasApiTokens;
+    use HasEncryptedAttributes;
     use HasFactory;
+    use HasUuid;
+    use Notifiable;
 
     public $incrementing = false;
 
@@ -37,8 +39,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'from_name',
         'email_subject',
         'banner_location',
+        'display_from_format',
         'catch_all',
         'bandwidth',
+        'reject_until',
+        'defer_until',
+        'defer_new_aliases_until',
         'default_alias_domain',
         'default_alias_format',
         'use_reply_to',
@@ -85,6 +91,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'email_verified_at' => 'datetime',
+        'reject_until' => 'datetime',
+        'defer_until' => 'datetime',
+        'defer_new_aliases_until' => 'datetime',
+        'display_from_format' => DisplayFromFormat::class,
     ];
 
     /**
@@ -154,6 +164,26 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's default alias domain.
+     */
+    protected function defaultAliasDomain(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ?? 'anonaddy.me',
+        );
+    }
+
+    /**
+     * Get the user's default alias format.
+     */
+    protected function defaultAliasFormat(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ?? 'random_characters',
+        );
+    }
+
+    /**
      * Get the user's default username.
      */
     public function defaultUsername()
@@ -178,11 +208,27 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get all of the user's email aliases including trashed.
+     */
+    public function allAliases()
+    {
+        return $this->hasMany(Alias::class)->withTrashed();
+    }
+
+    /**
      * Get all of the user's recipients.
      */
     public function recipients()
     {
         return $this->hasMany(Recipient::class);
+    }
+
+    /**
+     * Get all of the user's pending recipients.
+     */
+    public function pendingRecipients()
+    {
+        return $this->recipients()->pending();
     }
 
     /**
@@ -207,6 +253,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function failedDeliveries()
     {
         return $this->hasMany(FailedDelivery::class);
+    }
+
+    /**
+     * Get all of the user's outbound messages.
+     */
+    public function outboundMessages()
+    {
+        return $this->hasMany(OutboundMessage::class);
     }
 
     /**
@@ -322,6 +376,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the count for the user's aliases that are using the default recipient
+     */
+    public function aliasesUsingDefaultCount()
+    {
+        return $this->aliases()->select('id')->where(function (Builder $q) {
+            return $q->whereHas('recipients', function (Builder $query) {
+                $query->where('recipients.id', $this->default_recipient_id);
+            })
+                ->orWhereDoesntHave('recipients')->where(function (Builder $q) {
+                    return $q->whereDoesntHaveMorph(
+                        'aliasable',
+                        ['App\Models\Domain', 'App\Models\Username'],
+                        function (Builder $query) {
+                            $query->whereNotNull('default_recipient_id');
+                        }
+                    )->orWhereNull('aliasable_id')
+                        ->orWhereHasMorph('aliasable', ['App\Models\Domain', 'App\Models\Username'], function (Builder $query) {
+                            $query->where('default_recipient_id', $this->default_recipient_id);
+                        });
+                });
+        })->count();
+    }
+
+    /**
      * Send the email verification notification.
      *
      * @return void
@@ -329,6 +407,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new CustomVerifyEmail());
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPassword($token));
     }
 
     public function hasVerifiedDefaultRecipient()
@@ -390,6 +479,11 @@ class User extends Authenticatable implements MustVerifyEmail
                     return false;
                 },
                 function () {
+                    $now = now();
+                    if ($this->defer_new_aliases_until < $now) {
+                        $this->update(['defer_new_aliases_until' => $now->addHour()->toDateTimeString()]);
+                    }
+
                     return true;
                 }
             );
@@ -509,5 +603,10 @@ class User extends Authenticatable implements MustVerifyEmail
             ->concat($allDomains)
             ->reverse()
             ->values();
+    }
+
+    public function sharedDomainOptions()
+    {
+        return config('anonaddy.all_domains');
     }
 }

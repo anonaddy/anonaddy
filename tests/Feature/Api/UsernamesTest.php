@@ -18,8 +18,6 @@ class UsernamesTest extends TestCase
         parent::setUp();
         parent::setUpSanctum();
 
-        $this->user->recipients()->save($this->user->defaultRecipient);
-        $this->user->usernames()->save($this->user->defaultUsername);
         $this->user->defaultUsername->username = 'johndoe';
         $this->user->defaultUsername->save();
     }
@@ -225,6 +223,47 @@ class UsernamesTest extends TestCase
     }
 
     /** @test */
+    public function user_can_allow_login_for_username()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+            'can_login' => false,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/loginable-usernames/', [
+            'id' => $username->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertTrue($response->getData()->data->can_login);
+    }
+
+    /** @test */
+    public function user_can_disallow_login_for_username()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+            'can_login' => true,
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/loginable-usernames/'.$username->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->usernames[1]->can_login);
+    }
+
+    /** @test */
+    public function user_cannot_disallow_login_for_default_username()
+    {
+        $username = $this->user->defaultUsername;
+
+        $response = $this->json('DELETE', '/api/v1/loginable-usernames/'.$username->id);
+
+        $response->assertStatus(403);
+        $this->assertTrue($this->user->usernames[0]->can_login);
+    }
+
+    /** @test */
     public function user_can_update_usernames_description()
     {
         $username = Username::factory()->create([
@@ -237,6 +276,21 @@ class UsernamesTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals('The new description', $response->getData()->data->description);
+    }
+
+    /** @test */
+    public function user_can_update_username_from_name()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
+            'from_name' => 'John Doe',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('John Doe', $response->getData()->data->from_name);
     }
 
     /** @test */

@@ -58,93 +58,19 @@
                 <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 flex flex-wrap justify-between">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <input type="submit" class="bg-transparent cursor-pointer no-underline" value="{{ __('Logout') }}">
+                        <input type="submit" class="bg-transparent cursor-pointer no-underline font-medium text-indigo-600 hover:text-indigo-500" value="{{ __('Logout') }}">
                     </form>
-                    <a href="{{ route('login.backup_code.index') }}">Use backup code</a>
+                    <a class="font-medium text-indigo-600 hover:text-indigo-500" href="{{ route('login.backup_code.index') }}">Use backup code</a>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        var publicKey = {!! json_encode($publicKey) !!};
-
-        var errors = {
-            key_not_allowed: "{{ trans('webauthn::errors.key_not_allowed') }}",
-            not_secured: "{{ trans('webauthn::errors.not_secured') }}",
-            not_supported: "{{ trans('webauthn::errors.not_supported') }}",
-        };
-
-        function errorMessage(name, message) {
-            switch (name) {
-            case 'InvalidStateError':
-            return errors.key_not_allowed;
-            case 'NotAllowedError':
-            return errors.key_not_allowed;
-            default:
-            return message;
-            }
-        }
-
-        function error(message) {
-            document.getElementById("error").innerHTML = message;
-            document.getElementById("error").classList.remove("hidden");
-        }
-
-        var webauthn = new WebAuthn((name, message) => {
-            error(errorMessage(name, message));
-        });
-
-        if (! webauthn.webAuthnSupport()) {
-            switch (webauthn.notSupportedMessage()) {
-            case 'not_secured':
-                error(errors.not_secured);
-                break;
-            case 'not_supported':
-                error(errors.not_supported);
-                break;
-            }
-        }
-
-        if (! /apple/i.test(navigator.vendor)) {
-            webauthn.sign(
-                publicKey,
-                function (data) {
-                    document.getElementById("success").classList.remove("hidden");
-                    document.getElementById("id").value = data.id;
-                    document.getElementById("rawId").value = data.rawId;
-                    document.getElementById("authenticatorData").value = data.response.authenticatorData;
-                    // Sort no padding issue
-                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON.replace('=', '');
-                    document.getElementById("signature").value = data.response.signature;
-                    document.getElementById("userHandle").value = data.response.userHandle;
-                    document.getElementById("type").value = data.type;
-                    document.getElementById("form").submit();
-                }
-            );
-        }
-
-        function authenticateDevice() {
-            document.getElementById("error").classList.add("hidden");
-            webauthn.sign(
-                publicKey,
-                function (data) {
-                    document.getElementById("success").classList.remove("hidden");
-                    document.getElementById("id").value = data.id;
-                    document.getElementById("rawId").value = data.rawId;
-                    document.getElementById("authenticatorData").value = data.response.authenticatorData;
-                    // Sort no padding issue
-                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON.replace('=', '');
-                    document.getElementById("signature").value = data.response.signature;
-                    document.getElementById("userHandle").value = data.response.userHandle;
-                    document.getElementById("type").value = data.type;
-                    document.getElementById("form").submit();
-                }
-            );
-        }
-    </script>
 @endsection
 
 @section('webauthn')
-    <script src="{!! secure_asset('js/webauthn.js') !!}"></script>
+    <script>
+        var publicKey = {!! json_encode($publicKey) !!};
+    </script>
+
+    @vite('resources/js/webauthn/authenticate.js')
 @endsection

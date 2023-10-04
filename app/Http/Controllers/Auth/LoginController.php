@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Username;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class LoginController extends Controller
 {
@@ -42,11 +45,17 @@ class LoginController extends Controller
 
     public function username()
     {
-        $userId = Username::firstWhere('username', request()->input('username'))?->user_id;
+        return 'id';
+    }
+
+    public function addIdToRequest()
+    {
+        $userId = Username::select(['user_id', 'username', 'can_login'])
+            ->where('username', request()->input('username'))
+            ->where('can_login', true)
+            ->first()?->user_id;
 
         request()->merge(['id' => $userId]);
-
-        return 'id';
     }
 
     /**
@@ -58,10 +67,25 @@ class LoginController extends Controller
      */
     protected function validateLogin(Request $request)
     {
-        $request->validate([
-            $this->username() => 'nullable|string',
+        $this->addIdToRequest();
+
+        Validator::make($request->all(), [
+            'username' => 'required|regex:/^[a-zA-Z0-9]*$/|min:1|max:20',
             'password' => 'required|string',
-        ]);
+            $this->username() => 'nullable|string',
+        ], [
+            'username.regex' => 'Your username can only contain letters and numbers, do not use your email.',
+        ])->validate();
+    }
+
+    /**
+     * Get the needed authorization credentials from the request.
+     *
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        return $request->only('id', 'password');
     }
 
     /**
@@ -76,5 +100,29 @@ class LoginController extends Controller
         throw ValidationException::withMessages([
             'username' => [trans('auth.failed')],
         ]);
+    }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        // Check if the user's password needs rehashing
+        if (Hash::needsRehash($user->password)) {
+            $user->update(['password' => Hash::make($request->password)]);
+        }
+    }
+
+    /**
+     * The user has logged out of the application.
+     *
+     * @return mixed
+     */
+    protected function loggedOut(Request $request)
+    {
+        return Inertia::location(route('login'));
     }
 }

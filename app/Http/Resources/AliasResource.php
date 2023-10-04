@@ -19,6 +19,7 @@ class AliasResource extends JsonResource
             'email' => $this->email,
             'active' => $this->active,
             'description' => $this->description,
+            'from_name' => $this->from_name,
             'emails_forwarded' => $this->emails_forwarded,
             'emails_blocked' => $this->emails_blocked,
             'emails_replied' => $this->emails_replied,

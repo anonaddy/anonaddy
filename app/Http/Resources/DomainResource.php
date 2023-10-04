@@ -13,6 +13,7 @@ class DomainResource extends JsonResource
             'user_id' => $this->user_id,
             'domain' => $this->domain,
             'description' => $this->description,
+            'from_name' => $this->from_name,
             'aliases' => AliasResource::collection($this->whenLoaded('aliases')),
             'default_recipient' => new RecipientResource($this->whenLoaded('defaultRecipient')),
             'active' => $this->active,

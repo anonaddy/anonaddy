@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 use Symfony\Component\Mime\Email;
 
-class CustomVerifyEmail extends VerifyEmail implements ShouldQueue, ShouldBeEncrypted
+class CustomVerifyEmail extends VerifyEmail implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -35,12 +35,15 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldQueue, ShouldBeEncr
 
         $feedbackId = $notifiable instanceof User ? 'VU:anonaddy' : 'VR:anonaddy';
         $recipientId = $notifiable instanceof User ? $notifiable->default_recipient_id : $notifiable->id;
+        $userId = $notifiable instanceof User ? $notifiable->id : $notifiable->user_id;
 
         return (new MailMessage())
             ->subject(Lang::get('Verify Email Address'))
             ->markdown('mail.verify_email', [
                 'verificationUrl' => $verificationUrl,
+                'userId' => $userId,
                 'recipientId' => $recipientId,
+                'emailType' => $feedbackId,
             ])
             ->withSymfonyMessage(function (Email $message) use ($feedbackId) {
                 $message->getHeaders()

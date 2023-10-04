@@ -30,9 +30,9 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Events\ImportFailed;
 use Ramsey\Uuid\Uuid;
 
-class AliasesImport implements ToModel, WithHeadingRow, WithValidation, WithChunkReading, ShouldQueue, SkipsOnFailure, SkipsEmptyRows, SkipsOnError, WithLimit, WithColumnLimit, WithEvents
+class AliasesImport implements ShouldQueue, SkipsEmptyRows, SkipsOnError, SkipsOnFailure, ToModel, WithChunkReading, WithColumnLimit, WithEvents, WithHeadingRow, WithLimit, WithValidation
 {
-    use Queueable, Importable, SkipsFailures, SkipsErrors, RemembersRowNumber;
+    use Importable, Queueable, RemembersRowNumber, SkipsErrors, SkipsFailures;
 
     protected $user;
 

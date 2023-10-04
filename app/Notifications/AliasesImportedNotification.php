@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class AliasesImportedNotification extends Notification implements ShouldQueue, ShouldBeEncrypted
+class AliasesImportedNotification extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 

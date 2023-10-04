@@ -33,6 +33,7 @@ class UserResource extends JsonResource
             'recipient_count' => $this->recipients()->count(),
             'active_domain_count' => $this->domains()->where('active', true)->count(),
             'active_shared_domain_alias_count' => $this->activeSharedDomainAliases()->count(),
+            'active_rule_count' => $this->activeRules()->count(),
             'total_emails_forwarded' => (int) $totals->forwarded,
             'total_emails_blocked' => (int) $totals->blocked,
             'total_emails_replied' => (int) $totals->replied,

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FailedDeliveryNotification extends Notification implements ShouldQueue, ShouldBeEncrypted
+class FailedDeliveryNotification extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -59,7 +59,7 @@ class FailedDeliveryNotification extends Notification implements ShouldQueue, Sh
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject('New failed delivery on AnonAddy')
+            ->subject('New failed delivery on addy.io')
             ->markdown('mail.failed_delivery_notification', [
                 'aliasEmail' => $this->aliasEmail,
                 'recipientEmail' => $this->recipientEmail ?? $notifiable->email,
@@ -67,7 +67,9 @@ class FailedDeliveryNotification extends Notification implements ShouldQueue, Sh
                 'originalSubject' => $this->originalSubject,
                 'isStored' => $this->isStored,
                 'storeFailedDeliveries' => $this->storeFailedDeliveries,
+                'userId' => $notifiable->user_id,
                 'recipientId' => $notifiable->id,
+                'emailType' => 'FDN',
                 'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])
             ->withSymfonyMessage(function ($message) {

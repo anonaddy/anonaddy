@@ -11,11 +11,11 @@ notify me. I welcome working with you to resolve the issue promptly. Thanks in a
   degradation of the service. Only interact with accounts you own or with explicit permission of the
   account holder.
 - If you would like to encrypt your report, please use the PGP key with fingerprint
-  `5FCAFD8A67D2A783CFF4D0E31AC6D923E6FB4EF7` (available on the openpgp.org keyserver).
+  `E652C2DB43859328F35575DEBF7B93C6497510D0` (available on the openpgp.org keyserver).
 
 # Reporting a Vulnerability
 
-To report a vulnerability please send an email to contact@anonaddy.com, you can use the PGP key above if you wish to encrypt it.
+To report a vulnerability please send an email to contact (at) help.addy.io, you can use the PGP key above if you wish to encrypt it.
 
 # In-scope
 

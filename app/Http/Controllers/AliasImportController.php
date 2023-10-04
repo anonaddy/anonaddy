@@ -36,6 +36,6 @@ class AliasImportController extends Controller
             report($e);
         }
 
-        return back()->with(['status' => 'File uploaded successfully, your aliases are being imported']);
+        return back()->with(['flash' => 'File uploaded successfully, your aliases are being imported']);
     }
 }

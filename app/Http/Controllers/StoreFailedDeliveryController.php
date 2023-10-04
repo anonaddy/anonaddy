@@ -14,6 +14,6 @@ class StoreFailedDeliveryController extends Controller
             user()->update(['store_failed_deliveries' => false]);
         }
 
-        return back()->with(['status' => $request->store_failed_deliveries ? 'Store Failed Deliveries Enabled Successfully' : 'Store Failed Deliveries Disabled Successfully']);
+        return back()->with(['flash' => $request->store_failed_deliveries ? 'Store Failed Deliveries Enabled Successfully' : 'Store Failed Deliveries Disabled Successfully']);
     }
 }

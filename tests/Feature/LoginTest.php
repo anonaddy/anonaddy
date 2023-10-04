@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Username;
 use App\Notifications\UsernameReminder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -21,14 +20,7 @@ class LoginTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create([
-            'password' => Hash::make('mypassword'),
-        ])->fresh();
-        $this->user->recipients()->save($this->user->defaultRecipient);
-
-        $this->user->usernames()->save($this->user->defaultUsername);
-        $this->user->defaultUsername->username = 'johndoe';
-        $this->user->defaultUsername->save();
+        $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
     }
 
     /** @test */

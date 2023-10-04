@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class GpgKeyExpired extends Notification implements ShouldQueue, ShouldBeEncrypted
+class GpgKeyExpired extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -33,9 +33,12 @@ class GpgKeyExpired extends Notification implements ShouldQueue, ShouldBeEncrypt
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject('Your GPG key has expired on AnonAddy')
+            ->subject('Your GPG key has expired on addy.io')
             ->markdown('mail.gpg_key_expired', [
                 'recipient' => $notifiable,
+                'userId' => $notifiable->user_id,
+                'recipientId' => $notifiable->id,
+                'emailType' => 'GKE',
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

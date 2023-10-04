@@ -22,6 +22,6 @@ class DeactivateAliasController extends Controller
         $alias->deactivate();
 
         return redirect()->route('aliases.index')
-            ->with(['status' => 'Alias '.$alias->email.' deactivated successfully!']);
+            ->with(['flash' => 'Alias '.$alias->email.' deactivated successfully!']);
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class IncorrectOtpNotification extends Notification implements ShouldQueue, ShouldBeEncrypted
+class IncorrectOtpNotification extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -38,7 +38,9 @@ class IncorrectOtpNotification extends Notification implements ShouldQueue, Shou
         return (new MailMessage())
             ->subject('Failed Two Factor Authentication Login Attempt')
             ->markdown('mail.failed_login_attempt', [
+                'userId' => $notifiable->id,
                 'recipientId' => $recipient->id,
+                'emailType' => 'FLA',
                 'hasVerifiedEmail' => $recipient->hasVerifiedEmail(),
                 'fingerprint' => $fingerprint,
                 'username' => $notifiable->username,

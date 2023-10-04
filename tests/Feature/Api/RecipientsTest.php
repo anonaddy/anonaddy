@@ -31,7 +31,7 @@ class RecipientsTest extends TestCase
 
         // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->json()['data']);
+        $this->assertCount(4, $response->json()['data']);
     }
 
     /** @test */
@@ -187,7 +187,7 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/recipients/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertEmpty($this->user->recipients);
+        $this->assertCount(1, $this->user->recipients);
     }
 
     /** @test */
@@ -331,7 +331,7 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/allowed-recipients/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->recipients[0]->can_reply_send);
+        $this->assertFalse($this->user->recipients[1]->can_reply_send);
     }
 
     /** @test */

@@ -10,6 +10,6 @@ class EmailSubjectController extends Controller
     {
         user()->update(['email_subject' => $request->email_subject]);
 
-        return back()->with(['status' => 'Email Subject Updated Successfully']);
+        return back()->with(['flash' => 'Email Subject Updated Successfully']);
     }
 }

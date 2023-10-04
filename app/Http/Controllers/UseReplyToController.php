@@ -14,6 +14,6 @@ class UseReplyToController extends Controller
             user()->update(['use_reply_to' => false]);
         }
 
-        return back()->with(['status' => $request->use_reply_to ? 'Use Reply To Enabled Successfully' : 'Use Reply To Disabled Successfully']);
+        return back()->with(['flash' => $request->use_reply_to ? 'Use Reply To Enabled Successfully' : 'Use Reply To Disabled Successfully']);
     }
 }

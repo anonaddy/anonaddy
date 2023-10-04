@@ -6,16 +6,17 @@ use App\Notifications\CustomVerifyEmail;
 use App\Notifications\UsernameReminder;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 class Recipient extends Model
 {
-    use Notifiable;
-    use HasUuid;
     use HasEncryptedAttributes;
     use HasFactory;
+    use HasUuid;
+    use Notifiable;
 
     public $incrementing = false;
 
@@ -34,6 +35,7 @@ class Recipient extends Model
         'inline_encryption',
         'protected_headers',
         'fingerprint',
+        'pending',
         'email_verified_at',
     ];
 
@@ -44,6 +46,7 @@ class Recipient extends Model
         'should_encrypt' => 'boolean',
         'inline_encryption' => 'boolean',
         'protected_headers' => 'boolean',
+        'pending' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'email_verified_at' => 'datetime',
@@ -60,6 +63,33 @@ class Recipient extends Model
 
             $recipient->aliases()->detach();
         });
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // Global scope on Recipient model to not return any pending new email entries by default
+        static::addGlobalScope('notPending', function (Builder $builder) {
+            $builder->where('pending', false);
+        });
+    }
+
+    /**
+     * Scope a query to include pending new email recipients.
+     */
+    public function scopeWithPending(Builder $query): void
+    {
+        $query->withoutGlobalScope('notPending');
+    }
+
+    /**
+     * Scope a query to get only pending email recipients.
+     */
+    public function scopePending(Builder $query): void
+    {
+        $query->withoutGlobalScope('notPending')->where('pending', true);
     }
 
     /**
@@ -99,6 +129,14 @@ class Recipient extends Model
     }
 
     /**
+     * Get all of the recipient's outbound messages.
+     */
+    public function outboundMessages()
+    {
+        return $this->hasMany(OutboundMessage::class);
+    }
+
+    /**
      * Get all of the user's custom domains.
      */
     public function domainsUsingAsDefault()
@@ -112,6 +150,30 @@ class Recipient extends Model
     public function usernamesUsingAsDefault()
     {
         return $this->hasMany(Username::class, 'default_recipient_id', 'id');
+    }
+
+    public function domainAliasesUsingAsDefault()
+    {
+        return $this->hasManyThrough(
+            Alias::class,
+            Domain::class,
+            'default_recipient_id', // Foreign key on the domain table...
+            'aliasable_id', // Foreign key on the alias table...
+            'id', // Local key on the recipient table...
+            'id' // Local key on the domain table...
+        );
+    }
+
+    public function usernameAliasesUsingAsDefault()
+    {
+        return $this->hasManyThrough(
+            Alias::class,
+            Username::class,
+            'default_recipient_id', // Foreign key on the username table...
+            'aliasable_id', // Foreign key on the alias table...
+            'id', // Local key on the recipient table...
+            'id' // Local key on the username table...
+        );
     }
 
     /**

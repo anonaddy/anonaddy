@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rule extends Model
 {
-    use HasUuid;
     use HasFactory;
+    use HasUuid;
 
     public $incrementing = false;
 

@@ -18,7 +18,7 @@
     <meta name="theme-color" content="#19216C">
 
     <!-- Styles -->
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    @vite('resources/css/app.css')
     @yield('webauthn')
 </head>
 <body class="bg-grey-50 antialiased text-grey-900">

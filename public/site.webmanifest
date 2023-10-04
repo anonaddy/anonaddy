@@ -1,6 +1,6 @@
 {
-    "name": "AnonAddy",
-    "short_name": "AnonAddy",
+    "name": "addy.io",
+    "short_name": "addy.io",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -8,12 +8,12 @@
             "type": "image/png"
         },
         {
-            "src": "/android-chrome-256x256.png",
-            "sizes": "256x256",
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "theme_color": "#19216c",
+    "background_color": "#19216c",
     "display": "standalone"
 }

@@ -47,7 +47,15 @@ class DomainController extends Controller
     {
         $domain = user()->domains()->findOrFail($id);
 
-        $domain->update(['description' => $request->description]);
+        if ($request->has('description')) {
+            $domain->description = $request->description;
+        }
+
+        if ($request->has('from_name')) {
+            $domain->from_name = $request->from_name;
+        }
+
+        $domain->save();
 
         return new DomainResource($domain->refresh()->load(['aliases', 'defaultRecipient']));
     }

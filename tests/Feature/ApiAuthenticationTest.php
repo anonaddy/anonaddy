@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Facades\Hash;
@@ -18,13 +17,7 @@ class ApiAuthenticationTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create([
-            'password' => Hash::make('mypassword'),
-        ])->fresh();
-
-        $this->user->usernames()->save($this->user->defaultUsername);
-        $this->user->defaultUsername->username = 'johndoe';
-        $this->user->defaultUsername->save();
+        $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
     }
 
     /** @test */
@@ -126,7 +119,7 @@ class ApiAuthenticationTest extends TestCase
         ]);
 
         $response->assertForbidden();
-        $response->assertExactJson(['error' => 'WebAuthn authentication is not currently supported from the extension or mobile apps, please use an API key to login instead']);
+        $response->assertExactJson(['error' => 'Security key authentication is not currently supported from the extension or mobile apps, please use an API key to login instead']);
     }
 
     /** @test */

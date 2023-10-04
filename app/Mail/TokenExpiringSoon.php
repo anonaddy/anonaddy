@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Symfony\Component\Mime\Email;
 
-class TokenExpiringSoon extends Mailable implements ShouldQueue, ShouldBeEncrypted
+class TokenExpiringSoon extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
     use SerializesModels;
@@ -38,10 +38,12 @@ class TokenExpiringSoon extends Mailable implements ShouldQueue, ShouldBeEncrypt
     public function build()
     {
         return $this
-            ->subject('Your AnonAddy API token expires soon')
+            ->subject('Your addy.io API key expires soon')
             ->markdown('mail.token_expiring_soon', [
                 'user' => $this->user,
-                'recipientId' => $this->recipient->id,
+                'userId' => $this->user->id,
+                'recipientId' => $this->user->default_recipient_id,
+                'emailType' => 'TES',
                 'fingerprint' => $this->recipient->should_encrypt ? $this->recipient->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {

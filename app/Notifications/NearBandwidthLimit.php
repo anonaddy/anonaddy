@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEncrypted
+class NearBandwidthLimit extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -57,7 +57,9 @@ class NearBandwidthLimit extends Notification implements ShouldQueue, ShouldBeEn
                 'bandwidthLimit' => $notifiable->getBandwidthLimitMb(),
                 'month' => $this->month,
                 'reset' => $this->reset,
+                'userId' => $notifiable->id,
                 'recipientId' => $recipient->id,
+                'emailType' => 'NBL',
                 'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {

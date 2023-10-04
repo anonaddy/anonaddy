@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'username' => 'email',
+    'username' => 'username',
 
     /*
     |--------------------------------------------------------------------------
@@ -109,7 +109,7 @@ return [
     */
 
     'redirects' => [
-        'login' => null,
+        'login' => '/',
         'register' => '/settings',
     ],
 
@@ -127,8 +127,8 @@ return [
     */
 
     'views' => [
-        'authenticate' => 'webauthn::authenticate',
-        'register' => 'webauthn::register',
+        'authenticate' => 'vendor.webauthn.authenticate',
+        'register' => 'vendor.webauthn.register',
     ],
 
     /*
@@ -228,7 +228,7 @@ return [
         \Cose\Algorithms::COSE_ALGORITHM_ES256, // ECDSA with SHA-256
         \Cose\Algorithms::COSE_ALGORITHM_ES512, // ECDSA with SHA-512
         \Cose\Algorithms::COSE_ALGORITHM_RS256, // RSASSA-PKCS1-v1_5 with SHA-256
-        \Cose\Algorithms::COSE_ALGORITHM_EdDSA, // EdDSA
+        \Cose\Algorithms::COSE_ALGORITHM_EDDSA, // EDDSA
         \Cose\Algorithms::COSE_ALGORITHM_ES384, // ECDSA with SHA-384
     ],
 
@@ -264,7 +264,7 @@ return [
     |
     */
 
-    'user_verification' => 'preferred',
+    'user_verification' => 'discouraged',
 
     /*
     |--------------------------------------------------------------------------

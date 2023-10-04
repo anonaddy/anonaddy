@@ -41,7 +41,7 @@ class EncryptedPart extends AbstractPart
         $this->body = $body;
         $this->charset = $charset;
         $this->subtype = $subtype;
-        $this->seekable = \is_resource($body) ? stream_get_meta_data($body)['seekable'] && 0 === fseek($body, 0, \SEEK_CUR) : null;
+        $this->seekable = \is_resource($body) ? stream_get_meta_data($body)['seekable'] && fseek($body, 0, \SEEK_CUR) === 0 : null;
     }
 
     public function getMediaType(): string
@@ -56,7 +56,7 @@ class EncryptedPart extends AbstractPart
 
     public function getBody(): string
     {
-        if (null === $this->seekable) {
+        if ($this->seekable === null) {
             return $this->body;
         }
 
@@ -74,7 +74,7 @@ class EncryptedPart extends AbstractPart
 
     public function bodyToIterable(): iterable
     {
-        if (null !== $this->seekable) {
+        if ($this->seekable !== null) {
             if ($this->seekable) {
                 rewind($this->body);
             }
@@ -92,10 +92,10 @@ class EncryptedPart extends AbstractPart
     public function asDebugString(): string
     {
         $str = parent::asDebugString();
-        if (null !== $this->charset) {
+        if ($this->charset !== null) {
             $str .= ' charset: '.$this->charset;
         }
-        if (null !== $this->disposition) {
+        if ($this->disposition !== null) {
             $str .= ' disposition: '.$this->disposition;
         }
 
@@ -110,7 +110,7 @@ class EncryptedPart extends AbstractPart
     public function __sleep(): array
     {
         // convert resources to strings for serialization
-        if (null !== $this->seekable) {
+        if ($this->seekable !== null) {
             $this->body = $this->getBody();
         }
 

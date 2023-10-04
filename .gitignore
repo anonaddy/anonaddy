@@ -8,6 +8,7 @@
 /storage/*.key
 /storage/debugbar
 /vendor
+/postfix/vendor
 /.idea
 /.vscode
 /.vagrant

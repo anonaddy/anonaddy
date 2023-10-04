@@ -39,7 +39,8 @@ class CheckDomainsMxValidation extends Command
      */
     public function handle()
     {
-        Domain::all()
+        Domain::with('user.defaultUsername')
+            ->get()
             ->each(function ($domain) {
                 try {
                     if (! $domain->checkMxRecords()) {
