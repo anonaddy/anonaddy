@@ -470,7 +470,7 @@
         <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900">Store Failed Deliveries</h3>
           <p class="text-base text-grey-700">
-            This setting allows you to choose whether or not AnonAddy should
+            This setting allows you to choose whether or not addy.io should
             <b>temporarily store</b> failed delivery attempts, this ensures that
             <b>emails are not lost</b> if they are rejected by your recipients as they can be
             downloaded from the failed deliveries page. Failed deliveries are

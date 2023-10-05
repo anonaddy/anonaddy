@@ -68,6 +68,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
+            "cd ./postfix && composer install --prefer-dist --no-scripts --no-dev -q -o",
             "@php artisan anonaddy:update-app-version"
         ],
         "post-root-package-install": [

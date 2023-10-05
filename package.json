@@ -2,7 +2,7 @@
     "private": true,
     "scripts": {
         "dev": "vite --host",
-        "build": "vite build",
+        "production": "vite build",
         "format": "prettier --write 'resources/**/*.{css,js,vue}'",
         "prepare": "husky install",
         "pre-commit": "lint-staged"
@@ -19,7 +19,6 @@
         "chart.js": "^4.4.0",
         "cross-env": "^7.0.3",
         "dayjs": "^1.10.4",
-        "laravel-mix": "^6.0.11",
         "lodash": "^4.17.20",
         "mini-svg-data-uri": "^1.4.4",
         "postcss": "^8.4.5",
@@ -35,14 +34,14 @@
         "vuedraggable": "^4.1.0"
     },
     "devDependencies": {
-      "@vitejs/plugin-vue": "^4.2.3",
-      "css-loader": "^6.0.0",
-      "husky": "^8.0.0",
-      "laravel-vite-plugin": "^0.8.0",
-      "lint-staged": "^14.0.0",
-      "prettier": "^3.0.0",
-      "vite": "^4.3.6"
-  },
+        "@vitejs/plugin-vue": "^4.2.3",
+        "css-loader": "^6.0.0",
+        "husky": "^8.0.0",
+        "laravel-vite-plugin": "^0.8.0",
+        "lint-staged": "^14.0.0",
+        "prettier": "^3.0.0",
+        "vite": "^4.3.6"
+    },
     "lint-staged": {
         "*.{css,js,vue}": [
             "prettier --write"

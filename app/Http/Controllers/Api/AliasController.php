@@ -121,7 +121,7 @@ class AliasController extends Controller
 
         $aliasable = null;
 
-        // This is an AnonAddy domain.
+        // This is an addy.io domain.
         if ($parentDomain) {
             $subdomain = substr($request->domain, 0, strrpos($request->domain, '.'.$parentDomain));
 

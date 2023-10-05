@@ -2,7 +2,7 @@
 
 # GPG Key Encryption Error
 
-An error occured while trying to encrypt an email recently forwarded to you by AnonAddy.
+An error occured while trying to encrypt an email recently forwarded to you by addy.io.
 
 This was likely caused because the key has expired.
 

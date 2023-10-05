@@ -39,7 +39,7 @@ class UpdateAppVersion extends Command
     public function handle()
     {
         $version = GitVersionHelper::cacheFreshVersion();
-        $this->info("AnonAddy version: {$version}");
+        $this->info("addy.io version: {$version}");
 
         return 0;
     }
