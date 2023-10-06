@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\LoginViewResponse;
 use App\Http\Responses\RegisterSuccessResponse;
+use App\Http\Responses\RegisterViewResponse;
 use App\Models\PersonalAccessToken;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,7 +24,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         Sanctum::ignoreMigrations();
+        Webauthn::registerViewResponseUsing(RegisterViewResponse::class);
         Webauthn::registerSuccessResponseUsing(RegisterSuccessResponse::class);
+        Webauthn::loginViewResponseUsing(LoginViewResponse::class);
     }
 
     /**
