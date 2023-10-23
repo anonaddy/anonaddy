@@ -77,7 +77,6 @@ class SettingController extends Controller
         auth()->logout();
         $request->session()->invalidate();
 
-        return redirect()->route('login')
-            ->with(['flash' => 'Account deleted successfully!']);
+        return Inertia::location(route('login'));
     }
 }
