@@ -961,17 +961,16 @@ Make sure node is installed (`node -v`) if not then install it using NVM - [http
 
 At the time of writing this I'm using the latest LTS - v18.18.2
 
+Next copy the .env.example file and update it with correct values (database password, app url, redis password etc.) then install the dependencies.
+
 ```bash
 cd /var/www/anonaddy
-composer install --prefer-dist --no-dev -o && npm install
-npm run production
-```
 
-Next copy the .env.example file and update it with correct values (database password, app url, redis password etc.)
-
-```bash
 cp .env.example .env
 nano .env
+
+composer install --prefer-dist --no-dev -o && npm install
+npm run production
 ```
 
 Make sure to update the database settings, redis password and the AnonAddy variables. You can use Redis for queue, sessions and cache.

@@ -33,6 +33,9 @@ class ShowDomainController extends Controller
 
         return Inertia::render('Domains/Index', [
             'initialRows' => $domains,
+            'domainName' => config('anonaddy.domain'),
+            'hostname' => config('anonaddy.hostname'),
+            'dkimSelector' => config('anonaddy.dkim_selector'),
             'recipientOptions' => user()->verifiedRecipients()->select(['id', 'email'])->get(),
             'initialAaVerify' => sha1(config('anonaddy.secret').user()->id.user()->domains->count()),
             'search' => $validated['search'] ?? null,

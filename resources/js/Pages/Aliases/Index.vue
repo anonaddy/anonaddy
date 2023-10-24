@@ -676,7 +676,7 @@
         You can click the button above to create a random alias that will look something like this:
       </p>
       <p class="mb-2 text-grey-700">
-        <b>x481n904@anonaddy.me</b>
+        <b>x481n904@{{ domain }}</b>
       </p>
       <p clas="text-grey-700">
         This is useful if you do not wish to include your username in the email as a potential link
@@ -1218,7 +1218,7 @@
         <p class="mt-4 text-grey-700">
           <b>Shared Domain Aliases</b> - A shared domain alias is any alias that has a domain name
           that is also shared with other users. For example anyone can generate an alias with the
-          @anonaddy.me domain. Aliases with shared domain names must be pre-generated and cannot be
+          @{{ domain }} domain. Aliases with shared domain names must be pre-generated and cannot be
           created on-the-fly like standard aliases.
         </p>
 
@@ -1274,6 +1274,10 @@ const props = defineProps({
   },
   recipientOptions: {
     type: Array,
+    required: true,
+  },
+  domain: {
+    type: String,
     required: true,
   },
   subdomain: {

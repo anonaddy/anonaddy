@@ -169,7 +169,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function defaultAliasDomain(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ?? 'anonaddy.me',
+            get: fn (?string $value) => $value ?? config('anonaddy.domain'),
         );
     }
 

@@ -169,6 +169,7 @@ class ShowAliasController extends Controller
         return Inertia::render('Aliases/Index', [
             'initialRows' => fn () => $aliases,
             'recipientOptions' => fn () => user()->verifiedRecipients()->select(['id', 'email'])->get(),
+            'domain' => fn () => config('anonaddy.domain'),
             'subdomain' => fn () => user()->username.'.'.config('anonaddy.domain'),
             'domainOptions' => fn () => user()->domainOptions(),
             'defaultAliasDomain' => fn () => user()->default_alias_domain,

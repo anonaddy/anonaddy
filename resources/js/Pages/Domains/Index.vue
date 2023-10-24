@@ -376,22 +376,9 @@
             <div
               class="table-cell py-2 break-words cursor-pointer"
               title="Copy"
-              @click="clipboard('mail.anonaddy.me.')"
+              @click="clipboard(hostname)"
             >
-              mail.anonaddy.me.
-            </div>
-          </div>
-          <div class="table-row">
-            <div class="table-cell py-2">MX 20</div>
-            <div class="table-cell py-2 px-4 cursor-pointer" title="Copy" @click="clipboard('@')">
-              @
-            </div>
-            <div
-              class="table-cell py-2 break-words cursor-pointer"
-              title="Copy"
-              @click="clipboard('mail2.anonaddy.me.')"
-            >
-              mail2.anonaddy.me.
+              {{ hostname }}.
             </div>
           </div>
           <div class="table-row">
@@ -402,9 +389,9 @@
             <div
               class="table-cell py-2 break-words cursor-pointer"
               title="Copy"
-              @click="clipboard('v=spf1 include:spf.anonaddy.me -all')"
+              @click="clipboard('v=spf1 mx -all')"
             >
-              v=spf1 include:spf.anonaddy.me -all
+              v=spf1 mx -all
             </div>
           </div>
           <div class="table-row">
@@ -412,33 +399,16 @@
             <div
               class="table-cell py-2 px-4 cursor-pointer"
               title="Copy"
-              @click="clipboard('dk1._domainkey')"
+              @click="clipboard(`${dkimSelector}._domainkey`)"
             >
-              dk1._domainkey
+              {{ dkimSelector }}._domainkey
             </div>
             <div
               class="table-cell py-2 break-words cursor-pointer"
               title="Copy"
-              @click="clipboard('dk1._domainkey.anonaddy.me.')"
+              @click="clipboard(`${dkimSelector}._domainkey.${domainName}.`)"
             >
-              dk1._domainkey.anonaddy.me.
-            </div>
-          </div>
-          <div class="table-row">
-            <div class="table-cell py-2">CNAME</div>
-            <div
-              class="table-cell py-2 px-4 cursor-pointer"
-              title="Copy"
-              @click="clipboard('dk2._domainkey')"
-            >
-              dk2._domainkey
-            </div>
-            <div
-              class="table-cell py-2 break-words cursor-pointer"
-              title="Copy"
-              @click="clipboard('dk2._domainkey.anonaddy.me.')"
-            >
-              dk2._domainkey.anonaddy.me.
+              {{ dkimSelector }}._domainkey.{{ domainName }}.
             </div>
           </div>
           <div class="table-row">
@@ -617,6 +587,18 @@ import { PlusIcon } from '@heroicons/vue/20/solid'
 const props = defineProps({
   initialRows: {
     type: Array,
+    required: true,
+  },
+  domainName: {
+    type: String,
+    required: true,
+  },
+  hostname: {
+    type: String,
+    required: true,
+  },
+  dkimSelector: {
+    type: String,
     required: true,
   },
   recipientOptions: {
