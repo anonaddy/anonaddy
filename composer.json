@@ -77,6 +77,9 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
+        "post-update-cmd": [
+          "cd ./postfix && composer update"
+        ],
         "format": [
             "./vendor/bin/pint"
         ]

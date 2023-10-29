@@ -43,7 +43,7 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldBeEncrypted, Should
                 'verificationUrl' => $verificationUrl,
                 'userId' => $userId,
                 'recipientId' => $recipientId,
-                'emailType' => $feedbackId,
+                'emailType' => $notifiable instanceof User ? 'VU' : 'VR',
             ])
             ->withSymfonyMessage(function (Email $message) use ($feedbackId) {
                 $message->getHeaders()

@@ -495,27 +495,30 @@ const columns = [
 onMounted(() => {
   defaultRecipient.value = _.find(rows.value, ['id', defaultRecipientId.value])
 
-  axios
-    .post(
-      route('recipients.alias_count'),
-      JSON.stringify({
-        ids: _.map(rows.value, row => row.id),
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-    .then(response => {
-      Object.entries(response.data.count).forEach(([k, v]) => {
-        //rows.value[k].aliases_count = v.aliases_count
-        rows.value[k].aliases_count =
-          v.aliases_count +
-          v.domain_aliases_using_as_default_count +
-          v.username_aliases_using_as_default_count
-      })
+  // Prevent being called when a search returns no results
+  if (rows.value.length) {
+    axios
+      .post(
+        route('recipients.alias_count'),
+        JSON.stringify({
+          ids: _.map(rows.value, row => row.id),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+      .then(response => {
+        Object.entries(response.data.count).forEach(([k, v]) => {
+          //rows.value[k].aliases_count = v.aliases_count
+          rows.value[k].aliases_count =
+            v.aliases_count +
+            v.domain_aliases_using_as_default_count +
+            v.username_aliases_using_as_default_count
+        })
 
-      aliasCountLoading.value = false
-    })
+        aliasCountLoading.value = false
+      })
+  }
 })
 
 const isDefault = id => {
