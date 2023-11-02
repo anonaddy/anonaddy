@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\LoginRedirect;
 use App\Models\Username;
 use App\Notifications\UsernameReminder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -33,6 +34,24 @@ class LoginTest extends TestCase
 
         $response
             ->assertRedirect('/')
+            ->assertSessionHasNoErrors();
+    }
+
+    /** @test */
+    public function user_can_login_and_be_redirected_based_on_login_redirect_successfully()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        $this->user->login_redirect = LoginRedirect::ALIASES;
+        $this->user->save();
+
+        $response = $this->post('/login', [
+            'username' => 'johndoe',
+            'password' => 'mypassword',
+        ]);
+
+        $response
+            ->assertRedirect('/aliases')
             ->assertSessionHasNoErrors();
     }
 

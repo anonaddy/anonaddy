@@ -21,6 +21,7 @@ use App\Http\Controllers\DomainVerificationController;
 use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\EmailSubjectController;
 use App\Http\Controllers\FromNameController;
+use App\Http\Controllers\LoginRedirectController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShowAliasController;
@@ -147,6 +148,8 @@ Route::group([
     Route::post('/default-alias-format', [DefaultAliasFormatController::class, 'update'])->name('settings.default_alias_format');
 
     Route::post('/display-from-format', [DisplayFromFormatController::class, 'update'])->name('settings.display_from_format');
+
+    Route::post('/login-redirect', [LoginRedirectController::class, 'update'])->name('settings.login_redirect');
 
     Route::post('/from-name', [FromNameController::class, 'update'])->name('settings.from_name');
 

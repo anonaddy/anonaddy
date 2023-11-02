@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DisplayFromFormat;
+use App\Enums\LoginRedirect;
 use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
 use App\Traits\HasEncryptedAttributes;
@@ -40,6 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_subject',
         'banner_location',
         'display_from_format',
+        'login_redirect',
         'catch_all',
         'bandwidth',
         'reject_until',
@@ -95,6 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'defer_until' => 'datetime',
         'defer_new_aliases_until' => 'datetime',
         'display_from_format' => DisplayFromFormat::class,
+        'login_redirect' => LoginRedirect::class,
     ];
 
     /**

@@ -16,6 +16,7 @@ class SettingController extends Controller
         return Inertia::render('Settings/General', [
             'defaultAliasDomain' => user()->default_alias_domain,
             'defaultAliasFormat' => user()->default_alias_format,
+            'loginRedirect' => user()->login_redirect->value,
             'displayFromFormat' => user()->display_from_format->value,
             'useReplyTo' => user()->use_reply_to,
             'storeFailedDeliveries' => user()->store_failed_deliveries,

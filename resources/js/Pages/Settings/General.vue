@@ -309,6 +309,86 @@
 
       <div class="py-10">
         <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900">
+            Update Page to Display After Login
+          </h3>
+          <p class="text-base text-grey-700">
+            The login redirect determines which page you should be redirected to after logging in to
+            your account. If you select "Aliases" then you will be shown the aliases page after you
+            login to your account.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              loginRedirectForm.post(route('settings.login_redirect'), {
+                preserveScroll: true,
+              })
+            "
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label
+                  for="login-redirect"
+                  class="block text-sm font-medium leading-6 text-grey-600"
+                  >Select Login Redirect</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="login-redirect"
+                    v-model="loginRedirectForm.redirect"
+                    name="redirect"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      loginRedirectForm.errors.redirect
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="loginRedirectForm.errors.redirect ? 'true' : undefined"
+                    :aria-describedby="
+                      loginRedirectForm.errors.redirect ? 'login-redirect-error' : undefined
+                    "
+                  >
+                    <option
+                      v-for="redirect in loginRedirectOptions"
+                      :key="redirect.value"
+                      :value="redirect.value"
+                    >
+                      {{ redirect.label }}
+                    </option>
+                  </select>
+                  <div
+                    v-if="loginRedirectForm.errors.redirect"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="loginRedirectForm.errors.redirect"
+                  class="mt-2 text-sm text-red-600"
+                  id="login-redirect-error"
+                >
+                  {{ loginRedirectForm.errors.redirect }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="loginRedirectForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+            >
+              Update Login Redirect
+              <loader v-if="loginRedirectForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900">Update Display From Format</h3>
           <p class="text-base text-grey-700">
             The display from format is used when forwarding message to you. If one of your aliases
@@ -803,6 +883,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  loginRedirect: {
+    type: Number,
+    required: true,
+  },
   displayFromFormat: {
     type: Number,
     required: true,
@@ -871,6 +955,29 @@ const displayFromFormatOptions = [
   },
 ]
 
+const loginRedirectOptions = [
+  {
+    value: 0,
+    label: 'Dashboard',
+  },
+  {
+    value: 1,
+    label: 'Aliases',
+  },
+  {
+    value: 2,
+    label: 'Recipients',
+  },
+  {
+    value: 3,
+    label: 'Usernames',
+  },
+  {
+    value: 4,
+    label: 'Domains',
+  },
+]
+
 const emailForm = useForm({
   email: '',
   current: '',
@@ -882,6 +989,10 @@ const defaultAliasDomainForm = useForm({
 
 const defaultAliasFormatForm = useForm({
   format: props.defaultAliasFormat,
+})
+
+const loginRedirectForm = useForm({
+  redirect: props.loginRedirect,
 })
 
 const displayFromFormatForm = useForm({
