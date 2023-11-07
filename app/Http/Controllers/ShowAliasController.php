@@ -85,12 +85,15 @@ class ShowAliasController extends Controller
             ],
         ]);
 
+        $sort = $request->session()->get('aliasesSort', 'created_at');
+        $direction = $request->session()->get('aliasesSortDirection', 'desc');
+
         if ($request->has('sort')) {
             $direction = strpos($request->input('sort'), '-') === 0 ? 'desc' : 'asc';
             $sort = ltrim($request->input('sort'), '-');
-        } else {
-            $direction = 'desc';
-            $sort = 'created_at';
+
+            $request->session()->put('aliasesSort', $sort);
+            $request->session()->put('aliasesSortDirection', $direction);
         }
 
         $aliases = user()->aliases()
@@ -104,7 +107,7 @@ class ShowAliasController extends Controller
             ->when($request->input('username'), function ($query, $id) {
                 return $query->belongsToAliasable('App\Models\Username', $id);
             })
-            ->when($request->input('sort'), function ($query) use ($sort, $direction) {
+            ->when($sort !== 'created_at' || $direction !== 'desc', function ($query) use ($sort, $direction) {
                 if ($sort === 'created_at') {
                     return $query->orderBy($sort, $direction);
                 }

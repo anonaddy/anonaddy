@@ -4,9 +4,9 @@ This is the source code for self-hosting addy.io.
 
 ## FAQ
 
-- [Why is it called addy.io?](#why-is-it-called-addy-io)
+- [Why is it called addy.io?](#why-is-it-called-addyio)
 - [Why did you make this site?](#why-did-you-make-this-site)
-- [Why should I use addy.io?](#why-should-i-use-addy-io)
+- [Why should I use addy.io?](#why-should-i-use-addyio)
 - [Do you store emails?](#do-you-store-emails)
 - [What is a shared domain alias?](#what-is-a-shared-domain-alias)
 - [What is a standard alias?](#what-is-a-standard-alias)
@@ -30,7 +30,7 @@ This is the source code for self-hosting addy.io.
 - [How do I reply to a forwarded email?](#how-do-i-reply-to-a-forwarded-email)
 - [I'm trying to reply/send from an alias but the email keeps coming back to me, what's wrong?](#im-trying-to-replysend-from-an-alias-but-the-email-keeps-coming-back-to-me-whats-wrong)
 - [I'm trying to reply/send from an alias but it is rejected, what's wrong?](#im-trying-to-replysend-from-an-alias-but-it-is-rejected-whats-wrong)
-- [Does addy.io strip out the banner information when I reply to an email?](#does-addy-io-strip-out-the-banner-information-when-i-reply-to-an-email)
+- [Does addy.io strip out the banner information when I reply to an email?](#does-addyio-strip-out-the-banner-information-when-i-reply-to-an-email)
 - [How do I send email from an alias?](#how-do-i-send-email-from-an-alias)
 - [Will people see my real email if I reply to a forwarded one?](#will-people-see-my-real-email-if-i-reply-to-a-forwarded-one)
 - [Can emails have attachments?](#can-emails-have-attachments)
@@ -48,10 +48,10 @@ This is the source code for self-hosting addy.io.
 - [I'm not receiving any emails, what's wrong?](#im-not-receiving-any-emails-whats-wrong)
 - [I'm having trouble logging in, what's wrong?](#im-having-trouble-logging-in-whats-wrong)
 - [How do I know this site won't disappear next month?](#how-do-i-know-this-site-wont-disappear-next-month)
-- [What happens to addy.io if you die?](#what-happens-to-addy-io-if-you-die)
+- [What happens to addy.io if you die?](#what-happens-to-addyio-if-you-die)
 - [Is the application tested?](#is-the-appliction-tested)
 - [How do I host this myself?](#how-do-i-host-this-myself)
-- [Who's behind addy.io?](#whos-behind-addy-io)
+- [Who's behind addy.io?](#whos-behind-addyio)
 - [I couldn't find an answer to my question, how can I contact you?](#i-couldnt-find-an-answer-to-my-question-how-can-i-contact-you)
 
 ## Why is it called addy.io?
