@@ -102,6 +102,28 @@ class LoginController extends Controller
     }
 
     /**
+     * Send the response after the user was authenticated.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
+            return $response;
+        }
+
+        // If the intended path is just the dashboard then ignore and use the user's login redirect instead
+        $redirectTo = $this->redirectTo();
+        $intended = session()->pull('url.intended');
+
+        return $intended === url('/') ? redirect()->to($redirectTo) : redirect()->intended($intended ?? $redirectTo);
+    }
+
+    /**
      * Get the failed login response instance.
      *
      * @return \Symfony\Component\HttpFoundation\Response
