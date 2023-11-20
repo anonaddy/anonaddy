@@ -53,7 +53,7 @@ return [
     | Domain
     |--------------------------------------------------------------------------
     |
-    | If set and you are self hosting AnonAddy then a check will be done so that you can
+    | If set and you are self hosting addy.io then a check will be done so that you can
     | receive email at the root domain, e.g. @example.com aswell as @username.example.com
     |
     */

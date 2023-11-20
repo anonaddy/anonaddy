@@ -16,11 +16,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
 
-class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
+class SendFromEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
+    use CheckUserRules;
     use Queueable;
     use SerializesModels;
-    use CheckUserRules;
 
     protected $email;
 
@@ -48,6 +48,8 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
     protected $size;
 
+    protected $verpDomain;
+
     /**
      * Create a new message instance.
      *
@@ -64,7 +66,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->emailAttachments = $emailData->attachments;
         $this->emailInlineAttachments = $emailData->inlineAttachments;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
-        $this->displayFrom = $user->from_name ?? null;
+        $this->displayFrom = $alias->getFromName();
         $this->size = $emailData->size;
     }
 
@@ -75,21 +77,19 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
      */
     public function build()
     {
-        $returnPath = $this->alias->email;
         $this->fromEmail = $this->alias->email;
 
         if ($this->alias->isCustomDomain()) {
             if (! $this->alias->aliasable->isVerifiedForSending()) {
                 $this->fromEmail = config('mail.from.address');
-                $returnPath = config('anonaddy.return_path');
+                $this->verpDomain = config('anonaddy.domain');
             }
         }
 
         $this->email = $this
             ->from($this->fromEmail, $this->displayFrom)
             ->subject(base64_decode($this->emailSubject))
-            ->withSymfonyMessage(function (Email $message) use ($returnPath) {
-                $message->returnPath($returnPath);
+            ->withSymfonyMessage(function (Email $message) {
 
                 $message->getHeaders()
                     ->addTextHeader('Feedback-ID', 'S:'.$this->alias->id.':anonaddy');
@@ -108,7 +108,7 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                         $part->setContentId(base64_decode($attachment['contentId']));
                         $part->setFileName(base64_decode($attachment['file_name']));
 
-                        $message->attachPart($part);
+                        $message->addPart($part);
                     }
                 }
             });
@@ -143,10 +143,14 @@ class SendFromEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->checkRules('Sends');
 
         $this->email->with([
+            'userId' => $this->user->id,
+            'aliasId' => $this->alias->id,
+            'emailType' => 'S',
             'shouldBlock' => $this->size === 0,
             'encryptedParts' => $this->encryptedParts,
             'needsDkimSignature' => $this->needsDkimSignature(),
             'aliasDomain' => $this->alias->domain,
+            'verpDomain' => $this->verpDomain ?? $this->alias->domain,
         ]);
 
         if ($this->alias->isCustomDomain() && ! $this->needsDkimSignature()) {

@@ -18,8 +18,6 @@ class AliasesTest extends TestCase
         parent::setUp();
         parent::setUpSanctum();
 
-        $this->user->recipients()->save($this->user->defaultRecipient);
-        $this->user->usernames()->save($this->user->defaultUsername);
         $this->user->defaultUsername->username = 'johndoe';
         $this->user->defaultUsername->save();
     }
@@ -221,7 +219,30 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(422);
         $this->assertCount(0, $this->user->aliases);
-        $response->assertJsonValidationErrors('local_part');
+        $response->assertJsonValidationErrors('local_part_without_extension');
+    }
+
+    /** @test */
+    public function user_cannot_generate_custom_alias_that_already_exists()
+    {
+        Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'local_part' => 'exists',
+            'extension' => '1',
+            'domain' => $this->user->username.'.anonaddy.com',
+            'email' => 'exists@'.$this->user->username.'.anonaddy.com',
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $this->user->username.'.anonaddy.com',
+            'format' => 'custom',
+            'description' => 'the description',
+            'local_part' => 'exists+2',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertCount(1, $this->user->aliases);
+        $response->assertJsonValidationErrors('local_part_without_extension');
     }
 
     /** @test */
@@ -277,6 +298,21 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals('The new description', $response->getData()->data->description);
+    }
+
+    /** @test */
+    public function user_can_update_alias_from_name()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/aliases/'.$alias->id, [
+            'from_name' => 'John Doe',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('John Doe', $response->getData()->data->from_name);
     }
 
     /** @test */
@@ -387,5 +423,263 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertFalse($this->user->aliases[0]->active);
+    }
+
+    /** @test */
+    public function user_can_bulk_get_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/get/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->data);
+    }
+
+    /** @test */
+    public function user_cannot_bulk_get_invalid_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => '00000000-0000-0000-0000-000000000000',
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/get/bulk', [
+            'ids' => [
+                $alias->id,
+            ],
+        ]);
+
+        $response->assertStatus(404);
+        $this->assertEquals('No aliases found', $response->getData()->message);
+    }
+
+    /** @test */
+    public function user_can_bulk_activate_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/activate/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->ids);
+        $this->assertEquals('2 aliases activated successfully', $response->getData()->message);
+        $this->assertDatabaseHas('aliases', [
+            'id' => $alias->id,
+            'active' => true,
+        ]);
+    }
+
+    /** @test */
+    public function user_cannot_bulk_activate_invalid_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => '00000000-0000-0000-0000-000000000000',
+            'active' => false,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/activate/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->getData()->ids);
+        $this->assertEquals('1 alias activated successfully', $response->getData()->message);
+        $this->assertDatabaseHas('aliases', [
+            'id' => $alias->id,
+            'active' => true,
+        ]);
+        $this->assertDatabaseHas('aliases', [
+            'id' => $alias2->id,
+            'active' => false,
+        ]);
+    }
+
+    /** @test */
+    public function user_can_bulk_deactivate_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/deactivate/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->ids);
+        $this->assertEquals('2 aliases deactivated successfully', $response->getData()->message);
+        $this->assertDatabaseHas('aliases', [
+            'id' => $alias->id,
+            'active' => false,
+        ]);
+    }
+
+    /** @test */
+    public function user_can_bulk_delete_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+            'deleted_at' => null,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+            'deleted_at' => null,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/delete/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->ids);
+        $this->assertEquals('2 aliases deleted successfully', $response->getData()->message);
+        $this->assertDatabaseHas('aliases', [
+            'id' => $alias->id,
+            'active' => false,
+            'deleted_at' => now(),
+        ]);
+    }
+
+    /** @test */
+    public function user_can_bulk_restore_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+            'deleted_at' => now(),
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+            'deleted_at' => now(),
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/restore/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->ids);
+        $this->assertEquals('2 aliases restored successfully', $response->getData()->message);
+        $this->assertDatabaseHas('aliases', [
+            'id' => $alias->id,
+            'active' => true,
+            'deleted_at' => null,
+        ]);
+    }
+
+    /** @test */
+    public function user_can_bulk_forget_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/forget/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->ids);
+        $this->assertEquals('2 aliases forgotten successfully', $response->getData()->message);
+        $this->assertDatabaseMissing('aliases', [
+            'id' => $alias->id,
+        ]);
+    }
+
+    /** @test */
+    public function user_can_bulk_update_recipients_for_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/recipients/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+            ],
+            'recipient_ids' => [
+                $recipient->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->getData()->ids);
+        $this->assertEquals('recipients updated for 2 aliases successfully', $response->getData()->message);
+        $this->assertDatabaseHas('alias_recipients', [
+            'alias_id' => $alias->id,
+            'recipient_id' => $recipient->id,
+        ]);
     }
 }

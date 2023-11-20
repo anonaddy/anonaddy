@@ -25,6 +25,7 @@ class UpdateAliasRequest extends FormRequest
     {
         return [
             'description' => 'nullable|max:200',
+            'from_name' => 'nullable|string|max:50',
         ];
     }
 }

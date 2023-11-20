@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EnableTwoFactorAuthRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FALaravel\Support\Authenticator;
 
@@ -52,14 +51,14 @@ class TwoFactorAuthController extends Controller
 
         user()->update(['two_factor_secret' => $this->twoFactor->generateSecretKey()]);
 
-        return back()->with(['status' => '2FA Secret Successfully Regenerated']);
+        return back()->with(['flash' => '2FA Secret Successfully Regenerated']);
     }
 
     public function destroy(Request $request)
     {
-        if (! Hash::check($request->current_password_2fa, user()->password)) {
-            return back()->withErrors(['current_password_2fa' => 'Current password incorrect']);
-        }
+        $request->validate([
+            'current' => 'required|string|current_password',
+        ]);
 
         user()->update([
             'two_factor_enabled' => false,
@@ -68,7 +67,7 @@ class TwoFactorAuthController extends Controller
 
         $this->authenticator->logout();
 
-        return back()->with(['status' => '2FA Disabled Successfully']);
+        return back()->with(['flash' => '2FA Disabled Successfully']);
     }
 
     public function authenticateTwoFactor(Request $request)

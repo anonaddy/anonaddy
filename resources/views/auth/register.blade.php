@@ -4,7 +4,7 @@
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">
         <div class="w-full max-w-md">
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                <img class="w-48" alt="addy.io Logo" src="/svg/logo.svg">
             </div>
             <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('register') }}">
@@ -19,8 +19,8 @@
                         <div class="mx-auto mt-6 w-24 border-b-2 border-grey-200"></div>
 
                         <div class="mt-8 flex flex-wrap mb-6">
-                            <label for="username" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Username') }}:
+                            <label for="username" class="block text-grey-700 text-sm font-medium leading-6 mb-2">
+                                {{ __('Username') }}
                             </label>
 
                             <div class="table w-full">
@@ -41,8 +41,8 @@
                         </div>
 
                         <div class="flex flex-wrap mb-6">
-                            <label for="email" class="block text-grey-700 text-sm mb-2">
-                                Your Real Email Address:
+                            <label for="email" class="block text-grey-700 text-sm font-medium leading-6 mb-2">
+                                Your Real Email Address
                             </label>
 
                             <input id="email" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('email') ? ' border-red-500' : '' }}" name="email" value="{{ old('email') }}" placeholder="johndoe@example.com" required>
@@ -57,16 +57,16 @@
                         </div>
 
                         <div class="flex flex-wrap mb-6">
-                            <label for="email-confirm" class="block text-grey-700 text-sm mb-2">
-                                Confirm Email Address:
+                            <label for="email-confirm" class="block text-grey-700 text-sm font-medium leading-6 mb-2">
+                                Confirm Email Address
                             </label>
 
                             <input id="email-confirm" type="email" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="email_confirmation" value="{{ old('email_confirmation') }}" placeholder="johndoe@example.com" required>
                         </div>
 
                         <div class="flex flex-wrap mb-6">
-                            <label for="password" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Password') }}:
+                            <label for="password" class="block text-grey-700 text-sm font-medium leading-6 mb-2">
+                                {{ __('Password') }}
                             </label>
 
                             <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
@@ -79,12 +79,12 @@
                         </div>
 
                         <div class="flex flex-wrap mb-4 items-center">
-                            <label for="captcha" class="block w-full text-grey-700 text-sm">
-                                Verification:
+                            <label for="captcha" class="block w-full text-grey-700 text-sm font-medium leading-6">
+                                Human Verification (click image to refresh)
                             </label>
 
                             <div class="flex grow flex-wrap">
-                                <img src="{{captcha_src('mini')}}" class="shrink-0 h-12 w-16 mr-2 mt-2">
+                            <img src="{{captcha_src('mini')}}" onclick="this.src='/captcha/mini?'+Math.random()" class="cursor-pointer shrink-0 h-12 w-16 mr-2 mt-2" title="Click to refresh image" alt="captcha">
 
                                 <input id="captcha" type="text" class="grow mt-2 appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:ring{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
                             </div>

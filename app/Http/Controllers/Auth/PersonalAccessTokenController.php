@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePersonalAccessTokenRequest;
 use App\Http\Resources\PersonalAccessTokenResource;
 use chillerlan\QRCode\QRCode;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class PersonalAccessTokenController extends Controller
 {
@@ -16,6 +18,10 @@ class PersonalAccessTokenController extends Controller
 
     public function store(StorePersonalAccessTokenRequest $request)
     {
+        if (! Hash::check($request->password, user()->password)) {
+            throw ValidationException::withMessages(['password' => 'Incorrect password entered']);
+        }
+
         // day, week, month, year or null
         if ($request->expiration) {
             $method = 'add'.ucfirst($request->expiration);

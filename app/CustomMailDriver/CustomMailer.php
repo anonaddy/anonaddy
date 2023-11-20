@@ -4,14 +4,14 @@ namespace App\CustomMailDriver;
 
 use App\CustomMailDriver\Mime\Crypto\AlreadyEncrypted;
 use App\CustomMailDriver\Mime\Crypto\OpenPGPEncrypter;
-use App\Models\PostfixQueueId;
+use App\Models\OutboundMessage;
 use App\Models\Recipient;
 use App\Notifications\GpgKeyExpired;
+use Exception;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
-use Illuminate\Database\QueryException;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SentMessage;
-use Illuminate\Support\Str;
+use ParagonIE\ConstantTime\Base32;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mime\Crypto\DkimOptions;
@@ -121,6 +121,17 @@ class CustomMailer extends Mailer
         }
 
         if ($this->shouldSendMessage($symfonyMessage, $data)) {
+            // Set VERP address
+            $id = randomString(12);
+            $verpLocalPart = $this->getVerpLocalPart($id);
+
+            // If the message is a forward, reply or send then use the verp domain
+            if (isset($data['emailType']) && in_array($data['emailType'], ['F', 'R', 'S'])) {
+                $message->returnPath($verpLocalPart.'@'.$data['verpDomain']);
+            } else {
+                $message->returnPath($verpLocalPart.'@'.config('anonaddy.domain'));
+            }
+
             $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
 
             if ($symfonySentMessage) {
@@ -128,16 +139,20 @@ class CustomMailer extends Mailer
 
                 $this->dispatchSentEvent($sentMessage, $data);
 
-                try {
-                    // Get Postfix Queue ID and save in DB
-                    $id = str_replace("\r\n", '', Str::after($sentMessage->getDebug(), 'Ok: queued as '));
+                // Create a new Outbound Message for verifying any bounces
+                if (isset($data['userId']) && ! is_null($data['userId']) && isset($data['emailType']) && ! is_null($data['emailType'])) {
 
-                    PostfixQueueId::create([
-                        'queue_id' => $id,
-                    ]);
-                } catch (QueryException $e) {
-                    // duplicate entry
-                    //Log::info('Failed to save Postfix Queue ID: ' . $id);
+                    try {
+                        OutboundMessage::create([
+                            'id' => $id,
+                            'user_id' => $data['userId'],
+                            'alias_id' => $data['aliasId'] ?? null,
+                            'recipient_id' => $data['recipientId'] ?? null,
+                            'email_type' => $data['emailType'],
+                        ]);
+                    } catch (Exception $e) {
+                        report($e);
+                    }
                 }
 
                 return $sentMessage;
@@ -170,5 +185,15 @@ class CustomMailer extends Mailer
         } finally {
             //
         }
+    }
+
+    protected function getVerpLocalPart($id)
+    {
+        $hmac = hash_hmac('sha3-224', $id, config('anonaddy.secret'));
+        $hmacPayload = substr($hmac, 0, 8);
+        $encodedPayload = Base32::encodeUnpadded($id);
+        $encodedSignature = Base32::encodeUnpadded($hmacPayload);
+
+        return "b_{$encodedPayload}_{$encodedSignature}";
     }
 }

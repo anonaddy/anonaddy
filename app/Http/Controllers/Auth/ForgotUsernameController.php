@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Recipient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 class ForgotUsernameController extends Controller
 {
@@ -54,6 +55,14 @@ class ForgotUsernameController extends Controller
      */
     protected function validateEmail(Request $request)
     {
+        if (! App::environment('testing')) {
+            $request->validate([
+                'captcha' => 'required|captcha',
+            ], [
+                'captcha.captcha' => 'The text entered was incorrect, please try again.',
+            ]);
+        }
+
         $request->validate(['email' => 'required|email:rfc']);
     }
 }

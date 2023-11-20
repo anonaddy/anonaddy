@@ -11,6 +11,6 @@ class DefaultAliasFormatController extends Controller
         user()->default_alias_format = $request->format;
         user()->save();
 
-        return back()->with(['status' => 'Default Alias Format Updated Successfully']);
+        return back()->with(['flash' => 'Default Alias Format Updated Successfully']);
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Ramsey\Uuid\Uuid;
 
 class RegisterController extends Controller
@@ -55,6 +56,22 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        // Validate captcha separately first to prevent username enumeration
+        if (! App::environment('testing')) {
+            $validator = Validator::make($data, [
+                'captcha' => [
+                    'required',
+                    'captcha',
+                ],
+            ], [
+                'captcha.captcha' => 'The text entered was incorrect, please try again.',
+            ]);
+
+            if ($validator->fails()) {
+                return $validator;
+            }
+        }
+
         return Validator::make($data, [
             'username' => [
                 'required',
@@ -72,13 +89,10 @@ class RegisterController extends Controller
                 new RegisterUniqueRecipient(),
                 new NotLocalRecipient(),
             ],
-            'password' => ['required', 'min:8'],
+            'password' => ['required', Password::defaults()],
         ], [
-            'captcha.captcha' => 'The text entered was incorrect, please try again.',
-        ])
-            ->sometimes('captcha', 'required|captcha', function () {
-                return ! App::environment('testing');
-            });
+            'username.regex' => 'Your username can only contain letters and numbers.',
+        ]);
     }
 
     /**

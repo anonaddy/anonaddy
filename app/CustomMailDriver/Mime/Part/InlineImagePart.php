@@ -19,6 +19,21 @@ class InlineImagePart extends DataPart
         return $this;
     }
 
+    public function getContentId(): string
+    {
+        return $this->cid ?: $this->cid = $this->generateContentId();
+    }
+
+    public function hasContentId(): bool
+    {
+        return $this->cid !== null;
+    }
+
+    private function generateContentId(): string
+    {
+        return bin2hex(random_bytes(16)).'@symfony';
+    }
+
     /**
      * Sets the name of the file.
      *
@@ -35,11 +50,11 @@ class InlineImagePart extends DataPart
     {
         $headers = parent::getPreparedHeaders();
 
-        if (null !== $this->cid) {
+        if ($this->cid !== null) {
             $headers->setHeaderBody('Id', 'Content-ID', $this->cid);
         }
 
-        if (null !== $this->filename) {
+        if ($this->filename !== null) {
             $headers->setHeaderParameter('Content-Disposition', 'filename', $this->filename);
         }
 

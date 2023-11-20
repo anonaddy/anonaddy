@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class DefaultRecipientUpdated extends Notification implements ShouldQueue, ShouldBeEncrypted
+class DefaultRecipientUpdated extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -49,7 +49,9 @@ class DefaultRecipientUpdated extends Notification implements ShouldQueue, Shoul
             ->markdown('mail.default_recipient_updated', [
                 'defaultRecipient' => $notifiable->email,
                 'newDefaultRecipient' => $this->newDefaultRecipient,
+                'userId' => $notifiable->user_id,
                 'recipientId' => $notifiable->id,
+                'emailType' => 'DRU',
                 'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {

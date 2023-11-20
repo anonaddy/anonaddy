@@ -57,12 +57,19 @@ class BackupCodeController extends Controller
         return redirect()->intended($request->redirectPath);
     }
 
-    public function update()
+    public function update(Request $request)
     {
+        $request->validate([
+            'current' => 'required|string|current_password',
+        ]);
+
         user()->update([
             'two_factor_backup_code' => bcrypt($code = Str::random(40)),
         ]);
 
-        return back()->with(['backupCode' => $code]);
+        return back()->with([
+            'flash' => 'New Backup Code Generated Successfully',
+            'regeneratedBackupCode' => $code,
+        ]);
     }
 }

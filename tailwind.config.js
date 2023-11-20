@@ -1,6 +1,8 @@
+import defaultTheme from 'tailwindcss/defaultTheme'
+import forms from '@tailwindcss/forms'
 const svgToDataUri = require('mini-svg-data-uri')
 
-module.exports = {
+export default {
   content: [
     'app/**/*.php',
     'resources/**/*.html',
@@ -132,7 +134,5 @@ module.exports = {
       }),
     },
   },
-  plugins: [
-    // Some useful comment
-  ],
+  plugins: [forms],
 }

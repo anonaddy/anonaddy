@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,10 +13,10 @@ use Illuminate\Support\Str;
 
 class Alias extends Model
 {
-    use SoftDeletes;
-    use HasUuid;
     use HasEncryptedAttributes;
     use HasFactory;
+    use HasUuid;
+    use SoftDeletes;
 
     public $incrementing = false;
 
@@ -23,6 +24,7 @@ class Alias extends Model
 
     protected $encrypted = [
         'description',
+        'from_name',
     ];
 
     protected $fillable = [
@@ -30,6 +32,7 @@ class Alias extends Model
         'user_id',
         'active',
         'description',
+        'from_name',
         'email',
         'local_part',
         'extension',
@@ -124,6 +127,14 @@ class Alias extends Model
     }
 
     /**
+     * Get all of the aliases' outbound messages.
+     */
+    public function outboundMessages()
+    {
+        return $this->hasMany(OutboundMessage::class);
+    }
+
+    /**
      * Get all of the verified recipients for the email alias.
      */
     public function verifiedRecipients()
@@ -154,6 +165,24 @@ class Alias extends Model
         return $verifiedRecipients;
     }
 
+    public function scopeUsesRecipientWithId($query, $id, $isDefault = false)
+    {
+        return $query->where(function (Builder $q) use ($id) {
+            return $q->whereHas('recipients', function (Builder $query) use ($id) {
+                $query->where('recipients.id', $id);
+            })->orWhere(function (Builder $q) use ($id) {
+                return $q->whereHasMorph('aliasable', ['App\Models\Domain', 'App\Models\Username'], function (Builder $query) use ($id) {
+                    $query->where('default_recipient_id', $id);
+                })->doesntHave('recipients');
+            });
+        });
+    }
+
+    public function scopeBelongsToAliasable($query, $type, $id)
+    {
+        return $query->where('aliasable_type', $type)->where('aliasable_id', $id);
+    }
+
     /**
      * Deactivate the alias.
      */
@@ -178,6 +207,22 @@ class Alias extends Model
     public function hasSharedDomain()
     {
         return in_array($this->domain, config('anonaddy.all_domains'));
+    }
+
+    public function getFromName()
+    {
+        // Check alias from name
+        if ($aliasFromName = $this->from_name) {
+            return $aliasFromName;
+        }
+
+        // Check username / custom domain from name
+        if ($aliasableFromName = $this->aliasable?->from_name) {
+            return $aliasableFromName;
+        }
+
+        // Check user settings global from name
+        return $this->user->from_name ?? null;
     }
 
     public function isCustomDomain()

@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
-use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
@@ -19,8 +18,7 @@ class AliasTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create()->fresh();
-        $this->user->recipients()->save($this->user->defaultRecipient);
+        $this->user = $this->createUser();
     }
 
     /** @test */

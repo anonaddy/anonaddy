@@ -10,11 +10,11 @@ class BrowserSessionController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'current_password_sesssions' => 'current_password',
+            'current' => 'required|string|current_password',
         ]);
 
-        Auth::logoutOtherDevices($request->current_password_sesssions);
+        Auth::logoutOtherDevices($request->current);
 
-        return back()->with(['status' => 'Successfully logged out of other browser sessions!']);
+        return back()->with(['flash' => 'Successfully logged out of other browser sessions!']);
     }
 }

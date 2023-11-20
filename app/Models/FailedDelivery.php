@@ -5,15 +5,16 @@ namespace App\Models;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class FailedDelivery extends Model
 {
-    use HasUuid;
     use HasEncryptedAttributes;
     use HasFactory;
+    use HasUuid;
 
     public $incrementing = false;
 
@@ -21,6 +22,7 @@ class FailedDelivery extends Model
 
     protected $encrypted = [
         'sender',
+        'destination',
     ];
 
     protected $fillable = [
@@ -32,6 +34,7 @@ class FailedDelivery extends Model
         'bounce_type',
         'remote_mta',
         'sender',
+        'destination',
         'email_type',
         'status',
         'code',
@@ -68,6 +71,40 @@ class FailedDelivery extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Get the human readable email type.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function emailType(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => match ($value) {
+                'F' => 'Forward',
+                'R' => 'Reply',
+                'S' => 'Send',
+                'RP' => 'Reset Password',
+                'FDN' => 'Failed Delivery',
+                'DMI' => 'Domain MX Invalid',
+                'DRU' => 'Default Recipient Updated',
+                'FLA' => 'Failed Login Attempt',
+                'TES' => 'Token Expiring Soon',
+                'UR' => 'Username Reminder',
+                'VR' => 'Verify Recipient',
+                'VU' => 'Verify User',
+                'DRSA' => 'Disallowed Reply/Send Attempt',
+                'DUS' => 'Domain Unverified For Sending',
+                'GKE' => 'PGP Key Expired',
+                'NBL' => 'Near Bandwidth Limit',
+                'RSL' => 'Reached Reply/Send Limit',
+                'SRSA' => 'Spam Reply/Send Attempt',
+                'AIF' => 'Aliases Import Finished',
+                default => 'Forward',
+            },
+        );
     }
 
     /**

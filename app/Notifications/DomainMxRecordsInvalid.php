@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class DomainMxRecordsInvalid extends Notification implements ShouldQueue, ShouldBeEncrypted
+class DomainMxRecordsInvalid extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -48,10 +48,12 @@ class DomainMxRecordsInvalid extends Notification implements ShouldQueue, Should
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
         return (new MailMessage())
-            ->subject("Your domain's MX records no longer point to AnonAddy")
+            ->subject("Your domain's MX records no longer point to addy.io")
             ->markdown('mail.domain_mx_records_invalid', [
                 'domain' => $this->domain,
-                'recipientId' => $recipient->_id,
+                'userId' => $notifiable->id,
+                'recipientId' => $recipient->id,
+                'emailType' => 'DMI',
                 'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {

@@ -4,7 +4,7 @@
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">
         <div class="w-full max-w-md">
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                <img class="w-48" alt="addy.io Logo" src="/svg/logo.svg">
             </div>
             <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form method="POST" action="{{ route('login.2fa') }}">
@@ -29,7 +29,7 @@
                                 {{ __('One Time Token') }}:
                             </label>
 
-                            <input id="one_time_password" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('message') ? ' border border-red-500' : '' }}" name="one_time_password" placeholder="123456" required autofocus>
+                            <input id="one_time_password" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('message') ? ' border border-red-500' : '' }}" name="one_time_password" placeholder="123456" autocomplete="one-time-code" required autofocus>
 
                             @if ($errors->has('message'))
                                 <p class="text-red-500 text-xs italic mt-4">

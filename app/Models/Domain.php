@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Log;
 
 class Domain extends Model
 {
-    use HasUuid;
     use HasEncryptedAttributes;
     use HasFactory;
+    use HasUuid;
 
     public $incrementing = false;
 
@@ -24,11 +24,13 @@ class Domain extends Model
 
     protected $encrypted = [
         'description',
+        'from_name',
     ];
 
     protected $fillable = [
         'domain',
         'description',
+        'from_name',
         'active',
         'catch_all',
     ];

@@ -38,7 +38,15 @@ class UsernameController extends Controller
     {
         $username = user()->usernames()->findOrFail($id);
 
-        $username->update(['description' => $request->description]);
+        if ($request->has('description')) {
+            $username->description = $request->description;
+        }
+
+        if ($request->has('from_name')) {
+            $username->from_name = $request->from_name;
+        }
+
+        $username->save();
 
         return new UsernameResource($username->refresh()->load(['aliases', 'defaultRecipient']));
     }

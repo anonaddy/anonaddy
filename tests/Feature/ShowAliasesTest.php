@@ -5,9 +5,9 @@ namespace Tests\Feature;
 use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
-use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class ShowAliasesTest extends TestCase
@@ -20,7 +20,7 @@ class ShowAliasesTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create()->fresh();
+        $this->user = $this->createUser();
         $this->actingAs($this->user);
     }
 
@@ -28,17 +28,21 @@ class ShowAliasesTest extends TestCase
     public function user_can_view_aliases_from_the_dashboard()
     {
         // Arrange
-        $aliases = Alias::factory()->count(3)->create([
+        Alias::factory()->count(3)->create([
             'user_id' => $this->user->id,
         ]);
 
         // Act
-        $response = $this->get('/');
+        $response = $this->get('/aliases');
 
         // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('aliases'));
-        $aliases->assertEquals($response->data('aliases'));
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows.data', 3, fn (Assert $page) => $page
+                ->where('user_id', $this->user->id)
+                ->etc()
+            )
+        );
     }
 
     /** @test */
@@ -59,14 +63,19 @@ class ShowAliasesTest extends TestCase
         ]);
 
         // Act
-        $response = $this->get('/');
+        $response = $this->get('/aliases');
 
         // Assert
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('aliases'));
-        $this->assertTrue($response->data('aliases')[0]->is($b));
-        $this->assertTrue($response->data('aliases')[1]->is($c));
-        $this->assertTrue($response->data('aliases')[2]->is($a));
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows.data', 3, fn (Assert $page) => $page
+                ->where('user_id', $this->user->id)
+                ->etc()
+            )
+        );
+        $this->assertTrue($response->data('page')['props']['initialRows']['data'][0]['id'] === $b->id);
+        $this->assertTrue($response->data('page')['props']['initialRows']['data'][1]['id'] === $c->id);
+        $this->assertTrue($response->data('page')['props']['initialRows']['data'][2]['id'] === $a->id);
     }
 
     /** @test */
@@ -81,10 +90,15 @@ class ShowAliasesTest extends TestCase
             'deleted_at' => Carbon::now()->subDays(5),
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/aliases');
 
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('aliases'));
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows.data', 3, fn (Assert $page) => $page
+                ->where('user_id', $this->user->id)
+                ->etc()
+            )
+        );
     }
 
     /** @test */
@@ -103,11 +117,16 @@ class ShowAliasesTest extends TestCase
             'recipient' => $recipient,
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/aliases');
 
         $response->assertSuccessful();
-        $this->assertCount(1, $response->data('aliases'));
-        $this->assertEquals($aliasRecipient->recipient->email, $response->data('aliases')[0]['recipients'][0]['email']);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows.data', 1, fn (Assert $page) => $page
+                ->where('user_id', $this->user->id)
+                ->etc()
+            )
+        );
+        $this->assertEquals($aliasRecipient->recipient->email, $response->data('page')['props']['initialRows']['data'][0]['recipients'][0]['email']);
     }
 
     /** @test */
@@ -136,10 +155,12 @@ class ShowAliasesTest extends TestCase
             'recipient' => $unverifiedRecipient,
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('/aliases');
 
         $response->assertSuccessful();
-        $this->assertCount(1, $response->data('recipients'));
-        $this->assertEquals($aliasRecipient->recipient->email, $response->data('recipients')[0]['email']);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('recipientOptions', 2)
+        );
+        $this->assertEquals($aliasRecipient->recipient->email, $response->data('page')['props']['recipientOptions'][1]['email']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\DisplayFromFormat;
 use App\Exports\AliasesExport;
 use App\Imports\AliasesImport;
 use App\Models\Alias;
@@ -9,11 +10,13 @@ use App\Models\AliasRecipient;
 use App\Models\DeletedUsername;
 use App\Models\Domain;
 use App\Models\Recipient;
-use App\Models\User;
 use App\Models\Username;
+use App\Notifications\CustomVerifyEmail;
+use App\Notifications\DefaultRecipientUpdated;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
@@ -28,32 +31,37 @@ class SettingsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create()->fresh();
+        $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
         $this->actingAs($this->user);
-        $this->user->recipients()->save($this->user->defaultRecipient);
-        $this->user->usernames()->save($this->user->defaultUsername);
-        $this->user->defaultUsername->username = 'johndoe';
-        $this->user->defaultUsername->save();
     }
 
     /** @test */
     public function user_can_update_default_recipient()
     {
+        Notification::fake();
+
+        $currentDefaultRecipient = $this->user->defaultRecipient;
+
         $newDefaultRecipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
         ]);
 
-        $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
+        $this->assertNotEquals($currentDefaultRecipient->id, $newDefaultRecipient->id);
 
         $response = $this->post('/settings/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id,
+            'id' => $newDefaultRecipient->id,
         ]);
 
-        $response->assertStatus(302);
+        $response->assertStatus(200);
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
             'default_recipient_id' => $newDefaultRecipient->id,
         ]);
+
+        Notification::assertSentTo(
+            $currentDefaultRecipient,
+            DefaultRecipientUpdated::class
+        );
     }
 
     /** @test */
@@ -67,11 +75,93 @@ class SettingsTest extends TestCase
         $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
 
         $response = $this->post('/settings/default-recipient', [
-            'default_recipient' => $newDefaultRecipient->id,
+            'id' => $newDefaultRecipient->id,
         ]);
 
         $response->assertStatus(404);
         $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
+    }
+
+    /** @test */
+    public function user_can_edit_default_recipient()
+    {
+        Notification::fake();
+
+        $currentDefaultRecipient = $this->user->defaultRecipient;
+
+        $response = $this->post('/settings/edit-default-recipient', [
+            'email' => 'new@example.com',
+            'current' => 'mypassword',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'default_recipient_id' => $currentDefaultRecipient->id,
+        ]);
+
+        $this->assertDatabaseHas('recipients', [
+            'id' => $currentDefaultRecipient->id,
+        ]);
+
+        $this->assertDatabaseHas('recipients', [
+            'user_id' => $this->user->id,
+            'pending' => true,
+        ]);
+
+        $newPendingRecipient = $this->user->pendingRecipients()->first();
+
+        Notification::assertSentTo(
+            $newPendingRecipient,
+            CustomVerifyEmail::class
+        );
+    }
+
+    /** @test */
+    public function user_must_enter_current_password_to_edit_default_recipient()
+    {
+        Notification::fake();
+
+        $response = $this->post('/settings/edit-default-recipient', [
+            'email' => 'new@example.com',
+            'current' => 'wrong-password',
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHasErrors('current');
+
+        Notification::assertNothingSent(
+            CustomVerifyEmail::class
+        );
+    }
+
+    /** @test */
+    public function user_can_update_default_username()
+    {
+        $currentDefaultUsername = $this->user->defaultUsername;
+
+        $newDefaultUsername = Username::factory()->create([
+            'user_id' => $this->user->id,
+            'can_login' => false,
+        ]);
+
+        $this->assertNotEquals($currentDefaultUsername->id, $newDefaultUsername->id);
+
+        $response = $this->post('/settings/default-username', [
+            'id' => $newDefaultUsername->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'default_username_id' => $newDefaultUsername->id,
+        ]);
+        $this->assertDatabaseHas('usernames', [
+            'id' => $newDefaultUsername->id,
+            'user_id' => $this->user->id,
+            'can_login' => true,
+        ]);
     }
 
     /** @test */
@@ -133,6 +223,37 @@ class SettingsTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
             'default_alias_format' => null,
+        ]);
+    }
+
+    /** @test */
+    public function user_can_update_display_from_format()
+    {
+        $displayFromFormat = DisplayFromFormat::DEFAULT->value;
+
+        $response = $this->post('/settings/display-from-format', [
+            'format' => $displayFromFormat,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'display_from_format' => $displayFromFormat,
+        ]);
+    }
+
+    /** @test */
+    public function user_cannot_update_display_from_format_if_invalid()
+    {
+        $response = $this->post('/settings/display-from-format', [
+            'format' => 10,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['format']);
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'display_from_format' => 0,
         ]);
     }
 
@@ -279,21 +400,180 @@ class SettingsTest extends TestCase
 
         $currentBackupCode = $this->user->two_factor_backup_code;
 
-        $response = $this->post('/settings/2fa/new-backup-code/');
+        $response = $this->post('/settings/2fa/new-backup-code/', [
+            'current' => 'mypassword',
+        ]);
 
         $response
             ->assertStatus(302)
-            ->assertSessionHas('backupCode');
+            ->assertSessionHas('regeneratedBackupCode');
 
         $this->assertNotEquals($currentBackupCode, $this->user->two_factor_backup_code);
+    }
+
+    /** @test */
+    public function user_must_enter_current_password_to_generate_new_backup_code()
+    {
+        $this->user->update([
+            'two_factor_backup_code' => bcrypt(Str::random(40)),
+        ]);
+
+        $currentBackupCode = $this->user->two_factor_backup_code;
+
+        $response = $this->post('/settings/2fa/new-backup-code/', [
+            'current' => 'wrong-password',
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHasErrors('current')
+            ->assertSessionMissing('regeneratedBackupCode');
+
+        $this->assertEquals($currentBackupCode, $this->user->two_factor_backup_code);
+    }
+
+    /** @test */
+    public function user_can_enable_webauthn_key()
+    {
+        $key = $this->user->webauthnKeys()->create([
+            'name' => 'key',
+            'enabled' => false,
+            'credentialId' => 'xyz',
+            'type' => 'public-key',
+            'transports' => [],
+            'attestationType' => 'none',
+            'trustPath' => '{"type":"Webauthn\\TrustPath\\EmptyTrustPath"}',
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'xyz',
+            'counter' => 0,
+        ]);
+
+        $this->assertFalse($key->enabled);
+
+        $response = $this->post('/webauthn/enabled-keys/', [
+            'id' => $key->id,
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertTrue($this->user->webauthnKeys[0]->enabled);
+    }
+
+    /** @test */
+    public function user_can_disable_webauthn_key()
+    {
+        $key = $this->user->webauthnKeys()->create([
+            'name' => 'key',
+            'enabled' => true,
+            'credentialId' => 'xyz',
+            'type' => 'public-key',
+            'transports' => [],
+            'attestationType' => 'none',
+            'trustPath' => '{"type":"Webauthn\\TrustPath\\EmptyTrustPath"}',
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'xyz',
+            'counter' => 0,
+        ]);
+
+        $this->assertTrue($key->enabled);
+
+        $response = $this->post('/webauthn/enabled-keys/'.$key->id, [
+            'current' => 'mypassword',
+        ]);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->webauthnKeys[0]->enabled);
+    }
+
+    /** @test */
+    public function user_must_enter_correct_password_to_disable_webauthn_key()
+    {
+        $key = $this->user->webauthnKeys()->create([
+            'name' => 'key',
+            'enabled' => true,
+            'credentialId' => 'xyz',
+            'type' => 'public-key',
+            'transports' => [],
+            'attestationType' => 'none',
+            'trustPath' => '{"type":"Webauthn\\TrustPath\\EmptyTrustPath"}',
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'xyz',
+            'counter' => 0,
+        ]);
+
+        $this->assertTrue($key->enabled);
+
+        $response = $this->post('/webauthn/enabled-keys/'.$key->id, [
+            'current' => 'wrong-password',
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHasErrors('current');
+        $this->assertTrue($this->user->webauthnKeys[0]->enabled);
+    }
+
+    /** @test */
+    public function user_can_delete_webauthn_key()
+    {
+        $key = $this->user->webauthnKeys()->create([
+            'name' => 'key',
+            'enabled' => true,
+            'credentialId' => 'xyz',
+            'type' => 'public-key',
+            'transports' => [],
+            'attestationType' => 'none',
+            'trustPath' => '{"type":"Webauthn\\TrustPath\\EmptyTrustPath"}',
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'xyz',
+            'counter' => 0,
+        ]);
+
+        $response = $this->post('/webauthn/keys/'.$key->id, [
+            'current' => 'mypassword',
+        ]);
+
+        $response->assertStatus(302);
+
+        $this->assertDatabaseMissing('webauthn_keys', [
+            'id' => $key->id,
+            'user_id' => $this->user->id,
+        ]);
+    }
+
+    /** @test */
+    public function user_must_enter_correct_password_to_delete_webauthn_key()
+    {
+        $key = $this->user->webauthnKeys()->create([
+            'name' => 'key',
+            'enabled' => true,
+            'credentialId' => 'xyz',
+            'type' => 'public-key',
+            'transports' => [],
+            'attestationType' => 'none',
+            'trustPath' => '{"type":"Webauthn\\TrustPath\\EmptyTrustPath"}',
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'xyz',
+            'counter' => 0,
+        ]);
+
+        $response = $this->post('/webauthn/keys/'.$key->id, [
+            'current' => 'wrong-password',
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHasErrors('current');
+
+        $this->assertDatabaseHas('webauthn_keys', [
+            'id' => $key->id,
+            'user_id' => $this->user->id,
+        ]);
     }
 
     /** @test */
     public function user_can_delete_account()
     {
         $this->assertNotNull($this->user->id);
-
-        $this->user->update(['password' => Hash::make('mypassword')]);
 
         if (! Hash::check('mypassword', $this->user->password)) {
             $this->fail('Password does not match');
@@ -345,7 +625,7 @@ class SettingsTest extends TestCase
         ]);
 
         $response = $this->post('/settings/account', [
-            'current_password_delete' => 'mypassword',
+            'password' => 'mypassword',
         ]);
 
         $response->assertRedirect('/login');
@@ -415,19 +695,17 @@ class SettingsTest extends TestCase
     {
         $this->assertNotNull($this->user->id);
 
-        $this->user->update(['password' => Hash::make('mypassword')]);
-
         if (! Hash::check('mypassword', $this->user->password)) {
             $this->fail('Password does not match');
         }
 
         $response = $this->post('/settings/account', [
-            'current_password_delete' => 'wrongpassword',
+            'password' => 'wrongpassword',
         ]);
 
         $response->assertStatus(302);
 
-        $response->assertSessionHasErrors(['current_password_delete']);
+        $response->assertSessionHasErrors(['password']);
         $this->assertNull(DeletedUsername::first());
 
         $this->assertDatabaseHas('users', [

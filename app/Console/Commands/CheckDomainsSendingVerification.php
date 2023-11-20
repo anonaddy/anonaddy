@@ -39,7 +39,8 @@ class CheckDomainsSendingVerification extends Command
      */
     public function handle()
     {
-        Domain::whereNotNull('domain_sending_verified_at')->get()
+        Domain::with('user.defaultUsername')
+            ->whereNotNull('domain_sending_verified_at')->get()
             ->each(function ($domain) {
                 try {
                     $result = $domain->checkVerificationForSending();

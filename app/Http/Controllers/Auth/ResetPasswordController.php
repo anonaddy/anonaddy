@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Username;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 
 class ResetPasswordController extends Controller
 {
@@ -65,7 +66,11 @@ class ResetPasswordController extends Controller
         return [
             'token' => 'required',
             'username' => 'required|regex:/^[a-zA-Z0-9]*$/|max:20',
-            'password' => 'required|confirmed|min:8',
+            'password' => [
+                'required',
+                'confirmed',
+                Password::defaults(),
+            ],
         ];
     }
 

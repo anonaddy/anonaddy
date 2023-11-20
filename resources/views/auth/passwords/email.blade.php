@@ -4,7 +4,7 @@
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">
         <div class="w-full max-w-md">
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
+                <img class="w-48" alt="addy.io Logo" src="/svg/logo.svg">
             </div>
             <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form method="POST" action="{{ route('password.email') }}">
@@ -24,10 +24,17 @@
                             </div>
                         @endif
 
-                        <div class="mt-8 flex flex-wrap mb-6">
-                            <label for="username" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Username') }}:
-                            </label>
+                        <div class="mt-8 mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="username" class="block text-grey-700 text-sm font-medium leading-6">
+                                    {{ __('Username') }}
+                                </label>
+                                <div class="text-sm">
+                                    <a class="whitespace-nowrap no-underline font-medium text-indigo-600 hover:text-indigo-500" tabindex="-1" href="{{ route('username.reminder.show') }}">
+                                        {{ __('Forgot Username?') }}
+                                    </a>
+                                </div>
+                            </div>
 
                             <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required>
 
@@ -40,9 +47,23 @@
                             @endif
                         </div>
 
-                        <a class="whitespace-nowrap no-underline text-sm" href="{{ route('username.reminder.show') }}">
-                            {{ __('Forgot Username?') }}
-                        </a>
+                        <div class="flex flex-wrap mb-4 items-center">
+                            <label for="captcha" class="block w-full text-grey-700 text-sm">
+                                Human Verification (click image to refresh)
+                            </label>
+
+                            <div class="flex grow flex-wrap">
+                                <img src="{{captcha_src('mini')}}" onclick="this.src='/captcha/mini?'+Math.random()" class="cursor-pointer shrink-0 h-12 w-16 mr-2 mt-2" title="Click to refresh image" alt="captcha">
+
+                                <input id="captcha" type="text" class="grow mt-2 appearance-none bg-grey-100 rounded p-3 text-grey-700 focus:ring{{ $errors->has('captcha') ? ' border-red-500' : '' }}" name="captcha" placeholder="Enter the text you see" required>
+                            </div>
+
+                            @if ($errors->has('captcha'))
+                                <p class="text-red-500 text-xs italic mt-4">
+                                    {{ $errors->first('captcha') }}
+                                </p>
+                            @endif
+                        </div>
 
                     </div>
 

@@ -8,8 +8,7 @@ use App\Mail\SendFromEmail;
 use App\Models\Alias;
 use App\Models\Domain;
 use App\Models\EmailData;
-use App\Models\PostfixQueueId;
-use App\Models\Recipient;
+use App\Models\OutboundMessage;
 use App\Models\Username;
 use App\Notifications\DisallowedReplySendAttempt;
 use App\Notifications\FailedDeliveryNotification;
@@ -21,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ParagonIE\ConstantTime\Base32;
 use PhpMimeMailParser\Parser;
 use Ramsey\Uuid\Uuid;
 
@@ -52,6 +52,8 @@ class ReceiveEmail extends Command
     protected $senderFrom;
 
     protected $size;
+
+    protected $rawEmail;
 
     /**
      * Create a new command instance.
@@ -86,9 +88,44 @@ class ReceiveEmail extends Command
             $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
 
             foreach ($recipients as $recipient) {
-                // Handle bounces
-                if ($this->option('sender') === 'MAILER-DAEMON') {
-                    $this->handleBounce($recipient['email']);
+                // Check if VERP bounce
+                if (substr($recipient['email'], 0, 2) === 'b_') {
+                    if ($outboundMessageId = $this->getIdFromVerp($recipient['email'])) {
+                        // Is a valid bounce
+                        $outboundMessage = OutboundMessage::with(['user', 'alias', 'recipient'])->find($outboundMessageId);
+
+                        if (is_null($outboundMessage)) {
+                            // Must have been more than 7 days
+                            Log::info('VERP outboundMessage not found');
+
+                            exit(0);
+                        }
+
+                        $bouncedAlias = $outboundMessage->alias;
+
+                        // If already bounced then forward to the user instead
+                        if (! $outboundMessage->bounced) {
+                            $this->handleBounce($outboundMessage);
+                        }
+
+                        if (in_array(strtolower($this->parser->getHeader('Auto-Submitted')), ['auto-replied', 'auto-generated']) && ! in_array($outboundMessage->email_type, ['R', 'S'])) {
+                            Log::info('VERP auto-response to forward/notification, username: '.$outboundMessage->user?->username.' outboundMessageID: '.$outboundMessageId);
+
+                            exit(0);
+                        }
+
+                        // If it is a notification then there is no alias so exit and log, may be an auto-reply to a notification.
+                        if (is_null($bouncedAlias)) {
+                            Log::info('VERP previously bounced/auto-response to notification, username: '.$outboundMessage->user?->username.' outboundMessageID: '.$outboundMessageId);
+
+                            exit(0);
+                        }
+
+                        // If it is not a bounce (could be auto-reply) then redirect to alias
+                        $recipient['email'] = $bouncedAlias->email;
+                        $recipient['local_part'] = $bouncedAlias->local_part;
+                        $recipient['domain'] = $bouncedAlias->domain;
+                    }
                 }
 
                 // First determine if the alias already exists in the database
@@ -155,7 +192,7 @@ class ReceiveEmail extends Command
 
                 if ($verifiedRecipient?->can_reply_send) {
                     // Check if the Dmarc allow or spam headers are present from Rspamd
-                    if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow') || $this->parser->getHeader('X-AnonAddy-Spam')) {
+                    if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow')) {
                         // Notify user and exit
                         $verifiedRecipient->notify(new SpamReplySendAttempt($recipient, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
 
@@ -173,7 +210,8 @@ class ReceiveEmail extends Command
 
                     exit(0);
                 } else {
-                    $this->handleForward($user, $recipient, $alias ?? null, $aliasable ?? null);
+                    // Check if the spam header is present from Rspamd
+                    $this->handleForward($user, $recipient, $alias ?? null, $aliasable ?? null, $this->parser->getHeader('X-AnonAddy-Spam') === 'Yes');
                 }
             }
         } catch (\Exception $e) {
@@ -229,7 +267,7 @@ class ReceiveEmail extends Command
         Mail::to($sendTo)->queue($message);
     }
 
-    protected function handleForward($user, $recipient, $alias, $aliasable)
+    protected function handleForward($user, $recipient, $alias, $aliasable, $isSpam)
     {
         if (is_null($alias)) {
             // This is a new alias
@@ -277,14 +315,14 @@ class ReceiveEmail extends Command
 
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
-        $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData) {
-            $message = new ForwardEmail($alias, $emailData, $recipient);
+        $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData, $isSpam) {
+            $message = (new ForwardEmail($alias, $emailData, $recipient, $isSpam));
 
             Mail::to($recipient->email)->queue($message);
         });
     }
 
-    protected function handleBounce($returnPath)
+    protected function handleBounce($outboundMessage)
     {
         // Collect the attachments
         $attachments = collect($this->parser->getAttachments());
@@ -294,136 +332,103 @@ class ReceiveEmail extends Command
             return $attachment->getContentType() === 'message/delivery-status';
         })->first();
 
-        if ($deliveryReport) {
-            $dsn = $this->parseDeliveryStatus($deliveryReport->getMimePartStr());
+        // Is not a bounce, may be an auto-reply so return
+        if (! $deliveryReport) {
+            return;
+        }
 
-            // Verify queue ID
-            if (isset($dsn['X-postfix-queue-id'])) {
-                // First check in DB
-                $postfixQueueId = PostfixQueueId::firstWhere('queue_id', strtoupper($dsn['X-postfix-queue-id']));
+        // Mark the outboundMessage as bounced
+        $outboundMessage->markAsBounced();
 
-                if (! $postfixQueueId) {
-                    exit(0);
-                }
+        $dsn = $this->parseDeliveryStatus($deliveryReport->getMimePartStr());
 
-                // If found then delete from DB
-                $postfixQueueId->delete();
-            } else {
-                exit(0);
-            }
+        // Get the bounced email address
+        $bouncedEmailAddress = isset($dsn['Final-recipient']) ? trim(Str::after($dsn['Final-recipient'], ';')) : null;
 
-            // Get the bounced email address
-            $bouncedEmailAddress = isset($dsn['Final-recipient']) ? trim(Str::after($dsn['Final-recipient'], ';')) : '';
+        $remoteMta = isset($dsn['Remote-mta']) ? trim(Str::after($dsn['Remote-mta'], ';')) : '';
 
-            $remoteMta = isset($dsn['Remote-mta']) ? trim(Str::after($dsn['Remote-mta'], ';')) : '';
+        if (isset($dsn['Diagnostic-code']) && isset($dsn['Status'])) {
+            // Try to determine the bounce type, HARD, SPAM, SOFT
+            $bounceType = $this->getBounceType($dsn['Diagnostic-code'], $dsn['Status']);
 
-            if (isset($dsn['Diagnostic-code']) && isset($dsn['Status'])) {
-                // Try to determine the bounce type, HARD, SPAM, SOFT
-                $bounceType = $this->getBounceType($dsn['Diagnostic-code'], $dsn['Status']);
+            $diagnosticCode = Str::limit($dsn['Diagnostic-code'], 497);
+        } else {
+            $bounceType = null;
+            $diagnosticCode = null;
+        }
 
-                $diagnosticCode = Str::limit($dsn['Diagnostic-code'], 497);
-            } else {
-                $bounceType = null;
-                $diagnosticCode = null;
-            }
+        // Get the undelivered message
+        $undeliveredMessage = $attachments->filter(function ($attachment) {
+            return in_array($attachment->getContentType(), ['text/rfc822-headers', 'message/rfc822']);
+        })->first();
 
-            // The return path is the alias except when it is from an unverified custom domain
-            if ($returnPath !== config('anonaddy.return_path')) {
-                $alias = Alias::withTrashed()->firstWhere('email', $returnPath);
+        $undeliveredMessageHeaders = [];
 
-                if (isset($alias)) {
-                    $user = $alias->user;
-                }
-            }
+        if ($undeliveredMessage) {
+            $undeliveredMessageHeaders = $this->parseDeliveryStatus($undeliveredMessage->getMimePartStr());
+        }
 
-            // Try to find a user from the bounced email address
-            if ($recipient = Recipient::select(['id', 'user_id', 'email', 'email_verified_at'])->get()->firstWhere('email', $bouncedEmailAddress)) {
-                if (! isset($user)) {
-                    $user = $recipient->user;
-                }
-            }
+        // Get bounce user information
+        $user = $outboundMessage->user;
+        $alias = $outboundMessage->alias;
+        $recipient = $outboundMessage->recipient;
+        $emailType = $outboundMessage->getRawOriginal('email_type');
 
-            // Get the undelivered message
-            $undeliveredMessage = $attachments->filter(function ($attachment) {
-                return in_array($attachment->getContentType(), ['text/rfc822-headers', 'message/rfc822']);
-            })->first();
-
-            $undeliveredMessageHeaders = [];
-            $emailType = null;
+        if ($user) {
+            $failedDeliveryId = Uuid::uuid4();
 
             if ($undeliveredMessage) {
-                $undeliveredMessageHeaders = $this->parseDeliveryStatus($undeliveredMessage->getMimePartStr());
-
-                if (isset($undeliveredMessageHeaders['Feedback-id'])) {
-                    [$emailType, $aliasId] = explode(':', $undeliveredMessageHeaders['Feedback-id']);
-
-                    if (in_array($emailType, ['F', 'R', 'S']) && ! isset($alias)) {
-                        $alias = Alias::find($aliasId);
-
-                        // Find the user from the alias if we don't have it from the recipient
-                        if (! isset($user) && isset($alias)) {
-                            $user = $alias->user;
-                        }
-                    }
+                // Store the undelivered message if enabled by user. Do not store email verification notifications.
+                if ($user->store_failed_deliveries && ! in_array($emailType, ['VR', 'VU'])) {
+                    $isStored = Storage::disk('local')->put("{$failedDeliveryId}.eml", $this->trimUndeliveredMessage($undeliveredMessage->getMimePartStr()));
                 }
             }
 
-            if (isset($user)) {
-                $failedDeliveryId = Uuid::uuid4();
+            $failedDelivery = $user->failedDeliveries()->create([
+                'id' => $failedDeliveryId,
+                'recipient_id' => $recipient->id ?? null,
+                'alias_id' => $alias->id ?? null,
+                'is_stored' => $isStored ?? false,
+                'bounce_type' => $bounceType,
+                'remote_mta' => $remoteMta ?? null,
+                'sender' => $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null,
+                'destination' => $bouncedEmailAddress,
+                'email_type' => $emailType,
+                'status' => $dsn['Status'] ?? null,
+                'code' => $diagnosticCode,
+                'attempted_at' => $outboundMessage->created_at,
+            ]);
 
-                if ($undeliveredMessage) {
-
-                    // Store the undelivered message if enabled by user.
-                    if ($user->store_failed_deliveries) {
-                        $isStored = Storage::disk('local')->put("{$failedDeliveryId}.eml", $this->trimUndeliveredMessage($undeliveredMessage->getMimePartStr()));
-                    }
+            // Check the aliases failed deliveries
+            if ($alias) {
+                // Decrement the alias forward count due to failed delivery
+                if ($failedDelivery->getRawOriginal('email_type') === 'F' && $alias->emails_forwarded > 0) {
+                    $alias->decrement('emails_forwarded');
                 }
 
-                $failedDelivery = $user->failedDeliveries()->create([
-                    'id' => $failedDeliveryId,
-                    'recipient_id' => $recipient->id ?? null,
-                    'alias_id' => $alias->id ?? null,
-                    'is_stored' => $isStored ?? false,
-                    'bounce_type' => $bounceType,
-                    'remote_mta' => $remoteMta ?? null,
-                    'sender' => $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null,
-                    'email_type' => $emailType ?? null,
-                    'status' => $dsn['Status'] ?? null,
-                    'code' => $diagnosticCode,
-                    'attempted_at' => $postfixQueueId->created_at,
-                ]);
-
-                if (isset($alias)) {
-                    // Decrement the alias forward count due to failed delivery
-                    if ($failedDelivery->email_type === 'F' && $alias->emails_forwarded > 0) {
-                        $alias->decrement('emails_forwarded');
-                    }
-
-                    if ($failedDelivery->email_type === 'R' && $alias->emails_replied > 0) {
-                        $alias->decrement('emails_replied');
-                    }
-
-                    if ($failedDelivery->email_type === 'S' && $alias->emails_sent > 0) {
-                        $alias->decrement('emails_sent');
-                    }
+                if ($failedDelivery->getRawOriginal('email_type') === 'R' && $alias->emails_replied > 0) {
+                    $alias->decrement('emails_replied');
                 }
-            } else {
-                Log::info([
-                    'info' => 'user not found from bounce report',
-                    'deliveryReport' => $deliveryReport,
-                ]);
+
+                if ($failedDelivery->getRawOriginal('email_type') === 'S' && $alias->emails_sent > 0) {
+                    $alias->decrement('emails_sent');
+                }
             }
+        } else {
+            Log::info('User not found from outbound message, may have been deleted.');
+        }
 
-            // Check if the bounce is a Failed delivery notification and if so do not notify the user again
-            if (! in_array($emailType, ['FDN'])) {
+        // Check if the bounce is a Failed delivery notification and if so do not notify the user again
+        if (! in_array($emailType, ['FDN'])) {
 
-                $notifiable = $recipient?->email_verified_at ? $recipient : $user?->defaultRecipient;
+            $notifiable = $recipient?->email_verified_at ? $recipient : $user?->defaultRecipient;
 
-                // Notify user of failed delivery
-                if ($notifiable?->email_verified_at) {
+            // Notify user of failed delivery
+            if ($notifiable?->email_verified_at) {
 
-                    $notifiable->notify(new FailedDeliveryNotification($alias->email ?? null, $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null, $undeliveredMessageHeaders['Subject'] ?? null, $failedDelivery?->is_stored, $user?->store_failed_deliveries, $recipient?->email));
-                }
+                $notifiable->notify(new FailedDeliveryNotification($alias->email ?? null, $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null, $undeliveredMessageHeaders['Subject'] ?? null, $failedDelivery?->is_stored, $user?->store_failed_deliveries, $recipient?->email));
+
+                Log::info('FDN '.$emailType.': '.$notifiable->email);
             }
         }
 
@@ -433,6 +438,8 @@ class ReceiveEmail extends Command
     protected function checkBandwidthLimit($user)
     {
         if ($user->hasReachedBandwidthLimit()) {
+            $user->update(['reject_until' => now()->endOfMonth()]);
+
             $this->error('4.2.1 Bandwidth limit exceeded for user. Please try again later.');
 
             exit(1);
@@ -453,7 +460,9 @@ class ReceiveEmail extends Command
             ->then(
                 function () {
                 },
-                function () {
+                function () use ($user) {
+                    $user->update(['defer_until' => now()->addHour()]);
+
                     $this->error('4.2.1 Rate limit exceeded for user. Please try again later.');
 
                     exit(1);
@@ -532,6 +541,11 @@ class ReceiveEmail extends Command
         return $result;
     }
 
+    protected function trimUndeliveredMessage($message)
+    {
+        return Str::after($message, 'Content-Type: message/rfc822'.PHP_EOL.PHP_EOL);
+    }
+
     protected function getBounceType($code, $status)
     {
         if (preg_match("/(:?mailbox|address|user|account|recipient|@).*(:?rejected|unknown|disabled|unavailable|invalid|inactive|not exist|does(n't| not) exist)|(:?rejected|unknown|unavailable|no|illegal|invalid|no such).*(:?mailbox|address|user|account|recipient|alias)|(:?address|user|recipient) does(n't| not) have .*(:?mailbox|account)|returned to sender|(:?auth).*(:?required)/i", $code)) {
@@ -553,10 +567,46 @@ class ReceiveEmail extends Command
     protected function getSenderFrom()
     {
         try {
-            return $this->parser->getAddresses('from')[0]['address'];
+            // Ensure contains '@', may be malformed header which causes sends/replies to fail
+            $address = $this->parser->getAddresses('from')[0]['address'];
+
+            return Str::contains($address, '@') ? $address : $this->option('sender');
         } catch (\Exception $e) {
             return $this->option('sender');
         }
+    }
+
+    protected function getIdFromVerp($verp)
+    {
+        $localPart = Str::beforeLast($verp, '@');
+
+        $parts = explode('_', $localPart);
+
+        if (count($parts) !== 3) {
+            Log::channel('single')->info('VERP invalid email: '.$verp);
+
+            return;
+        }
+
+        try {
+            $id = Base32::decodeNoPadding($parts[1]);
+
+            $signature = Base32::decodeNoPadding($parts[2]);
+        } catch (\Exception $e) {
+            Log::channel('single')->info('VERP base32 decode failure: '.$verp.' '.$e->getMessage());
+
+            return;
+        }
+
+        $expectedSignature = substr(hash_hmac('sha3-224', $id, config('anonaddy.secret')), 0, 8);
+
+        if ($signature !== $expectedSignature) {
+            Log::channel('single')->info('VERP invalid signature: '.$verp);
+
+            return;
+        }
+
+        return $id;
     }
 
     protected function exitIfFromSelf()

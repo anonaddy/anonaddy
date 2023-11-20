@@ -1,12 +1,12 @@
 # Anonymous Email Forwarding
 
-This is the source code for self-hosting AnonAddy.
+This is the source code for self-hosting addy.io.
 
 ## FAQ
 
-- [Why is it called AnonAddy?](#why-is-it-called-anonaddy)
+- [Why is it called addy.io?](#why-is-it-called-addyio)
 - [Why did you make this site?](#why-did-you-make-this-site)
-- [Why should I use AnonAddy?](#why-should-i-use-anonaddy)
+- [Why should I use addy.io?](#why-should-i-use-addyio)
 - [Do you store emails?](#do-you-store-emails)
 - [What is a shared domain alias?](#what-is-a-shared-domain-alias)
 - [What is a standard alias?](#what-is-a-standard-alias)
@@ -30,7 +30,7 @@ This is the source code for self-hosting AnonAddy.
 - [How do I reply to a forwarded email?](#how-do-i-reply-to-a-forwarded-email)
 - [I'm trying to reply/send from an alias but the email keeps coming back to me, what's wrong?](#im-trying-to-replysend-from-an-alias-but-the-email-keeps-coming-back-to-me-whats-wrong)
 - [I'm trying to reply/send from an alias but it is rejected, what's wrong?](#im-trying-to-replysend-from-an-alias-but-it-is-rejected-whats-wrong)
-- [Does AnonAddy strip out the banner information when I reply to an email?](#does-anonaddy-strip-out-the-banner-information-when-i-reply-to-an-email)
+- [Does addy.io strip out the banner information when I reply to an email?](#does-addyio-strip-out-the-banner-information-when-i-reply-to-an-email)
 - [How do I send email from an alias?](#how-do-i-send-email-from-an-alias)
 - [Will people see my real email if I reply to a forwarded one?](#will-people-see-my-real-email-if-i-reply-to-a-forwarded-one)
 - [Can emails have attachments?](#can-emails-have-attachments)
@@ -48,15 +48,15 @@ This is the source code for self-hosting AnonAddy.
 - [I'm not receiving any emails, what's wrong?](#im-not-receiving-any-emails-whats-wrong)
 - [I'm having trouble logging in, what's wrong?](#im-having-trouble-logging-in-whats-wrong)
 - [How do I know this site won't disappear next month?](#how-do-i-know-this-site-wont-disappear-next-month)
-- [What happens to AnonAddy if you die?](#what-happens-to-anonaddy-if-you-die)
+- [What happens to addy.io if you die?](#what-happens-to-addyio-if-you-die)
 - [Is the application tested?](#is-the-appliction-tested)
 - [How do I host this myself?](#how-do-i-host-this-myself)
-- [Who's behind AnonAddy?](#whos-behind-anonaddy)
+- [Who's behind addy.io?](#whos-behind-addyio)
 - [I couldn't find an answer to my question, how can I contact you?](#i-couldnt-find-an-answer-to-my-question-how-can-i-contact-you)
 
-## Why is it called AnonAddy?
+## Why is it called addy.io?
 
-AnonAddy is short for "Anonymous Email Address". The word "Addy" is internet slang for email address, e.g.
+Addy is short for "Address". The word "Addy" is internet slang for an email address, e.g.
 
 > "My addy is being spammed. I should've kept it private."
 
@@ -75,7 +75,7 @@ I made the code open-source to show everyone what was going on behind the scenes
 
 I use this service myself for the vast majority of sites I'm signed up to.
 
-## Why should I use AnonAddy?
+## Why should I use addy.io?
 
 There are a number of reasons you should consider using this service:
 
@@ -104,24 +104,24 @@ Yes you can use your own domain name so you can also have *@example.com as your 
 
 ## Can I add a domain and also use it as a recipient?
 
-No, you cannot use the same domain as a custom domain and also for a recipient on AnonAddy.
+No, you cannot use the same domain as a custom domain and also for a recipient on addy.io.
 
 e.g if you add "example.com" as a custom domain, you cannot then add "xyz@example.com" as a recipient. This is because a domain cannot direct email to multiple locations simultaneously using MX records. So your email would arrive for "example.com" and then attempt to be forwarded to "xyz@example.com" which would create a loop.
 
-You can instead use a subdomain for your custom domain, e.g. "mail.example.com" instead of "example.com", this would allow you to create *@mail.example.com for your aliases. More details can be found [here](https://anonaddy.com/help/adding-a-custom-domain/).
+You can instead use a subdomain for your custom domain, e.g. "mail.example.com" instead of "example.com", this would allow you to create *@mail.example.com for your aliases. More details can be found [here](https://addy.io/help/adding-a-custom-domain/).
 
 ## Can I add a domain if I'm already using it for email somewhere else?
 
-If you have a custom domain say **example.com** and you are already using it for email somewhere else e.g. ProtonMail or Namecheap then you cannot also use it simultaneously with AnonAddy.
+If you have a custom domain say **example.com** and you are already using it for email somewhere else e.g. ProtonMail or Namecheap then you cannot also use it simultaneously with addy.io.
 
 This is because emails cannot be handled by multiple different mail servers at the same time, even if they have the same priority MX records. It can only be delivered to one mail server at a time which will typically be the MX record with the smallest number since this has the highest priority.
 
 You can either:
 
-- Migrate your domain to AnonAddy by removing the current provider's MX records and adding AnonAddy's.
-- Or, if you would like to keep using your domain with your current email provider then I would recommend instead adding a subdomain of it to AnonAddy such as **mail.example.com**.
+- Migrate your domain to addy.io by removing the current provider's MX records and adding addy.io's.
+- Or, if you would like to keep using your domain with your current email provider then I would recommend instead adding a subdomain of it to addy.io such as **mail.example.com**.
 
-Using a subdomain will not interfere with your current email setup and you'll be able to create aliases ***@mail.example.com** through AnonAddy.
+Using a subdomain will not interfere with your current email setup and you'll be able to create aliases ***@mail.example.com** through addy.io.
 
 ## Why should I use this instead of a similar service?
 
@@ -134,14 +134,14 @@ Here are a few reasons I can think of:
 * Open-source application code
 * No limitation on the number of aliases that can be created
 * Generous monthly bandwidth
-* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and another 3 for paid plan users)
+* Multiple domains to choose for aliases (currently anonaddy.com, anonaddy.me and more for paid plan users)
 * Ability to generate random character and random word aliases at shared domains
 * Ability to add additional usernames to compartmentalise aliases
 * New features added regularly
 
 ## Is there a browser extension?
 
-Yes there is an [open-source](https://github.com/anonaddy/browser-extension) browser extension available to download for [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/anonaddy/) and [Chrome](https://chrome.google.com/webstore/detail/anonaddy/iadbdpnoknmbdeolbapdackdcogdmjpe) (also available on other chromium based browsers such as Brave and Vivaldi). You can use the extension to generate new aliases remotely.
+Yes there is an [open-source](https://github.com/anonaddy/browser-extension) browser extension available to download for [Firefox](https://addons.mozilla.org/en-GB/firefox/addon/addy_io/) and [Chrome](https://chrome.google.com/webstore/detail/addyio-anonymous-email-fo/iadbdpnoknmbdeolbapdackdcogdmjpe) (also available on other chromium based browsers such as Brave and Vivaldi). You can use the extension to generate new aliases remotely.
 
 ## Is there an Android app?
 
@@ -159,7 +159,7 @@ Yes, [http.james'](https://httpjames.space/) [open-source](https://github.com/ra
 
 ## How do I add my own GPG/OpenPGP key for encryption?
 
-On the recipients page you simply need to click "Add public key" and paste in your **public** key data. Now all emails forwarded to you will be encrypted with your key. You can even hide and encrypt the subject as AnonAddy supports protected headers.
+On the recipients page you simply need to click "Add public key" and paste in your **public** key data. Now all emails forwarded to you will be encrypted with your key. You can even hide and encrypt the subject as addy.io supports protected headers.
 
 ## Are attachments encrypted too?
 
@@ -167,11 +167,11 @@ Yes attachments are part of the email body and are also encrypted if you have it
 
 ## Are forwarded emails signed when encryption is enabled?
 
-Yes when you have encryption enabled all forwarded emails are signed using our mailer@anonaddy.me private key.
+Yes when you have encryption enabled all forwarded emails are signed using our no-reply@addy.io private key.
 
 You can add this key to your own keyring so that you can verify emails have come from us.
 
-The fingerprint of the mailer@anonaddy.me key is "26A987650243B28802524E2F809FD0D502E2F695" you can find the key on [https://keys.openpgp.org](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695).
+The fingerprint of the no-reply@addy.io key is "26A987650243B28802524E2F809FD0D502E2F695" you can find the key on [https://keys.openpgp.org](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695).
 
 ## What if I don't want anyone to link ownership of my aliases together?
 
@@ -220,11 +220,11 @@ All you need to do is click reply in your email client or web interface and it w
 
 To check if a reply has worked properly check in your dashboard if the reply count has been incremented for that alias.
 
-For further details please see this help article - [Replying to email using an alias](https://anonaddy.com/help/replying-to-email-using-an-alias/).
+For further details please see this help article - [Replying to email using an alias](https://addy.io/help/replying-to-email-using-an-alias/).
 
 ## I'm trying to reply/send from an alias but the email keeps coming back to me, what's wrong?
 
-If you are trying to reply or send from an alias but the email keeps coming back to yourself then it is most likely because you are not sending the message from an email address that **is not listed as a verified recipient** on your AnonAddy account.
+If you are trying to reply or send from an alias but the email keeps coming back to yourself then it is most likely because you are not sending the message from an email address that **is not listed as a verified recipient** on your addy.io account.
 
 If you try to reply or send from an alias using an unverified email address then the message will simply be forwarded to you as it would be if it was sent by any other sender.
 
@@ -236,11 +236,11 @@ If you see the rejection message `550 5.1.1 Recipient address rejected: Address 
 
 If you receive an email notification with the subject "Attempted reply/send from alias has failed" then it is usually because you have a verified recipient that is using your own domain which does not have a DMARC policy.
 
-> Note: This is referring to **your verified recipient address** on your AnonAddy account **and not** any of your custom domains or the email address that you are replying / sending to
+> Note: This is referring to **your verified recipient address** on your addy.io account **and not** any of your custom domains or the email address that you are replying / sending to
 
-When replying or sending from an alias, **additional checks** are carried out to ensure it is not a spoofed email. Your AnonAddy recipient's email domain must pass DMARC checks in order to protect against spoofed emails and to make sure that the reply/send from attempt definitely came from your recipient.
+When replying or sending from an alias, **additional checks** are carried out to ensure it is not a spoofed email. Your addy.io recipient's email domain must pass DMARC checks in order to protect against spoofed emails and to make sure that the reply/send from attempt definitely came from your recipient.
 
-For example if the verified recipient on your AnonAddy account is `hello@example.com` and you get this email notification then it is because the domain "example.com" does not have a DMARC policy in place.
+For example if the verified recipient on your addy.io account is `hello@example.com` and you get this email notification then it is because the domain "example.com" does not have a DMARC policy in place.
 
 To resolve this you simply need to add a DMARC record, for example:
 
@@ -253,9 +253,9 @@ You should also have SPF and DKIM records in place.
 
 To learn more about DMARC please see this site - [https://dmarc.org/](https://dmarc.org/).
 
-If your AnonAddy recipient is with a popular mail service provider for example: Gmail, Outlook, Tutanota, Mailbox.org, Protonmail etc. then they will already have a DMARC policy in place so you do not need to take any action.
+If your addy.io recipient is with a popular mail service provider for example: Gmail, Outlook, Tutanota, Mailbox.org, Protonmail etc. then they will already have a DMARC policy in place so you do not need to take any action.
 
-## Does AnonAddy strip out the banner information when I reply to an email?
+## Does addy.io strip out the banner information when I reply to an email?
 
 Yes, the email banner "This email was sent to..." will be automatically removed when you reply to any messages. You can test this by replying to yourself from one of your aliases.
 
@@ -287,7 +287,7 @@ If you need to send an email to an address with an extension e.g. **hello+whatev
 
 Just enter the extension too!
 
-For further details please see this help article - [Sending email from an alias](https://anonaddy.com/help/sending-email-from-an-alias/).
+For further details please see this help article - [Sending email from an alias](https://addy.io/help/sending-email-from-an-alias/).
 
 ## Will people see my real email if I reply to a forwarded one?
 
@@ -309,10 +309,10 @@ A few days before your billing cycle ends you will receive an email letting you 
 
 * Any custom domains will be **deactivated**
 * Any additional usernames will be **deactivated**
-* If you have any more than **2 recipients** they will be **deleted**
+* If you have any more than **1 recipient** they will be **deleted**
 * Paid account settings will be reverted to default values
 * Any aliases using paid plan only domains will be **deactivated**
-* If you have any more than 20 aliases using a shared domain e.g. anonaddy.me they will be **deactivated**
+* If you have any more than 10 aliases using a shared domain e.g. anonaddy.me they will be **deactivated**
 * If your account username has catch-all disabled then it will be enabled
 
 You will not be able to activate any of the above again until you resubscribe.
@@ -366,7 +366,7 @@ Yes, you can login with any of your usernames. You can add 1 additional username
 
 ## I'm not receiving any emails, what's wrong?
 
-Please make sure to add mailer@anonaddy.me, mailer@anonaddy.com and any other aliases you use to your address book and also to check your spam folder. Make sure to mark emails from AnonAddy as safe if they turn up in spam.
+Please make sure to add no-reply@addy.io and any aliases you use to your address book and also to check your spam folder. Make sure to mark emails from addy.io as safe if they turn up in spam.
 
 If an alias has been deleted and you try to send email to it, the emails will be rejected with an error message - "550 5.1.1 Recipient address rejected: Address does not exist".
 
@@ -382,7 +382,7 @@ For some reason Apple seems to think these emails are spam/phishing and returns 
 
 If you are having issues with emails being rejected as "possibly spammy" by Google, iCloud or Microsoft then please try the following steps if you can:
 
-1. **Replace the email subject** by going to your settings in AnonAddy
+1. **Replace the email subject** by going to your settings in addy.io
 2. Try adding a GPG key and **enabling encryption**. This will prevent the email's content being scanned and reduce the chance of it being rejected.
 3. Enable the option to hide and encrypt the email subject
 4. Try disabling the banner information on forwarded emails
@@ -406,11 +406,11 @@ Please make sure you are using your account username (e.g. johndoe) and not your
 
 2. Forgotten password
 
-If you've forgotten your password you can reset it by entering your username here - https://app.anonaddy.com/password/reset
+If you've forgotten your password you can reset it by entering your username here - https://app.addy.io/password/reset
 
 3. Forgotten username
 
-If you've forgotten your username you can request a reminder by entering your email address here - https://app.anonaddy.com/username/reminder
+If you've forgotten your username you can request a reminder by entering your email address here - https://app.addy.io/username/reminder
 
 4. Lost 2FA device
 
@@ -424,11 +424,11 @@ If you have a YubiKey and are using Windows and have an issue with your personal
 
 I am very passionate about this project. I use it myself every day and will be keeping it running indefinitely. The service also provides me with an income.
 
-## What happens to AnonAddy if you die?
+## What happens to addy.io if you die?
 
-I do have someone in place who can keep the service running in the event of me not being here. They are able to continue paying for the servers that host AnonAddy and the domains that it uses. All AnonAddy domains also always have over 5 years until they expire.
+I do have someone in place who can keep the service running in the event of me not being here. They are able to continue paying for the servers that host addy.io and the domains that it uses. All addy.io domains also always have over 5 years until they expire.
 
-They would make a Twitter announcement informing all users that they would be keeping the service running. You would then be able to decide whether you'd like to continue using AnonAddy or start to update your email addresses.
+They would make a Twitter announcement informing all users that they would be keeping the service running. You would then be able to decide whether you'd like to continue using addy.io or start to update your email addresses.
 
 ## Is the application tested?
 
@@ -440,22 +440,22 @@ You will need to set up your own server with Postfix so that you can pipe the re
 
 For those who prefer using Docker there is an image you can use here - [github.com/anonaddy/docker](https://github.com/anonaddy/docker).
 
-## Who's behind AnonAddy?
+## Who's behind addy.io?
 
 My name is Will Browning, I'm a web developer from the UK and an advocate for online privacy and open-source software. You can find me on [Twitter](https://twitter.com/willbrowningme) although I don't tweet that much!
 
 ## I couldn't find an answer to my question, how can I contact you?
 
-For any other questions just send an email to - [contact@anonaddy.com](mailto:contact@anonaddy.com) ([GPG Key](https://anonaddy.com/anonaddy-contact-public-key.asc))
+For any other questions just send an email to - contact (at) help.addy.io ([GPG Key](https://addy.io/contact-public-key.asc))
 
 ## Self Hosting
 
 ## Software Requirements
 
 * Postfix (3.0.0+) (plus postfix-mysql for database queries and postfix-pcre)
-* PHP (8.0+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
+* PHP (8.2+) and the [php-mailparse](https://pecl.php.net/package/mailparse) extension, the [php-gnupg](https://pecl.php.net/package/gnupg) extension if you plan to encrypt forwarded emails, the [php-imagick](https://pecl.php.net/package/imagick) extension for generating 2FA QR codes
 * Port 25 unblocked and open
-* Redis (6.x+) for throttling and queues
+* Redis (7.x+) for throttling and queues
 * FQDN as hostname e.g. mail.anonaddy.me
 * MariaDB / MySQL
 * Nginx
@@ -468,9 +468,9 @@ For full details please see the [self-hosting instructions file](SELF-HOSTING.md
 
 ## My sponsors
 
-Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev), [Patrick Dobler](https://github.com/patrickdobler), [Luca Steeb](https://github.com/steebchen), [Laiteux](https://github.com/Laiteux), [narolinus](https://github.com/narolinus) and [Limon Monte](https://github.com/limonte) for supporting me by sponsoring the project on GitHub!
+Thanks to [Vlad Timofeev](https://github.com/vlad-timofeev), [Patrick Dobler](https://github.com/patrickdobler), [Luca Steeb](https://github.com/steebchen), [Laiteux](https://github.com/Laiteux), [narolinus](https://github.com/narolinus),[Limon Monte](https://github.com/limonte) and [Lukas](https://github.com/lunibo) for supporting me by sponsoring the project on GitHub!
 
-Also an extra special thanks to [CrazyMax](https://github.com/crazy-max) for sponsoring me and also creating and maintaining the awesome [AnonAddy Docker image](https://github.com/anonaddy/docker)!
+Also an extra special thanks to [CrazyMax](https://github.com/crazy-max) for sponsoring me and also creating and maintaining the awesome [addy.io Docker image](https://github.com/anonaddy/docker)!
 
 ## Thanks
 

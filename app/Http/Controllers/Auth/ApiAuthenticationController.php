@@ -42,7 +42,7 @@ class ApiAuthenticationController extends Controller
         } elseif (Webauthn::enabled($user)) {
             // If WebAuthn is enabled then return currently unsupported message
             return response()->json([
-                'error' => 'WebAuthn authentication is not currently supported from the extension or mobile apps, please use an API key to login instead',
+                'error' => 'Security key authentication is not currently supported from the extension or mobile apps, please use an API key to login instead',
             ], 403);
         }
 

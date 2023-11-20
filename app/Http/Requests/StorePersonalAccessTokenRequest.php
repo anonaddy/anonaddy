@@ -35,6 +35,10 @@ class StorePersonalAccessTokenRequest extends FormRequest
                 'max:5',
                 'in:day,week,month,year',
             ],
+            'password' => [
+                'required',
+                'string',
+            ],
         ];
     }
 }

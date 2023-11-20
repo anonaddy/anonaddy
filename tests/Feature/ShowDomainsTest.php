@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Domain;
-use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class ShowDomainsTest extends TestCase
@@ -18,22 +18,26 @@ class ShowDomainsTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create()->fresh();
+        $this->user = $this->createUser();
         $this->actingAs($this->user);
     }
 
     /** @test */
     public function user_can_view_domains_from_the_domains_page()
     {
-        $domains = Domain::factory()->count(3)->create([
+        Domain::factory()->count(3)->create([
             'user_id' => $this->user->id,
         ]);
 
         $response = $this->get('/domains');
 
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('domains'));
-        $domains->assertEquals($response->data('domains'));
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows', 3, fn (Assert $page) => $page
+                ->where('user_id', $this->user->id)
+                ->etc()
+            )
+        );
     }
 
     /** @test */
@@ -55,10 +59,15 @@ class ShowDomainsTest extends TestCase
         $response = $this->get('/domains');
 
         $response->assertSuccessful();
-        $this->assertCount(3, $response->data('domains'));
-        $this->assertTrue($response->data('domains')[0]->is($b));
-        $this->assertTrue($response->data('domains')[1]->is($c));
-        $this->assertTrue($response->data('domains')[2]->is($a));
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows', 3, fn (Assert $page) => $page
+                ->where('user_id', $this->user->id)
+                ->etc()
+            )
+        );
+        $this->assertTrue($response->data('page')['props']['initialRows'][0]['id'] === $b->id);
+        $this->assertTrue($response->data('page')['props']['initialRows'][1]['id'] === $c->id);
+        $this->assertTrue($response->data('page')['props']['initialRows'][2]['id'] === $a->id);
     }
 
     /** @test */

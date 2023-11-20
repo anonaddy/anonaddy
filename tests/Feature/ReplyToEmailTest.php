@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Mail\ReplyToEmail;
 use App\Models\Alias;
 use App\Models\Recipient;
-use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -20,14 +19,7 @@ class ReplyToEmailTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create()->fresh();
-        $this->user->recipients()->save($this->user->defaultRecipient);
-        $this->user->defaultRecipient->email = 'will@anonaddy.com';
-        $this->user->defaultRecipient->save();
-
-        $this->user->usernames()->save($this->user->defaultUsername);
-        $this->user->defaultUsername->username = 'johndoe';
-        $this->user->defaultUsername->save();
+        $this->user = $this->createUser('johndoe', 'will@anonaddy.com');
     }
 
     /** @test */

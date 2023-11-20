@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class DomainUnverifiedForSending extends Notification implements ShouldQueue, ShouldBeEncrypted
+class DomainUnverifiedForSending extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -51,11 +51,13 @@ class DomainUnverifiedForSending extends Notification implements ShouldQueue, Sh
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
         return (new MailMessage())
-            ->subject('Your domain has been unverified for sending on AnonAddy')
+            ->subject('Your domain has been unverified for sending on addy.io')
             ->markdown('mail.domain_unverified_for_sending', [
                 'domain' => $this->domain,
                 'reason' => $this->reason,
+                'userId' => $notifiable->id,
                 'recipientId' => $recipient->id,
+                'emailType' => 'DUS',
                 'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {

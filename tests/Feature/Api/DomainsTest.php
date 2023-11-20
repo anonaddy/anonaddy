@@ -202,6 +202,21 @@ class DomainsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_update_domain_from_name()
+    {
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
+            'from_name' => 'John Doe',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('John Doe', $response->getData()->data->from_name);
+    }
+
+    /** @test */
     public function user_can_delete_domain()
     {
         $domain = Domain::factory()->create([

@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Facades\Webauthn as WebauthnFacade;
-use App\Models\WebauthnKey;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Str;
 use LaravelWebauthn\Actions\PrepareCreationData;
 use LaravelWebauthn\Actions\ValidateKeyCreation;
+use LaravelWebauthn\Contracts\DestroyResponse;
+use LaravelWebauthn\Contracts\RegisterSuccessResponse;
 use LaravelWebauthn\Contracts\RegisterViewResponse;
+use LaravelWebauthn\Facades\Webauthn;
 use LaravelWebauthn\Http\Controllers\WebauthnKeyController as ControllersWebauthnController;
 use LaravelWebauthn\Http\Requests\WebauthnRegisterRequest;
 
@@ -24,67 +21,39 @@ class WebauthnController extends ControllersWebauthnController
 
     /**
      * Return the register data to attempt a Webauthn registration.
-     *
-     * @return RegisterViewResponse
      */
-    public function create(Request $request)
+    /* public function create(Request $request): RegisterViewResponse
     {
         $publicKey = app(PrepareCreationData::class)($request->user());
 
         return app(RegisterViewResponse::class)
             ->setPublicKey($request, $publicKey);
-    }
+    } */
 
     /**
      * Validate and create the Webauthn request.
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function store(WebauthnRegisterRequest $request)
+    public function store(WebauthnRegisterRequest $request): RegisterSuccessResponse
     {
         $request->validate([
             'name' => 'required|string|max:50',
+            'password' => 'required|string|current_password',
         ]);
 
-        try {
-            app(ValidateKeyCreation::class)(
-                $request->user(),
-                $request->only(['id', 'rawId', 'response', 'type']),
-                $request->input('name')
-            );
-
-            user()->update([
-                'two_factor_enabled' => false,
-            ]);
-
-            return $this->redirectAfterSuccessRegister();
-        } catch (\Exception $e) {
-            return Response::json([
-                'error' => [
-                    'message' => $e->getMessage(),
-                ],
-            ], 403);
-        }
-    }
-
-    /**
-     * Return the redirect destination after a successfull register.
-     *
-     * @param  WebauthnKey  $webauthnKey
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
-     */
-    protected function redirectAfterSuccessRegister()
-    {
-        // If the user already has at least one key do not generate a new backup code.
-        if (user()->webauthnKeys()->count() > 1) {
-            return Redirect::intended('/settings');
-        }
+        $webauthnKey = app(ValidateKeyCreation::class)(
+            $request->user(),
+            $request->only(['id', 'rawId', 'response', 'type']),
+            $request->input('name')
+        );
 
         user()->update([
-            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
+            'two_factor_enabled' => false,
         ]);
 
-        return Redirect::intended('/settings')->with(['backupCode' => $code]);
+        return app(RegisterSuccessResponse::class)
+            ->setWebauthnKey($request, $webauthnKey);
     }
 
     /**
@@ -92,27 +61,27 @@ class WebauthnController extends ControllersWebauthnController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, $webauthnKeyId)
+    public function destroy(Request $request, $webauthnKeyId): DestroyResponse
     {
-        try {
-            user()->webauthnKeys()
-                ->findOrFail($webauthnKeyId)
-                ->delete();
+        $request->validate([
+            'current' => 'required|string|current_password',
+        ]);
 
-            if (! WebauthnFacade::hasKey(user())) {
-                WebauthnFacade::logout();
-            }
+        user()->webauthnKeys()
+            ->findOrFail($webauthnKeyId)
+            ->delete();
 
-            return Response::json([
-                'deleted' => true,
-                'id' => $webauthnKeyId,
-            ]);
-        } catch (ModelNotFoundException $e) {
-            return Response::json([
-                'error' => [
-                    'message' => trans('webauthn::errors.object_not_found'),
-                ],
-            ], 404);
+        // Using vendor Facade to ensure disabled keys are included
+        if (! Webauthn::hasKey(user())) {
+            // Remove session value when last key is deleted
+            Webauthn::logout();
         }
+
+        return app(DestroyResponse::class);
+    }
+
+    public function delete()
+    {
+        return abort(404);
     }
 }

@@ -10,6 +10,6 @@ class BannerLocationController extends Controller
     {
         user()->update(['banner_location' => $request->banner_location]);
 
-        return back()->with(['status' => 'Location Updated Successfully']);
+        return back()->with(['flash' => 'Location Updated Successfully']);
     }
 }

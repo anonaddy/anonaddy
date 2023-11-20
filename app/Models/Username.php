@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Username extends Model
 {
-    use HasUuid;
     use HasEncryptedAttributes;
     use HasFactory;
+    use HasUuid;
 
     public $incrementing = false;
 
@@ -19,14 +19,17 @@ class Username extends Model
 
     protected $encrypted = [
         'description',
+        'from_name',
     ];
 
     protected $fillable = [
         'user_id',
         'username',
         'description',
+        'from_name',
         'active',
         'catch_all',
+        'can_login',
     ];
 
     protected $casts = [
@@ -34,6 +37,7 @@ class Username extends Model
         'user_id' => 'string',
         'active' => 'boolean',
         'catch_all' => 'boolean',
+        'can_login' => 'boolean',
         'default_recipient_id' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -120,5 +124,21 @@ class Username extends Model
     public function enableCatchAll()
     {
         $this->update(['catch_all' => true]);
+    }
+
+    /**
+     * Disallow login for the username.
+     */
+    public function disallowLogin()
+    {
+        $this->update(['can_login' => false]);
+    }
+
+    /**
+     * Allow login for the username.
+     */
+    public function allowLogin()
+    {
+        $this->update(['can_login' => true]);
     }
 }

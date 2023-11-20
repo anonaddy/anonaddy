@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
 
-class DisallowedReplySendAttempt extends Notification implements ShouldQueue, ShouldBeEncrypted
+class DisallowedReplySendAttempt extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -63,7 +63,9 @@ class DisallowedReplySendAttempt extends Notification implements ShouldQueue, Sh
                 'recipient' => $this->recipient,
                 'destination' => $this->destination,
                 'authenticationResults' => $this->authenticationResults,
+                'userId' => $notifiable->user_id,
                 'recipientId' => $notifiable->id,
+                'emailType' => 'DRSA',
                 'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {

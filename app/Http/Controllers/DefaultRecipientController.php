@@ -21,29 +21,46 @@ class DefaultRecipientController extends Controller
 
     public function update(UpdateDefaultRecipientRequest $request)
     {
-        $recipient = user()->verifiedRecipients()->findOrFail($request->default_recipient);
+        $recipient = user()->verifiedRecipients()->findOrFail($request->id);
 
         $currentDefaultRecipient = user()->defaultRecipient;
 
-        user()->default_recipient = $recipient;
-        user()->save();
+        user()->update(['default_recipient_id' => $recipient->id]);
 
         if ($currentDefaultRecipient->id !== $recipient->id) {
             $currentDefaultRecipient->notify(new DefaultRecipientUpdated($recipient->email));
         }
 
-        return back()->with(['status' => 'Default Recipient Updated Successfully']);
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     public function edit(EditDefaultRecipientRequest $request)
     {
         $recipient = user()->defaultRecipient;
 
-        $recipient->email = $request->email;
+        // Updating already verified default recipient, create new pending entry and send verification email.
+        if ($recipient->hasVerifiedEmail()) {
+            // Clear all other pending entries
+            user()->pendingRecipients()->delete();
+
+            $pendingRecipient = user()->recipients()->create([
+                'email' => strtolower($request->email),
+                'pending' => true,
+            ]);
+
+            $pendingRecipient->sendEmailVerificationNotification();
+
+            return back()->with(['flash' => 'Email Pending Verification, Please Check Your Inbox For The Verification Email']);
+        }
+
+        // Unverified default recipient so we can simply update and send the verification email.
+        $recipient->email = strtolower($request->email);
         $recipient->save();
 
         user()->sendEmailVerificationNotification();
 
-        return back()->with(['status' => 'Email Updated Successfully, Please Check Your Inbox For The Verification Email']);
+        return back()->with(['flash' => 'Email Updated Successfully, Please Check Your Inbox For The Verification Email']);
     }
 }

@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Recipient;
 use App\Models\User;
+use App\Notifications\DefaultRecipientUpdated;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 class VerificationController extends Controller
 {
@@ -47,6 +50,18 @@ class VerificationController extends Controller
     }
 
     /**
+     * Show the email verification notice.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
+    public function show(Request $request)
+    {
+        return $request->user()->hasVerifiedEmail()
+                        ? redirect($this->redirectPath())
+                        : Inertia::render('Auth/Verify', ['flash' => $request->session()->get('resent', null) ? 'A fresh verification link has been sent to your email address.' : null]);
+    }
+
+    /**
      * Mark the authenticated user's email address as verified.
      *
      * @return \Illuminate\Http\Response
@@ -55,7 +70,7 @@ class VerificationController extends Controller
      */
     public function verify(Request $request)
     {
-        $verifiable = User::find($request->route('id')) ?? Recipient::find($request->route('id'));
+        $verifiable = User::find($request->route('id')) ?? Recipient::withPending()->find($request->route('id'));
 
         if (is_null($verifiable)) {
             throw new AuthorizationException('Email address not found.');
@@ -83,8 +98,35 @@ class VerificationController extends Controller
             $redirect = 'login';
         }
 
+        // Check if the verifiable is a pending new email Recipient
+        if ($verifiable instanceof Recipient && $verifiable->pending) {
+
+            try {
+                DB::transaction(function () use ($verifiable) {
+                    $user = $verifiable->user;
+                    $defaultRecipient = $user->defaultRecipient;
+                    // Notify the current default recipient of the change
+                    $defaultRecipient->notify(new DefaultRecipientUpdated($verifiable->email));
+
+                    // Set verifiable email as new default recipient
+                    $defaultRecipient->update([
+                        'email' => strtolower($verifiable->email),
+                        'email_verified_at' => now(),
+                    ]);
+
+                    // Delete pending verifiable
+                    $verifiable->delete();
+                });
+            } catch (\Exception $e) {
+                report($e);
+
+                return redirect($redirect)
+                    ->with(['flash' => 'An error has occurred, please try again later.']);
+            }
+        }
+
         return redirect($redirect)
             ->with('verified', true)
-            ->with(['status' => 'Email Address Verified Successfully']);
+            ->with(['flash' => 'Email Address Verified Successfully']);
     }
 }

@@ -27,8 +27,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('anonaddy:check-domains-sending-verification')->daily();
         $schedule->command('anonaddy:check-domains-mx-validation')->daily();
         $schedule->command('anonaddy:clear-failed-deliveries')->daily();
-        $schedule->command('anonaddy:clear-postfix-queue-ids')->hourly();
+        $schedule->command('anonaddy:clear-outbound-messages')->everySixHours();
+        $schedule->command('anonaddy:email-users-with-token-expiring-soon')->daily();
         $schedule->command('auth:clear-resets')->daily();
+        $schedule->command('sanctum:prune-expired --hours=168')->daily();
         $schedule->command('cache:prune-stale-tags')->hourly();
     }
 

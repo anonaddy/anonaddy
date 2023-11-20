@@ -73,8 +73,8 @@ class AliasController extends Controller
             return response('You have reached your hourly limit for creating new aliases', 429);
         }
 
-        if (isset($request->validated()['local_part'])) {
-            $localPart = $request->validated()['local_part'];
+        if (isset($request->validated()['local_part_without_extension'])) {
+            $localPart = $request->local_part; // To get the local_part with any potential extension
 
             // Local part has extension
             if (Str::contains($localPart, '+')) {
@@ -121,7 +121,7 @@ class AliasController extends Controller
 
         $aliasable = null;
 
-        // This is an AnonAddy domain.
+        // This is an addy.io domain.
         if ($parentDomain) {
             $subdomain = substr($request->domain, 0, strrpos($request->domain, '.'.$parentDomain));
 
@@ -153,7 +153,15 @@ class AliasController extends Controller
     {
         $alias = user()->aliases()->withTrashed()->findOrFail($id);
 
-        $alias->update(['description' => $request->description]);
+        if ($request->has('description')) {
+            $alias->description = $request->description;
+        }
+
+        if ($request->has('from_name')) {
+            $alias->from_name = $request->from_name;
+        }
+
+        $alias->save();
 
         return new AliasResource($alias->refresh()->load('recipients'));
     }

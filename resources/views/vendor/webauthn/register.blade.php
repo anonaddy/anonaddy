@@ -31,6 +31,8 @@
                         {{ trans('webauthn::messages.buttonAdvise') }}
                         <br />
                         {{ trans('webauthn::messages.noButtonAdvise') }}
+                        <br />
+                        You can also add a Passkey here.
                     </p>
 
                     <form method="POST" onsubmit="registerDevice();return false"  class="mt-8" action="{{ route('webauthn.store') }}" id="form">
@@ -44,100 +46,48 @@
                         <label for="name" class="block text-grey-700 text-sm mb-2">
                             Name:
                         </label>
-                        <input type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="name" id="name" placeholder="Yubikey" required autofocus>
+                        <input type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="name" id="name" placeholder="Yubikey" autocomplete="off" required autofocus>
 
                         @if ($errors->has('name'))
                             <p class="text-red-500 text-xs italic mt-4">
                                 {{ $errors->first('name') }}
                             </p>
                         @endif
+
+                        <label for="password" class="block text-grey-700 text-sm font-medium leading-6 mt-4 mb-2">
+                            Current Password
+                        </label>
+                        <input type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring" name="password" id="password" placeholder="********" required>
+
+                        @error('password')
+                            <p class="text-red-500 text-xs italic mt-4">
+                                {{ $errors->first('password') }}
+                            </p>
+                        @enderror
                     </form>
 
                 </div>
 
                 <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 flex flex-wrap items-center">
                     <button onclick="registerDevice()" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto">
-                        Add Device
+                        Add Key
                     </button>
                 </div>
             </div>
             <p class="w-full text-xs text-center text-indigo-100 mt-6">
                 Changed your mind?
-                <a class="text-white hover:text-indigo-50 no-underline" href="{{ route('settings.show') }}">
+                <a class="text-white hover:text-indigo-50 no-underline" href="{{ route('settings.security') }}">
                     {{ trans('webauthn::messages.cancel') }}
                 </a>
             </p>
         </div>
     </div>
-
-    <script>
-        var publicKey = {!! json_encode($publicKey) !!};
-
-        var errors = {
-            key_already_used: "{{ trans('webauthn::errors.key_already_used') }}",
-            key_not_allowed: "{{ trans('webauthn::errors.key_not_allowed') }}",
-            not_secured: "{{ trans('webauthn::errors.not_secured') }}",
-            not_supported: "{{ trans('webauthn::errors.not_supported') }}",
-        };
-
-        function errorMessage(name, message) {
-            switch (name) {
-            case 'InvalidStateError':
-                return errors.key_already_used;
-            case 'NotAllowedError':
-                return errors.key_not_allowed;
-            default:
-                return message;
-            }
-        }
-
-        function error(message) {
-            document.getElementById("error").innerHTML = message;
-            document.getElementById("error").classList.remove("hidden");
-        }
-
-        var webauthn = new WebAuthn((name, message) => {
-            error(errorMessage(name, message));
-        });
-
-        if (! webauthn.webAuthnSupport()) {
-            switch (webauthn.notSupportedMessage()) {
-                case 'not_secured':
-                error(errors.not_secured);
-                break;
-                case 'not_supported':
-                error(errors.not_supported);
-                break;
-            }
-        }
-
-        function registerDevice() {
-
-            if(document.getElementById("name").value === '') {
-                return error('A device name is required');
-            }
-
-            if(document.getElementById("name").value.length > 50) {
-                return error('The device name may not be greater than 50 characters.');
-            }
-
-            webauthn.register(
-                publicKey,
-                function (data) {
-                    document.getElementById("success").classList.remove("hidden");
-                    document.getElementById("id").value = data.id;
-                    document.getElementById("rawId").value = data.rawId;
-                    document.getElementById("attestationObject").value = data.response.attestationObject;
-                    document.getElementById("clientDataJSON").value = data.response.clientDataJSON;
-                    document.getElementById("type").value = data.type;
-                    document.getElementById("form").submit();
-                }
-            );
-        }
-
-    </script>
 @endsection
 
 @section('webauthn')
-    <script src="{!! secure_asset('js/webauthn.js') !!}"></script>
+    <script>
+        var publicKey = {!! json_encode($publicKey) !!};
+    </script>
+
+    @vite('resources/js/webauthn/register.js')
 @endsection

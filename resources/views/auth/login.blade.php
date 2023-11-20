@@ -5,9 +5,7 @@
         <div class="w-full max-w-md">
 
             <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <a href="https://anonaddy.com" aria-label="Go to Anonaddy homepage">
-                    <img class="w-48" alt="AnonAddy Logo" src="/svg/logo.svg">
-                </a>
+                <img class="w-48" alt="addy.io Logo" src="/svg/logo.svg">
             </div>
             <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('login') }}">
@@ -27,10 +25,17 @@
                             </div>
                         @endif
 
-                        <div class="mt-8 flex flex-wrap mb-6">
-                            <label for="username" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Username') }}:
-                            </label>
+                        <div class="mt-8 mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="username" class="block text-grey-700 text-sm font-medium leading-6">
+                                    {{ __('Username') }}
+                                </label>
+                                <div class="text-sm">
+                                    <a class="whitespace-nowrap no-underline font-medium text-indigo-600 hover:text-indigo-500" tabindex="-1" href="{{ route('username.reminder.show') }}">
+                                        {{ __('Forgot Username?') }}
+                                    </a>
+                                </div>
+                            </div>
 
                             <input id="username" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('username') ? ' border-red-500' : '' }}" name="username" value="{{ old('username') }}" placeholder="johndoe" required autofocus>
 
@@ -48,10 +53,17 @@
                             @endif
                         </div>
 
-                        <div class="flex flex-wrap mb-2">
-                            <label for="password" class="block text-grey-700 text-sm mb-2">
-                                {{ __('Password') }}:
-                            </label>
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="password" class="block text-grey-700 text-sm font-medium leading-6">
+                                    {{ __('Password') }}
+                                </label>
+                                <div class="text-sm">
+                                    <a class="whitespace-nowrap no-underline font-medium text-indigo-600 hover:text-indigo-500" tabindex="-1" href="{{ route('password.request') }}">
+                                        {{ __('Forgot Password?') }}
+                                    </a>
+                                </div>
+                            </div>
 
                             <input id="password" type="password" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('password') ? ' border-red-500' : '' }}" name="password" placeholder="********" required>
 
@@ -64,22 +76,17 @@
 
                         <div class="flex flex-wrap justify-between items-center">
                             <div class="mr-5 mt-4">
-                                <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                <label class="text-sm text-grey-700 ml-3" for="remember">
+                                <input type="checkbox" name="remember" id="remember" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" {{ old('remember') ? 'checked' : '' }}>
+                                <label class="text-sm text-grey-700 ml-2" for="remember">
                                     {{ __('Remember Me') }}
                                 </label>
                             </div>
-                            @if (Route::has('password.request'))
-                                <a class="whitespace-nowrap no-underline text-sm mt-4" href="{{ route('password.request') }}">
-                                    {{ __('Forgot Username/Password?') }}
-                                </a>
-                            @endif
                         </div>
 
                     </div>
 
                     <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 flex flex-wrap items-center">
-                        <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto">
+                        <button type="submit" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                             {{ __('Login') }}
                         </button>
                     </div>

@@ -20,8 +20,6 @@ class RulesTest extends TestCase
         parent::setUp();
         parent::setUpSanctum();
 
-        $this->user->recipients()->save($this->user->defaultRecipient);
-        $this->user->usernames()->save($this->user->defaultUsername);
         $this->user->defaultUsername->username = 'johndoe';
         $this->user->defaultUsername->save();
     }

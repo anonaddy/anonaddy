@@ -16,8 +16,12 @@ class WebauthnEnabledKeyController extends Controller
         return response('', 201);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $request->validate([
+            'current' => 'required|string|current_password',
+        ]);
+
         $webauthnKey = user()->webauthnKeys()->findOrFail($id);
 
         $webauthnKey->disable();

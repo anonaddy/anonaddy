@@ -10,6 +10,32 @@ html {
   display: none;
 }
 
+[type='search']::-webkit-search-cancel-button,
+[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.horizontal-scroll::-webkit-scrollbar,
+.vgt-responsive::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+.horizontal-scroll::-webkit-scrollbar:horizontal,
+.vgt-responsive::-webkit-scrollbar:horizontal {
+  @apply h-1;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb,
+.vgt-responsive::-webkit-scrollbar-thumb {
+  @apply bg-indigo-500 rounded-full;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track,
+.vgt-responsive::-webkit-scrollbar-track {
+  @apply bg-indigo-50;
+}
+
 @tailwind components;
 
 /* Add custom components here... */

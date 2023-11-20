@@ -64,7 +64,7 @@ class EmailData
                     $this->text = base64_encode(stream_get_contents($attachment->getStream()));
                 } else {
                     if (! str_contains($contentType, '/')) {
-                        if (null === self::$mimeTypes) {
+                        if (self::$mimeTypes === null) {
                             self::$mimeTypes = new MimeTypes();
                         }
                         $contentType = self::$mimeTypes->getMimeTypes($contentType)[0] ?? 'application/octet-stream';

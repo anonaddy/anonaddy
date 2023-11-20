@@ -25,6 +25,7 @@ class EnableTwoFactorAuthRequest extends FormRequest
     {
         return [
             'two_factor_token' => 'required|min:6',
+            'current' => 'required|string|current_password',
         ];
     }
 }

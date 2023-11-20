@@ -38,6 +38,6 @@ class ResetBandwidth extends Command
      */
     public function handle()
     {
-        User::where('bandwidth', '>', 0)->update(['bandwidth' => 0]);
+        User::where('bandwidth', '>', 0)->update(['bandwidth' => 0, 'reject_until' => null, 'defer_until' => null]);
     }
 }

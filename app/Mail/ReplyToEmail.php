@@ -16,11 +16,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
 
-class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
+class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
+    use CheckUserRules;
     use Queueable;
     use SerializesModels;
-    use CheckUserRules;
 
     protected $email;
 
@@ -52,6 +52,8 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
 
     protected $references;
 
+    protected $verpDomain;
+
     /**
      * Create a new message instance.
      *
@@ -68,7 +70,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->emailAttachments = $emailData->attachments;
         $this->emailInlineAttachments = $emailData->inlineAttachments;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
-        $this->displayFrom = $user->from_name ?? null;
+        $this->displayFrom = $alias->getFromName();
         $this->size = $emailData->size;
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
@@ -81,21 +83,19 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
      */
     public function build()
     {
-        $returnPath = $this->alias->email;
         $this->fromEmail = $this->alias->email;
 
         if ($this->alias->isCustomDomain()) {
             if (! $this->alias->aliasable->isVerifiedForSending()) {
                 $this->fromEmail = config('mail.from.address');
-                $returnPath = config('anonaddy.return_path');
+                $this->verpDomain = config('anonaddy.domain');
             }
         }
 
         $this->email = $this
             ->from($this->fromEmail, $this->displayFrom)
             ->subject(base64_decode($this->emailSubject))
-            ->withSymfonyMessage(function (Email $message) use ($returnPath) {
-                $message->returnPath($returnPath);
+            ->withSymfonyMessage(function (Email $message) {
 
                 $message->getHeaders()
                     ->addTextHeader('Feedback-ID', 'R:'.$this->alias->id.':anonaddy');
@@ -124,7 +124,7 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
                         $part->setContentId(base64_decode($attachment['contentId']));
                         $part->setFileName(base64_decode($attachment['file_name']));
 
-                        $message->attachPart($part);
+                        $message->addPart($part);
                     }
                 }
             });
@@ -159,10 +159,14 @@ class ReplyToEmail extends Mailable implements ShouldQueue, ShouldBeEncrypted
         $this->checkRules('Replies');
 
         $this->email->with([
+            'userId' => $this->user->id,
+            'aliasId' => $this->alias->id,
+            'emailType' => 'R',
             'shouldBlock' => $this->size === 0,
             'encryptedParts' => $this->encryptedParts,
             'needsDkimSignature' => $this->needsDkimSignature(),
             'aliasDomain' => $this->alias->domain,
+            'verpDomain' => $this->verpDomain ?? $this->alias->domain,
         ]);
 
         if ($this->alias->isCustomDomain() && ! $this->needsDkimSignature()) {

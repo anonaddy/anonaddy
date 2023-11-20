@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
 
-class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBeEncrypted
+class SpamReplySendAttempt extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
@@ -61,7 +61,9 @@ class SpamReplySendAttempt extends Notification implements ShouldQueue, ShouldBe
                 'recipient' => $this->recipient,
                 'destination' => $this->destination,
                 'authenticationResults' => $this->authenticationResults,
+                'userId' => $notifiable->user_id,
                 'recipientId' => $notifiable->id,
+                'emailType' => 'SRSA',
                 'fingerprint' => $notifiable->should_encrypt ? $notifiable->fingerprint : null,
             ])
             ->withSymfonyMessage(function (Email $message) {
