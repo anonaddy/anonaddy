@@ -31,6 +31,8 @@
                         {{ trans('webauthn::messages.buttonAdvise') }}
                         <br />
                         {{ trans('webauthn::messages.noButtonAdvise') }}
+                        <br />
+                        You can also add a Passkey here.
                     </p>
 
                     <form method="POST" onsubmit="registerDevice();return false"  class="mt-8" action="{{ route('webauthn.store') }}" id="form">
@@ -68,7 +70,7 @@
 
                 <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 flex flex-wrap items-center">
                     <button onclick="registerDevice()" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto">
-                        Add Device
+                        Add Key
                     </button>
                 </div>
             </div>

@@ -30,7 +30,7 @@
           <h3 class="text-lg font-medium leading-6 text-grey-900">Update Password</h3>
           <p class="text-base text-grey-700">
             Ensure your account is using a long, random, unique password to stay secure. It is
-            recommended to use a password manager such as BitWarden. Updating your password will
+            recommended to use a password manager such as Bitwarden. Updating your password will
             also logout your active sessions on other browsers and devices.
           </p>
         </div>
@@ -235,8 +235,8 @@
           <p class="text-base text-grey-700">
             Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of
             security to your account beyond your username and password. There are
-            <b>two options for 2FA</b> - Authentication App (e.g. Google Authenticator or another,
-            Aegis, andOTP) or Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey).
+            <b>multiple options for 2FA</b> - 1. Authentication App (e.g. Google Authenticator or another,
+            Aegis, andOTP) 2. Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey) 3. Passkeys (which can be stored in a supported provider such as Bitwarden or 1Password).
           </p>
           <p class="text-base text-grey-700">
             When you login with 2FA enabled, you will be prompted to use a security key or enter a
@@ -419,17 +419,17 @@
           <div class="py-10">
             <div class="space-y-1">
               <h3 class="text-lg font-medium leading-6 text-grey-900">
-                Device Authentication (WebAuthn)
+                Device/Passkey Authentication (WebAuthn)
               </h3>
               <p class="text-base text-grey-700">
-                Hardware security keys you have registered for 2nd factor authentication. To remove
+                Hardware security keys and Passkeys that you have registered for 2nd factor authentication. To remove
                 a key simply click the delete button next to it. Disabled keys cannot be used to
                 login. Disabling all keys will turn off 2FA on your account.
               </p>
             </div>
             <div class="mt-4">
               <p class="mb-0" v-if="keys.length === 0">
-                You have not registered any hardware keys.
+                You have not registered any keys.
               </p>
 
               <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
@@ -668,7 +668,7 @@
           <div class="py-10">
             <div class="space-y-1">
               <h3 class="text-lg font-medium leading-6 text-grey-900">
-                Enable Device Authentication (WebAuthn)
+                Enable Device/Passkey Authentication (WebAuthn)
               </h3>
               <p class="text-base text-grey-700">
                 WebAuthn is a new W3C global standard for secure authentication. You can use any
@@ -681,7 +681,7 @@
                 :href="route('webauthn.create')"
                 class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
               >
-                Register New Hardware Key
+                Register New Key
               </a>
             </div>
           </div>
@@ -690,7 +690,7 @@
     </div>
 
     <Modal :open="disableKeyModalOpen" @close="closeDisableKeyModal">
-      <template v-slot:title> Disable Hardware Key </template>
+      <template v-slot:title> Disable Key </template>
       <template v-slot:content>
         <p v-if="enabledKeys.length <= 1" class="my-4 text-grey-700">
           Once this key is disabled, <b>Two-Factor Authentication</b> will be disabled on your
@@ -698,7 +698,7 @@
         </p>
         <p v-else class="my-4 text-grey-700">
           Once this key is disabled, <b>Two-Factor Authentication</b> will still be enabled as you
-          have other enabled hardware keys associated with your account.
+          have other enabled keys associated with your account.
         </p>
         <div class="mt-6">
           <label
@@ -740,7 +740,7 @@
     </Modal>
 
     <Modal :open="deleteKeyModalOpen" @close="closeDeleteKeyModal">
-      <template v-slot:title> Remove Hardware Key </template>
+      <template v-slot:title> Remove Key </template>
       <template v-slot:content>
         <p v-if="enabledKeys.length <= 1" class="my-4 text-grey-700">
           Once this key is removed, <b>Two-Factor Authentication</b> will be disabled on your
@@ -748,7 +748,7 @@
         </p>
         <p v-else class="my-4 text-grey-700">
           Once this key is removed, <b>Two-Factor Authentication</b> will still be enabled as you
-          have other enabled hardware keys associated with your account.
+          have other enabled keys associated with your account.
         </p>
         <div class="mt-6">
           <label
