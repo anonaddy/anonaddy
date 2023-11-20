@@ -175,7 +175,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\HelperServiceProvider::class,
         App\Providers\CustomMailServiceProvider::class,
-	\SocialiteProviders\Manager\ServiceProvider::class,
+	    \SocialiteProviders\Manager\ServiceProvider::class,
 
     ])->toArray(),
 
