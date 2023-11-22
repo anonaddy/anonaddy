@@ -48,17 +48,8 @@
   </TransitionRoot>
 </template>
 
-<script>
+<script setup>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
-export default {
-  props: ['open', 'maxWidth'],
-  components: {
-    Dialog,
-    DialogPanel,
-    DialogTitle,
-    TransitionChild,
-    TransitionRoot,
-  },
-}
+defineProps(['open', 'maxWidth'])
 </script>

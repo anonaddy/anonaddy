@@ -8,18 +8,19 @@
         <h1 class="text-2xl font-semibold text-grey-900">Domains</h1>
         <p class="mt-2 text-sm text-grey-700">
           A list of all the domains {{ search ? 'found for your search' : 'in your account' }}
-          <InformationCircleIcon
-            @click="moreInfoOpen = !moreInfoOpen"
-            class="h-6 w-6 inline-block cursor-pointer text-grey-500"
-            title="Click for more information"
-          />
+          <button @click="moreInfoOpen = !moreInfoOpen">
+            <InformationCircleIcon
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              title="Click for more information"
+            />
+          </button>
         </p>
       </div>
       <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
         <button
           type="button"
           @click="openAddDomainModal"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus:outline-none sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Add Domain
         </button>
@@ -45,12 +46,13 @@
           >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'domain'">
-          <span
+          <button
             class="tooltip cursor-pointer outline-none font-medium text-grey-700"
             data-tippy-content="Click to copy"
             @click="clipboard(rows[props.row.originalIndex].domain)"
-            >{{ $filters.truncate(props.row.domain, 30) }}</span
           >
+            {{ $filters.truncate(props.row.domain, 30) }}
+          </button>
         </span>
         <span v-else-if="props.column.field == 'description'">
           <div v-if="domainIdToEdit === props.row.id" class="flex items-center">
@@ -67,58 +69,48 @@
               tabindex="0"
               autofocus
             />
-            <icon
-              name="close"
-              class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-              @click="domainIdToEdit = domainDescriptionToEdit = ''"
-            />
-            <icon
-              name="save"
-              class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-              @click="editDomain(rows[props.row.originalIndex])"
-            />
+            <button @click="domainIdToEdit = domainDescriptionToEdit = ''">
+              <icon name="close" class="inline-block w-6 h-6 text-red-300 fill-current" />
+            </button>
+            <button @click="editDomain(rows[props.row.originalIndex])">
+              <icon name="save" class="inline-block w-6 h-6 text-cyan-500 fill-current" />
+            </button>
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="outline-none text-grey-500">{{
+            <span class="outline-none text-grey-500 mr-2">{{
               $filters.truncate(props.row.description, 60)
             }}</span>
-            <icon
-              name="edit"
-              class="inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer ml-2"
+            <button
               @click="
                 ;(domainIdToEdit = props.row.id), (domainDescriptionToEdit = props.row.description)
               "
-            />
+            >
+              <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
           <div v-else class="flex justify-center">
-            <icon
-              name="plus"
-              class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click=";(domainIdToEdit = props.row.id), (domainDescriptionToEdit = '')"
-            />
+            <button @click=";(domainIdToEdit = props.row.id), (domainDescriptionToEdit = '')">
+              <icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
         </span>
         <span v-else-if="props.column.field === 'default_recipient'">
           <div v-if="props.row.default_recipient">
             <span
-              class="tooltip cursor-pointer font-medium text-grey-500"
+              class="tooltip cursor-pointer font-medium text-grey-500 mr-2"
               data-tippy-content="Click to copy"
               @click="clipboard(rows[props.row.originalIndex].default_recipient.email)"
             >
               {{ $filters.truncate(props.row.default_recipient.email, 30) }}
             </span>
-            <icon
-              name="edit"
-              class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click="openDomainDefaultRecipientModal(props.row)"
-            />
+            <button @click="openDomainDefaultRecipientModal(props.row)">
+              <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
           <div class="flex justify-center" v-else>
-            <icon
-              name="plus"
-              class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click="openDomainDefaultRecipientModal(props.row)"
-            />
+            <button @click="openDomainDefaultRecipientModal(props.row)">
+              <icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
         </span>
         <span v-else-if="props.column.field === 'aliases_count'">
@@ -152,7 +144,7 @@
           <div v-if="props.row.domain_sending_verified_at || props.row.domain_mx_validated_at">
             <svg
               v-if="props.row.domain_sending_verified_at && props.row.domain_mx_validated_at"
-              class="h-5 w-5 inline-block tooltip"
+              class="h-5 w-5 inline-block tooltip focus:outline-none"
               data-tippy-content="Domain fully verified"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
@@ -172,7 +164,7 @@
               v-else-if="!props.row.domain_mx_validated_at"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
-              class="h-5 w-5 inline-block tooltip"
+              class="h-5 w-5 inline-block tooltip focus:outline-none"
               data-tippy-content="MX records invalid"
             >
               <g fill="none" fill-rule="evenodd">
@@ -197,7 +189,7 @@
               v-else
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
-              class="h-5 w-5 inline-block tooltip"
+              class="h-5 w-5 inline-block tooltip focus:outline-none"
               data-tippy-content="DNS records for sending invalid"
             >
               <g fill="none" fill-rule="evenodd">
@@ -220,7 +212,7 @@
             </svg>
             <button
               @click="openCheckRecordsModal(rows[props.row.originalIndex])"
-              class="focus:outline-none text-sm ml-2 text-grey-500"
+              class="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-sm ml-2 text-grey-500 rounded-sm"
             >
               Recheck
             </button>
@@ -228,7 +220,7 @@
           <button
             v-else
             @click="openCheckRecordsModal(rows[props.row.originalIndex])"
-            class="focus:outline-none text-sm text-grey-500"
+            class="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-sm text-grey-500 rounded-sm"
           >
             Check Records
           </button>
@@ -290,7 +282,7 @@
       <template v-if="!domainToCheck" v-slot:content>
         <p class="mt-4 mb-2 text-grey-700">
           To verify ownership of the domain, please add the following TXT record and then click Add
-          Domain below.
+          Domain below. Once you've added the domain you can safely remove this TXT record.
         </p>
         <div class="table w-full">
           <div class="table-row">
@@ -301,12 +293,14 @@
           <div class="table-row">
             <div class="table-cell py-2">TXT</div>
             <div class="table-cell p-2">@</div>
-            <div
-              class="table-cell py-2 break-all cursor-pointer"
-              title="Copy"
-              @click="clipboard(`aa-verify=${aaVerify}`)"
-            >
-              aa-verify={{ aaVerify }}
+            <div class="table-cell py-2">
+              <button
+                @click="clipboard(`aa-verify=${aaVerify}`)"
+                class="break-all focus-visible:outline-indigo-600"
+                title="Copy"
+              >
+                aa-verify={{ aaVerify }}
+              </button>
             </div>
           </div>
         </div>
@@ -324,7 +318,7 @@
           />
           <button
             @click="validateNewDomain"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :class="addDomainLoading ? 'cursor-not-allowed' : ''"
             :disabled="addDomainLoading"
           >
@@ -333,7 +327,7 @@
           </button>
           <button
             @click="addDomainModalOpen = false"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -370,69 +364,85 @@
           </div>
           <div class="table-row">
             <div class="table-cell py-2">MX 10</div>
-            <div class="table-cell py-2 px-4 cursor-pointer" title="Copy" @click="clipboard('@')">
-              @
+            <div class="table-cell py-2 px-4">
+              <button title="Copy" @click="clipboard('@')" class="focus-visible:outline-indigo-600">
+                @
+              </button>
             </div>
-            <div
-              class="table-cell py-2 break-words cursor-pointer"
-              title="Copy"
-              @click="clipboard(hostname)"
-            >
-              {{ hostname }}.
+            <div class="table-cell py-2 break-words">
+              <button
+                title="Copy"
+                @click="clipboard(hostname)"
+                class="focus-visible:outline-indigo-600"
+              >
+                {{ hostname }}.
+              </button>
             </div>
           </div>
           <div class="table-row">
             <div class="table-cell py-2">TXT</div>
-            <div class="table-cell py-2 px-4 cursor-pointer" title="Copy" @click="clipboard('@')">
-              @
+            <div class="table-cell py-2 px-4">
+              <button title="Copy" @click="clipboard('@')" class="focus-visible:outline-indigo-600">
+                @
+              </button>
             </div>
-            <div
-              class="table-cell py-2 break-words cursor-pointer"
-              title="Copy"
-              @click="clipboard('v=spf1 mx -all')"
-            >
-              v=spf1 mx -all
+            <div class="table-cell py-2 break-words">
+              <button
+                title="Copy"
+                @click="clipboard('v=spf1 mx -all')"
+                class="focus-visible:outline-indigo-600"
+              >
+                v=spf1 mx -all
+              </button>
             </div>
           </div>
           <div class="table-row">
             <div class="table-cell py-2">CNAME</div>
-            <div
-              class="table-cell py-2 px-4 cursor-pointer"
-              title="Copy"
-              @click="clipboard(`${dkimSelector}._domainkey`)"
-            >
-              {{ dkimSelector }}._domainkey
+            <div class="table-cell py-2 px-4">
+              <button
+                title="Copy"
+                @click="clipboard(`${dkimSelector}._domainkey`)"
+                class="focus-visible:outline-indigo-600"
+              >
+                {{ dkimSelector }}._domainkey
+              </button>
             </div>
-            <div
-              class="table-cell py-2 break-words cursor-pointer"
-              title="Copy"
-              @click="clipboard(`${dkimSelector}._domainkey.${domainName}.`)"
-            >
-              {{ dkimSelector }}._domainkey.{{ domainName }}.
+            <div class="table-cell py-2 break-words">
+              <button
+                title="Copy"
+                @click="clipboard(`${dkimSelector}._domainkey.${domainName}.`)"
+                class="focus-visible:outline-indigo-600"
+              >
+                {{ dkimSelector }}._domainkey.{{ domainName }}.
+              </button>
             </div>
           </div>
           <div class="table-row">
             <div class="table-cell py-2">TXT</div>
-            <div
-              class="table-cell py-2 px-4 cursor-pointer"
-              title="Copy"
-              @click="clipboard('_dmarc')"
-            >
-              _dmarc
+            <div class="table-cell py-2 px-4">
+              <button
+                title="Copy"
+                @click="clipboard('_dmarc')"
+                class="focus-visible:outline-indigo-600"
+              >
+                _dmarc
+              </button>
             </div>
-            <div
-              class="table-cell py-2 break-words cursor-pointer"
-              title="Copy"
-              @click="clipboard('v=DMARC1; p=quarantine; adkim=s')"
-            >
-              v=DMARC1; p=quarantine; adkim=s
+            <div class="table-cell py-2 break-words">
+              <button
+                title="Copy"
+                @click="clipboard('v=DMARC1; p=quarantine; adkim=s')"
+                class="focus-visible:outline-indigo-600"
+              >
+                v=DMARC1; p=quarantine; adkim=s
+              </button>
             </div>
           </div>
         </div>
         <div class="mt-6">
           <button
             @click="checkRecords(domainToCheck)"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :class="checkRecordsLoading ? 'cursor-not-allowed' : ''"
             :disabled="checkRecordsLoading"
           >
@@ -441,7 +451,7 @@
           </button>
           <button
             @click="closeCheckRecordsModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -485,7 +495,7 @@
           <button
             type="button"
             @click="editDefaultRecipient()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="editDefaultRecipientLoading"
           >
             Update Default Recipient
@@ -493,7 +503,7 @@
           </button>
           <button
             @click="closeDomainDefaultRecipientModal()"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -513,7 +523,7 @@
           <button
             type="button"
             @click="deleteDomain(domainIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteDomainLoading"
           >
             Delete domain
@@ -521,7 +531,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -561,7 +571,7 @@
         <div class="mt-6 flex flex-col sm:flex-row">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

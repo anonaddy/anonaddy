@@ -158,7 +158,7 @@
           <button
             @click="editFromName"
             :disabled="domain.fromNameLoading"
-            class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+            class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
           >
             Update From Name
             <loader v-if="domain.fromNameLoading" />

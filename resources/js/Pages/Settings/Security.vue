@@ -147,7 +147,7 @@
             <button
               type="submit"
               :disabled="updatePasswordForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Password
               <loader v-if="updatePasswordForm.processing" />
@@ -220,7 +220,7 @@
             <button
               type="submit"
               :disabled="browserSessionsForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Logout Other Browser Sessions
               <loader v-if="browserSessionsForm.processing" />
@@ -235,8 +235,9 @@
           <p class="text-base text-grey-700">
             Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of
             security to your account beyond your username and password. There are
-            <b>multiple options for 2FA</b> - 1. Authentication App (e.g. Google Authenticator or another,
-            Aegis, andOTP) 2. Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey) 3. Passkeys (which can be stored in a supported provider such as Bitwarden or 1Password).
+            <b>multiple options for 2FA</b> - 1. Authentication App (e.g. Google Authenticator or
+            another, Aegis, andOTP) 2. Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey) 3.
+            Passkeys (which can be stored in a supported provider such as Bitwarden or 1Password).
           </p>
           <p class="text-base text-grey-700">
             When you login with 2FA enabled, you will be prompted to use a security key or enter a
@@ -332,7 +333,7 @@
             <button
               type="submit"
               :disabled="newBackupCodeForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Generate New Backup Code
               <loader v-if="newBackupCodeForm.processing" />
@@ -406,7 +407,7 @@
             <button
               type="submit"
               :disabled="disableTwoFactorForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Disable Two-Factor Authentication
               <loader v-if="disableTwoFactorForm.processing" />
@@ -422,15 +423,13 @@
                 Device/Passkey Authentication (WebAuthn)
               </h3>
               <p class="text-base text-grey-700">
-                Hardware security keys and Passkeys that you have registered for 2nd factor authentication. To remove
-                a key simply click the delete button next to it. Disabled keys cannot be used to
-                login. Disabling all keys will turn off 2FA on your account.
+                Hardware security keys and Passkeys that you have registered for 2nd factor
+                authentication. To remove a key simply click the delete button next to it. Disabled
+                keys cannot be used to login. Disabling all keys will turn off 2FA on your account.
               </p>
             </div>
             <div class="mt-4">
-              <p class="mb-0" v-if="keys.length === 0">
-                You have not registered any keys.
-              </p>
+              <p class="mb-0" v-if="keys.length === 0">You have not registered any keys.</p>
 
               <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
                 <div class="table-row">
@@ -492,27 +491,27 @@
                     </svg>
                   </div>
                   <div class="table-cell p-1 md:p-4 text-right">
-                    <a
+                    <button
                       v-if="key.enabled"
-                      class="text-indigo-500 font-bold cursor-pointer focus:outline-none"
+                      class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       @click="showDisableKeyModal(key)"
                     >
                       Disable
-                    </a>
-                    <a
+                    </button>
+                    <button
                       v-else
-                      class="text-indigo-500 font-bold cursor-pointer focus:outline-none"
+                      class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       @click="enableKey(key)"
                     >
                       Enable
                       <loader v-if="key.enableKeyLoading" />
-                    </a>
-                    <a
-                      class="text-red-500 font-bold cursor-pointer sm:ml-4 focus:outline-none"
+                    </button>
+                    <button
+                      class="text-red-500 font-bold cursor-pointer sm:ml-4 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       @click="showDeleteKeyModal(key)"
                     >
                       Delete
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -657,7 +656,7 @@
                 <button
                   type="submit"
                   :disabled="enableTwoFactorForm.processing"
-                  class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+                  class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
                 >
                   Verify and Enable
                   <loader v-if="enableTwoFactorForm.processing" />
@@ -679,7 +678,7 @@
               <a
                 type="button"
                 :href="route('webauthn.create')"
-                class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none text-center"
+                class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-center"
               >
                 Register New Key
               </a>
@@ -722,7 +721,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="disableKey"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none disable:cursor-not-allowed"
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disable:cursor-not-allowed"
               :disabled="disableKeyLoading"
             >
               Disable
@@ -730,7 +729,7 @@
             </button>
             <button
               @click="closeDisableKeyModal"
-              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>
@@ -772,7 +771,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="deleteKey"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none disable:cursor-not-allowed"
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disable:cursor-not-allowed"
               :disabled="deleteKeyLoading"
             >
               Remove
@@ -780,7 +779,7 @@
             </button>
             <button
               @click="closeDeleteKeyModal"
-              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>

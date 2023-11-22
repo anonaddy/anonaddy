@@ -8,18 +8,19 @@
         <h1 class="text-2xl font-semibold text-grey-900">Usernames</h1>
         <p class="mt-2 text-sm text-grey-700">
           A list of all the usernames {{ search ? 'found for your search' : 'in your account' }}
-          <InformationCircleIcon
-            @click="moreInfoOpen = !moreInfoOpen"
-            class="h-6 w-6 inline-block cursor-pointer text-grey-500"
-            title="Click for more information"
-          />
+          <button @click="moreInfoOpen = !moreInfoOpen">
+            <InformationCircleIcon
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              title="Click for more information"
+            />
+          </button>
         </p>
       </div>
       <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
         <button
           type="button"
           @click="openAddUsernameModal"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus:outline-none sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Add Username
         </button>
@@ -45,21 +46,20 @@
           >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'username'">
-          <span
-            class="tooltip cursor-pointer outline-none font-medium text-grey-700"
+          <button
+            class="tooltip outline-none font-medium text-grey-700"
             data-tippy-content="Click to copy"
             @click="clipboard(rows[props.row.originalIndex].username)"
-            >{{ $filters.truncate(props.row.username, 30) }}</span
           >
+            {{ $filters.truncate(props.row.username, 30) }}
+          </button>
           <span
             v-if="isDefault(props.row.id)"
             class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full"
             >default</span
           >
           <span v-else class="block text-grey-400 text-sm py-1">
-            <span @click="openMakeDefaultModal(props.row)" class="cursor-pointer">
-              Make Default
-            </span>
+            <button @click="openMakeDefaultModal(props.row)">Make Default</button>
           </span>
         </span>
         <span v-else-if="props.column.field == 'description'">
@@ -77,59 +77,49 @@
               tabindex="0"
               autofocus
             />
-            <Icon
-              name="close"
-              class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-              @click="usernameIdToEdit = usernameDescriptionToEdit = ''"
-            />
-            <Icon
-              name="save"
-              class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-              @click="editUsername(rows[props.row.originalIndex])"
-            />
+            <button @click="usernameIdToEdit = usernameDescriptionToEdit = ''">
+              <Icon name="close" class="inline-block w-6 h-6 text-red-300 fill-current" />
+            </button>
+            <button @click="editUsername(rows[props.row.originalIndex])">
+              <Icon name="save" class="inline-block w-6 h-6 text-cyan-500 fill-current" />
+            </button>
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="outline-none text-grey-500">{{
+            <span class="outline-none text-grey-500 mr-2">{{
               $filters.truncate(props.row.description, 60)
             }}</span>
-            <Icon
-              name="edit"
-              class="inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer ml-2"
+            <button
               @click="
                 ;(usernameIdToEdit = props.row.id),
                   (usernameDescriptionToEdit = props.row.description)
               "
-            />
+            >
+              <Icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
           <div v-else class="flex justify-center">
-            <Icon
-              name="plus"
-              class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click=";(usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = '')"
-            />
+            <button @click=";(usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = '')">
+              <Icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
         </span>
         <span v-else-if="props.column.field === 'default_recipient'">
           <div v-if="props.row.default_recipient">
             <span
-              class="tooltip cursor-pointer font-medium text-grey-500"
+              class="tooltip cursor-pointer font-medium text-grey-500 mr-2"
               data-tippy-content="Click to copy"
               @click="clipboard(rows[props.row.originalIndex].default_recipient.email)"
             >
               {{ $filters.truncate(props.row.default_recipient.email, 30) }}
             </span>
-            <Icon
-              name="edit"
-              class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click="openUsernameDefaultRecipientModal(props.row)"
-            />
+            <button @click="openUsernameDefaultRecipientModal(props.row)">
+              <Icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
           <div class="flex justify-center" v-else>
-            <Icon
-              name="plus"
-              class="block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              @click="openUsernameDefaultRecipientModal(props.row)"
-            />
+            <button @click="openUsernameDefaultRecipientModal(props.row)">
+              <Icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </div>
         </span>
         <span v-else-if="props.column.field === 'aliases_count'">
@@ -225,7 +215,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="validateNewUsername"
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="addUsernameLoading"
             >
               Add Username
@@ -233,7 +223,7 @@
             </button>
             <button
               @click="addUsernameModalOpen = false"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Cancel
             </button>
@@ -268,7 +258,7 @@
           <button
             type="button"
             @click="editDefaultRecipient()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="editDefaultRecipientLoading"
           >
             Update Default Recipient
@@ -276,7 +266,7 @@
           </button>
           <button
             @click="closeUsernameDefaultRecipientModal()"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -297,7 +287,7 @@
           <button
             type="button"
             @click="deleteUsername(usernameIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteUsernameLoading"
           >
             Delete username
@@ -305,7 +295,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -326,7 +316,7 @@
           <button
             type="button"
             @click="makeDefaultUsername(usernameToMakeDefault)"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="makeDefaultLoading"
           >
             Make default username
@@ -334,7 +324,7 @@
           </button>
           <button
             @click="closeMakeDefaultModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -364,7 +354,7 @@
         <div class="mt-6 flex flex-col sm:flex-row">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

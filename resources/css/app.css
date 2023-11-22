@@ -336,11 +336,8 @@ table.vgt-table tr.clickable:hover {
   @apply p-3 align-middle relative;
 }
 .vgt-table th.sortable button {
-  @apply absolute appearance-none border-none top-0 left-0 w-full h-full;
+  @apply absolute appearance-none border-none top-0 left-0 w-full h-full focus-visible:outline-indigo-600;
   background: 0 0;
-}
-.vgt-table th.sortable button:focus {
-  outline: 0;
 }
 .vgt-table th.sortable button:after {
   @apply absolute h-0 w-0;

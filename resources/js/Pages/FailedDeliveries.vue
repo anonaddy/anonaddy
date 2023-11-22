@@ -9,11 +9,12 @@
         <p class="mt-2 text-sm text-grey-700">
           A list of all the failed deliveries
           {{ search ? 'found for your search' : 'in your account' }}
-          <InformationCircleIcon
-            @click="moreInfoOpen = !moreInfoOpen"
-            class="h-6 w-6 inline-block cursor-pointer text-grey-500"
-            title="Click for more information"
-          />
+          <button @click="moreInfoOpen = !moreInfoOpen">
+            <InformationCircleIcon
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              title="Click for more information"
+            />
+          </button>
         </p>
       </div>
     </div>
@@ -149,7 +150,7 @@
           <button
             type="button"
             @click="deleteFailedDelivery(failedDeliveryIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteFailedDeliveryLoading"
           >
             Delete failed delivery
@@ -157,7 +158,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -185,7 +186,7 @@
         <div class="mt-6 flex flex-col sm:flex-row">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

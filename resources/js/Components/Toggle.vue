@@ -1,9 +1,10 @@
 <template>
   <Switch
     @click="toggle"
+    @keyup.space="toggle"
     :class="[
       modelValue ? 'bg-cyan-500' : 'bg-grey-300',
-      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none',
+      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
     ]"
   >
     <span class="sr-only">Use setting</span>
@@ -47,19 +48,16 @@
   </Switch>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import { Switch } from '@headlessui/vue'
 
-export default {
-  props: ['modelValue'],
-  components: {
-    Switch,
-  },
-  methods: {
-    toggle() {
-      this.$emit('update:modelValue', !this.modelValue)
-      this.modelValue ? this.$emit('off') : this.$emit('on')
-    },
-  },
+const emit = defineEmits(['update:modelValue', 'on', 'off'])
+
+const props = defineProps(['modelValue'])
+
+const toggle = () => {
+  emit('update:modelValue', !props.modelValue)
+  props.modelValue ? emit('off') : emit('on')
 }
 </script>

@@ -8,18 +8,19 @@
         <h1 class="text-2xl font-semibold text-grey-900">Recipients</h1>
         <p class="mt-2 text-sm text-grey-700">
           A list of all the recipients {{ search ? 'found for your search' : 'in your account' }}
-          <InformationCircleIcon
-            @click="moreInfoOpen = !moreInfoOpen"
-            class="h-6 w-6 inline-block cursor-pointer text-grey-500"
-            title="Click for more information"
-          />
+          <button @click="moreInfoOpen = !moreInfoOpen">
+            <InformationCircleIcon
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              title="Click for more information"
+            />
+          </button>
         </p>
       </div>
       <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
         <button
           type="button"
           @click="openAddRecipientModal"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus:outline-none sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Add Recipient
         </button>
@@ -71,12 +72,13 @@
           {{ props.row.key }}
         </span>
         <span v-else-if="props.column.field == 'email'">
-          <span
-            class="tooltip cursor-pointer outline-none font-medium text-grey-700"
+          <button
+            class="tooltip outline-none font-medium text-grey-700"
             data-tippy-content="Click to copy"
             @click="clipboard(rows[props.row.originalIndex].email)"
-            >{{ $filters.truncate(props.row.email, 30) }}</span
           >
+            {{ $filters.truncate(props.row.email, 30) }}
+          </button>
 
           <span
             v-if="isDefault(props.row.id)"
@@ -86,9 +88,7 @@
           >
 
           <span v-else-if="props.row.email_verified_at" class="block text-grey-400 text-sm py-1">
-            <span @click="openMakeDefaultModal(props.row)" class="cursor-pointer">
-              Make Default
-            </span>
+            <button @click="openMakeDefaultModal(props.row)">Make Default</button>
           </span>
         </span>
         <span v-else-if="props.column.field === 'aliases'">
@@ -125,23 +125,25 @@
               @on="turnOnEncryption(props.row.id)"
               @off="turnOffEncryption(props.row.id)"
             />
-            <icon
-              name="fingerprint"
-              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-300 fill-current mx-2"
-              :data-tippy-content="props.row.fingerprint"
+            <button
               @click="clipboard(props.row.fingerprint)"
-            />
-            <icon
-              name="delete"
-              class="tooltip outline-none cursor-pointer block w-6 h-6 text-grey-300 fill-current"
+              class="tooltip"
+              :data-tippy-content="props.row.fingerprint"
+            >
+              <icon name="fingerprint" class="block w-6 h-6 text-grey-300 fill-current mx-2" />
+            </button>
+            <button
               @click="openDeleteRecipientKeyModal(props.row)"
+              class="tooltip"
               data-tippy-content="Remove public key"
-            />
+            >
+              <icon name="delete" class="block w-6 h-6 text-grey-300 fill-current" />
+            </button>
           </span>
           <button
             v-else
             @click="openRecipientKeyModal(props.row)"
-            class="focus:outline-none text-sm text-grey-500"
+            class="text-sm text-grey-500 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add PGP key
           </button>
@@ -160,7 +162,7 @@
           <button
             v-else
             @click="resendVerification(props.row.id)"
-            class="focus:outline-none text-sm disabled:cursor-not-allowed"
+            class="text-sm disabled:cursor-not-allowed rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :disabled="resendVerificationLoading"
           >
             Resend email
@@ -228,7 +230,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="validateNewRecipient"
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="addRecipientLoading"
             >
               Add Recipient
@@ -236,7 +238,7 @@
             </button>
             <button
               @click="addRecipientModalOpen = false"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Cancel
             </button>
@@ -277,7 +279,7 @@
             <button
               type="button"
               @click="validateRecipientKey"
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="addRecipientKeyLoading"
             >
               Add Key
@@ -285,7 +287,7 @@
             </button>
             <button
               @click="closeRecipientKeyModal"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Cancel
             </button>
@@ -305,7 +307,7 @@
           <button
             type="button"
             @click="deleteRecipientKey(recipientKeyToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteRecipientKeyLoading"
           >
             Remove public key
@@ -313,7 +315,7 @@
           </button>
           <button
             @click="closeDeleteRecipientKeyModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -329,7 +331,7 @@
           <button
             type="button"
             @click="deleteRecipient(recipientToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteRecipientLoading"
           >
             Delete recipient
@@ -337,7 +339,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -358,7 +360,7 @@
           <button
             type="button"
             @click="makeDefaultRecipient(recipientToMakeDefault)"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="makeDefaultLoading"
           >
             Make default recipient
@@ -366,7 +368,7 @@
           </button>
           <button
             @click="closeMakeDefaultModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -392,7 +394,7 @@
         <div class="mt-6 flex flex-col sm:flex-row">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

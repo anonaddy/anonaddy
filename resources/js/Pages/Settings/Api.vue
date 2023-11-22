@@ -38,7 +38,7 @@
         <div class="mt-4">
           <button
             @click="openCreateTokenModal"
-            class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+            class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Create New API Key
           </button>
@@ -82,12 +82,12 @@
                   </div>
                   <div v-else class="table-cell p-1 md:p-4">Does not expire</div>
                   <div class="table-cell p-1 md:p-4 text-right">
-                    <a
-                      class="text-red-500 font-bold cursor-pointer focus:outline-none"
+                    <button
+                      class="text-red-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       @click="showRevokeModal(token)"
                     >
                       Delete
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -165,7 +165,7 @@
             />
             <button
               @click="store"
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               :class="loading ? 'cursor-not-allowed' : ''"
               :disabled="loading"
             >
@@ -174,7 +174,7 @@
             </button>
             <button
               @click="closeCreateTokenModal"
-              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>
@@ -202,14 +202,14 @@
           </div>
           <div class="mt-6">
             <button
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               @click="clipboard(accessToken)"
             >
               Copy To Clipboard
             </button>
             <button
               @click="closeCreateTokenModal"
-              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>
@@ -228,7 +228,7 @@
         <div class="mt-6">
           <button
             @click="revoke"
-            class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus:outline-none"
+            class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :class="revokeTokenLoading ? 'cursor-not-allowed' : ''"
             :disabled="revokeTokenLoading"
           >
@@ -237,7 +237,7 @@
           </button>
           <button
             @click="closeRevokeTokenModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

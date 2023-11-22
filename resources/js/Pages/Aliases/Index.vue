@@ -13,18 +13,19 @@
               ? 'found for your search or filters'
               : 'in your account'
           }}
-          <InformationCircleIcon
-            @click="moreInfoOpen = !moreInfoOpen"
-            class="h-6 w-6 inline-block cursor-pointer text-grey-500"
-            title="Click for more information"
-          />
+          <button @click="moreInfoOpen = !moreInfoOpen">
+            <InformationCircleIcon
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              title="Click for more information"
+            />
+          </button>
         </p>
       </div>
       <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex items-center">
         <button
           type="button"
           @click="createAliasModalOpen = true"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus:outline-none sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Create Alias
         </button>
@@ -41,7 +42,7 @@
           <div class="relative">
             <div>
               <ListboxButton
-                class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 focus:outline-none"
+                class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 <span class="sr-only">Change display</span>
                 <ListboxLabel class="cursor-pointer">Display</ListboxLabel>
@@ -115,7 +116,7 @@
             <div class="relative">
               <div>
                 <ListboxButton
-                  class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 focus:outline-none"
+                  class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   <span class="sr-only">Change sort by</span>
                   <ListboxLabel class="cursor-pointer">Sort By</ListboxLabel>
@@ -327,11 +328,12 @@
               </span>
             </span>
             <span v-else-if="props.column.field == 'email'" class="block">
-              <span
-                class="text-grey-400 tooltip cursor-pointer outline-none"
+              <button
+                class="text-grey-400 tooltip outline-none"
                 data-tippy-content="Click to copy"
                 @click="clipboard(getAliasEmail(rows[props.row.originalIndex]))"
-                ><span class="font-semibold text-indigo-800">{{
+              >
+                <span class="font-semibold text-indigo-800">{{
                   $filters.truncate(getAliasLocalPart(props.row), 60)
                 }}</span
                 ><span
@@ -344,14 +346,14 @@
                     )
                   }}</span
                 >
-              </span>
+              </button>
               <div v-if="aliasIdToEdit === props.row.id" class="flex items-center">
                 <input
                   @keyup.enter="editAliasDescription(rows[props.row.originalIndex])"
                   @keyup.esc="aliasIdToEdit = aliasDescriptionToEdit = ''"
                   v-model="aliasDescriptionToEdit"
                   type="text"
-                  class="grow text-sm appearance-none bg-grey-50 border text-grey-700 focus:outline-none rounded px-2 py-1"
+                  class="grow text-sm appearance-none bg-grey-50 border text-grey-700 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 px-2 py-1"
                   :class="
                     aliasDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'
                   "
@@ -359,36 +361,35 @@
                   tabindex="0"
                   autofocus
                 />
-                <icon
-                  name="close"
-                  class="inline-block w-6 h-6 text-red-300 fill-current cursor-pointer"
-                  @click="aliasIdToEdit = aliasDescriptionToEdit = ''"
-                />
-                <icon
-                  name="save"
-                  class="inline-block w-6 h-6 text-cyan-500 fill-current cursor-pointer"
-                  @click="editAliasDescription(rows[props.row.originalIndex])"
-                />
+                <button @click="aliasIdToEdit = aliasDescriptionToEdit = ''">
+                  <icon name="close" class="inline-block w-6 h-6 text-red-300 fill-current" />
+                </button>
+                <button @click="editAliasDescription(rows[props.row.originalIndex])">
+                  <icon name="save" class="inline-block w-6 h-6 text-cyan-500 fill-current" />
+                </button>
               </div>
               <div v-else-if="props.row.description" class="flex items-center">
-                <span class="inline-block text-grey-400 text-sm py-1 border border-transparent">
+                <span
+                  class="inline-block text-grey-400 text-sm py-1 border border-transparent mr-2"
+                >
                   {{ $filters.truncate(props.row.description, 60) }}
                 </span>
-                <icon
-                  name="edit"
-                  class="inline-block w-6 h-6 ml-2 text-grey-300 fill-current cursor-pointer"
+                <button
                   @click="
                     ;(aliasIdToEdit = props.row.id),
                       (aliasDescriptionToEdit = props.row.description)
                   "
-                />
+                >
+                  <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
+                </button>
               </div>
               <div v-else>
-                <span
-                  class="inline-block text-grey-300 text-sm cursor-pointer py-1 border border-transparent"
+                <button
+                  class="inline-block text-grey-300 text-sm py-1 border border-transparent"
                   @click=";(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = '')"
-                  >Add description</span
                 >
+                  Add description
+                </button>
               </div>
             </span>
             <span
@@ -421,11 +422,9 @@
                 :data-tippy-content="$page.props.user.email"
                 >default</span
               >
-              <icon
-                name="edit"
-                class="ml-2 inline-block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                @click="openAliasRecipientsModal(props.row)"
-              />
+              <button @click="openAliasRecipientsModal(props.row)" class="ml-2">
+                <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
+              </button>
             </span>
             <span
               v-else-if="props.column.field == 'emails_forwarded'"
@@ -462,14 +461,14 @@
                 class="text-indigo-500 hover:text-indigo-800 font-medium"
                 >Edit<span class="sr-only">, {{ props.row.email }}</span></Link
               >
-              <span
+              <button
                 @click="openSendFromModal(props.row)"
-                class="group cursor-pointer flex items-center text-indigo-500 hover:text-indigo-800 font-medium ml-4 tooltip"
+                class="group flex items-center text-indigo-500 hover:text-indigo-800 font-medium ml-4 tooltip"
                 data-tippy-content="Send an email from this alias"
               >
                 Send
                 <EnvelopeIcon class="ml-1 h-4 w-4" aria-hidden="true" />
-              </span>
+              </button>
             </span>
           </template>
         </vue-good-table>
@@ -816,7 +815,7 @@
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             @click="createNewAlias"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="createAliasLoading"
           >
             Create Alias
@@ -824,7 +823,7 @@
           </button>
           <button
             @click="createAliasModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -859,7 +858,7 @@
           <button
             type="button"
             @click="editAliasRecipients()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="editAliasRecipientsLoading"
           >
             Update Recipients
@@ -867,7 +866,7 @@
           </button>
           <button
             @click="closeAliasRecipientsModal()"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -902,7 +901,7 @@
           <button
             type="button"
             @click="bulkEditAliasRecipients()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="bulkEditAliasRecipientsLoading"
           >
             Update Recipients
@@ -910,7 +909,7 @@
           </button>
           <button
             @click="closeBulkAliasRecipientsModal()"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -929,7 +928,7 @@
           <button
             type="button"
             @click="restoreAlias(aliasIdToRestore)"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="restoreAliasLoading"
           >
             Restore alias
@@ -937,7 +936,7 @@
           </button>
           <button
             @click="closeRestoreModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -957,7 +956,7 @@
           <button
             type="button"
             @click="bulkRestoreAlias()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="bulkRestoreAliasLoading"
           >
             Restore aliases
@@ -965,7 +964,7 @@
           </button>
           <button
             @click="bulkRestoreAliasModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -986,7 +985,7 @@
           <button
             type="button"
             @click="deleteAlias(aliasToDelete.id)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteAliasLoading"
           >
             Delete alias
@@ -994,7 +993,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -1014,7 +1013,7 @@
           <button
             type="button"
             @click="bulkDeleteAlias()"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="bulkDeleteAliasLoading"
           >
             Delete aliases
@@ -1022,7 +1021,7 @@
           </button>
           <button
             @click="bulkDeleteAliasModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -1046,7 +1045,7 @@
           <button
             type="button"
             @click="forgetAlias(aliasToForget.id)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="forgetAliasLoading"
           >
             Forget alias
@@ -1054,7 +1053,7 @@
           </button>
           <button
             @click="closeForgetModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -1079,7 +1078,7 @@
           <button
             type="button"
             @click="bulkForgetAlias()"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="bulkForgetAliasLoading"
           >
             Forget aliases
@@ -1087,7 +1086,7 @@
           </button>
           <button
             @click="bulkForgetAliasModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -1188,7 +1187,7 @@
           <button
             type="button"
             @click="displaySendFromAddress(aliasToSendFrom)"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="sendFromAliasLoading"
           >
             Show address
@@ -1196,7 +1195,7 @@
           </button>
           <button
             @click="closeSendFromModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>
@@ -1225,7 +1224,7 @@
         <div class="mt-6 flex flex-col sm:flex-row">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

@@ -67,7 +67,7 @@
 
             <button
               type="submit"
-              class="text-white font-bold bg-red-500 hover:bg-red-600 w-full py-3 px-4 rounded focus:outline-none"
+              class="text-white font-bold bg-red-500 hover:bg-red-600 w-full py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Delete Account
             </button>
@@ -87,7 +87,7 @@
           <button
             type="button"
             @click="submitDeleteAccountForm"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus:outline-none disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteAccountForm.processing"
           >
             Delete Account
@@ -95,7 +95,7 @@
           </button>
           <button
             @click="deleteAccountModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus:outline-none"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>

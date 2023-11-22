@@ -190,7 +190,7 @@
                     placeholder="Search"
                     type="search"
                   />
-                  <div
+                  <button
                     v-if="search"
                     @click="
                       ;(searchForm.search = ''),
@@ -201,10 +201,10 @@
                           },
                         )
                     "
-                    class="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3"
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     <XMarkIcon class="h-5 w-5 text-grey-400" aria-hidden="true" />
-                  </div>
+                  </button>
                 </div>
               </form>
               <Listbox as="div" v-model="searchTypeSelected">
@@ -222,7 +222,7 @@
                         </p>
                       </div>
                       <ListboxButton
-                        class="relative inline-flex items-center bg-indigo-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus:outline-none focus:z-10"
+                        class="relative inline-flex items-center bg-indigo-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 focus:z-10"
                         style="height: 39px"
                       >
                         <span class="sr-only">Change published status</span>
@@ -279,7 +279,9 @@
               <!-- Profile dropdown -->
               <Menu as="div" class="relative flex-shrink-0" role="menu">
                 <div>
-                  <MenuButton class="bg-white rounded-full flex text-base focus:outline-none">
+                  <MenuButton
+                    class="bg-white rounded-sm flex text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
                     <span class="sr-only">Open user menu</span>
                     <span id="dropdown-username" class="ml-2 md:ml-0 font-medium">{{
                       $page.props.user.username

@@ -48,7 +48,7 @@
                     </form>
 
                     <div class="mt-4">
-                        <button onclick="authenticateDevice()" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none ml-auto">
+                        <button onclick="authenticateDevice()" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ml-auto">
                             Authenticate
                         </button>
                     </div>

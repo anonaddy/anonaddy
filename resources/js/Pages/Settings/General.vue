@@ -121,7 +121,7 @@
             <button
               type="submit"
               :disabled="emailForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Email
               <loader v-if="emailForm.processing" />
@@ -201,7 +201,7 @@
             <button
               type="submit"
               :disabled="defaultAliasDomainForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Default Alias Domain
               <loader v-if="defaultAliasDomainForm.processing" />
@@ -298,7 +298,7 @@
             <button
               type="submit"
               :disabled="defaultAliasFormatForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Default Alias Format
               <loader v-if="defaultAliasFormatForm.processing" />
@@ -378,7 +378,7 @@
             <button
               type="submit"
               :disabled="loginRedirectForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Login Redirect
               <loader v-if="loginRedirectForm.processing" />
@@ -456,7 +456,7 @@
             <button
               type="submit"
               :disabled="displayFromFormatForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Display From Format
               <loader v-if="displayFromFormatForm.processing" />
@@ -537,7 +537,7 @@
             <button
               type="submit"
               :disabled="useReplyToForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Use Reply-To
               <loader v-if="useReplyToForm.processing" />
@@ -620,7 +620,7 @@
             <button
               type="submit"
               :disabled="storeFailedDeliveriesForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Store Failed Deliveries
               <loader v-if="storeFailedDeliveriesForm.processing" />
@@ -702,7 +702,7 @@
             <button
               type="submit"
               :disabled="fromNameForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Global From Name
               <loader v-if="fromNameForm.processing" />
@@ -785,7 +785,7 @@
             <button
               type="submit"
               :disabled="bannerLocationForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Banner Location
               <loader v-if="bannerLocationForm.processing" />
@@ -857,7 +857,7 @@
             <button
               type="submit"
               :disabled="emailSubjectForm.processing"
-              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus:outline-none disabled:cursor-not-allowed"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
               Update Email Subject
               <loader v-if="emailSubjectForm.processing" />
