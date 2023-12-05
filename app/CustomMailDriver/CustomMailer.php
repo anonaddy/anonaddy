@@ -67,17 +67,19 @@ class CustomMailer extends Mailer
 
             try {
                 $encrypter = new OpenPGPEncrypter(config('anonaddy.signing_key_fingerprint'), $data['fingerprint'], '~/.gnupg', $recipient->protected_headers);
+
+                $encryptedSymfonyMessage = $recipient->inline_encryption ? $encrypter->encryptInline($symfonyMessage) : $encrypter->encrypt($symfonyMessage);
             } catch (RuntimeException $e) {
                 info($e->getMessage());
-                $encrypter = null;
+                $encryptedSymfonyMessage = null;
 
                 $recipient->update(['should_encrypt' => false]);
 
                 $recipient->notify(new GpgKeyExpired());
             }
 
-            if ($encrypter) {
-                $symfonyMessage = $recipient->inline_encryption ? $encrypter->encryptInline($symfonyMessage) : $encrypter->encrypt($symfonyMessage);
+            if ($encryptedSymfonyMessage) {
+                $symfonyMessage = $encryptedSymfonyMessage;
             }
         }
 
