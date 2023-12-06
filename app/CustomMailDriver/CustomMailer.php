@@ -13,7 +13,6 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SentMessage;
 use ParagonIE\ConstantTime\Base32;
 use Symfony\Component\Mailer\Envelope;
-use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
@@ -69,7 +68,7 @@ class CustomMailer extends Mailer
                 $encrypter = new OpenPGPEncrypter(config('anonaddy.signing_key_fingerprint'), $data['fingerprint'], '~/.gnupg', $recipient->protected_headers);
 
                 $encryptedSymfonyMessage = $recipient->inline_encryption ? $encrypter->encryptInline($symfonyMessage) : $encrypter->encrypt($symfonyMessage);
-            } catch (RuntimeException $e) {
+            } catch (Exception $e) {
                 info($e->getMessage());
                 $encryptedSymfonyMessage = null;
 

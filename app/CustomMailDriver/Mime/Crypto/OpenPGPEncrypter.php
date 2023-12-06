@@ -101,11 +101,13 @@ class OpenPGPEncrypter
      * @param  Email  $email
      * @return $this
      *
-     * @throws RuntimeException
+     * @throws Exception
      */
-    public function encrypt(Email $message): Email
+    public function encrypt(Email $symfonyMessage): Email
     {
-        $originalMessage = clone $message;
+        $originalMessage = clone $symfonyMessage;
+        // Clone to ensure headers are not altered if encryption fails
+        $message = clone $symfonyMessage;
 
         $headers = $message->getPreparedHeaders();
 
@@ -170,12 +172,12 @@ class OpenPGPEncrypter
      * @param  Email  $email
      * @return $this
      *
-     * @throws RuntimeException
+     * @throws Exception
      */
-    public function encryptInline(Email $message): Email
+    public function encryptInline(Email $symfonyMessage): Email
     {
         if (! $this->signingKey) {
-            foreach ($message->getFrom() as $key => $value) {
+            foreach ($symfonyMessage->getFrom() as $key => $value) {
                 $this->addSignature($this->getKey($key, 'sign'));
             }
         }
@@ -188,16 +190,16 @@ class OpenPGPEncrypter
             throw new RuntimeException('Encryption has been enabled, but no recipients have been added. Use autoAddRecipients() or addRecipient()');
         }
 
-        $body = $message->getTextBody() ?? '';
+        $body = $symfonyMessage->getTextBody() ?? '';
 
         $text = $this->pgpEncryptAndSignString($body, $this->recipientKey, $this->signingKey);
 
-        $headers = $message->getPreparedHeaders();
+        $headers = $symfonyMessage->getPreparedHeaders();
         $headers->setHeaderBody('Parameterized', 'Content-Type', 'text/plain');
         $headers->setHeaderParameter('Content-Type', 'charset', 'utf-8');
-        $message->setHeaders($headers);
+        $symfonyMessage->setHeaders($headers);
 
-        return $message->setBody(new EncryptedPart($text));
+        return $symfonyMessage->setBody(new EncryptedPart($text));
     }
 
     /**
