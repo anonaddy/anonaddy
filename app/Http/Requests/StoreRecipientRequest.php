@@ -27,6 +27,7 @@ class StoreRecipientRequest extends FormRequest
     {
         return [
             'email' => [
+                'bail',
                 'required',
                 'string',
                 'max:254',

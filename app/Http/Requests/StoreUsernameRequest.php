@@ -27,6 +27,7 @@ class StoreUsernameRequest extends FormRequest
     {
         return [
             'username' => [
+                'bail',
                 'required',
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',

@@ -47,6 +47,7 @@ class StoreAliasRequest extends FormRequest
             'description' => 'nullable|max:200',
             'format' => 'nullable|in:random_characters,uuid,random_words,custom',
             'recipient_ids' => [
+                'bail',
                 'nullable',
                 'array',
                 'max:10',
@@ -58,6 +59,7 @@ class StoreAliasRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->sometimes('local_part_without_extension', [
+            'bail',
             'required',
             'max:50',
             Rule::unique('aliases', 'local_part')->where(function ($query) {

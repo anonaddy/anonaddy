@@ -28,6 +28,7 @@ class StoreDomainRequest extends FormRequest
     {
         return [
             'domain' => [
+                'bail',
                 'required',
                 'string',
                 'max:50',

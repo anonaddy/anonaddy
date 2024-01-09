@@ -74,6 +74,7 @@ class RegisterController extends Controller
 
         return Validator::make($data, [
             'username' => [
+                'bail',
                 'required',
                 'regex:/^[a-zA-Z0-9]*$/',
                 'max:20',
@@ -82,6 +83,7 @@ class RegisterController extends Controller
                 new NotDeletedUsername(),
             ],
             'email' => [
+                'bail',
                 'required',
                 'email:rfc,dns',
                 'max:254',

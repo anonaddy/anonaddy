@@ -26,6 +26,7 @@ class StoreAliasRecipientRequest extends FormRequest
     {
         return [
             'recipient_ids' => [
+                'bail',
                 'array',
                 'max:10',
                 new VerifiedRecipientId(),

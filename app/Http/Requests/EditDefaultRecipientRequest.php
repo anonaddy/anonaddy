@@ -26,6 +26,7 @@ class EditDefaultRecipientRequest extends FormRequest
     {
         return [
             'email' => [
+                'bail',
                 'required',
                 'email:rfc,dns',
                 'max:254',
