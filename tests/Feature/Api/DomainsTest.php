@@ -118,7 +118,7 @@ class DomainsTest extends TestCase
     public function new_domain_must_not_be_local_subdomain()
     {
         $response = $this->json('POST', '/api/v1/domains', [
-            'domain' => 'subdomain'.config('anonaddy.domain'),
+            'domain' => 'subdomain.'.config('anonaddy.domain'),
         ]);
 
         $response

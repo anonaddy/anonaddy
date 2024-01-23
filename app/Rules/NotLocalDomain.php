@@ -21,8 +21,8 @@ class NotLocalDomain implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $count = collect(config('anonaddy.all_domains'))
-            ->filter(function ($name) use ($value) {
-                return Str::endsWith(strtolower($value), $name);
+            ->filter(function ($domain) use ($value) {
+                return Str::endsWith(strtolower($value), '.'.$domain) || strtolower($value) == $domain;
             })
             ->count();
 
