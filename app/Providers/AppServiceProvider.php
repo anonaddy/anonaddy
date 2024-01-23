@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
                         : $rule;
         });
 
-        Builder::macro('jsonPaginate', function (int $maxResults = null, int $defaultSize = null) {
+        Builder::macro('jsonPaginate', function (?int $maxResults = null, ?int $defaultSize = null) {
             $maxResults = $maxResults ?? 100;
             $defaultSize = $defaultSize ?? 100;
             $paginationMethod = 'paginate'; // 'simplePaginate' or 'paginate';
@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
             return $paginator;
         });
 
-        Collection::macro('paginate', function (int $defaultSize = null, int $maxResults = null, $page = null) {
+        Collection::macro('paginate', function (?int $defaultSize = null, ?int $maxResults = null, $page = null) {
             $maxResults = $maxResults ?? 100;
             $defaultSize = $defaultSize ?? 25;
             $size = (int) is_null(request()->input('pageSize')) ? $defaultSize : request()->input('pageSize');
@@ -86,7 +86,7 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        Collection::macro('jsonPaginate', function (int $maxResults = null, int $defaultSize = null, $page = null) {
+        Collection::macro('jsonPaginate', function (?int $maxResults = null, ?int $defaultSize = null, $page = null) {
             $maxResults = $maxResults ?? 100;
             $defaultSize = $defaultSize ?? 100;
             $size = (int) is_null(request()->input('page.size')) ? $defaultSize : request()->input('page.size');

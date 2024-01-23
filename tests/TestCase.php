@@ -50,7 +50,7 @@ abstract class TestCase extends BaseTestCase
         Sanctum::actingAs($this->user, []);
     }
 
-    protected function createUser(string $username = null, string $email = null, array $userAttributes = [])
+    protected function createUser(?string $username = null, ?string $email = null, array $userAttributes = [])
     {
         $userId = Uuid::uuid4();
         $usernameId = Uuid::uuid4();

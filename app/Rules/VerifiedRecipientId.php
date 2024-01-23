@@ -14,7 +14,7 @@ class VerifiedRecipientId implements ValidationRule
      *
      * @return void
      */
-    public function __construct(array $verifiedRecipientIds = null)
+    public function __construct(?array $verifiedRecipientIds = null)
     {
         if (! is_null($verifiedRecipientIds)) {
             $this->verifiedRecipientIds = $verifiedRecipientIds;

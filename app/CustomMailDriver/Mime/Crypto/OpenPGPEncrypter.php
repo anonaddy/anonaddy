@@ -227,8 +227,8 @@ class OpenPGPEncrypter
     }
 
     /**
-     * @param $plaintext
-     * @param $keyFingerprints
+     * @param  $plaintext
+     * @param  $keyFingerprints
      * @return string
      *
      * @throws RuntimeException
