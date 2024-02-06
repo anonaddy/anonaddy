@@ -17,6 +17,15 @@ class AliasController extends Controller
     public function index(IndexAliasRequest $request)
     {
         $aliases = user()->aliases()->with('recipients')
+            ->when($request->input('recipient'), function ($query, $id) {
+                return $query->usesRecipientWithId($id, $id === user()->default_recipient_id);
+            })
+            ->when($request->input('domain'), function ($query, $id) {
+                return $query->belongsToAliasable('App\Models\Domain', $id);
+            })
+            ->when($request->input('username'), function ($query, $id) {
+                return $query->belongsToAliasable('App\Models\Username', $id);
+            })
             ->when($request->input('sort'), function ($query, $sort) {
                 $direction = strpos($sort, '-') === 0 ? 'desc' : 'asc';
                 $sort = ltrim($sort, '-');

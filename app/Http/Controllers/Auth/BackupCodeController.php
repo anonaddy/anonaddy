@@ -14,7 +14,7 @@ class BackupCodeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('throttle:3,1')->only('login');
+        $this->middleware('throttle:3,1')->only(['login', 'update']);
     }
 
     public function index(Request $request)

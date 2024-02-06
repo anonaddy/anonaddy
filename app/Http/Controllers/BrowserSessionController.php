@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Auth;
 
 class BrowserSessionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:3,1')->only('destroy');
+    }
+
     public function destroy(Request $request)
     {
         $request->validate([

@@ -11,6 +11,11 @@ use LaravelWebauthn\Facades\Webauthn;
 
 class SettingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:3,1')->only('destroy');
+    }
+
     public function show()
     {
         return Inertia::render('Settings/General', [

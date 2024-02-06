@@ -14,6 +14,11 @@ use LaravelWebauthn\Http\Requests\WebauthnRegisterRequest;
 
 class WebauthnController extends ControllersWebauthnController
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:3,1')->only('destroy');
+    }
+
     public function index()
     {
         return user()->webauthnKeys()->latest()->select(['id', 'name', 'enabled', 'created_at'])->get()->values();

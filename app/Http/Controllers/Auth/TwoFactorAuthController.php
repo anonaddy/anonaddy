@@ -16,6 +16,7 @@ class TwoFactorAuthController extends Controller
 
     public function __construct(Request $request)
     {
+        $this->middleware('throttle:3,1')->only(['store', 'update', 'destroy']);
         $this->twoFactor = app('pragmarx.google2fa');
         $this->authenticator = app(Authenticator::class)->boot($request);
     }

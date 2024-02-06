@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class WebauthnEnabledKeyController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:3,1')->only('destroy');
+    }
+
     public function store(Request $request)
     {
         $webauthnKey = user()->webauthnKeys()->findOrFail($request->id);

@@ -88,6 +88,18 @@ class IndexAliasRequest extends FormRequest
                     '-deleted_at',
                 ]),
             ],
+            'recipient' => [
+                'nullable',
+                'uuid',
+            ],
+            'domain' => [
+                'nullable',
+                'uuid',
+            ],
+            'username' => [
+                'nullable',
+                'uuid',
+            ],
         ];
     }
 }

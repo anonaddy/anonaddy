@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class PasswordController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:3,1')->only('update');
+    }
+
     public function update(UpdatePasswordRequest $request)
     {
         // Log out of other sessions
