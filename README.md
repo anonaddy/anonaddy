@@ -88,7 +88,7 @@ There are a number of reasons you should consider using this service:
 
 ## Do you store emails?
 
-No I definitely do not store/save any emails that pass through the server.
+Emails are only ever stored in the event of a failed delivery, and only if you have this option enabled in your account settings.
 
 ## What is a shared domain alias?
 
