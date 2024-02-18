@@ -118,7 +118,7 @@ return [
     |
     */
 
-    'limit' => env('ANONADDY_LIMIT', 200),
+    'limit' => (int) env('ANONADDY_LIMIT', 200),
 
     /*
     |--------------------------------------------------------------------------
@@ -130,7 +130,7 @@ return [
     |
     */
 
-    'bandwidth_limit' => env('ANONADDY_BANDWIDTH_LIMIT', 104857600),
+    'bandwidth_limit' => (int) env('ANONADDY_BANDWIDTH_LIMIT', 104857600),
 
     /*
     |--------------------------------------------------------------------------
@@ -142,7 +142,7 @@ return [
     |
     */
 
-    'new_alias_hourly_limit' => env('ANONADDY_NEW_ALIAS_LIMIT', 100),
+    'new_alias_hourly_limit' => (int) env('ANONADDY_NEW_ALIAS_LIMIT', 100),
 
     /*
     |--------------------------------------------------------------------------
@@ -154,7 +154,7 @@ return [
     |
     */
 
-    'additional_username_limit' => env('ANONADDY_ADDITIONAL_USERNAME_LIMIT', 10),
+    'additional_username_limit' => (int) env('ANONADDY_ADDITIONAL_USERNAME_LIMIT', 10),
 
     /*
     |--------------------------------------------------------------------------
