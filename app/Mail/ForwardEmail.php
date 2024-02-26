@@ -161,7 +161,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
         $displayFrom = base64_decode($this->displayFrom);
 
-        if ($this->user->display_from_format === DisplayFromFormat::LEGACY_AT) {
+        if ($this->user->display_from_format === DisplayFromFormat::LEGACY) {
             $displayFrom = $displayFrom." '".$this->sender."'";
         } else if ($displayFrom === $this->sender) {
             $displayFrom = Str::replaceLast('@', ' at ', $this->sender);
@@ -395,7 +395,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             DisplayFromFormat::ADDRESS => str_replace('@', ' at ', $this->sender),
             DisplayFromFormat::DOMAINONLY => Str::afterLast($this->sender, '@'),
             DisplayFromFormat::NONE => null,
-            DisplayFromFormat::LEGACY_AT => $displayFrom." '".$this->sender."'",
+            DisplayFromFormat::LEGACY => $displayFrom." '".$this->sender."'",
             default => str_replace('@', ' at ', $displayFrom." '".$this->sender."'"),
         };
     }
