@@ -924,6 +924,11 @@ const displayFromFormatOptions = [
     paid: false,
   },
   {
+    value: 7,
+    label: "John Doe 'johndoe@example.com'",
+    paid: false,
+  },
+  {
     value: 1,
     label: 'John Doe - johndoe(a)example.com',
     paid: true,
