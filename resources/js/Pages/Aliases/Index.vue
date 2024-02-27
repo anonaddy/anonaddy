@@ -1479,22 +1479,18 @@ const aliasFormatOptions = [
   {
     value: 'random_characters',
     label: 'Random Characters',
-    paid: false,
   },
   {
     value: 'uuid',
     label: 'UUID',
-    paid: false,
   },
   {
     value: 'random_words',
     label: 'Random Words',
-    paid: true,
   },
   {
     value: 'custom',
     label: 'Custom',
-    paid: false,
   },
 ]
 const columns = [

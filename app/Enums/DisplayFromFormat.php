@@ -11,4 +11,5 @@ enum DisplayFromFormat: int
     case ADDRESS = 4;
     case NONE = 5;
     case DOMAINONLY = 6;
+    case LEGACY = 7;
 }

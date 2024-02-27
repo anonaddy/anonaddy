@@ -870,7 +870,7 @@
 </template>
 
 <script setup>
-import { useForm, Link } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import SettingsLayout from './../../Layouts/SettingsLayout.vue'
 import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 
@@ -921,37 +921,34 @@ const displayFromFormatOptions = [
   {
     value: 0,
     label: "John Doe 'johndoe at example.com'",
-    paid: false,
+  },
+  {
+    value: 7,
+    label: "John Doe 'johndoe@example.com'",
   },
   {
     value: 1,
     label: 'John Doe - johndoe(a)example.com',
-    paid: true,
   },
   {
     value: 2,
     label: 'John Doe - example.com',
-    paid: true,
   },
   {
     value: 3,
     label: 'John Doe',
-    paid: true,
   },
   {
     value: 4,
     label: 'johndoe at example.com',
-    paid: true,
   },
   {
     value: 6,
     label: 'example.com',
-    paid: true,
   },
   {
     value: 5,
     label: 'No name - just the alias',
-    paid: true,
   },
 ]
 

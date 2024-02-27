@@ -116,7 +116,7 @@
 
 <script setup>
 import SettingsLayout from './../../Layouts/SettingsLayout.vue'
-import { useForm, Link } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 
 const props = defineProps({
   totalAliasesCount: {
