@@ -14,7 +14,7 @@ window.dayjs = dayjs
 
 import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
-import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m'
+import { ZiggyVue } from 'ziggy-js'
 import Notifications from '@kyvg/vue3-notification'
 
 // Styles

@@ -15,8 +15,8 @@
     <meta name="theme-color" content="#19216C">
 
     <!-- Scripts -->
-    @routes
     @vite('resources/js/app.js')
+    @routes
     @inertiaHead
 </head>
 <body class="bg-grey-50 antialiased text-grey-900">

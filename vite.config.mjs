@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
 import fs from 'fs'
+import { resolve } from 'path'
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), 'APP_URL')
@@ -46,6 +47,11 @@ export default defineConfig(({ command, mode }) => {
       }),
     ],
     base: '',
+    resolve: {
+      alias: {
+          'ziggy-js': resolve('vendor/tightenco/ziggy'),
+      },
+    },
   }
 })
 
