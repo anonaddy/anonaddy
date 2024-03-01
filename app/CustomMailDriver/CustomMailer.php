@@ -88,7 +88,7 @@ class CustomMailer extends Mailer
         }
 
         // DkimSigner only for forwards, replies and sends...
-        if (isset($data['needsDkimSignature']) && $data['needsDkimSignature']) {
+        if (isset($data['needsDkimSignature']) && $data['needsDkimSignature'] && ! is_null(config('anonaddy.dkim_signing_key'))) {
             $dkimSigner = new DkimSigner(config('anonaddy.dkim_signing_key'), $data['aliasDomain'], config('anonaddy.dkim_selector'));
 
             $options = (new DkimOptions())->headersToIgnore([

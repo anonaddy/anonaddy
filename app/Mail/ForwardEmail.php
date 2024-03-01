@@ -17,6 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
+use Throwable;
 
 class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
@@ -342,10 +343,9 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Throwable  $exception
      * @return void
      */
-    public function failed()
+    public function failed(Throwable $exception)
     {
         // Send user failed delivery notification, add to failed deliveries table
         $recipient = Recipient::find($this->recipientId);
@@ -371,7 +371,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'sender' => $this->sender,
             'email_type' => 'F',
             'status' => null,
-            'code' => 'An error has occurred, please check the logs.',
+            'code' => $exception->getMessage(),
             'attempted_at' => now(),
         ]);
     }
