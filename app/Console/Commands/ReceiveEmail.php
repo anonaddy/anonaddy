@@ -214,10 +214,10 @@ class ReceiveEmail extends Command
                     $this->handleForward($user, $recipient, $alias ?? null, $aliasable ?? null, $this->parser->getHeader('X-AnonAddy-Spam') === 'Yes');
                 }
             }
-        } catch (\Exception $e) {
-            report($e);
-
+        } catch (\Throwable $e) {
             $this->error('4.3.0 An error has occurred, please try again later.');
+
+            report($e);
 
             exit(1);
         }
