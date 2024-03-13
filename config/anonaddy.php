@@ -38,6 +38,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Non-Admin Shared Domains
+    |--------------------------------------------------------------------------
+    |
+    | If set to false this will prevent any non-admin users from being able to create
+    | shared domain aliases at any domains that have been set for 'all_domains' below
+    |
+    */
+
+    'non_admin_shared_domains' => env('ANONADDY_NON_ADMIN_SHARED_DOMAINS', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Registration
     |--------------------------------------------------------------------------
     |

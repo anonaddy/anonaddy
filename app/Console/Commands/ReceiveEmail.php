@@ -505,7 +505,7 @@ class ReceiveEmail extends Command
             return $next($mimePart);
         });
 
-        if ($file == 'stream') {
+        if ($file === 'stream') {
             $fd = fopen('php://stdin', 'r');
             $this->rawEmail = '';
             while (! feof($fd)) {
@@ -549,6 +549,12 @@ class ReceiveEmail extends Command
     protected function getBounceType($code, $status)
     {
         if (preg_match("/(:?mailbox|address|user|account|recipient|@).*(:?rejected|unknown|disabled|unavailable|invalid|inactive|not exist|does(n't| not) exist)|(:?rejected|unknown|unavailable|no|illegal|invalid|no such).*(:?mailbox|address|user|account|recipient|alias)|(:?address|user|recipient) does(n't| not) have .*(:?mailbox|account)|returned to sender|(:?auth).*(:?required)/i", $code)) {
+
+            // If the status starts with 4 then return soft instead of hard
+            if (Str::startsWith($status, '4')) {
+                return 'soft';
+            }
+
             return 'hard';
         }
 

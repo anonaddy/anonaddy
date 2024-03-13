@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -171,8 +172,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected function defaultAliasDomain(): Attribute
     {
+        $defaultDomain = $this->canCreateSharedDomainAliases() ? config('anonaddy.domain') : $this->username.'.'.config('anonaddy.domain');
+
         return Attribute::make(
-            get: fn (?string $value) => $value ?? config('anonaddy.domain'),
+            get: fn (?string $value) => $value ?? $defaultDomain,
         );
     }
 
@@ -603,13 +606,29 @@ class User extends Authenticatable implements MustVerifyEmail
                 });
             })
             ->concat($customDomains)
-            ->concat($allDomains)
+            ->when($this->canCreateSharedDomainAliases(), function (Collection $collection) use ($allDomains) {
+                return $collection->concat($allDomains);
+            })
             ->reverse()
             ->values();
     }
 
     public function sharedDomainOptions()
     {
-        return config('anonaddy.all_domains');
+        if ($this->canCreateSharedDomainAliases()) {
+            return config('anonaddy.all_domains');
+        }
+
+        return [];
+    }
+
+    public function isAdminUser()
+    {
+        return $this->username === config('anonaddy.admin_username');
+    }
+
+    public function canCreateSharedDomainAliases()
+    {
+        return config('anonaddy.non_admin_shared_domains') || $this->isAdminUser();
     }
 }

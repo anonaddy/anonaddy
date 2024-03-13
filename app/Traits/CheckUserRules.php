@@ -30,7 +30,7 @@ trait CheckUserRules
 
         $result = $results->unique();
 
-        if ($logicalOperator == 'OR') {
+        if ($logicalOperator === 'OR') {
             return $result->contains(true);
         }
 

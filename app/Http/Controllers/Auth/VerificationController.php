@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 
 class VerificationController extends Controller
@@ -106,7 +107,8 @@ class VerificationController extends Controller
                     $user = $verifiable->user;
                     $defaultRecipient = $user->defaultRecipient;
                     // Notify the current default recipient of the change
-                    $defaultRecipient->notify(new DefaultRecipientUpdated($verifiable->email));
+                    // Have to use sendNow method here to ensure this notification is sent before the current defaultRecipient's email is updated below
+                    Notification::sendNow($defaultRecipient, new DefaultRecipientUpdated($verifiable->email));
 
                     // Set verifiable email as new default recipient
                     $defaultRecipient->update([

@@ -499,7 +499,7 @@ class RulesTest extends TestCase
             return $next($mimePart);
         });
 
-        if ($file == 'stream') {
+        if ($file === 'stream') {
             $fd = fopen('php://stdin', 'r');
             $this->rawEmail = '';
             while (! feof($fd)) {

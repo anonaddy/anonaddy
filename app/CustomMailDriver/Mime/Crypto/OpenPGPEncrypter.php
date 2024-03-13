@@ -290,6 +290,6 @@ class OpenPGPEncrypter
 
     protected function isValidKey($key, $purpose)
     {
-        return ! ($key['disabled'] || $key['expired'] || $key['revoked'] || ($purpose == 'sign' && ! $key['can_sign']) || ($purpose == 'encrypt' && ! $key['can_encrypt']));
+        return ! ($key['disabled'] || $key['expired'] || $key['revoked'] || ($purpose === 'sign' && ! $key['can_sign']) || ($purpose === 'encrypt' && ! $key['can_encrypt']));
     }
 }

@@ -22,7 +22,7 @@ class NotLocalDomain implements ValidationRule
     {
         $count = collect(config('anonaddy.all_domains'))
             ->filter(function ($domain) use ($value) {
-                return Str::endsWith(strtolower($value), '.'.$domain) || strtolower($value) == $domain;
+                return Str::endsWith(strtolower($value), '.'.$domain) || strtolower($value) === $domain;
             })
             ->count();
 

@@ -25,7 +25,7 @@ class UniqueRecipient implements ValidationRule
             ->select('email')
             ->get()
             ->filter(function ($recipient) use ($value) {
-                if (($recipient->email) == strtolower($value)) {
+                if (($recipient->email) === strtolower($value)) {
                     return $recipient;
                 }
             });

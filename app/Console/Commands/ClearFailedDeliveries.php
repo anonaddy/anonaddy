@@ -44,7 +44,7 @@ class ClearFailedDeliveries extends Command
         // Delete any stored failed deliveries older than 7 days
         collect(Storage::disk('local')->listContents(''))
             ->each(function ($file) {
-                if ($file['type'] == 'file' && $file['lastModified'] < now()->subDays(7)->getTimestamp()) {
+                if ($file['type'] === 'file' && $file['lastModified'] < now()->subDays(7)->getTimestamp()) {
                     Storage::disk('local')->delete($file['path']);
                 }
             });
