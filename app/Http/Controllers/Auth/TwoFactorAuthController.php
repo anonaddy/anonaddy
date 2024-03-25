@@ -28,7 +28,7 @@ class TwoFactorAuthController extends Controller
 
     public function store(EnableTwoFactorAuthRequest $request)
     {
-        if (! $this->twoFactor->verifyKey(user()->two_factor_secret, $request->two_factor_token)) {
+        if (! $this->twoFactor->verifyKey(user()->two_factor_secret, $request->two_factor_token, config('google2fa.window'))) {
             return redirect(url()->previous().'#two-factor')->withErrors(['two_factor_token' => 'The token you entered was incorrect']);
         }
 

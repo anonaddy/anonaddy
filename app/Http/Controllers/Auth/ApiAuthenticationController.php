@@ -46,9 +46,16 @@ class ApiAuthenticationController extends Controller
             ], 403);
         }
 
+        // Token expires after 3 months, user must re-login
+        $newToken = $user->createToken($request->device_name, ['*'], now()->addMonths(3));
+        $token = $newToken->accessToken;
+
         // If the user doesn't use 2FA then return the new API key
         return response()->json([
-            'api_key' => explode('|', $user->createToken($request->device_name)->plainTextToken, 2)[1],
+            'api_key' => explode('|', $newToken->plainTextToken, 2)[1],
+            'name' => $token->name,
+            'created_at' => $token->created_at?->toDateTimeString(),
+            'expires_at' => $token->expires_at?->toDateTimeString(),
         ]);
     }
 
@@ -79,9 +86,9 @@ class ApiAuthenticationController extends Controller
         }
 
         $google2fa = new Google2FA();
-        $lastTimeStamp = Cache::get('2fa_ts:'.$user->id);
+        $lastTimeStamp = Cache::get('2fa_ts:'.$user->id, 0);
 
-        $timestamp = $google2fa->verifyKeyNewer($user->two_factor_secret, $request->otp, $lastTimeStamp);
+        $timestamp = $google2fa->verifyKeyNewer($user->two_factor_secret, $request->otp, $lastTimeStamp, config('google2fa.window'));
 
         if (! $timestamp) {
             return response()->json([
@@ -93,8 +100,14 @@ class ApiAuthenticationController extends Controller
             Cache::put('2fa_ts:'.$user->id, $timestamp, now()->addMinutes(5));
         }
 
+        $newToken = $user->createToken($request->device_name, ['*'], now()->addMonths(3));
+        $token = $newToken->accessToken;
+
         return response()->json([
-            'api_key' => explode('|', $user->createToken($request->device_name)->plainTextToken, 2)[1],
+            'api_key' => explode('|', $newToken->plainTextToken, 2)[1],
+            'name' => $token->name,
+            'created_at' => $token->created_at?->toDateTimeString(),
+            'expires_at' => $token->expires_at?->toDateTimeString(),
         ]);
     }
 }

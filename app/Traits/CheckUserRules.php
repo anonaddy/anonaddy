@@ -129,7 +129,7 @@ trait CheckUserRules
                 }
                 break;
             case 'block':
-                $this->alias->increment('emails_blocked');
+                $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
                 $this->size = 0;
                 exit(0);
                 break;

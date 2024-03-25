@@ -43,6 +43,11 @@ class Alias extends Model
         'emails_blocked',
         'emails_replied',
         'emails_sent',
+        'last_forwarded',
+        'last_blocked',
+        'last_replied',
+        'last_sent',
+        'deleted_at',
     ];
 
     protected $casts = [
@@ -51,6 +56,10 @@ class Alias extends Model
         'aliasable_id' => 'string',
         'aliasable_type' => 'string',
         'active' => 'boolean',
+        'last_forwarded' => 'datetime',
+        'last_blocked' => 'datetime',
+        'last_replied' => 'datetime',
+        'last_sent' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

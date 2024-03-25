@@ -54,6 +54,10 @@ class ShowAliasController extends Controller
                     'emails_blocked',
                     'emails_replied',
                     'emails_sent',
+                    'last_forwarded',
+                    'last_blocked',
+                    'last_replied',
+                    'last_sent',
                     'active',
                     'created_at',
                     'updated_at',
@@ -65,6 +69,10 @@ class ShowAliasController extends Controller
                     '-emails_blocked',
                     '-emails_replied',
                     '-emails_sent',
+                    '-last_forwarded',
+                    '-last_blocked',
+                    '-last_replied',
+                    '-last_sent',
                     '-active',
                     '-created_at',
                     '-updated_at',
@@ -97,7 +105,7 @@ class ShowAliasController extends Controller
         }
 
         $aliases = user()->aliases()
-            ->select(['id', 'user_id', 'aliasable_id', 'aliasable_type', 'local_part', 'extension', 'email', 'domain', 'description', 'active', 'emails_forwarded', 'emails_blocked', 'emails_replied', 'emails_sent', 'created_at', 'deleted_at'])
+            ->select(['id', 'user_id', 'aliasable_id', 'aliasable_type', 'local_part', 'extension', 'email', 'domain', 'description', 'active', 'emails_forwarded', 'emails_blocked', 'emails_replied', 'emails_sent', 'last_forwarded', 'last_blocked', 'last_replied', 'last_sent', 'created_at', 'deleted_at'])
             ->when($request->input('recipient'), function ($query, $id) {
                 return $query->usesRecipientWithId($id, $id === user()->default_recipient_id);
             })

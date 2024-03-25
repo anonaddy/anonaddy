@@ -24,7 +24,7 @@ class ProtectedHeadersRecipientController extends Controller
 
         $recipient->update(['protected_headers' => true]);
 
-        return new RecipientResource($recipient->load('aliases'));
+        return new RecipientResource($recipient->loadCount('aliases'));
     }
 
     public function destroy($id)

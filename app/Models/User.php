@@ -52,6 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_alias_format',
         'use_reply_to',
         'store_failed_deliveries',
+        'save_alias_last_used',
         'default_username_id',
         'default_recipient_id',
         'password',
@@ -91,6 +92,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_enabled' => 'boolean',
         'use_reply_to' => 'boolean',
         'store_failed_deliveries' => 'boolean',
+        'save_alias_last_used' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'email_verified_at' => 'datetime',
@@ -559,14 +561,17 @@ class User extends Authenticatable implements MustVerifyEmail
                 })
                 ->pluck('email')
                 ->each(function ($email) use ($gnupg, $fingerprint, $recipientsUsingFingerprint) {
-                    if ($this->isVerifiedRecipient($email) && $recipientsUsingFingerprint->count() === 1) {
-                        $gnupg->deletekey($fingerprint);
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        if ($this->isVerifiedRecipient($email) && $recipientsUsingFingerprint->count() === 1) {
+                            $gnupg->deletekey($fingerprint);
 
-                        $recipientsUsingFingerprint->first()->update([
-                            'should_encrypt' => false,
-                            'fingerprint' => null,
-                        ]);
+                            $recipientsUsingFingerprint->first()->update([
+                                'should_encrypt' => false,
+                                'fingerprint' => null,
+                            ]);
+                        }
                     }
+
                 });
         }
     }

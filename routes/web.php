@@ -23,6 +23,7 @@ use App\Http\Controllers\EmailSubjectController;
 use App\Http\Controllers\FromNameController;
 use App\Http\Controllers\LoginRedirectController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\SaveAliasLastUsedController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShowAliasController;
 use App\Http\Controllers\ShowDashboardController;
@@ -158,6 +159,8 @@ Route::group([
     Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
 
     Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
+
+    Route::post('/save-alias-last-used', [SaveAliasLastUsedController::class, 'update'])->name('settings.save_alias_last_used');
 
     Route::post('/use-reply-to', [UseReplyToController::class, 'update'])->name('settings.use_reply_to');
 

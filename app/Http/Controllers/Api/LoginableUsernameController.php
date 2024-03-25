@@ -16,7 +16,7 @@ class LoginableUsernameController extends Controller
 
         $username->allowLogin();
 
-        return new UsernameResource($username->load(['aliases', 'defaultRecipient']));
+        return new UsernameResource($username->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function destroy($id)

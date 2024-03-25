@@ -392,6 +392,34 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function user_can_enable_save_alias_last_used()
+    {
+        $this->user->update(['save_alias_last_used' => false]);
+
+        $this->assertFalse($this->user->save_alias_last_used);
+
+        $response = $this->post('/settings/save-alias-last-used/', [
+            'save_alias_last_used' => true,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertTrue($this->user->save_alias_last_used);
+    }
+
+    /** @test */
+    public function user_can_disable_save_alias_last_used()
+    {
+        $this->assertTrue($this->user->save_alias_last_used);
+
+        $response = $this->post('/settings/save-alias-last-used/', [
+            'save_alias_last_used' => false,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertFalse($this->user->save_alias_last_used);
+    }
+
+    /** @test */
     public function user_can_generate_new_backup_code()
     {
         $this->user->update([

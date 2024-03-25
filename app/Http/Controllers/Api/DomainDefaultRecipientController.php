@@ -20,6 +20,6 @@ class DomainDefaultRecipientController extends Controller
 
         $domain->save();
 
-        return new DomainResource($domain->load(['aliases', 'defaultRecipient']));
+        return new DomainResource($domain->load('defaultRecipient')->loadCount('aliases'));
     }
 }

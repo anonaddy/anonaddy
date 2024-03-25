@@ -4,14 +4,20 @@ namespace App\CustomMailDriver;
 
 use App\CustomMailDriver\Mime\Crypto\AlreadyEncrypted;
 use App\CustomMailDriver\Mime\Crypto\OpenPGPEncrypter;
+use App\Models\Alias;
 use App\Models\OutboundMessage;
 use App\Models\Recipient;
+use App\Models\User;
+use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\GpgKeyExpired;
 use Exception;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SentMessage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use ParagonIE\ConstantTime\Base32;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
@@ -133,7 +139,77 @@ class CustomMailer extends Mailer
                 $message->returnPath($verpLocalPart.'@'.config('anonaddy.domain'));
             }
 
-            $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
+            try {
+                $symfonySentMessage = $this->sendSymfonyMessage($symfonyMessage);
+            } catch (Exception $e) {
+                $symfonySentMessage = false;
+                $userId = $data['userId'] ?? '';
+
+                // Store the undelivered message if enabled by user. Do not store email verification notifications.
+                if ($user = User::find($userId)) {
+                    $failedDeliveryId = Uuid::uuid4();
+
+                    // Example $e->getMessage();
+                    // Expected response code "250/251/252" but got code "554", with message "554 5.7.1 Spam message rejected".
+                    // Expected response code "250" but got empty code.
+                    // Connection could not be established with host "mail.example:25": stream_socket_client(): Unable to connect to mail.example.com:25 (Connection refused)
+                    $matches = Str::of($e->getMessage())->matchAll('/"([^"]*)"/');
+                    $status = $matches[1] ?? '4.3.2';
+                    $code = $matches[2] ?? '453 4.3.2 A temporary error has occurred.';
+
+                    if ($code && $status) {
+                        // If the error is temporary e.g. connection lost then rethrow the error to allow retry or send to failed_jobs table
+                        if (Str::startsWith($status, '4')) {
+                            throw $e;
+                        }
+
+                        // Try to determine the bounce type, HARD, SPAM, SOFT
+                        $bounceType = $this->getBounceType($code, $status);
+
+                        $diagnosticCode = Str::limit($code, 497);
+                    } else {
+                        $bounceType = null;
+                        $diagnosticCode = null;
+                    }
+
+                    $emailType = $data['emailType'] ?? null;
+
+                    if ($user->store_failed_deliveries && ! in_array($emailType, ['VR', 'VU'])) {
+                        $isStored = Storage::disk('local')->put("{$failedDeliveryId}.eml", $symfonyMessage->toString());
+                    }
+
+                    $failedDelivery = $user->failedDeliveries()->create([
+                        'id' => $failedDeliveryId,
+                        'recipient_id' => $data['recipientId'] ?? null,
+                        'alias_id' => $data['aliasId'] ?? null,
+                        'is_stored' => $isStored ?? false,
+                        'bounce_type' => $bounceType,
+                        'remote_mta' => config('mail.mailers.smtp.host'),
+                        'sender' => $symfonyMessage->getHeaders()->get('X-AnonAddy-Original-Sender')?->getValue(),
+                        'destination' => $symfonyMessage->getTo()[0]?->getAddress(),
+                        'email_type' => $emailType,
+                        'status' => $status,
+                        'code' => $diagnosticCode,
+                        'attempted_at' => now(),
+                    ]);
+
+                    // Calling $failedDelivery->email_type will return 'Failed Delivery' and not 'FDN'
+                    // Check if the bounce is a Failed delivery notification or Alias deactivated notification and if so do not notify the user again
+                    if (! in_array($emailType, ['FDN', 'ADN']) && ! is_null($emailType)) {
+
+                        $recipient = Recipient::find($failedDelivery->recipient_id);
+                        $alias = Alias::find($failedDelivery->alias_id);
+
+                        $notifiable = $recipient?->email_verified_at ? $recipient : $user?->defaultRecipient;
+
+                        // Notify user of failed delivery
+                        if ($notifiable?->email_verified_at) {
+
+                            $notifiable->notify(new FailedDeliveryNotification($alias->email ?? null, $failedDelivery->sender, $symfonyMessage->getSubject(), $failedDelivery?->is_stored, $user?->store_failed_deliveries, $recipient?->email));
+                        }
+                    }
+                }
+            }
 
             if ($symfonySentMessage) {
                 $sentMessage = new SentMessage($symfonySentMessage);
@@ -196,5 +272,29 @@ class CustomMailer extends Mailer
         $encodedSignature = Base32::encodeUnpadded($hmacPayload);
 
         return "b_{$encodedPayload}_{$encodedSignature}";
+    }
+
+    protected function getBounceType($code, $status)
+    {
+        if (preg_match("/(:?mailbox|address|user|account|recipient|@).*(:?rejected|unknown|disabled|unavailable|invalid|inactive|not exist|does(n't| not) exist)|(:?rejected|unknown|unavailable|no|illegal|invalid|no such).*(:?mailbox|address|user|account|recipient|alias)|(:?address|user|recipient) does(n't| not) have .*(:?mailbox|account)|returned to sender|(:?auth).*(:?required)/i", $code)) {
+
+            // If the status starts with 4 then return soft instead of hard
+            if (Str::startsWith($status, '4')) {
+                return 'soft';
+            }
+
+            return 'hard';
+        }
+
+        if (preg_match('/(:?spam|unsolicited|blacklisting|blacklisted|blacklist|554|mail content denied|reject for policy reason|mail rejected by destination domain|security issue)/i', $code)) {
+            return 'spam';
+        }
+
+        // No match for code but status starts with 5 e.g. 5.2.2
+        if (Str::startsWith($status, '5')) {
+            return 'hard';
+        }
+
+        return 'soft';
     }
 }

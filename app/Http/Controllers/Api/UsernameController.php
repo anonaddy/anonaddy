@@ -11,14 +11,14 @@ class UsernameController extends Controller
 {
     public function index()
     {
-        return UsernameResource::collection(user()->usernames()->with(['aliases', 'defaultRecipient'])->latest()->get());
+        return UsernameResource::collection(user()->usernames()->with('defaultRecipient')->withCount('aliases')->latest()->get());
     }
 
     public function show($id)
     {
         $username = user()->usernames()->findOrFail($id);
 
-        return new UsernameResource($username->load(['aliases', 'defaultRecipient']));
+        return new UsernameResource($username->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function store(StoreUsernameRequest $request)
@@ -31,7 +31,7 @@ class UsernameController extends Controller
 
         user()->increment('username_count');
 
-        return new UsernameResource($username->refresh()->load(['aliases', 'defaultRecipient']));
+        return new UsernameResource($username->refresh()->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function update(UpdateUsernameRequest $request, $id)
@@ -48,7 +48,7 @@ class UsernameController extends Controller
 
         $username->save();
 
-        return new UsernameResource($username->refresh()->load(['aliases', 'defaultRecipient']));
+        return new UsernameResource($username->refresh()->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function destroy($id)

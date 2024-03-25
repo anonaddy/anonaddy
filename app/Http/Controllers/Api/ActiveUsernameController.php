@@ -16,7 +16,7 @@ class ActiveUsernameController extends Controller
 
         $username->activate();
 
-        return new UsernameResource($username->load(['aliases', 'defaultRecipient']));
+        return new UsernameResource($username->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function destroy($id)

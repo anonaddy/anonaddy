@@ -17,14 +17,14 @@ class DomainController extends Controller
 
     public function index()
     {
-        return DomainResource::collection(user()->domains()->with(['aliases', 'defaultRecipient'])->latest()->get());
+        return DomainResource::collection(user()->domains()->with('defaultRecipient')->withCount('aliases')->latest()->get());
     }
 
     public function show($id)
     {
         $domain = user()->domains()->findOrFail($id);
 
-        return new DomainResource($domain->load(['aliases', 'defaultRecipient']));
+        return new DomainResource($domain->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function store(StoreDomainRequest $request)
@@ -40,7 +40,7 @@ class DomainController extends Controller
 
         $domain->markDomainAsVerified();
 
-        return new DomainResource($domain->refresh()->load(['aliases', 'defaultRecipient']));
+        return new DomainResource($domain->refresh()->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function update(UpdateDomainRequest $request, $id)
@@ -57,7 +57,7 @@ class DomainController extends Controller
 
         $domain->save();
 
-        return new DomainResource($domain->refresh()->load(['aliases', 'defaultRecipient']));
+        return new DomainResource($domain->refresh()->load('defaultRecipient')->loadCount('aliases'));
     }
 
     public function destroy($id)

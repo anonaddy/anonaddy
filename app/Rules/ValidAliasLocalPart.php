@@ -19,7 +19,7 @@ class ValidAliasLocalPart implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (! preg_match('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))$/', $value)) {
+        if (! preg_match('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))$/', $value) || ! mb_check_encoding($value, 'ASCII')) {
             $fail('Invalid alias local part.');
         }
     }

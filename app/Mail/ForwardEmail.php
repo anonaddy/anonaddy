@@ -65,6 +65,8 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $encryptedParts;
 
+    protected $isInlineEncrypted;
+
     protected $receivedHeaders;
 
     protected $fromEmail;
@@ -124,6 +126,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->originalSenderHeader = $emailData->originalSenderHeader;
         $this->authenticationResults = $emailData->authenticationResults;
         $this->encryptedParts = $emailData->encryptedParts ?? null;
+        $this->isInlineEncrypted = $emailData->isInlineEncrypted ?? false;
         $this->receivedHeaders = $emailData->receivedHeaders;
         $this->recipientId = $recipient->id;
 
@@ -331,7 +334,11 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         }
 
         if ($this->size > 0) {
-            $this->alias->increment('emails_forwarded');
+            if ($this->user->save_alias_last_used) {
+                $this->alias->increment('emails_forwarded', 1, ['last_forwarded' => now()]);
+            } else {
+                $this->alias->increment('emails_forwarded');
+            }
 
             $this->user->bandwidth += $this->size;
             $this->user->save();
@@ -394,7 +401,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     private function isAlreadyEncrypted()
     {
-        return $this->encryptedParts || preg_match('/^-----BEGIN PGP MESSAGE-----([A-Za-z0-9+=\/\n]+)-----END PGP MESSAGE-----$/', base64_decode($this->emailText));
+        return $this->encryptedParts || $this->isInlineEncrypted;
     }
 
     private function needsDkimSignature()

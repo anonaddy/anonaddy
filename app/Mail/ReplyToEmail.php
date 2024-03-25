@@ -175,7 +175,11 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         }
 
         if ($this->size > 0) {
-            $this->alias->increment('emails_replied');
+            if ($this->user->save_alias_last_used) {
+                $this->alias->increment('emails_replied', 1, ['last_replied' => now()]);
+            } else {
+                $this->alias->increment('emails_replied');
+            }
 
             $this->user->bandwidth += $this->size;
             $this->user->save();

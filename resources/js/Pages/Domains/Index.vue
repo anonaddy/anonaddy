@@ -41,7 +41,7 @@
       <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
-          class="tooltip outline-none text-sm text-grey-500"
+          class="tooltip outline-none cursor-default text-sm text-grey-500"
           :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
           >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
@@ -121,7 +121,7 @@
               type="button"
               data-tippy-content="Click to view the aliases using this domain"
               class="text-indigo-600 hover:text-indigo-900 font-medium tooltip"
-              >{{ props.row.aliases_count }}</Link
+              >{{ props.row.aliases_count.toLocaleString() }}</Link
             >
           </span>
           <span v-else class="text-grey-500"> {{ props.row.aliases_count }}</span>

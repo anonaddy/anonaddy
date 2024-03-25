@@ -159,7 +159,11 @@ class SendFromEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         }
 
         if ($this->size > 0) {
-            $this->alias->increment('emails_sent');
+            if ($this->user->save_alias_last_used) {
+                $this->alias->increment('emails_sent', 1, ['last_sent' => now()]);
+            } else {
+                $this->alias->increment('emails_sent');
+            }
 
             $this->user->bandwidth += $this->size;
             $this->user->save();

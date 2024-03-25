@@ -322,7 +322,7 @@
                 ></span>
               </span>
               <span
-                class="tooltip outline-none text-sm whitespace-nowrap text-grey-500"
+                class="tooltip outline-none cursor-default text-sm whitespace-nowrap text-grey-500"
                 :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
                 >{{ $filters.timeAgo(props.row.created_at) }}
               </span>
@@ -410,7 +410,7 @@
               >
               <span
                 v-else-if="has(props.row.aliasable, 'default_recipient.email')"
-                class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
+                class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none cursor-default"
                 :data-tippy-content="props.row.aliasable.default_recipient.email"
                 >{{
                   props.row.aliasable_type === 'App\\Models\\Domain' ? 'domain' : 'username'
@@ -418,7 +418,7 @@
               >
               <span
                 v-else
-                class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none"
+                class="py-1 px-2 text-xs bg-yellow-200 text-yellow-900 rounded-full tooltip outline-none cursor-default"
                 :data-tippy-content="$page.props.user.email"
                 >default</span
               >
@@ -430,21 +430,61 @@
               v-else-if="props.column.field == 'emails_forwarded'"
               class="font-semibold text-indigo-800"
             >
-              {{ props.row.emails_forwarded }} <span class="text-grey-300">/</span>
-              {{ props.row.emails_blocked }}
-            </span>
-            <span
-              v-else-if="props.column.field == 'emails_blocked'"
-              class="font-semibold text-indigo-800"
-            >
-              {{ props.row.emails_blocked }}
+              <span
+                v-if="props.row.last_forwarded"
+                class="tooltip outline-none cursor-default"
+                :data-tippy-content="
+                  $filters.timeAgo(props.row.last_forwarded) +
+                  ' (' +
+                  $filters.formatDate(rows[props.row.originalIndex].last_forwarded) +
+                  ')'
+                "
+                >{{ props.row.emails_forwarded.toLocaleString() }}
+              </span>
+              <span v-else>{{ props.row.emails_forwarded.toLocaleString() }} </span>
+              <span class="text-grey-300 mx-1.5">/</span>
+              <span
+                v-if="props.row.last_blocked"
+                class="tooltip outline-none cursor-default"
+                :data-tippy-content="
+                  $filters.timeAgo(props.row.last_blocked) +
+                  ' (' +
+                  $filters.formatDate(rows[props.row.originalIndex].last_blocked) +
+                  ')'
+                "
+                >{{ props.row.emails_blocked.toLocaleString() }}
+              </span>
+              <span v-else>{{ props.row.emails_blocked.toLocaleString() }} </span>
             </span>
             <span
               v-else-if="props.column.field == 'emails_replied'"
               class="font-semibold text-indigo-800"
             >
-              {{ props.row.emails_replied }} <span class="text-grey-300">/</span>
-              {{ props.row.emails_sent }}
+              <span
+                v-if="props.row.last_replied"
+                class="tooltip outline-none cursor-default"
+                :data-tippy-content="
+                  $filters.timeAgo(props.row.last_replied) +
+                  ' (' +
+                  $filters.formatDate(rows[props.row.originalIndex].last_replied) +
+                  ')'
+                "
+                >{{ props.row.emails_replied.toLocaleString() }}
+              </span>
+              <span v-else>{{ props.row.emails_replied.toLocaleString() }} </span>
+              <span class="text-grey-300 mx-1.5">/</span>
+              <span
+                v-if="props.row.last_sent"
+                class="tooltip outline-none cursor-default"
+                :data-tippy-content="
+                  $filters.timeAgo(props.row.last_sent) +
+                  ' (' +
+                  $filters.formatDate(rows[props.row.originalIndex].last_sent) +
+                  ')'
+                "
+                >{{ props.row.emails_sent.toLocaleString() }}
+              </span>
+              <span v-else>{{ props.row.emails_sent.toLocaleString() }} </span>
             </span>
             <span v-else-if="props.column.field === 'active'" class="flex items-center">
               <Toggle
@@ -1467,6 +1507,22 @@ const sortOptions = [
   {
     value: 'emails_sent',
     label: 'Emails Sent',
+  },
+  {
+    value: 'last_blocked',
+    label: 'Last Blocked At',
+  },
+  {
+    value: 'last_forwarded',
+    label: 'Last Forwarded At',
+  },
+  {
+    value: 'last_replied',
+    label: 'Last Replied At',
+  },
+  {
+    value: 'last_sent',
+    label: 'Last Sent At',
   },
   {
     value: 'updated_at',

@@ -18,7 +18,8 @@ class RecipientResource extends JsonResource
             'protected_headers' => $this->protected_headers,
             'fingerprint' => $this->fingerprint,
             'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
-            'aliases' => AliasResource::collection($this->whenLoaded('aliases')),
+            'aliases' => [],
+            'aliases_count' => $this->whenCounted('aliases_count'),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

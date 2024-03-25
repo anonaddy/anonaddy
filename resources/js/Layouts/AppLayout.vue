@@ -167,7 +167,7 @@
           <div class="max-w-screen-2xl mx-auto flex-1 flex justify-between px-4 sm:px-6 lg:px-8">
             <div class="flex-1 flex items-center">
               <form @submit.prevent="submitSearchForm()" class="w-full flex md:ml-0">
-                <label for="search-input" class="sr-only">Search all files</label>
+                <label for="search-input" class="sr-only">Search all resources</label>
                 <div class="relative w-full text-grey-400 focus-within:text-grey-600">
                   <div class="pointer-events-none absolute inset-y-0 left-1.5 flex items-center">
                     <MagnifyingGlassIcon class="flex-shrink-0 h-5 w-5" aria-hidden="true" />
@@ -190,7 +190,7 @@
                     placeholder="Search"
                     type="search"
                   />
-                  <button
+                  <div
                     v-if="search"
                     @click="
                       ;(searchForm.search = ''),
@@ -201,10 +201,10 @@
                           },
                         )
                     "
-                    class="absolute inset-y-0 right-0 flex items-center pr-3 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    class="absolute inset-y-0 right-0 cursor-pointer flex items-center pr-3 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     <XMarkIcon class="h-5 w-5 text-grey-400" aria-hidden="true" />
-                  </button>
+                  </div>
                 </div>
               </form>
               <Listbox as="div" v-model="searchTypeSelected">

@@ -24,7 +24,7 @@ class InlineEncryptedRecipientController extends Controller
 
         $recipient->update(['inline_encryption' => true]);
 
-        return new RecipientResource($recipient->load('aliases'));
+        return new RecipientResource($recipient->loadCount('aliases'));
     }
 
     public function destroy($id)

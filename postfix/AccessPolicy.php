@@ -15,6 +15,7 @@ try {
             'DB_PASSWORD',
             'DB_SOCKET',
             'MYSQL_ATTR_SSL_CA',
+            'ACTION_NON_ASCII',
             'ACTION_DOES_NOT_EXIST',
             'ACTION_ALIAS_DISCARD',
             'ACTION_USERNAME_DISCARD',
@@ -67,6 +68,7 @@ try {
 
     // Define actions, these can be overridden by adding the variables to your .env file
     // e.g. ACTION_DOES_NOT_EXIST='550 5.1.1 User not found'
+    define('ACTION_NON_ASCII', $_ENV['ACTION_NON_ASCII'] ?? '553 5.6.7 Non-ASCII characters in the local-part of the recipient address are not permitted');
     define('ACTION_DOES_NOT_EXIST', $_ENV['ACTION_DOES_NOT_EXIST'] ?? '550 5.1.1 Address does not exist');
     define('ACTION_ALIAS_DISCARD', $_ENV['ACTION_ALIAS_DISCARD'] ?? 'DISCARD is inactive alias');
     define('ACTION_USERNAME_DISCARD', $_ENV['ACTION_USERNAME_DISCARD'] ?? 'DISCARD has inactive username');
@@ -85,17 +87,27 @@ try {
 
     // If no alias email is provided then exit
     if (empty($aliasEmail) || empty($allDomains)) {
+        sendAction(ACTION_DOES_NOT_EXIST);
+
         logData('No alias email or $allDomains not set.');
         exit(0);
     }
 
     //$senderEmail = strtolower($args['sender']);
-    $aliasDomain = explode('@', $aliasEmail)[1];
+    [$aliasLocalPart, $aliasDomain] = explode('@', $aliasEmail);
+
+    if (! mb_check_encoding($aliasLocalPart, 'ASCII')) {
+        sendAction(ACTION_NON_ASCII);
+
+        // exit to prevent running the rest of the script
+        exit(0);
+    }
+
     $aliasHasSharedDomain = in_array($aliasDomain, $allDomains);
 
     // Check if it is a bounce with a valid VERP...
     if (substr($aliasEmail, 0, 2) === 'b_') {
-        if ($outboundMessageId = getIdFromVerp($aliasEmail)) {
+        if ($outboundMessageId = getIdFromVerp($aliasLocalPart, $aliasEmail)) {
             // Is a valid bounce
             $outboundMessage = Database::table('outbound_messages')->find($outboundMessageId);
 
@@ -118,7 +130,7 @@ try {
 
     // If the alias has a plus extension then remove it
     if (str_contains($aliasEmail, '+')) {
-        $aliasEmail = before($aliasEmail, '+').'@'.afterLast($aliasEmail, '@');
+        $aliasEmail = before($aliasEmail, '+').'@'.$aliasDomain;
     }
 
     // Check if the alias already exists or not
@@ -159,7 +171,7 @@ try {
             // If the alias is inactive or deleted then increment the blocked count
             Database::table('aliases')
                 ->where('email', $aliasEmail)
-                ->increment('emails_blocked');
+                ->increment('emails_blocked', 1, ['last_blocked' => new DateTime()]);
 
             sendAction($aliasAction);
         } elseif ($aliasHasSharedDomain || in_array($aliasAction, [ACTION_REJECT, ACTION_DEFER])) {
@@ -253,11 +265,9 @@ function sendAction($action)
 }
 
 // Get the outbound message ID from the VERP address
-function getIdFromVerp($verp)
+function getIdFromVerp($verpLocalPart, $verpEmail)
 {
-    $localPart = beforeLast($verp, '@');
-
-    $parts = explode('_', $localPart);
+    $parts = explode('_', $verpLocalPart);
 
     if (count($parts) !== 3) {
         //logData('VERP invalid email: '.$verp);
@@ -270,15 +280,15 @@ function getIdFromVerp($verp)
 
         $signature = Base32::decodeNoPadding($parts[2]);
     } catch (\Exception $e) {
-        logData('VERP base32 decode failure: '.$verp.' '.$e->getMessage());
+        logData('VERP base32 decode failure: '.$verpEmail.' '.$e->getMessage());
 
         return;
     }
 
-    $expectedSignature = substr(hash_hmac('sha3-224', $id, $_ENV['ANONADDY_SECRET'] ?? ''), 0, 8);
+    $expectedSignature = substr(hash_hmac('sha3-224', $id, $_ENV['ANONADDY_VERP_SECRET'] ?? ''), 0, 8);
 
     if ($signature !== $expectedSignature) {
-        logData('VERP invalid signature: '.$verp);
+        logData('VERP invalid signature: '.$verpEmail);
 
         return;
     }
@@ -312,22 +322,6 @@ function beforeLast($subject, $search)
     }
 
     return mb_substr($subject, 0, $pos, 'UTF-8');
-}
-
-// Return the remainder of a string after the last occurrence of a given value
-function afterLast($subject, $search)
-{
-    if ($search === '') {
-        return $subject;
-    }
-
-    $position = strrpos($subject, (string) $search);
-
-    if ($position === false) {
-        return $subject;
-    }
-
-    return substr($subject, $position + strlen($search));
 }
 
 // Determine if a given string ends with a given substring

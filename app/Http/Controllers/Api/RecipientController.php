@@ -11,7 +11,7 @@ class RecipientController extends Controller
 {
     public function index(IndexRecipientRequest $request)
     {
-        $recipients = user()->recipients()->with('aliases')->latest();
+        $recipients = user()->recipients()->withCount('aliases')->latest();
 
         if ($request->input('filter.verified') === 'true') {
             $recipients->verified();
@@ -28,7 +28,7 @@ class RecipientController extends Controller
     {
         $recipient = user()->recipients()->findOrFail($id);
 
-        return new RecipientResource($recipient->load('aliases'));
+        return new RecipientResource($recipient->loadCount('aliases'));
     }
 
     public function store(StoreRecipientRequest $request)
@@ -45,7 +45,7 @@ class RecipientController extends Controller
             $recipient->sendEmailVerificationNotification();
         }
 
-        return new RecipientResource($recipient->refresh()->load('aliases'));
+        return new RecipientResource($recipient->refresh()->loadCount('aliases'));
     }
 
     public function destroy($id)

@@ -160,6 +160,10 @@ class AliasBulkController extends Controller
                 'emails_blocked' => 0,
                 'emails_replied' => 0,
                 'emails_sent' => 0,
+                'last_forwarded' => null,
+                'last_blocked' => null,
+                'last_replied' => null,
+                'last_sent' => null,
                 'active' => false,
                 'deleted_at' => now(),
             ]);

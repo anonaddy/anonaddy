@@ -631,6 +631,93 @@
 
       <div class="py-10">
         <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900">Save Alias 'Last Used At'</h3>
+          <p class="text-base text-grey-700">
+            This setting allows you to choose whether or not addy.io should save the dates for
+            <b>last forwarded at</b>, <b>last replied at</b> and <b>last sent at</b> for your
+            aliases. You can view this information by hovering over the relevant count of each of
+            these on the
+            <Link
+              :href="route('aliases.index')"
+              class="text-indigo-500 hover:text-indigo-800 font-medium"
+              >aliases page</Link
+            >. You can also sort your list of aliases by "Last Forwarded At" etc.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              saveAliasLastUsedForm.post(route('settings.save_alias_last_used'), {
+                preserveScroll: true,
+              })
+            "
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label
+                  for="save-alias-last-used"
+                  class="block text-sm font-medium leading-6 text-grey-600"
+                  >Save Alias Last Used At</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="save-alias-last-used"
+                    v-model="saveAliasLastUsedForm.save_alias_last_used"
+                    name="format"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      saveAliasLastUsedForm.errors.save_alias_last_used
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      saveAliasLastUsedForm.errors.save_alias_last_used ? 'true' : undefined
+                    "
+                    :aria-describedby="
+                      saveAliasLastUsedForm.errors.save_alias_last_used
+                        ? 'save-alias-last-used-error'
+                        : undefined
+                    "
+                  >
+                    <option :value="true" :selected="saveAliasLastUsed ? 'selected' : ''">
+                      Enabled
+                    </option>
+                    <option :value="false" :selected="!saveAliasLastUsed ? 'selected' : ''">
+                      Disabled
+                    </option>
+                  </select>
+                  <div
+                    v-if="saveAliasLastUsedForm.errors.save_alias_last_used"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="saveAliasLastUsedForm.errors.save_alias_last_used"
+                  class="mt-2 text-sm text-red-600"
+                  id="save-alias-last-used-error"
+                >
+                  {{ saveAliasLastUsedForm.errors.save_alias_last_used }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="saveAliasLastUsedForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update Save Alias Last Used At
+              <loader v-if="saveAliasLastUsedForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900">Update Global 'From Name'</h3>
           <div>
             <p class="text-base text-grey-700">
@@ -903,6 +990,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  saveAliasLastUsed: {
+    type: Boolean,
+    required: true,
+  },
   fromName: {
     type: String,
     required: true,
@@ -1002,6 +1093,10 @@ const useReplyToForm = useForm({
 
 const storeFailedDeliveriesForm = useForm({
   store_failed_deliveries: props.storeFailedDeliveries,
+})
+
+const saveAliasLastUsedForm = useForm({
+  save_alias_last_used: props.saveAliasLastUsed,
 })
 
 const fromNameForm = useForm({

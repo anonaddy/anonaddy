@@ -25,6 +25,7 @@ class SettingController extends Controller
             'displayFromFormat' => user()->display_from_format->value,
             'useReplyTo' => user()->use_reply_to,
             'storeFailedDeliveries' => user()->store_failed_deliveries,
+            'saveAliasLastUsed' => user()->save_alias_last_used,
             'fromName' => user()->from_name ?? '',
             'emailSubject' => user()->email_subject ?? '',
             'bannerLocation' => user()->banner_location,

@@ -16,7 +16,7 @@ class AllowedRecipientController extends Controller
 
         $recipient->update(['can_reply_send' => true]);
 
-        return new RecipientResource($recipient->load('aliases'));
+        return new RecipientResource($recipient->loadCount('aliases'));
     }
 
     public function destroy($id)
