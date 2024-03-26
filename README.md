@@ -23,7 +23,7 @@ This is the source code for self-hosting addy.io.
 - [Are forwarded emails signed when encryption is enabled?](#are-forwarded-emails-signed-when-encryption-is-enabled)
 - [Can I reply/send from aliases using encryption?](#can-i-replysend-from-aliases-using-encryption)
 - [Is my public GPG/OpenPGP key removed when I reply/send from an alias?](#is-my-public-gpgopenpgp-key-removed-when-i-replysend-from-an-alias)
-- [Can I mark emails forwarded to me by addy.io as spam?](#can-i-mark-emails-forwarded-to-me-by-addy-io-as-spam)
+- [Can I mark emails forwarded to me by addy.io as spam?](#can-i-mark-emails-forwarded-to-me-by-addyio-as-spam)
 - [Can I use aliases to create multiple accounts on other websites and services?](#can-i-use-aliases-to-create-multiple-accounts-on-other-websites-and-services)
 - [Can I have multiple Free accounts?](#can-i-have-multiple-free-accounts)
 - [What if I don't want anyone to link ownership of my aliases together?](#what-if-i-dont-want-anyone-to-link-ownership-of-my-aliases-together)
@@ -201,7 +201,7 @@ addy.io is signed up to multiple feedback loops (FBLs) that trigger a notificati
 
 No, you must not use addy.io to create large numbers of accounts on other websites/services as this is against the [terms and conditions](https://addy.io/terms/).
 
-## Can I have multiple Free accounts? {#can-i-have-multiple-free-accounts}
+## Can I have multiple Free accounts?
 
 Having multiple Free accounts is not considered an acceptable use of our service. Any users found to be abusing this rule may have their accounts disabled. This does not apply to those with a paid subscription.
 
