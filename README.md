@@ -21,6 +21,11 @@ This is the source code for self-hosting addy.io.
 - [How do I add my own GPG/OpenPGP key for encryption?](#how-do-i-add-my-own-gpgopenpgp-key-for-encryption)
 - [Are attachments encrypted too?](#are-attachments-encrypted-too)
 - [Are forwarded emails signed when encryption is enabled?](#are-forwarded-emails-signed-when-encryption-is-enabled)
+- [Can I reply/send from aliases using encryption?](#can-i-replysend-from-aliases-using-encryption)
+- [Is my public GPG/OpenPGP key removed when I reply/send from an alias?](#is-my-public-gpgopenpgp-key-removed-when-i-replysend-from-an-alias)
+- [Can I mark emails forwarded to me by addy.io as spam?](#can-i-mark-emails-forwarded-to-me-by-addy-io-as-spam)
+- [Can I use aliases to create multiple accounts on other websites and services?](#can-i-use-aliases-to-create-multiple-accounts-on-other-websites-and-services)
+- [Can I have multiple Free accounts?](#can-i-have-multiple-free-accounts)
 - [What if I don't want anyone to link ownership of my aliases together?](#what-if-i-dont-want-anyone-to-link-ownership-of-my-aliases-together)
 - [Where is the server located?](#where-is-the-server-located)
 - [What if I don't trust you?](#what-if-i-dont-trust-you)
@@ -30,6 +35,7 @@ This is the source code for self-hosting addy.io.
 - [How do I reply to a forwarded email?](#how-do-i-reply-to-a-forwarded-email)
 - [I'm trying to reply/send from an alias but the email keeps coming back to me, what's wrong?](#im-trying-to-replysend-from-an-alias-but-the-email-keeps-coming-back-to-me-whats-wrong)
 - [I'm trying to reply/send from an alias but it is rejected, what's wrong?](#im-trying-to-replysend-from-an-alias-but-it-is-rejected-whats-wrong)
+- [I've been forwarded an email with a red warning banner saying it may have been spoofed, what does it mean?](#ive-been-forwarded-an-email-with-a-red-warning-banner-saying-it-may-have-been-spoofed-what-does-it-mean)
 - [Does addy.io strip out the banner information when I reply to an email?](#does-addyio-strip-out-the-banner-information-when-i-reply-to-an-email)
 - [How do I send email from an alias?](#how-do-i-send-email-from-an-alias)
 - [Will people see my real email if I reply to a forwarded one?](#will-people-see-my-real-email-if-i-reply-to-a-forwarded-one)
@@ -173,6 +179,32 @@ You can add this key to your own keyring so that you can verify emails have come
 
 The fingerprint of the no-reply@addy.io key is "26A987650243B28802524E2F809FD0D502E2F695" you can find the key on [https://keys.openpgp.org](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695).
 
+## Can I reply/send from aliases using encryption?
+
+1. If the person you are sending your message to **already uses GPG/OpenPGP encryption** then you can simply encrypt your reply/send from your alias using their public key.
+
+2. If the person you are sending your message to **does not use GPG/OpenPGP encryption** then you can instead encrypt your reply/send with the `no-reply@addy.io` [public key](https://keys.openpgp.org/search?q=26A987650243B28802524E2F809FD0D502E2F695) (<span class="break-words">"26A987650243B28802524E2F809FD0D502E2F695"</span>). Your reply/send will then be **automatically decrypted** on the addy.io server before being sent on to the correct destination in clear text. This is useful if you wish to hide your replies/sends from your email provider such as Gmail.
+
+## Is my public GPG/OpenPGP key removed when I reply/send from an alias?
+
+Yes, any attached GPG/OpenPGP public keys or GPG/OpenPGP signatures are automatically removed when replying or sending from an alias. This is to prevent you accidentally revealing your real email address which is usually shown as an identity in your public key.
+
+## Can I mark emails forwarded to me by addy.io as spam?
+
+No, you must not mark messages forwarded to you by addy.io as spam as this can damage the reputation of the mail servers and is against the [terms and conditions](https://addy.io/terms/).
+
+If an alias is receiving spam messages then please deactivate it or delete it.
+
+addy.io is signed up to multiple feedback loops (FBLs) that trigger a notification when any messages are marked as spam. Repeatedly marking messages as spam will result in your account being disabled.
+
+## Can I use aliases to create multiple accounts on other websites and services?
+
+No, you must not use addy.io to create large numbers of accounts on other websites/services as this is against the [terms and conditions](https://addy.io/terms/).
+
+## Can I have multiple Free accounts? {#can-i-have-multiple-free-accounts}
+
+Having multiple Free accounts is not considered an acceptable use of our service. Any users found to be abusing this rule may have their accounts disabled. This does not apply to those with a paid subscription.
+
 ## What if I don't want anyone to link ownership of my aliases together?
 
 If you're concerned that your aliases are all linked by your username e.g. @johndoe.anonaddy.com, then you have a couple of options:
@@ -255,9 +287,19 @@ To learn more about DMARC please see this site - [https://dmarc.org/](https://dm
 
 If your addy.io recipient is with a popular mail service provider for example: Gmail, Outlook, Tutanota, Mailbox.org, Protonmail etc. then they will already have a DMARC policy in place so you do not need to take any action.
 
+## I've been forwarded an email with a red warning banner saying it may have been spoofed, what does it mean?
+
+If an incoming email looks like spam (for example, because it has failed its [DMARC](https://dmarc.org/overview/) check) then a red warning banner is added by addy.io before forwarding the message on to you. This warning banner is added in order to help protect you from any potential phishing attempts, for example someone pretending to be your bank.
+
+Most of the time this is nothing to worry about and is just because the sender has not correctly configured their DNS records.
+
+To see why this banner was added you can view the headers of the received email and look for the header called 'X-AnonAddy-Authentication-Results'. This header shows the original email's authentication results and will show you why the email failed its DMARC checks.
+
 ## Does addy.io strip out the banner information when I reply to an email?
 
 Yes, the email banner "This email was sent to..." will be automatically removed when you reply to any messages. You can test this by replying to yourself from one of your aliases.
+
+Make sure not to alter or edit the email banner as this may cause issues when trying to match and remove it. You can still remove it manually from the quoted message of your reply if you wish.
 
 ## How do I send email from an alias?
 

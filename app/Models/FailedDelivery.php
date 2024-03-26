@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FailedDelivery extends Model
 {
@@ -104,6 +105,20 @@ class FailedDelivery extends Model
                 'AIF' => 'Aliases Import Finished',
                 default => 'Forward',
             },
+        );
+    }
+
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => Str::ascii($value),
+        );
+    }
+
+    protected function code(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => Str::ascii($value),
         );
     }
 
