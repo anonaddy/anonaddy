@@ -50,6 +50,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Non-Admin Subdomains
+    |--------------------------------------------------------------------------
+    |
+    | If set to false this will prevent any non-admin users from being able to create
+    | subdomain aliases at any domains that have been set for 'all_domains' below
+    |
+    */
+
+    'non_admin_subdomains' => env('ANONADDY_NON_ADMIN_SUBDOMAINS', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Registration
     |--------------------------------------------------------------------------
     |

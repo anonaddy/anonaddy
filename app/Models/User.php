@@ -603,14 +603,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $allDomains = config('anonaddy.all_domains')[0] ? config('anonaddy.all_domains') : [config('anonaddy.domain')];
 
-        return $this->usernames()
+        $subDomains = $this->usernames()
             ->pluck('username')
             ->flatMap(function ($username) use ($allDomains) {
                 return collect($allDomains)->map(function ($domain) use ($username) {
                     return $username.'.'.$domain;
                 });
+            });
+
+        return collect($customDomains)
+            ->when($this->canCreateSubdomainAliases(), function (Collection $collection) use ($subDomains) {
+                return $collection->concat($subDomains);
             })
-            ->concat($customDomains)
             ->when($this->canCreateSharedDomainAliases(), function (Collection $collection) use ($allDomains) {
                 return $collection->concat($allDomains);
             })
@@ -635,5 +639,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canCreateSharedDomainAliases()
     {
         return config('anonaddy.non_admin_shared_domains') || $this->isAdminUser();
+    }
+
+    public function canCreateSubdomainAliases()
+    {
+        return config('anonaddy.non_admin_subdomains') || $this->isAdminUser();
     }
 }
