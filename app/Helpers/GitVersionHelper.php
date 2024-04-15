@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
@@ -16,6 +17,24 @@ class GitVersionHelper
         }
 
         return self::cacheFreshVersion();
+    }
+
+    public static function updateAvailable()
+    {
+        $currentVersion = self::version()->value();
+
+        // Cache latestVersion for 1 day
+        $latestVersion = Cache::remember('app-latest-version', now()->addDay(), function () {
+            $response = Http::get('https://api.github.com/repos/anonaddy/anonaddy/releases/latest');
+
+            return Str::of($response->json('tag_name', 'v0.0.0'))->after('v')->trim();
+        });
+
+        if (version_compare($latestVersion, $currentVersion, '>')) {
+            return true;
+        }
+
+        return false;
     }
 
     public static function cacheFreshVersion()
