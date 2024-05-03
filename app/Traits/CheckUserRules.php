@@ -16,6 +16,9 @@ trait CheckUserRules
                 collect($rule->actions)->each(function ($action) {
                     $this->applyAction($action);
                 });
+
+                // Increment applied count
+                $rule->increment('applied', 1, ['last_applied' => now()]);
             }
         });
     }
@@ -125,7 +128,14 @@ trait CheckUserRules
                 break;
             case 'banner':
                 if (in_array($action['value'], ['top', 'bottom', 'off'])) {
-                    $this->email->bannerLocation = $action['value'];
+
+                    if ($this->emailHtml) {
+                        // Turn off the banner for the plain text version
+                        $this->bannerLocationText = 'off';
+                        $this->bannerLocationHtml = $action['value'];
+                    } else {
+                        $this->bannerLocationText = $action['value'];
+                    }
                 }
                 break;
             case 'block':

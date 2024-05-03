@@ -10,6 +10,52 @@ class EmailData
 {
     private static $mimeTypes;
 
+    public $sender;
+
+    public $display_from;
+
+    public $reply_to_address;
+
+    public $originalCc;
+
+    public $originalTo;
+
+    public $subject;
+
+    public $text;
+
+    public $html;
+
+    public $attachments;
+
+    public $inlineAttachments;
+
+    public $size;
+
+    public $messageId;
+
+    public $listUnsubscribe;
+
+    public $inReplyTo;
+
+    public $references;
+
+    public $originalEnvelopeFrom;
+
+    public $originalFromHeader;
+
+    public $originalReplyToHeader;
+
+    public $originalSenderHeader;
+
+    public $authenticationResults;
+
+    public $receivedHeaders;
+
+    public $encryptedParts;
+
+    public $isInlineEncrypted;
+
     public function __construct(Parser $parser, $sender, $size, $emailType = 'F')
     {
         if (isset($parser->getAddresses('from')[0]['address'])) {

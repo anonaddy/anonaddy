@@ -24,6 +24,8 @@ class Rule extends Model
         'replies',
         'sends',
         'active',
+        'applied',
+        'last_applied',
         'order',
     ];
 
@@ -36,6 +38,8 @@ class Rule extends Model
         'sends' => 'boolean',
         'conditions' => 'array',
         'actions' => 'array',
+        'applied' => 'integer',
+        'last_applied' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

@@ -212,7 +212,7 @@ class RulesTest extends TestCase
     /** @test */
     public function it_can_apply_user_rules()
     {
-        Rule::factory()->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
             'conditions' => [
                 [
@@ -247,6 +247,8 @@ class RulesTest extends TestCase
             'forwards' => true,
             'replies' => false,
             'sends' => false,
+            'applied' => 0,
+            'last_applied' => null,
         ]);
 
         $alias = Alias::factory()->create([
@@ -269,12 +271,19 @@ class RulesTest extends TestCase
         $email = $job->build();
 
         $this->assertEquals('New Subject!', $email->subject);
+
+        $this->assertDatabaseHas('rules', [
+            'id' => $rule->id,
+            'user_id' => $this->user->id,
+            'applied' => 1,
+            'last_applied' => now(),
+        ]);
     }
 
     /** @test */
     public function it_does_not_apply_rules_if_email_type_is_not_selected()
     {
-        Rule::factory()->create([
+        $rule = Rule::factory()->create([
             'user_id' => $this->user->id,
             'conditions' => [
                 [
@@ -331,6 +340,13 @@ class RulesTest extends TestCase
         $email = $job->build();
 
         $this->assertEquals($parser->getHeader('subject'), $email->subject);
+
+        $this->assertDatabaseHas('rules', [
+            'id' => $rule->id,
+            'user_id' => $this->user->id,
+            'applied' => 0,
+            'last_applied' => null,
+        ]);
     }
 
     /** @test */

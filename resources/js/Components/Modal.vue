@@ -1,7 +1,7 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog as="div" class="relative z-10" @close="open = false">
+    <Dialog as="div" class="relative z-10" @close="setIsOpen">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -52,4 +52,9 @@
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 defineProps(['open', 'maxWidth'])
+const emit = defineEmits(['update:modelValue'])
+
+function setIsOpen(value) {
+  emit('update:modelValue', value)
+}
 </script>
