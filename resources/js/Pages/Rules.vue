@@ -30,97 +30,99 @@
     </div>
 
     <div v-if="rows.length" class="bg-white shadow">
-      <table class="table-auto w-full">
-        <thead class="border-b border-grey-100 text-grey-400">
-          <tr>
-            <th scope="col" class="p-3"></th>
-            <th scope="col" class="p-3 text-left">Created</th>
-            <th scope="col" class="p-3 text-left">Name</th>
-            <th scope="col" class="p-3 text-left">Active</th>
-            <th scope="col" class="p-3 text-left">
-              Applied
-              <span
-                class="tooltip outline-none"
-                data-tippy-content="This is the number of times that the rule has been applied. Hover over the count to see when it was last applied."
-              >
-                <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
-              </span>
-            </th>
-            <th scope="col" class="p-3"></th>
-          </tr>
-        </thead>
-        <draggable
-          :component-data="{ type: 'transition', name: 'flip-list' }"
-          v-model="rows"
-          item-key="id"
-          tag="tbody"
-          handle=".handle"
-          :group="{ name: 'description' }"
-          ghost-class="ghost"
-          @change="reorderRules"
-          @update="debounceToolips"
-        >
-          <template #item="{ element }">
-            <tr class="border-b border-grey-100 h-20">
-              <td scope="row" class="p-3">
-                <icon
-                  name="menu"
-                  class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-                />
-              </td>
-              <td scope="row" class="p-3">
+      <div class="vgt-responsive">
+        <table class="table-auto w-full">
+          <thead class="border-b border-grey-100 text-grey-400">
+            <tr>
+              <th scope="col" class="p-3"></th>
+              <th scope="col" class="p-3 text-left">Created</th>
+              <th scope="col" class="p-3 text-left">Name</th>
+              <th scope="col" class="p-3 text-left">Active</th>
+              <th scope="col" class="p-3 text-left">
+                Applied
                 <span
-                  class="tooltip outline-none cursor-default text-sm text-grey-500"
-                  :data-tippy-content="$filters.formatDate(element.created_at)"
-                  >{{ $filters.timeAgo(element.created_at) }}
-                </span>
-              </td>
-              <td scope="row" class="p-3">
-                <span class="font-medium text-grey-700">{{ element.name }}</span>
-              </td>
-              <td scope="row" class="p-3">
-                <Toggle
-                  v-model="element.active"
-                  @on="activateRule(element.id)"
-                  @off="deactivateRule(element.id)"
-                />
-              </td>
-              <td scope="row" class="p-3">
-                <span
-                  v-if="element.last_applied"
-                  class="tooltip outline-none cursor-default font-semibold text-indigo-800"
-                  :data-tippy-content="
-                    $filters.timeAgo(element.last_applied) +
-                    ' (' +
-                    $filters.formatDate(element.last_applied) +
-                    ')'
-                  "
-                  >{{ element.applied.toLocaleString() }}
-                </span>
-                <span v-else>{{ element.applied.toLocaleString() }} </span>
-              </td>
-              <td scope="row" class="p-3 text-right w-0 min-w-fit whitespace-nowrap">
-                <button
-                  @click="openEditModal(element)"
-                  as="button"
-                  type="button"
-                  class="text-indigo-500 hover:text-indigo-800 font-medium"
+                  class="tooltip outline-none"
+                  data-tippy-content="This is the number of times that the rule has been applied. Hover over the count to see when it was last applied."
                 >
-                  Edit
-                </button>
-                <button
-                  @click="openDeleteModal(element.id)"
-                  as="button"
-                  type="button"
-                  class="text-indigo-500 hover:text-indigo-800 font-medium ml-4"
-                >
-                  Delete
-                </button>
-              </td>
+                  <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+                </span>
+              </th>
+              <th scope="col" class="p-3"></th>
             </tr>
-          </template>
-        </draggable>
-      </table>
+          </thead>
+          <draggable
+            :component-data="{ type: 'transition', name: 'flip-list' }"
+            v-model="rows"
+            item-key="id"
+            tag="tbody"
+            handle=".handle"
+            :group="{ name: 'description' }"
+            ghost-class="ghost"
+            @change="reorderRules"
+            @update="debounceToolips"
+          >
+            <template #item="{ element }">
+              <tr class="border-b border-grey-100 h-20">
+                <td scope="row" class="p-3">
+                  <icon
+                    name="menu"
+                    class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
+                  />
+                </td>
+                <td scope="row" class="p-3">
+                  <span
+                    class="tooltip outline-none cursor-default text-sm text-grey-500"
+                    :data-tippy-content="$filters.formatDate(element.created_at)"
+                    >{{ $filters.timeAgo(element.created_at) }}
+                  </span>
+                </td>
+                <td scope="row" class="p-3">
+                  <span class="font-medium text-grey-700">{{ element.name }}</span>
+                </td>
+                <td scope="row" class="p-3">
+                  <Toggle
+                    v-model="element.active"
+                    @on="activateRule(element.id)"
+                    @off="deactivateRule(element.id)"
+                  />
+                </td>
+                <td scope="row" class="p-3">
+                  <span
+                    v-if="element.last_applied"
+                    class="tooltip outline-none cursor-default font-semibold text-indigo-800"
+                    :data-tippy-content="
+                      $filters.timeAgo(element.last_applied) +
+                      ' (' +
+                      $filters.formatDate(element.last_applied) +
+                      ')'
+                    "
+                    >{{ element.applied.toLocaleString() }}
+                  </span>
+                  <span v-else>{{ element.applied.toLocaleString() }} </span>
+                </td>
+                <td scope="row" class="p-3 text-right w-0 min-w-fit whitespace-nowrap">
+                  <button
+                    @click="openEditModal(element)"
+                    as="button"
+                    type="button"
+                    class="text-indigo-500 hover:text-indigo-800 font-medium"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    @click="openDeleteModal(element.id)"
+                    as="button"
+                    type="button"
+                    class="text-indigo-500 hover:text-indigo-800 font-medium ml-4"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </template>
+          </draggable>
+        </table>
+      </div>
     </div>
 
     <div v-else-if="search" class="text-center">
