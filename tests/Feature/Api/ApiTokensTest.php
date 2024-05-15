@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ApiTokensTest extends TestCase
@@ -21,7 +22,7 @@ class ApiTokensTest extends TestCase
         Sanctum::actingAs($this->user, [], 'web');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_api_token()
     {
         $response = $this->post('/settings/personal-access-tokens', [
@@ -38,7 +39,7 @@ class ApiTokensTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_create_api_token_with_incorrect_password()
     {
         $response = $this->post('/settings/personal-access-tokens', [
@@ -56,7 +57,7 @@ class ApiTokensTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_revoke_api_token()
     {
         $token = $this->user->createToken('New');

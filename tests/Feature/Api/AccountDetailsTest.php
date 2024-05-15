@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AccountDetailsTest extends TestCase
@@ -15,7 +16,7 @@ class AccountDetailsTest extends TestCase
         parent::setUpSanctum();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_account_details()
     {
         $response = $this->json('GET', '/api/v1/account-details');

@@ -234,7 +234,7 @@ try {
             sendAction(getAction($domainActionQuery));
         }
     }
-} catch (\Exception $e) {
+} catch (\Throwable $e) {
     logData($e->getMessage());
 
     exit(0);

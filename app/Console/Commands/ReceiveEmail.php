@@ -351,10 +351,22 @@ class ReceiveEmail extends Command
             // Try to determine the bounce type, HARD, SPAM, SOFT
             $bounceType = $this->getBounceType($dsn['Diagnostic-code'], $dsn['Status']);
 
-            $diagnosticCode = Str::limit($dsn['Diagnostic-code'], 497);
+            $diagnosticCode = trim(Str::limit($dsn['Diagnostic-code'], 497));
         } else {
             $bounceType = null;
             $diagnosticCode = null;
+        }
+
+        // To sort '5.7.1 (delivery not authorized, message refused)' as status
+        if ($status = $dsn['Status'] ?? null) {
+
+            if (Str::length($status) > 5) {
+                if (is_null($diagnosticCode)) {
+                    $diagnosticCode = trim(Str::substr($status, 5, 497));
+                }
+
+                $status = trim(Str::substr($status, 0, 5));
+            }
         }
 
         // Get the undelivered message
@@ -394,7 +406,7 @@ class ReceiveEmail extends Command
                 'sender' => $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null,
                 'destination' => $bouncedEmailAddress,
                 'email_type' => $emailType,
-                'status' => $dsn['Status'] ?? null,
+                'status' => $status ?? null,
                 'code' => $diagnosticCode,
                 'attempted_at' => $outboundMessage->created_at,
             ]);

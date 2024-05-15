@@ -35,7 +35,7 @@
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^5.0.0",
-        "css-loader": "^6.0.0",
+        "css-loader": "^7.0.0",
         "husky": "^9.0.0",
         "laravel-vite-plugin": "^1.0.0",
         "lint-staged": "^15.0.0",

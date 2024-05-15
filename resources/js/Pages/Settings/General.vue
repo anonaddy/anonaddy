@@ -957,7 +957,7 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, Link } from '@inertiajs/vue3'
 import SettingsLayout from './../../Layouts/SettingsLayout.vue'
 import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 

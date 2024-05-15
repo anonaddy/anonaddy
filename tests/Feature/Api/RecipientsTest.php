@@ -6,6 +6,7 @@ use App\Models\Domain;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RecipientsTest extends TestCase
@@ -18,7 +19,7 @@ class RecipientsTest extends TestCase
         parent::setUpSanctum();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_recipients()
     {
         // Arrange
@@ -34,7 +35,7 @@ class RecipientsTest extends TestCase
         $this->assertCount(4, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_individual_recipient()
     {
         // Arrange
@@ -51,7 +52,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals($recipient->email, $response->json()['data']['email']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_new_recipient()
     {
         $response = $this->json('POST', '/api/v1/recipients', [
@@ -62,7 +63,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals('johndoe@example.com', $response->getData()->data->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_auto_verified_recipient()
     {
         Notification::fake();
@@ -87,7 +88,7 @@ class RecipientsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_the_same_recipient()
     {
         Recipient::factory()->create([
@@ -104,7 +105,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_the_same_recipient_in_uppercase()
     {
         Recipient::factory()->create([
@@ -121,7 +122,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_the_same_recipient_as_default()
     {
         $this->user->recipients()->save($this->user->defaultRecipient);
@@ -135,7 +136,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_recipient_with_local_domain()
     {
         $response = $this->json('POST', '/api/v1/recipients', [
@@ -147,7 +148,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_recipient_with_local_custom_domain()
     {
         Domain::factory()->create([
@@ -165,7 +166,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    /** @test */
+    #[Test]
     public function new_recipient_must_have_valid_email()
     {
         $response = $this->json('POST', '/api/v1/recipients', [
@@ -177,7 +178,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_recipient()
     {
         $recipient = Recipient::factory()->create([
@@ -190,7 +191,7 @@ class RecipientsTest extends TestCase
         $this->assertCount(1, $this->user->recipients);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_delete_default_recipient()
     {
         $this->user->recipients()->save($this->user->defaultRecipient);
@@ -204,7 +205,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals($defaultRecipient->id, $this->user->defaultRecipient->id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_add_gpg_key_to_recipient()
     {
         $gnupg = new \gnupg();
@@ -222,7 +223,7 @@ class RecipientsTest extends TestCase
         $this->assertTrue($response->getData()->data->should_encrypt);
     }
 
-    /** @test */
+    #[Test]
     public function gpg_key_must_be_correct_format()
     {
         $recipient = Recipient::factory()->create([
@@ -238,7 +239,7 @@ class RecipientsTest extends TestCase
             ->assertJsonValidationErrors('key_data');
     }
 
-    /** @test */
+    #[Test]
     public function gpg_key_must_be_valid()
     {
         $recipient = Recipient::factory()->create([
@@ -253,7 +254,7 @@ class RecipientsTest extends TestCase
             ->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_remove_gpg_key_from_recipient()
     {
         $gnupg = new \gnupg();
@@ -272,7 +273,7 @@ class RecipientsTest extends TestCase
         $this->assertFalse($this->user->recipients[0]->should_encrypt);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_turn_on_encryption_for_recipient()
     {
         $recipient = Recipient::factory()->create([
@@ -289,7 +290,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->should_encrypt);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_turn_off_encryption_for_recipient()
     {
         $recipient = Recipient::factory()->create([
@@ -304,7 +305,7 @@ class RecipientsTest extends TestCase
         $this->assertFalse($this->user->recipients[0]->should_encrypt);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_allow_recipient_to_send_or_reply()
     {
         $recipient = Recipient::factory()->create([
@@ -320,7 +321,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->can_reply_send);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disallow_recipient_from_sending_or_replying()
     {
         $recipient = Recipient::factory()->create([
@@ -334,7 +335,7 @@ class RecipientsTest extends TestCase
         $this->assertFalse($this->user->recipients[1]->can_reply_send);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_turn_on_inline_encryption()
     {
         $recipient = Recipient::factory()->create([
@@ -351,7 +352,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->inline_encryption);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_turn_off_inline_encryption()
     {
         $recipient = Recipient::factory()->create([
@@ -366,7 +367,7 @@ class RecipientsTest extends TestCase
         $this->assertFalse($this->user->recipients[0]->inline_encryption);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_turn_on_protected_headers()
     {
         $recipient = Recipient::factory()->create([
@@ -383,7 +384,7 @@ class RecipientsTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->protected_headers);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_turn_off_protected_headers()
     {
         $recipient = Recipient::factory()->create([

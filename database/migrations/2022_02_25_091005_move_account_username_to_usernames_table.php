@@ -70,6 +70,7 @@ class MoveAccountUsernameToUsernamesTable extends Migration
 
         // Drop the username and catch_all column from the users table
         Schema::table('users', function (Blueprint $table) {
+            $table->dropIndex('users_username_unique');
             $table->dropColumn('username');
         });
         // Separate call to dropColumn since SQLite doesn't support multiple calls

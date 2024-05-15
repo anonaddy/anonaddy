@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\FailedDelivery;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class FailedDeliveriesTest extends TestCase
@@ -18,7 +19,7 @@ class FailedDeliveriesTest extends TestCase
         $this->user->recipients()->save($this->user->defaultRecipient);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_failed_deliveries()
     {
         // Arrange
@@ -34,7 +35,7 @@ class FailedDeliveriesTest extends TestCase
         $this->assertCount(3, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_individual_failed_delivery()
     {
         // Arrange
@@ -51,7 +52,7 @@ class FailedDeliveriesTest extends TestCase
         $this->assertEquals($failedDelivery->code, $response->json()['data']['code']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_failed_delivery()
     {
         $failedDelivery = FailedDelivery::factory()->create([

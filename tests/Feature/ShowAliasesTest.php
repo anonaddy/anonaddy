@@ -8,6 +8,7 @@ use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ShowAliasesTest extends TestCase
@@ -24,7 +25,7 @@ class ShowAliasesTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_view_aliases_from_the_dashboard()
     {
         // Arrange
@@ -45,7 +46,7 @@ class ShowAliasesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function latest_aliases_are_listed_first()
     {
         // Arrange
@@ -78,7 +79,7 @@ class ShowAliasesTest extends TestCase
         $this->assertTrue($response->data('page')['props']['initialRows']['data'][2]['id'] === $a->id);
     }
 
-    /** @test */
+    #[Test]
     public function deleted_aliases_are_not_listed()
     {
         Alias::factory()->count(3)->create([
@@ -101,7 +102,7 @@ class ShowAliasesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function aliases_are_listed_with_recipients()
     {
         $alias = Alias::factory()->create([
@@ -129,7 +130,7 @@ class ShowAliasesTest extends TestCase
         $this->assertEquals($aliasRecipient->recipient->email, $response->data('page')['props']['initialRows']['data'][0]['recipients'][0]['email']);
     }
 
-    /** @test */
+    #[Test]
     public function aliases_are_listed_with_only_verified_recipient_options()
     {
         $alias = Alias::factory()->create([

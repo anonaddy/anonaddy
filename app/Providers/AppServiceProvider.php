@@ -23,7 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        Sanctum::ignoreMigrations();
         Webauthn::registerViewResponseUsing(RegisterViewResponse::class);
         Webauthn::registerSuccessResponseUsing(RegisterSuccessResponse::class);
         Webauthn::loginViewResponseUsing(LoginViewResponse::class);

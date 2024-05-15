@@ -7,6 +7,7 @@ use App\Models\Domain;
 use App\Models\Recipient;
 use App\Models\Username;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AliasesTest extends TestCase
@@ -22,7 +23,7 @@ class AliasesTest extends TestCase
         $this->user->defaultUsername->save();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_aliases()
     {
         // Arrange
@@ -38,7 +39,7 @@ class AliasesTest extends TestCase
         $this->assertCount(3, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_aliases_including_deleted()
     {
         // Arrange
@@ -59,7 +60,7 @@ class AliasesTest extends TestCase
         $this->assertCount(3, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_only_deleted_aliases()
     {
         // Arrange
@@ -80,7 +81,7 @@ class AliasesTest extends TestCase
         $this->assertCount(2, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_only_active_aliases()
     {
         // Arrange
@@ -102,7 +103,7 @@ class AliasesTest extends TestCase
         $this->assertCount(1, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_individual_alias()
     {
         // Arrange
@@ -119,7 +120,7 @@ class AliasesTest extends TestCase
         $this->assertEquals($alias->email, $response->json()['data']['email']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_alias()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -133,7 +134,7 @@ class AliasesTest extends TestCase
         $this->assertEquals($this->user->aliases[0]->local_part, $response->getData()->data->local_part);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_alias_with_recipients()
     {
         $recipient = Recipient::factory()->create([
@@ -158,7 +159,7 @@ class AliasesTest extends TestCase
         $this->assertContains($recipient->email, $this->user->aliases[0]->recipients->pluck('email'));
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_uuid_alias()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -174,7 +175,7 @@ class AliasesTest extends TestCase
         $this->assertEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_alias_with_local_part()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -190,7 +191,7 @@ class AliasesTest extends TestCase
         $this->assertEquals('valid-local-part@'.$this->user->username.'.anonaddy.com', $this->user->aliases[0]->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_alias_with_local_part_and_extension()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -207,7 +208,7 @@ class AliasesTest extends TestCase
         $this->assertEquals('valid-local-part@'.$this->user->username.'.anonaddy.com', $this->user->aliases[0]->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_generate_new_alias_with_invalid_local_part()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -222,7 +223,7 @@ class AliasesTest extends TestCase
         $response->assertJsonValidationErrors('local_part_without_extension');
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_generate_custom_alias_that_already_exists()
     {
         Alias::factory()->create([
@@ -245,7 +246,7 @@ class AliasesTest extends TestCase
         $response->assertJsonValidationErrors('local_part_without_extension');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_random_word_alias()
     {
         $response = $this->json('POST', '/api/v1/aliases', [
@@ -260,7 +261,7 @@ class AliasesTest extends TestCase
         $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_alias_with_correct_aliasable_type()
     {
         Username::factory()->create([
@@ -285,7 +286,7 @@ class AliasesTest extends TestCase
         $this->assertEquals($domain->id, $this->user->aliases[0]->aliasable_id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_alias_description()
     {
         $alias = Alias::factory()->create([
@@ -300,7 +301,7 @@ class AliasesTest extends TestCase
         $this->assertEquals('The new description', $response->getData()->data->description);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_alias_from_name()
     {
         $alias = Alias::factory()->create([
@@ -315,7 +316,7 @@ class AliasesTest extends TestCase
         $this->assertEquals('John Doe', $response->getData()->data->from_name);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_alias()
     {
         $alias = Alias::factory()->create([
@@ -330,7 +331,7 @@ class AliasesTest extends TestCase
         $this->assertFalse($alias->refresh()->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_forget_alias()
     {
         $alias = Alias::factory()->create([
@@ -347,7 +348,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_forget_shared_domain_alias()
     {
         $sharedDomainAlias = Alias::factory()->create([
@@ -381,7 +382,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_restore_deleted_alias()
     {
         $alias = Alias::factory()->create([
@@ -395,7 +396,7 @@ class AliasesTest extends TestCase
         $this->assertFalse($this->user->aliases[0]->trashed());
     }
 
-    /** @test */
+    #[Test]
     public function user_can_activate_alias()
     {
         $alias = Alias::factory()->create([
@@ -411,7 +412,7 @@ class AliasesTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_deactivate_alias()
     {
         $alias = Alias::factory()->create([
@@ -425,7 +426,7 @@ class AliasesTest extends TestCase
         $this->assertFalse($this->user->aliases[0]->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_get_aliases()
     {
         $alias = Alias::factory()->create([
@@ -447,7 +448,7 @@ class AliasesTest extends TestCase
         $this->assertCount(2, $response->getData()->data);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_bulk_get_invalid_aliases()
     {
         $alias = Alias::factory()->create([
@@ -464,7 +465,7 @@ class AliasesTest extends TestCase
         $this->assertEquals('No aliases found', $response->getData()->message);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_activate_aliases()
     {
         $alias = Alias::factory()->create([
@@ -493,7 +494,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_bulk_activate_invalid_aliases()
     {
         $alias = Alias::factory()->create([
@@ -526,7 +527,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_deactivate_aliases()
     {
         $alias = Alias::factory()->create([
@@ -555,7 +556,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_delete_aliases()
     {
         $alias = Alias::factory()->create([
@@ -587,7 +588,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_restore_aliases()
     {
         $alias = Alias::factory()->create([
@@ -619,7 +620,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_forget_aliases()
     {
         $alias = Alias::factory()->create([
@@ -647,7 +648,7 @@ class AliasesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_bulk_update_recipients_for_aliases()
     {
         $alias = Alias::factory()->create([

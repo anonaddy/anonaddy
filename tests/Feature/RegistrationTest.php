@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function user_can_register_successfully()
     {
         Notification::fake();
@@ -48,7 +49,7 @@ class RegistrationTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_invalid_characters()
     {
         $response = $this->post('/register', [
@@ -66,7 +67,7 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_verify_email_successfully()
     {
         $user = User::factory()->create()->fresh();
@@ -93,7 +94,7 @@ class RegistrationTest extends TestCase
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_use_valid_username()
     {
         $response = $this->post('/register', [
@@ -110,7 +111,7 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_confirm_email()
     {
         $response = $this->post('/register', [
@@ -127,7 +128,7 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_existing_email()
     {
         $user = User::factory()->create()->fresh();
@@ -153,7 +154,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['email']);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_existing_username()
     {
         $user = User::factory()->create()->fresh();
@@ -174,7 +175,7 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors(['username']);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_blacklisted_username()
     {
         $response = $this->post('/register', [
@@ -192,7 +193,7 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_uppercase_blacklisted_username()
     {
         $response = $this->post('/register', [
@@ -210,7 +211,7 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_deleted_username()
     {
         DeletedUsername::create(['username' => 'johndoe']);
@@ -230,7 +231,7 @@ class RegistrationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_register_with_uppercase_deleted_username()
     {
         DeletedUsername::create(['username' => 'johndoe']);

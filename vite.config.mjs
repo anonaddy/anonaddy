@@ -9,10 +9,10 @@ export default defineConfig(({ command, mode }) => {
   const host = env.APP_URL.replace(/https?:\/\//, '')
   return {
     server: {
+      host: host,
       hmr: {
         host: host,
       },
-      host: host,
       https: {
         key:
           process.env.NODE_ENV === 'production'
@@ -25,6 +25,7 @@ export default defineConfig(({ command, mode }) => {
       },
       watch: {
         usePolling: true,
+        ignored: ['**/vendor/**', '**/postfix/**', '**/storage/**'],
       },
     },
     plugins: [
@@ -35,7 +36,6 @@ export default defineConfig(({ command, mode }) => {
           'resources/js/webauthn/authenticate.js',
           'resources/js/webauthn/register.js',
         ],
-        refresh: true,
       }),
       vue({
         template: {

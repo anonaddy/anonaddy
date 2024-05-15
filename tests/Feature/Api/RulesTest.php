@@ -9,6 +9,7 @@ use App\Models\Rule;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RulesTest extends TestCase
@@ -24,7 +25,7 @@ class RulesTest extends TestCase
         $this->user->defaultUsername->save();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_rules()
     {
         // Arrange
@@ -40,7 +41,7 @@ class RulesTest extends TestCase
         $this->assertCount(3, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_individual_rule()
     {
         // Arrange
@@ -57,7 +58,7 @@ class RulesTest extends TestCase
         $this->assertEquals($rule->name, $response->json()['data']['name']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_new_rule()
     {
         $response = $this->json('POST', '/api/v1/rules', [
@@ -101,7 +102,7 @@ class RulesTest extends TestCase
         $this->assertEquals('test rule', $response->getData()->data->name);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_create_invalid_rule()
     {
         $response = $this->json('POST', '/api/v1/rules', [
@@ -130,7 +131,7 @@ class RulesTest extends TestCase
         $response->assertStatus(422);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_rule()
     {
         $rule = Rule::factory()->create([
@@ -166,7 +167,7 @@ class RulesTest extends TestCase
         $this->assertEquals('OR', $response->getData()->data->operator);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_rule()
     {
         $rule = Rule::factory()->create([
@@ -179,7 +180,7 @@ class RulesTest extends TestCase
         $this->assertEmpty($this->user->rules);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_activate_rule()
     {
         $rule = Rule::factory()->create([
@@ -195,7 +196,7 @@ class RulesTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_deactivate_rule()
     {
         $rule = Rule::factory()->create([
@@ -209,7 +210,7 @@ class RulesTest extends TestCase
         $this->assertFalse($this->user->rules[0]->active);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_apply_user_rules()
     {
         $rule = Rule::factory()->create([
@@ -280,7 +281,7 @@ class RulesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_apply_rules_if_email_type_is_not_selected()
     {
         $rule = Rule::factory()->create([
@@ -349,7 +350,7 @@ class RulesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_apply_user_rules_in_correct_order()
     {
         Rule::factory()->create([
@@ -435,7 +436,7 @@ class RulesTest extends TestCase
         $this->assertEquals('Applied after', $email->subject);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_reorder_rules()
     {
         $ruleOne = Rule::factory()->create([
@@ -517,12 +518,12 @@ class RulesTest extends TestCase
 
         if ($file === 'stream') {
             $fd = fopen('php://stdin', 'r');
-            $this->rawEmail = '';
+            $rawEmail = '';
             while (! feof($fd)) {
-                $this->rawEmail .= fread($fd, 1024);
+                $rawEmail .= fread($fd, 1024);
             }
             fclose($fd);
-            $parser->setText($this->rawEmail);
+            $parser->setText($rawEmail);
         } else {
             $parser->setPath($file);
         }

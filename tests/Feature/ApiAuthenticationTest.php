@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ApiAuthenticationTest extends TestCase
@@ -20,7 +21,7 @@ class ApiAuthenticationTest extends TestCase
         $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_retreive_valid_access_token()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
@@ -35,7 +36,7 @@ class ApiAuthenticationTest extends TestCase
         $this->assertEquals($this->user->tokens[0]->token, hash('sha256', $response->json()['api_key']));
     }
 
-    /** @test */
+    #[Test]
     public function user_password_must_be_correct_to_get_access_token()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
@@ -49,7 +50,7 @@ class ApiAuthenticationTest extends TestCase
         $response->assertUnauthorized();
     }
 
-    /** @test */
+    #[Test]
     public function user_must_exist_to_get_access_token()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
@@ -64,7 +65,7 @@ class ApiAuthenticationTest extends TestCase
         $response->assertExactJson(['error' => 'The provided credentials are incorrect']);
     }
 
-    /** @test */
+    #[Test]
     public function user_is_throttled_by_middleware_for_too_many_requests()
     {
         $this->json('POST', '/api/auth/login', [
@@ -94,7 +95,7 @@ class ApiAuthenticationTest extends TestCase
         $response->assertStatus(429);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_get_access_token_with_webauthn_enabled()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
@@ -122,7 +123,7 @@ class ApiAuthenticationTest extends TestCase
         $response->assertExactJson(['error' => 'Security key authentication is not currently supported from the extension or mobile apps, please use an API key to login instead']);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_provide_correct_otp_if_enabled()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);

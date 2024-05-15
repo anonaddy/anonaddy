@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ReceiveEmailTest extends TestCase
@@ -28,7 +29,7 @@ class ReceiveEmailTest extends TestCase
         $this->user = $this->createUser('johndoe');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_from_file()
     {
         Mail::fake();
@@ -64,7 +65,7 @@ class ReceiveEmailTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_from_file_with_capitals()
     {
         Mail::fake();
@@ -97,7 +98,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_from_file_with_attachment()
     {
         Mail::fake();
@@ -130,7 +131,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_from_file_to_multiple_recipients()
     {
         Mail::fake();
@@ -175,7 +176,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_from_file_with_extension()
     {
         Mail::fake();
@@ -209,7 +210,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_with_existing_alias()
     {
         Mail::fake();
@@ -250,7 +251,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_with_uuid_generated_alias()
     {
         Mail::fake();
@@ -300,7 +301,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_with_random_word_generated_alias()
     {
         Mail::fake();
@@ -349,7 +350,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_with_existing_alias_and_receipients()
     {
         Mail::fake();
@@ -410,7 +411,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_attach_recipients_to_new_alias_with_extension()
     {
         Mail::fake();
@@ -455,7 +456,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_not_attach_unverified_recipient_to_new_alias_with_extension()
     {
         Mail::fake();
@@ -500,7 +501,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_send_email_if_default_recipient_has_not_yet_been_verified()
     {
         Mail::fake();
@@ -532,7 +533,7 @@ class ReceiveEmailTest extends TestCase
         Mail::assertNotQueued(ForwardEmail::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_unsubscribe_alias_by_emailing_list_unsubscribe()
     {
         Mail::fake();
@@ -584,7 +585,7 @@ class ReceiveEmailTest extends TestCase
         Mail::assertNotQueued(ForwardEmail::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_unsubscribe_alias_if_not_a_verified_user_recipient()
     {
         Mail::fake();
@@ -631,7 +632,7 @@ class ReceiveEmailTest extends TestCase
         Mail::assertNotQueued(ForwardEmail::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_to_admin_username_for_root_domain()
     {
         Mail::fake();
@@ -667,7 +668,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_for_custom_domain()
     {
         Mail::fake();
@@ -709,7 +710,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_for_custom_domain_with_verified_sending()
     {
         Mail::fake();
@@ -752,7 +753,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_for_username()
     {
         Mail::fake();
@@ -793,7 +794,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_near_bandwidth_limit_notification()
     {
         Notification::fake();
@@ -829,7 +830,7 @@ class ReceiveEmailTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_send_near_bandwidth_limit_notification_more_than_once_per_day()
     {
         Notification::fake();
@@ -872,7 +873,7 @@ class ReceiveEmailTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_from_file_for_all_domains()
     {
         Mail::fake();
@@ -905,7 +906,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_for_custom_domain_with_default_recipient()
     {
         Mail::fake();
@@ -952,7 +953,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_for_username_with_default_recipient()
     {
         Mail::fake();
@@ -998,7 +999,7 @@ class ReceiveEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_forward_email_using_old_reply_to_and_from_headers()
     {
         Mail::fake();

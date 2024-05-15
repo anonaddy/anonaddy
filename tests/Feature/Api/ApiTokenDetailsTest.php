@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ApiTokenDetailsTest extends TestCase
@@ -15,7 +16,7 @@ class ApiTokenDetailsTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_account_details()
     {
         $user = User::factory()->create()->fresh();

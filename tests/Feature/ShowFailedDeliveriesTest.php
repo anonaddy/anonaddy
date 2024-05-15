@@ -6,6 +6,7 @@ use App\Models\FailedDelivery;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ShowFailedDeliveriesTest extends TestCase
@@ -22,7 +23,7 @@ class ShowFailedDeliveriesTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_view_failed_deliveries_from_the_failed_deliveries_page()
     {
         FailedDelivery::factory()->count(3)->create([
@@ -40,7 +41,7 @@ class ShowFailedDeliveriesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function latest_failed_deliveries_are_listed_first()
     {
         $a = FailedDelivery::factory()->create([

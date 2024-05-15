@@ -773,14 +773,8 @@
               v-for="formatOption in aliasFormatOptions"
               :key="formatOption.value"
               :value="formatOption.value"
-              :disabled="createAliasDomainIsShared && formatOption.value === 'custom'"
             >
               {{ formatOption.label }}
-              {{
-                createAliasDomainIsShared && formatOption.value === 'custom'
-                  ? '(Not available for shared domains)'
-                  : ''
-              }}
             </option>
           </select>
         </div>
@@ -1391,10 +1385,6 @@ const selectedAliasesToRestore = computed(() =>
   _.filter(selectedRows.value, row => row.deleted_at !== null),
 )
 
-const createAliasDomainIsShared = computed(() =>
-  props.sharedDomains.includes(createAliasDomain.value),
-)
-
 const links = ref(props.initialRows.links.slice(1, -1))
 
 const aliasIdToEdit = ref('')
@@ -1631,12 +1621,6 @@ watch(
   },
   { deep: true },
 )
-
-watch(createAliasDomainIsShared, isShared => {
-  if (isShared) {
-    createAliasFormat.value = 'random_characters'
-  }
-})
 
 onMounted(() => {
   debounceToolips()

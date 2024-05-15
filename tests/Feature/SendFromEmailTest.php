@@ -6,6 +6,7 @@ use App\Mail\SendFromEmail;
 use App\Models\Alias;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class SendFromEmailTest extends TestCase
@@ -21,7 +22,7 @@ class SendFromEmailTest extends TestCase
         $this->user = $this->createUser('johndoe', 'will@anonaddy.com');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_email_from_alias_from_file()
     {
         Mail::fake();
@@ -57,7 +58,7 @@ class SendFromEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_from_alias_to_multiple_emails_from_file()
     {
         Mail::fake();
@@ -101,7 +102,7 @@ class SendFromEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_email_from_catch_all_alias_that_does_not_yet_exist()
     {
         Mail::fake();

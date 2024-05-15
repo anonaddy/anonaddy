@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Domain;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class DomainsTest extends TestCase
@@ -17,7 +18,7 @@ class DomainsTest extends TestCase
         parent::setUpSanctum();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_domains()
     {
         // Arrange
@@ -33,7 +34,7 @@ class DomainsTest extends TestCase
         $this->assertCount(3, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_individual_domain()
     {
         // Arrange
@@ -50,7 +51,7 @@ class DomainsTest extends TestCase
         $this->assertEquals($domain->domain, $response->json()['data']['domain']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_new_domain()
     {
         $response = $this->json('POST', '/api/v1/domains', [
@@ -61,7 +62,7 @@ class DomainsTest extends TestCase
         $this->assertEquals('random.com', $response->getData()->data->domain);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_the_same_domain()
     {
         Domain::factory()->create([
@@ -78,7 +79,7 @@ class DomainsTest extends TestCase
             ->assertJsonValidationErrors('domain');
     }
 
-    /** @test */
+    #[Test]
     public function new_domain_must_be_a_valid_fqdn()
     {
         $response = $this->json('POST', '/api/v1/domains', [
@@ -90,7 +91,7 @@ class DomainsTest extends TestCase
             ->assertJsonValidationErrors('domain');
     }
 
-    /** @test */
+    #[Test]
     public function new_domain_must_not_include_protocol()
     {
         $response = $this->json('POST', '/api/v1/domains', [
@@ -102,7 +103,7 @@ class DomainsTest extends TestCase
             ->assertJsonValidationErrors('domain');
     }
 
-    /** @test */
+    #[Test]
     public function new_domain_must_not_be_local()
     {
         $response = $this->json('POST', '/api/v1/domains', [
@@ -114,7 +115,7 @@ class DomainsTest extends TestCase
             ->assertJsonValidationErrors('domain');
     }
 
-    /** @test */
+    #[Test]
     public function new_domain_must_not_be_local_subdomain()
     {
         $response = $this->json('POST', '/api/v1/domains', [
@@ -126,7 +127,7 @@ class DomainsTest extends TestCase
             ->assertJsonValidationErrors('domain');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_activate_domain()
     {
         $domain = Domain::factory()->create([
@@ -142,7 +143,7 @@ class DomainsTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_deactivate_domain()
     {
         $domain = Domain::factory()->create([
@@ -156,7 +157,7 @@ class DomainsTest extends TestCase
         $this->assertFalse($this->user->domains[0]->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_enable_catch_all_for_domain()
     {
         $domain = Domain::factory()->create([
@@ -172,7 +173,7 @@ class DomainsTest extends TestCase
         $this->assertTrue($response->getData()->data->catch_all);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disable_catch_all_for_domain()
     {
         $domain = Domain::factory()->create([
@@ -186,7 +187,7 @@ class DomainsTest extends TestCase
         $this->assertFalse($this->user->domains[0]->catch_all);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_domain_description()
     {
         $domain = Domain::factory()->create([
@@ -201,7 +202,7 @@ class DomainsTest extends TestCase
         $this->assertEquals('The new description', $response->getData()->data->description);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_domain_from_name()
     {
         $domain = Domain::factory()->create([
@@ -216,7 +217,7 @@ class DomainsTest extends TestCase
         $this->assertEquals('John Doe', $response->getData()->data->from_name);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_domain()
     {
         $domain = Domain::factory()->create([
@@ -229,7 +230,7 @@ class DomainsTest extends TestCase
         $this->assertEmpty($this->user->domains);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_domain_default_recipient()
     {
         $domain = Domain::factory()->create([
@@ -254,7 +255,7 @@ class DomainsTest extends TestCase
         $this->assertEquals($newDefaultRecipient->email, $domain->refresh()->defaultRecipient->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_domain_default_recipient_with_unverified_recipient()
     {
         $domain = Domain::factory()->create([
@@ -278,7 +279,7 @@ class DomainsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_remove_domain_default_recipient()
     {
         $defaultRecipient = Recipient::factory()->create([

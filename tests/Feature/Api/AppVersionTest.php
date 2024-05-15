@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Helpers\GitVersionHelper as Version;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AppVersionTest extends TestCase
@@ -16,7 +17,7 @@ class AppVersionTest extends TestCase
         parent::setUpSanctum();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_app_version()
     {
         $response = $this->json('GET', '/api/v1/app-version');
