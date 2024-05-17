@@ -30,11 +30,7 @@ class GitVersionHelper
             return Str::of($response->json('tag_name', 'v0.0.0'))->after('v')->trim();
         });
 
-        if (version_compare($latestVersion, $currentVersion, '>')) {
-            return true;
-        }
-
-        return false;
+        return version_compare($latestVersion, $currentVersion, '>');
     }
 
     public static function cacheFreshVersion()
