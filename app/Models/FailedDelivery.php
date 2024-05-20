@@ -111,14 +111,14 @@ class FailedDelivery extends Model
     protected function status(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => Str::ascii($value),
+            set: fn (?string $value) => Str::ascii($value),
         );
     }
 
     protected function code(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => Str::ascii($value),
+            set: fn (?string $value) => Str::ascii($value),
         );
     }
 

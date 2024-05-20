@@ -6,6 +6,7 @@ use App\Models\Username;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ShowUsernamesTest extends TestCase
@@ -22,7 +23,7 @@ class ShowUsernamesTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_view_usernames_from_the_usernames_page()
     {
         Username::factory()->count(3)->create([
@@ -40,7 +41,7 @@ class ShowUsernamesTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function latest_usernames_are_listed_first()
     {
         $a = Username::factory()->create([

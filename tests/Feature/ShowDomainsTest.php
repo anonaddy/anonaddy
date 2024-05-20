@@ -6,6 +6,7 @@ use App\Models\Domain;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ShowDomainsTest extends TestCase
@@ -22,7 +23,7 @@ class ShowDomainsTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_view_domains_from_the_domains_page()
     {
         Domain::factory()->count(3)->create([
@@ -40,7 +41,7 @@ class ShowDomainsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function latest_domains_are_listed_first()
     {
         $a = Domain::factory()->create([
@@ -70,7 +71,7 @@ class ShowDomainsTest extends TestCase
         $this->assertTrue($response->data('page')['props']['initialRows'][2]['id'] === $a->id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_verify_domain_sending_records()
     {
         $domain = Domain::factory()->create([

@@ -7,6 +7,7 @@ use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class UsernamesTest extends TestCase
@@ -22,7 +23,7 @@ class UsernamesTest extends TestCase
         $this->user->defaultUsername->save();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_all_usernames()
     {
         // Arrange
@@ -38,7 +39,7 @@ class UsernamesTest extends TestCase
         $this->assertCount(4, $response->json()['data']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_individual_username()
     {
         // Arrange
@@ -55,7 +56,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals($username->username, $response->json()['data']['username']);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_username()
     {
         $response = $this->json('POST', '/api/v1/usernames', [
@@ -67,7 +68,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals(1, $this->user->username_count);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_exceed_username_limit()
     {
         $this->json('POST', '/api/v1/usernames', [
@@ -91,7 +92,7 @@ class UsernamesTest extends TestCase
         $this->assertCount(4, $this->user->usernames);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_the_same_username()
     {
         Username::factory()->create([
@@ -108,7 +109,7 @@ class UsernamesTest extends TestCase
             ->assertJsonValidationErrors('username');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_create_username_that_has_been_deleted()
     {
         DeletedUsername::factory()->create([
@@ -124,7 +125,7 @@ class UsernamesTest extends TestCase
             ->assertJsonValidationErrors('username');
     }
 
-    /** @test */
+    #[Test]
     public function must_be_unique_across_users_and_usernames_tables()
     {
         $user = User::factory()->create()->fresh();
@@ -138,7 +139,7 @@ class UsernamesTest extends TestCase
             ->assertJsonValidationErrors('username');
     }
 
-    /** @test */
+    #[Test]
     public function username_must_be_alpha_numeric()
     {
         $response = $this->json('POST', '/api/v1/usernames', [
@@ -150,7 +151,7 @@ class UsernamesTest extends TestCase
             ->assertJsonValidationErrors('username');
     }
 
-    /** @test */
+    #[Test]
     public function username_must_be_less_than_max_length()
     {
         $response = $this->json('POST', '/api/v1/usernames', [
@@ -162,7 +163,7 @@ class UsernamesTest extends TestCase
             ->assertJsonValidationErrors('username');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_activate_username()
     {
         $username = Username::factory()->create([
@@ -178,7 +179,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals(true, $response->getData()->data->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_deactivate_username()
     {
         $username = Username::factory()->create([
@@ -192,7 +193,7 @@ class UsernamesTest extends TestCase
         $this->assertFalse($this->user->usernames[1]->active);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_enable_catch_all_for_username()
     {
         $username = Username::factory()->create([
@@ -208,7 +209,7 @@ class UsernamesTest extends TestCase
         $this->assertTrue($response->getData()->data->catch_all);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disable_catch_all_for_username()
     {
         $username = Username::factory()->create([
@@ -222,7 +223,7 @@ class UsernamesTest extends TestCase
         $this->assertFalse($this->user->usernames[1]->catch_all);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_allow_login_for_username()
     {
         $username = Username::factory()->create([
@@ -238,7 +239,7 @@ class UsernamesTest extends TestCase
         $this->assertTrue($response->getData()->data->can_login);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disallow_login_for_username()
     {
         $username = Username::factory()->create([
@@ -252,7 +253,7 @@ class UsernamesTest extends TestCase
         $this->assertFalse($this->user->usernames[1]->can_login);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_disallow_login_for_default_username()
     {
         $username = $this->user->defaultUsername;
@@ -263,7 +264,7 @@ class UsernamesTest extends TestCase
         $this->assertTrue($this->user->usernames[0]->can_login);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_usernames_description()
     {
         $username = Username::factory()->create([
@@ -278,7 +279,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals('The new description', $response->getData()->data->description);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_username_from_name()
     {
         $username = Username::factory()->create([
@@ -293,7 +294,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals('John Doe', $response->getData()->data->from_name);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_username()
     {
         $username = Username::factory()->create([
@@ -308,7 +309,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals(DeletedUsername::first()->username, $username->username);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_not_delete_default_username()
     {
         $this->user->usernames()->save($this->user->defaultUsername);
@@ -322,7 +323,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals($defaultUsername->id, $this->user->defaultUsername->id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_username_default_recipient()
     {
         $username = Username::factory()->create([
@@ -346,7 +347,7 @@ class UsernamesTest extends TestCase
         $this->assertEquals($newDefaultRecipient->email, $username->refresh()->defaultRecipient->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_username_default_recipient_with_unverified_recipient()
     {
         $username = Username::factory()->create([
@@ -369,7 +370,7 @@ class UsernamesTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_remove_username_default_recipient()
     {
         $defaultRecipient = Recipient::factory()->create([

@@ -20,6 +20,8 @@ class RuleResource extends JsonResource
             'replies' => $this->replies,
             'sends' => $this->sends,
             'active' => $this->active,
+            'applied' => $this->applied,
+            'last_applied' => $this->last_applied?->toDateTimeString(),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

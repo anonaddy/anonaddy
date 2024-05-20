@@ -243,7 +243,7 @@
             :disabled="disabledBulkRestore()"
             @click="
               selectedAliasesToRestore.length === 1
-                ? openRestoreModal(selectedAliasesToRestore[0].id)
+                ? openRestoreModal(selectedAliasesToRestore[0])
                 : (bulkRestoreAliasModalOpen = true)
             "
           >
@@ -773,14 +773,8 @@
               v-for="formatOption in aliasFormatOptions"
               :key="formatOption.value"
               :value="formatOption.value"
-              :disabled="createAliasDomainIsShared && formatOption.value === 'custom'"
             >
               {{ formatOption.label }}
-              {{
-                createAliasDomainIsShared && formatOption.value === 'custom'
-                  ? '(Not available for shared domains)'
-                  : ''
-              }}
             </option>
           </select>
         </div>
@@ -961,13 +955,14 @@
       <template v-slot:title> Restore alias </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700">
-          Are you sure you want to restore this alias? Once restored it will be
-          <b>able to receive emails again</b>.
+          Are you sure you want to restore <b class="break-words">{{ aliasToRestore.email }}</b
+          >? Once restored <b class="break-words">{{ aliasToRestore.email }}</b> will be
+          <b>able to forward emails again</b>.
         </p>
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
-            @click="restoreAlias(aliasIdToRestore)"
+            @click="restoreAlias(aliasToRestore.id)"
             class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="restoreAliasLoading"
           >
@@ -990,7 +985,7 @@
         <p class="mt-4 text-grey-700">
           Are you sure you want to restore these
           <b>{{ selectedAliasesToRestore.length }}</b> aliases? Once restored they will be
-          <b>able to receive emails again</b>.
+          <b>able to forward emails again</b>.
         </p>
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
@@ -1076,10 +1071,25 @@
           Are you sure you want to forget <b class="break-words">{{ aliasToForget.email }}</b
           >? Forgetting an alias will disassociate it from your account.
         </p>
-        <p class="mt-4 text-grey-700">
-          <b>Note:</b> If this alias uses a shared domain then it can <b>never be restored</b> or
-          used again so make sure you are certain. If it is a standard alias then it can be created
-          again since it will be as if it never existed.
+        <p v-if="sharedDomains.includes(aliasToForget.domain)" class="mt-4 text-grey-700">
+          <b>Note:</b> This alias uses a shared domain so it can
+          <b>never be restored or used again</b> so make sure you are certain. Once forgotten,
+          <b class="break-words">{{ aliasToForget.email }}</b> will reject any emails sent to it.
+        </p>
+        <p v-else class="mt-4 text-grey-700">
+          <b>Note:</b> This is a standard alias so it
+          <b>can be created again in the future</b> since it will be as if it never existed in the
+          database. Once forgotten, if someone sends an email to this alias and you have
+          <b>catch-all enabled</b> for your
+          <b
+            >"{{
+              aliasToForget.aliasable_type === 'App\\Models\\Username'
+                ? aliasToForget.domain.split('.')[0] + '" username'
+                : aliasToForget.domain + '" domain'
+            }}</b
+          >
+          then it will be created automatically again. If you would like this alias to reject any
+          messages sent to it then you should delete it instead.
         </p>
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
@@ -1375,10 +1385,6 @@ const selectedAliasesToRestore = computed(() =>
   _.filter(selectedRows.value, row => row.deleted_at !== null),
 )
 
-const createAliasDomainIsShared = computed(() =>
-  props.sharedDomains.includes(createAliasDomain.value),
-)
-
 const links = ref(props.initialRows.links.slice(1, -1))
 
 const aliasIdToEdit = ref('')
@@ -1389,7 +1395,7 @@ const aliasToSendFrom = ref({})
 const sendFromAliasDestination = ref('')
 const sendFromAliasEmailToSendTo = ref('')
 const sendFromAliasCopied = ref(false)
-const aliasIdToRestore = ref('')
+const aliasToRestore = ref({})
 const deleteAliasLoading = ref(false)
 const forgetAliasLoading = ref(false)
 const deleteAliasModalOpen = ref(false)
@@ -1615,12 +1621,6 @@ watch(
   },
   { deep: true },
 )
-
-watch(createAliasDomainIsShared, isShared => {
-  if (isShared) {
-    createAliasFormat.value = 'random_characters'
-  }
-})
 
 onMounted(() => {
   debounceToolips()
@@ -1916,6 +1916,7 @@ const deleteAlias = id => {
 
         deleteAliasModalOpen.value = false
         deleteAliasLoading.value = false
+        selectedRowIds.value = []
         debounceToolips()
         successMessage('Alias deleted successfully')
       } else {
@@ -1924,6 +1925,7 @@ const deleteAlias = id => {
           onSuccess: page => {
             deleteAliasModalOpen.value = false
             deleteAliasLoading.value = false
+            selectedRowIds.value = []
             rows.value = props.initialRows.data
             successMessage('Alias deleted successfully')
           },
@@ -1960,6 +1962,7 @@ const bulkDeleteAlias = () => {
         })
         bulkDeleteAliasLoading.value = false
         bulkDeleteAliasModalOpen.value = false
+        selectedRowIds.value = []
         debounceToolips()
         successMessage(response.data.message)
       } else {
@@ -1968,6 +1971,7 @@ const bulkDeleteAlias = () => {
           onSuccess: page => {
             bulkDeleteAliasLoading.value = false
             bulkDeleteAliasModalOpen.value = false
+            selectedRowIds.value = []
             rows.value = props.initialRows.data
             successMessage(response.data.message)
           },
@@ -1998,6 +2002,7 @@ const forgetAlias = id => {
         onSuccess: page => {
           forgetAliasModalOpen.value = false
           forgetAliasLoading.value = false
+          selectedRowIds.value = []
           rows.value = props.initialRows.data
           successMessage('Alias forgotten successfully')
         },
@@ -2031,6 +2036,7 @@ const bulkForgetAlias = () => {
         onSuccess: page => {
           bulkForgetAliasLoading.value = false
           bulkForgetAliasModalOpen.value = false
+          selectedRowIds.value = []
           rows.value = props.initialRows.data
           successMessage(response.data.message)
         },
@@ -2064,6 +2070,7 @@ const restoreAlias = id => {
           onSuccess: page => {
             restoreAliasModalOpen.value = false
             restoreAliasLoading.value = false
+            selectedRowIds.value = []
             rows.value = props.initialRows.data
             successMessage('Alias restored successfully')
           },
@@ -2075,6 +2082,7 @@ const restoreAlias = id => {
 
         restoreAliasModalOpen.value = false
         restoreAliasLoading.value = false
+        selectedRowIds.value = []
         successMessage('Alias restored successfully')
       }
     })
@@ -2106,6 +2114,7 @@ const bulkRestoreAlias = () => {
           onSuccess: page => {
             bulkRestoreAliasLoading.value = false
             bulkRestoreAliasModalOpen.value = false
+            selectedRowIds.value = []
             rows.value = props.initialRows.data
             successMessage(response.data.message)
           },
@@ -2117,6 +2126,7 @@ const bulkRestoreAlias = () => {
         })
         bulkRestoreAliasLoading.value = false
         bulkRestoreAliasModalOpen.value = false
+        selectedRowIds.value = []
         successMessage(response.data.message)
       }
     })
@@ -2205,14 +2215,14 @@ const closeSendFromModal = () => {
   _.delay(() => (aliasToSendFrom.value = {}), 300)
 }
 
-const openRestoreModal = id => {
+const openRestoreModal = alias => {
   restoreAliasModalOpen.value = true
-  aliasIdToRestore.value = id
+  aliasToRestore.value = alias
 }
 
 const closeRestoreModal = () => {
   restoreAliasModalOpen.value = false
-  aliasIdToRestore.value = ''
+  _.delay(() => (aliasToRestore.value = {}), 300)
 }
 
 const openAliasRecipientsModal = alias => {

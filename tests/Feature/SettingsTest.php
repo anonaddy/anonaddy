@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class SettingsTest extends TestCase
@@ -35,7 +36,7 @@ class SettingsTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_default_recipient()
     {
         Notification::fake();
@@ -64,7 +65,7 @@ class SettingsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_to_unverified_default_recipient()
     {
         $newDefaultRecipient = Recipient::factory()->create([
@@ -82,7 +83,7 @@ class SettingsTest extends TestCase
         $this->assertNotEquals($this->user->default_recipient_id, $newDefaultRecipient->id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_edit_default_recipient()
     {
         Notification::fake();
@@ -117,7 +118,7 @@ class SettingsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_must_enter_current_password_to_edit_default_recipient()
     {
         Notification::fake();
@@ -136,7 +137,7 @@ class SettingsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_default_username()
     {
         $currentDefaultUsername = $this->user->defaultUsername;
@@ -164,7 +165,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_default_alias_domain()
     {
         $defaultAliasDomain = $this->user->username.'.anonaddy.me';
@@ -180,7 +181,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_default_alias_domain_if_invalid()
     {
         $response = $this->post('/settings/default-alias-domain', [
@@ -195,7 +196,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_default_alias_format()
     {
         $defaultAliasFormat = 'random_words';
@@ -211,7 +212,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_default_alias_format_if_invalid()
     {
         $response = $this->post('/settings/default-alias-format', [
@@ -226,7 +227,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_display_from_format()
     {
         $displayFromFormat = DisplayFromFormat::DEFAULT->value;
@@ -242,7 +243,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_display_from_format_if_invalid()
     {
         $response = $this->post('/settings/display-from-format', [
@@ -257,7 +258,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_reply_from_name()
     {
         $this->assertNull($this->user->from_name);
@@ -270,7 +271,7 @@ class SettingsTest extends TestCase
         $this->assertEquals('John Doe', $this->user->from_name);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_reply_from_name_to_empty()
     {
         $this->assertNull($this->user->from_name);
@@ -283,7 +284,7 @@ class SettingsTest extends TestCase
         $this->assertEquals(null, $this->user->from_name);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_email_subject()
     {
         $this->assertNull($this->user->email_subject);
@@ -296,7 +297,7 @@ class SettingsTest extends TestCase
         $this->assertEquals('The subject', $this->user->email_subject);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_email_subject_to_empty()
     {
         $this->assertNull($this->user->email_subject);
@@ -309,7 +310,7 @@ class SettingsTest extends TestCase
         $this->assertEquals(null, $this->user->email_subject);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_email_banner_location()
     {
         $this->assertEquals('top', $this->user->banner_location);
@@ -322,7 +323,7 @@ class SettingsTest extends TestCase
         $this->assertEquals('bottom', $this->user->banner_location);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_update_email_banner_location_to_incorrect_value()
     {
         $this->assertEquals('top', $this->user->banner_location);
@@ -337,7 +338,7 @@ class SettingsTest extends TestCase
         $this->assertEquals('top', $this->user->banner_location);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_enable_use_reply_to()
     {
         $this->assertFalse($this->user->use_reply_to);
@@ -350,7 +351,7 @@ class SettingsTest extends TestCase
         $this->assertTrue($this->user->use_reply_to);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disable_use_reply_to()
     {
         $this->user->update(['use_reply_to' => true]);
@@ -365,7 +366,7 @@ class SettingsTest extends TestCase
         $this->assertFalse($this->user->use_reply_to);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_enable_store_failed_deliveries()
     {
         $this->user->update(['store_failed_deliveries' => false]);
@@ -378,7 +379,7 @@ class SettingsTest extends TestCase
         $this->assertTrue($this->user->store_failed_deliveries);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disable_store_failed_deliveries()
     {
         $this->assertTrue($this->user->store_failed_deliveries);
@@ -391,7 +392,7 @@ class SettingsTest extends TestCase
         $this->assertFalse($this->user->store_failed_deliveries);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_enable_save_alias_last_used()
     {
         $this->user->update(['save_alias_last_used' => false]);
@@ -406,7 +407,7 @@ class SettingsTest extends TestCase
         $this->assertTrue($this->user->save_alias_last_used);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disable_save_alias_last_used()
     {
         $this->assertTrue($this->user->save_alias_last_used);
@@ -419,7 +420,7 @@ class SettingsTest extends TestCase
         $this->assertFalse($this->user->save_alias_last_used);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_generate_new_backup_code()
     {
         $this->user->update([
@@ -439,7 +440,7 @@ class SettingsTest extends TestCase
         $this->assertNotEquals($currentBackupCode, $this->user->two_factor_backup_code);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_enter_current_password_to_generate_new_backup_code()
     {
         $this->user->update([
@@ -460,7 +461,7 @@ class SettingsTest extends TestCase
         $this->assertEquals($currentBackupCode, $this->user->two_factor_backup_code);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_enable_webauthn_key()
     {
         $key = $this->user->webauthnKeys()->create([
@@ -486,7 +487,7 @@ class SettingsTest extends TestCase
         $this->assertTrue($this->user->webauthnKeys[0]->enabled);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_disable_webauthn_key()
     {
         $key = $this->user->webauthnKeys()->create([
@@ -512,7 +513,7 @@ class SettingsTest extends TestCase
         $this->assertFalse($this->user->webauthnKeys[0]->enabled);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_enter_correct_password_to_disable_webauthn_key()
     {
         $key = $this->user->webauthnKeys()->create([
@@ -540,7 +541,7 @@ class SettingsTest extends TestCase
         $this->assertTrue($this->user->webauthnKeys[0]->enabled);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_webauthn_key()
     {
         $key = $this->user->webauthnKeys()->create([
@@ -568,7 +569,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_enter_correct_password_to_delete_webauthn_key()
     {
         $key = $this->user->webauthnKeys()->create([
@@ -598,7 +599,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_account()
     {
         $this->assertNotNull($this->user->id);
@@ -718,7 +719,7 @@ class SettingsTest extends TestCase
         $this->assertEquals(DeletedUsername::skip(1)->first()->username, $username->username);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_enter_correct_password_to_delete_account()
     {
         $this->assertNotNull($this->user->id);
@@ -745,9 +746,7 @@ class SettingsTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_can_import_aliases_for_custom_domains()
     {
         Excel::fake();
@@ -771,9 +770,7 @@ class SettingsTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function user_can_download_aliases_export()
     {
         Excel::fake();

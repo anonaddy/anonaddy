@@ -6,6 +6,7 @@ use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AliasRecipientsTest extends TestCase
@@ -18,7 +19,7 @@ class AliasRecipientsTest extends TestCase
         parent::setUpSanctum();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_attach_recipient_to_alias()
     {
         $alias = Alias::factory()->create([
@@ -39,7 +40,7 @@ class AliasRecipientsTest extends TestCase
         $this->assertEquals($recipient->email, $alias->recipients[0]->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_attach_multiple_recipients_to_alias()
     {
         $alias = Alias::factory()->create([
@@ -67,7 +68,7 @@ class AliasRecipientsTest extends TestCase
         $this->assertCount(3, $alias->recipients);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_existing_recipients_for_alias()
     {
         $alias = Alias::factory()->create([
@@ -100,7 +101,7 @@ class AliasRecipientsTest extends TestCase
         $this->assertCount(2, $alias->recipients);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_attach_unverified_recipient_to_alias()
     {
         $alias = Alias::factory()->create([
@@ -121,7 +122,7 @@ class AliasRecipientsTest extends TestCase
         $this->assertCount(0, $alias->recipients);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_attach_more_than_allowed_recipients_to_alias()
     {
         $alias = Alias::factory()->create([
@@ -141,7 +142,7 @@ class AliasRecipientsTest extends TestCase
         $this->assertCount(0, $alias->recipients);
     }
 
-    /** @test */
+    #[Test]
     public function alias_recipient_record_is_deleted_if_recipient_is_deleted()
     {
         $alias = Alias::factory()->create([

@@ -6,9 +6,11 @@ use App\Enums\LoginRedirect;
 use App\Models\Username;
 use App\Notifications\UsernameReminder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
@@ -24,7 +26,7 @@ class LoginTest extends TestCase
         $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_successfully()
     {
         $response = $this->post('/login', [
@@ -37,7 +39,7 @@ class LoginTest extends TestCase
             ->assertSessionHasNoErrors();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_and_be_redirected_based_on_login_redirect_successfully()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
@@ -55,7 +57,7 @@ class LoginTest extends TestCase
             ->assertSessionHasNoErrors();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_with_any_username()
     {
         $username = Username::factory()->create([
@@ -72,7 +74,7 @@ class LoginTest extends TestCase
             ->assertSessionHasNoErrors();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_successfully_using_backup_code()
     {
         $this->user->update([
@@ -107,7 +109,7 @@ class LoginTest extends TestCase
             ->assertSessionHasNoErrors();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_receive_username_reminder_email()
     {
         $this->withoutMiddleware();
@@ -126,7 +128,7 @@ class LoginTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function username_reminder_email_not_sent_for_unkown_email()
     {
         $this->withoutMiddleware();

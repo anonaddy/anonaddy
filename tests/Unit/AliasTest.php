@@ -6,6 +6,7 @@ use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AliasTest extends TestCase
@@ -21,7 +22,7 @@ class AliasTest extends TestCase
         $this->user = $this->createUser();
     }
 
-    /** @test */
+    #[Test]
     public function alias_can_get_verified_recipients()
     {
         $alias = Alias::factory()->create([
@@ -52,7 +53,7 @@ class AliasTest extends TestCase
         $this->assertEquals($verifiedRecipient->id, $alias->verifiedRecipients[0]->id);
     }
 
-    /** @test */
+    #[Test]
     public function alias_can_set_default_recipient_email()
     {
         Alias::factory()->create([
@@ -70,7 +71,7 @@ class AliasTest extends TestCase
         $this->assertEquals($this->user->default_recipient_id, $recipient->id);
     }
 
-    /** @test */
+    #[Test]
     public function alias_can_get_default_recipient_email()
     {
         $alias = Alias::factory()->create([
@@ -92,7 +93,7 @@ class AliasTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function alias_can_get_verified_recipients_or_default()
     {
         $alias = Alias::factory()->create([

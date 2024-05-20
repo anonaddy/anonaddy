@@ -45,6 +45,18 @@
             >v{{ $page.props.version }}</a
           >
         </div>
+        <div
+          v-if="$page.props.updateAvailable"
+          class="text-indigo-50 shrink-0 text-center text-sm font-semibold px-2"
+        >
+          <a
+            href="https://github.com/anonaddy/anonaddy/releases/latest"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="block sm:inline"
+            >Update Available</a
+          >
+        </div>
       </div>
     </div>
 
@@ -138,6 +150,18 @@
                     rel="nofollow noreferrer noopener"
                     class="block sm:inline"
                     >v{{ $page.props.version }}</a
+                  >
+                </div>
+                <div
+                  v-if="$page.props.updateAvailable"
+                  class="text-indigo-50 shrink-0 text-center text-sm font-semibold px-2"
+                >
+                  <a
+                    href="https://github.com/anonaddy/anonaddy/releases/latest"
+                    target="_blank"
+                    rel="nofollow noreferrer noopener"
+                    class="block sm:inline"
+                    >Update Available</a
                   >
                 </div>
               </div>
@@ -310,7 +334,7 @@
                   >
                     <MenuItem v-slot="{ active }" as="div">
                       <a
-                        href="/docs"
+                        href="https://app.addy.io/docs/"
                         target="_blank"
                         rel="nofollow noreferrer noopener"
                         :class="[
@@ -388,7 +412,7 @@
         </div>
       </header>
 
-      <main class="overflow-y-auto">
+      <main class="overflow-y-visible">
         <section
           aria-labelledby="primary-heading"
           class="min-w-0 h-full px-4 sm:px-6 lg:px-8 max-w-screen-2xl mx-auto py-6"

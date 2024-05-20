@@ -12,13 +12,13 @@ use Ramsey\Uuid\Uuid;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication;
-
     protected $user;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->withoutVite();
 
         config([
             'anonaddy.limit' => 1000,

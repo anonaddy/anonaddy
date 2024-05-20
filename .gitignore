@@ -1,3 +1,4 @@
+/.phpunit.cache
 /node_modules
 /public/hot
 /public/storage
@@ -9,14 +10,18 @@
 /storage/debugbar
 /vendor
 /postfix/vendor
+/.fleet
 /.idea
 /.vscode
 /.vagrant
 Homestead.json
 Homestead.yaml
+auth.json
 npm-debug.log
 yarn-error.log
 .env
+.env.backup
+.env.production
 .php-cs-fixer.cache
 .phpunit.result.cache
 ray.php

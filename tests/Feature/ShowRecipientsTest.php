@@ -2,10 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Alias;
-use App\Models\AliasRecipient;
 use App\Models\Recipient;
-use App\Models\User;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -14,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ShowRecipientsTest extends TestCase
@@ -30,7 +28,7 @@ class ShowRecipientsTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_view_recipients_from_the_recipients_page()
     {
         Recipient::factory()->count(5)->create([
@@ -48,7 +46,7 @@ class ShowRecipientsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function latest_recipients_are_listed_first()
     {
         $a = Recipient::factory()->create([
@@ -78,8 +76,8 @@ class ShowRecipientsTest extends TestCase
         $this->assertTrue($response->data('page')['props']['initialRows'][3]['id'] === $a->id);
     }
 
-    /** @test */
-    /* public function recipients_are_listed_with_aliases_count()
+    /* #[Test]
+    public function recipients_are_listed_with_aliases_count()
     {
         $recipient = Recipient::factory()->create([
             'user_id' => $this->user->id,
@@ -100,7 +98,7 @@ class ShowRecipientsTest extends TestCase
         $this->assertCount(3, $response->data('recipients')[0]['aliases']);
     } */
 
-    /** @test */
+    #[Test]
     public function user_can_resend_recipient_verification_email()
     {
         Notification::fake();
@@ -124,7 +122,7 @@ class ShowRecipientsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_can_verify_recipient_email_successfully()
     {
         $recipient = Recipient::factory()->create([
@@ -152,7 +150,7 @@ class ShowRecipientsTest extends TestCase
         $this->assertNotNull($recipient->refresh()->email_verified_at);
     }
 
-    /** @test */
+    #[Test]
     public function user_must_wait_before_resending_recipient_verification_email()
     {
         Notification::fake();

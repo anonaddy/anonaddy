@@ -6,6 +6,7 @@ use App\Models\Alias;
 use App\Models\AliasRecipient;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -21,7 +22,7 @@ class UserTest extends TestCase
         $this->user = $this->createUser('johndoe');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_aliases_from_relationship()
     {
         $aliases = Alias::factory()->count(10)->create([
@@ -31,7 +32,7 @@ class UserTest extends TestCase
         $aliases->assertEquals($this->user->aliases);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_only_get_their_own_aliases_from_relationship()
     {
         $aliases = Alias::factory()->count(5)->create([
@@ -43,7 +44,7 @@ class UserTest extends TestCase
         $aliases->assertEquals($this->user->aliases);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_total_emails_forwarded()
     {
         Alias::factory()->create([
@@ -66,7 +67,7 @@ class UserTest extends TestCase
         $this->assertEquals(10, $this->user->totalEmailsForwarded());
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_total_emails_blocked()
     {
         Alias::factory()->create([
@@ -89,7 +90,7 @@ class UserTest extends TestCase
         $this->assertEquals(8, $this->user->totalEmailsBlocked());
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_total_emails_replied()
     {
         Alias::factory()->create([
@@ -112,7 +113,7 @@ class UserTest extends TestCase
         $this->assertEquals(7, $this->user->totalEmailsReplied());
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_aliases_using_default_recipient()
     {
         $recipient = Recipient::factory()->create([
@@ -146,7 +147,7 @@ class UserTest extends TestCase
         $this->assertCount(3, $this->user->aliases);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_bandwidth_in_mb()
     {
         $this->user->update(['bandwidth' => 10485760]);
@@ -159,7 +160,7 @@ class UserTest extends TestCase
         $this->assertEquals(10, $this->user->bandwidth_mb);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_bandwidth_in_mb_to_correct_precision()
     {
         $this->user->update(['bandwidth' => 7324019]);
@@ -172,13 +173,13 @@ class UserTest extends TestCase
         $this->assertEquals(6.98, $this->user->bandwidth_mb);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_get_bandwidth_limit_in_mb()
     {
         $this->assertEquals(100, $this->user->getBandwidthLimitMb());
     }
 
-    /** @test */
+    #[Test]
     public function user_can_check_if_near_bandwidth_usage_limit()
     {
         $this->user->update(['bandwidth' => 100943820]);
@@ -193,7 +194,7 @@ class UserTest extends TestCase
         $this->assertEquals(96.27, $this->user->bandwidth_mb);
     }
 
-    /** @test */
+    #[Test]
     public function user_get_domain_options()
     {
         $username = $this->user->username;
@@ -214,7 +215,7 @@ class UserTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function user_can_match_verified_recipient_with_extension()
     {
         $this->user->defaultRecipient->email = 'hello+anonaddy@example.com';

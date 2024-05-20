@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Username;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -135,20 +134,6 @@ class LoginController extends Controller
         throw ValidationException::withMessages([
             'username' => [trans('auth.failed')],
         ]);
-    }
-
-    /**
-     * The user has been authenticated.
-     *
-     * @param  mixed  $user
-     * @return mixed
-     */
-    protected function authenticated(Request $request, $user)
-    {
-        // Check if the user's password needs rehashing
-        if (Hash::needsRehash($user->password)) {
-            $user->update(['password' => Hash::make($request->password)]);
-        }
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\Alias;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ReplyToEmailTest extends TestCase
@@ -22,7 +23,7 @@ class ReplyToEmailTest extends TestCase
         $this->user = $this->createUser('johndoe', 'will@anonaddy.com');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reply_to_email_from_file()
     {
         Mail::fake();
@@ -58,7 +59,7 @@ class ReplyToEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_reply_using_unverified_recipient()
     {
         Mail::fake();
@@ -104,7 +105,7 @@ class ReplyToEmailTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_can_reply_to_multiple_emails_from_file()
     {
         Mail::fake();

@@ -30,55 +30,99 @@
     </div>
 
     <div v-if="rows.length" class="bg-white shadow">
-      <draggable
-        :component-data="{ name: 'flip-list' }"
-        item-key="id"
-        v-model="rows"
-        :group="{ name: 'description' }"
-        ghost-class="ghost"
-        handle=".handle"
-        @change="reorderRules"
-      >
-        <template #item="{ element }">
-          <div class="relative flex items-center py-3 px-5 border-b border-grey-100">
-            <div class="flex items-center w-2/5 md:w-3/5">
-              <icon
-                name="menu"
-                class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
-              />
-
-              <span class="m-4">{{ element.name }} </span>
-            </div>
-
-            <div class="w-1/5 relative flex">
-              <Toggle
-                v-model="element.active"
-                @on="activateRule(element.id)"
-                @off="deactivateRule(element.id)"
-              />
-            </div>
-
-            <div class="w-2/5 md:w-1/5 flex justify-end">
-              <button
-                @click="openEditModal(element)"
-                as="button"
-                type="button"
-                class="text-indigo-500 hover:text-indigo-800 font-medium mr-3"
-              >
-                Edit
-              </button>
-              <button
-                @click="openDeleteModal(element.id)"
-                as="button"
-                type="button"
-                class="text-indigo-500 hover:text-indigo-800 font-medium"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </template>
-      </draggable>
+      <div class="vgt-responsive">
+        <table class="table-auto w-full">
+          <thead class="border-b border-grey-100 text-grey-400">
+            <tr>
+              <th scope="col" class="p-3"></th>
+              <th scope="col" class="p-3 text-left">Created</th>
+              <th scope="col" class="p-3 text-left">Name</th>
+              <th scope="col" class="p-3 text-left">Active</th>
+              <th scope="col" class="p-3 text-left">
+                Applied
+                <span
+                  class="tooltip outline-none"
+                  data-tippy-content="This is the number of times that the rule has been applied. Hover over the count to see when it was last applied."
+                >
+                  <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+                </span>
+              </th>
+              <th scope="col" class="p-3"></th>
+            </tr>
+          </thead>
+          <draggable
+            :component-data="{ type: 'transition', name: 'flip-list' }"
+            v-model="rows"
+            item-key="id"
+            tag="tbody"
+            handle=".handle"
+            :group="{ name: 'description' }"
+            ghost-class="ghost"
+            @change="reorderRules"
+            @update="debounceToolips"
+          >
+            <template #item="{ element }">
+              <tr class="border-b border-grey-100 h-20">
+                <td scope="row" class="p-3">
+                  <icon
+                    name="menu"
+                    class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
+                  />
+                </td>
+                <td scope="row" class="p-3">
+                  <span
+                    class="tooltip outline-none cursor-default text-sm text-grey-500"
+                    :data-tippy-content="$filters.formatDate(element.created_at)"
+                    >{{ $filters.timeAgo(element.created_at) }}
+                  </span>
+                </td>
+                <td scope="row" class="p-3">
+                  <span class="font-medium text-grey-700">{{ element.name }}</span>
+                </td>
+                <td scope="row" class="p-3">
+                  <Toggle
+                    v-model="element.active"
+                    @on="activateRule(element.id)"
+                    @off="deactivateRule(element.id)"
+                  />
+                </td>
+                <td scope="row" class="p-3">
+                  <span
+                    v-if="element.last_applied"
+                    class="tooltip outline-none cursor-default font-semibold text-indigo-800"
+                    :data-tippy-content="
+                      $filters.timeAgo(element.last_applied) +
+                      ' (' +
+                      $filters.formatDate(element.last_applied) +
+                      ')'
+                    "
+                    >{{ element.applied.toLocaleString() }}
+                  </span>
+                  <span v-else>{{ element.applied.toLocaleString() }} </span>
+                </td>
+                <td scope="row" class="p-3 text-right w-0 min-w-fit whitespace-nowrap">
+                  <button
+                    @click="openEditModal(element)"
+                    as="button"
+                    type="button"
+                    class="text-indigo-500 hover:text-indigo-800 font-medium"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    @click="openDeleteModal(element.id)"
+                    as="button"
+                    type="button"
+                    class="text-indigo-500 hover:text-indigo-800 font-medium ml-4"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </template>
+          </draggable>
+        </table>
+      </div>
     </div>
 
     <div v-else-if="search" class="text-center">
@@ -150,7 +194,7 @@
               <div class="relative">
                 <select
                   v-model="createRuleObject.operator"
-                  id="edit_rule_operator"
+                  :id="`create_rule_operator_${key}`"
                   class="block appearance-none w-full text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                   required
                 >
@@ -170,7 +214,7 @@
                     <div class="relative">
                       <select
                         v-model="createRuleObject.conditions[key].type"
-                        id="edit_rule_condition_types"
+                        :id="`create_rule_condition_types_${key}`"
                         class="block appearance-none w-full sm:w-32 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -192,7 +236,7 @@
                     <div class="relative sm:mr-4">
                       <select
                         v-model="createRuleObject.conditions[key].match"
-                        id="edit_rule_condition_matches"
+                        :id="`create_rule_condition_matches_${key}`"
                         class="block appearance-none w-full sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -209,7 +253,7 @@
                     <div class="flex">
                       <input
                         v-model="createRuleObject.conditions[key].currentConditionValue"
-                        @keyup.enter="addValueToCondition(editRuleObect, key)"
+                        @keyup.enter="addValueToCondition(createRuleObect, key)"
                         type="text"
                         class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2"
                         :class="errors.ruleConditions ? 'border-red-500' : ''"
@@ -292,7 +336,7 @@
                       <select
                         v-model="createRuleObject.actions[key].type"
                         @change="ruleActionChange(createRuleObject.actions[key])"
-                        id="rule_action_types"
+                        :id="`rule_action_types_${key}`"
                         class="w-full block appearance-none text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -333,7 +377,7 @@
                     <div class="relative sm:mr-4 w-full">
                       <select
                         v-model="createRuleObject.actions[key].value"
-                        id="edit_rule_action_banner"
+                        :id="`create_rule_action_banner_${key}`"
                         class="w-full block appearance-none sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -370,7 +414,7 @@
         </fieldset>
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Run rule on</legend>
+          <legend class="px-2 leading-none text-sm">Apply rule on</legend>
           <div class="w-full flex">
             <div class="relative flex items-center">
               <input
@@ -458,7 +502,7 @@
               <div class="relative">
                 <select
                   v-model="editRuleObject.operator"
-                  id="edit_rule_operator"
+                  :id="`edit_rule_operator_${key}`"
                   class="block appearance-none w-full text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                   required
                 >
@@ -478,7 +522,7 @@
                     <div class="relative">
                       <select
                         v-model="editRuleObject.conditions[key].type"
-                        id="edit_rule_condition_types"
+                        :id="`edit_rule_condition_types_${key}`"
                         class="block appearance-none w-full sm:w-32 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -500,7 +544,7 @@
                     <div class="relative sm:mr-4">
                       <select
                         v-model="editRuleObject.conditions[key].match"
-                        id="edit_rule_condition_matches"
+                        :id="`edit_rule_condition_matches_${key}`"
                         class="block appearance-none w-full sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -597,7 +641,7 @@
                       <select
                         v-model="editRuleObject.actions[key].type"
                         @change="ruleActionChange(editRuleObject.actions[key])"
-                        id="rule_action_types"
+                        :id="`rule_action_types_${key}`"
                         class="w-full block appearance-none text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -638,7 +682,7 @@
                     <div class="relative sm:mr-4 w-full">
                       <select
                         v-model="editRuleObject.actions[key].value"
-                        id="edit_rule_action_banner"
+                        :id="`edit_rule_action_banner_${key}`"
                         class="w-full block appearance-none sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
@@ -675,7 +719,7 @@
         </fieldset>
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Run rule on</legend>
+          <legend class="px-2 leading-none text-sm">Apply rule on</legend>
           <div class="w-full flex">
             <div class="relative flex items-center">
               <input
@@ -764,7 +808,11 @@
           if so then to replace the email subject.
         </p>
         <p class="mt-4 text-grey-700">
-          You can choose to run rules on forwards, replies and/or sends.
+          You can choose to apply rules on forwards, replies and/or sends.
+        </p>
+        <p class="mt-4 text-grey-700">
+          Rules are applied in the order displayed on this page from top to bottom. You can re-order
+          your rules by dragging them using the icon on the left of each row.
         </p>
 
         <div class="mt-6 flex flex-col">
@@ -781,10 +829,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Modal from '../Components/Modal.vue'
 import Toggle from '../Components/Toggle.vue'
+import { roundArrow } from 'tippy.js'
+import tippy from 'tippy.js'
 import draggable from 'vuedraggable'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, FunnelIcon } from '@heroicons/vue/24/outline'
@@ -831,6 +881,7 @@ const createRuleObject = ref({
   replies: false,
   sends: false,
 })
+const tippyInstance = ref(null)
 const errors = ref({})
 
 const conditionTypeOptions = [
@@ -886,6 +937,10 @@ const indexToHuman = {
   4: 'fifth',
 }
 
+onMounted(() => {
+  addTooltips()
+})
+
 const activeRules = () => {
   return _.filter(rows.value, rule => rule.active)
 }
@@ -893,6 +948,21 @@ const activeRules = () => {
 const rowsIds = computed(() => {
   return _.map(rows.value, row => row.id)
 })
+
+const addTooltips = () => {
+  if (tippyInstance.value) {
+    _.each(tippyInstance.value, instance => instance.destroy())
+  }
+
+  tippyInstance.value = tippy('.tooltip', {
+    arrow: roundArrow,
+    allowHTML: true,
+  })
+}
+
+const debounceToolips = _.debounce(function () {
+  addTooltips()
+}, 50)
 
 const createNewRule = () => {
   errors.value = {}
@@ -948,6 +1018,8 @@ const createNewRule = () => {
       resetCreateRuleObject()
       rows.value.push(data.data)
       createRuleModalOpen.value = false
+      debounceToolips()
+      reorderRules(false)
       successMessage('New rule created successfully')
     })
     .catch(error => {
@@ -1022,8 +1094,7 @@ const editRule = () => {
       rule.forwards = editRuleObject.value.forwards
       rule.replies = editRuleObject.value.replies
       rule.sends = editRuleObject.value.sends
-      editRuleObject.value = {}
-      editRuleModalOpen.value = false
+      closeEditModal()
       successMessage('Rule successfully updated')
     })
     .catch(error => {
@@ -1091,7 +1162,7 @@ const deactivateRule = id => {
     })
 }
 
-const reorderRules = () => {
+const reorderRules = (displaySuccess = true) => {
   axios
     .post(
       `/api/v1/reorder-rules`,
@@ -1103,7 +1174,9 @@ const reorderRules = () => {
       },
     )
     .then(response => {
-      successMessage('Rule order successfully updated')
+      if (displaySuccess) {
+        successMessage('Rule order successfully updated')
+      }
     })
     .catch(error => {
       if (error.response !== undefined) {
@@ -1252,3 +1325,10 @@ const errorMessage = (text = 'An error has occurred, please try again later') =>
   })
 }
 </script>
+
+<style>
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+</style>

@@ -6,6 +6,7 @@ use App\Mail\TokenExpiringSoon;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class EmailUsersWithTokenExpiringSoonTest extends TestCase
@@ -23,7 +24,7 @@ class EmailUsersWithTokenExpiringSoonTest extends TestCase
         Mail::fake();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_send_a_mail_concerning_a_token_expiring_soon()
     {
         $this->setNow(2019, 1, 28);
