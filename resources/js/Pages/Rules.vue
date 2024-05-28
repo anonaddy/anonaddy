@@ -284,7 +284,7 @@
                   v-for="(value, index) in createRuleObject.conditions[key].values"
                   :key="index"
                 >
-                  <span class="bg-green-200 text-sm font-semibold rounded-sm pl-1">
+                  <span class="bg-green-200 text-sm font-semibold rounded-sm pl-1 text-nowrap">
                     {{ value }}
                     <icon
                       name="close"
@@ -589,7 +589,7 @@
               </div>
               <div class="mt-2 text-left">
                 <span v-for="(value, index) in editRuleObject.conditions[key].values" :key="index">
-                  <span class="bg-green-200 text-sm font-semibold rounded-sm pl-1">
+                  <span class="bg-green-200 text-sm font-semibold rounded-sm pl-1 text-nowrap">
                     {{ value }}
                     <icon
                       name="close"

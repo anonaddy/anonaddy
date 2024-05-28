@@ -52,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
             $defaultSize = $defaultSize ?? 100;
             $paginationMethod = 'paginate'; // 'simplePaginate' or 'paginate';
 
+            // (int) makes null values 0 which causes errors!
             $size = (int) is_null(request()->input('page.size')) ? $defaultSize : request()->input('page.size');
 
             $size = $size > $maxResults ? $maxResults : $size;
@@ -62,6 +63,27 @@ class AppServiceProvider extends ServiceProvider
                 ->appends(Arr::except(request()->input(), 'page.number'));
 
             return $paginator;
+        });
+
+        Collection::macro('jsonPaginate', function (?int $maxResults = null, ?int $defaultSize = null, $page = null) {
+            $maxResults = $maxResults ?? 100;
+            $defaultSize = $defaultSize ?? 100;
+            $size = (int) is_null(request()->input('page.size')) ? $defaultSize : request()->input('page.size');
+
+            $size = $size > $maxResults ? $maxResults : $size;
+            $page = (int) is_null(request()->input('page.number')) ? 1 : request()->input('page.number');
+
+            return new LengthAwarePaginator(
+                $this->forPage($page, $size),
+                $this->count(),
+                $size,
+                $page,
+                [
+                    'path' => LengthAwarePaginator::resolveCurrentPath(),
+                    'query' => Arr::except(LengthAwarePaginator::resolveQueryString(), 'page.number'),
+                    'pageName' => 'page[number]',
+                ]
+            );
         });
 
         Collection::macro('paginate', function (?int $defaultSize = null, ?int $maxResults = null, $page = null) {
@@ -81,27 +103,6 @@ class AppServiceProvider extends ServiceProvider
                     'path' => LengthAwarePaginator::resolveCurrentPath(),
                     'query' => Arr::except(LengthAwarePaginator::resolveQueryString(), 'page'),
                     'pageName' => 'page',
-                ]
-            );
-        });
-
-        Collection::macro('jsonPaginate', function (?int $maxResults = null, ?int $defaultSize = null, $page = null) {
-            $maxResults = $maxResults ?? 100;
-            $defaultSize = $defaultSize ?? 100;
-            $size = (int) is_null(request()->input('page.size')) ? $defaultSize : request()->input('page.size');
-            $size = $size > $maxResults ? $maxResults : $size;
-
-            $page = (int) is_null(request()->input('page.number')) ? 1 : request()->input('page.number');
-
-            return new LengthAwarePaginator(
-                $this->forPage($page, $size),
-                $this->count(),
-                $size,
-                $page,
-                [
-                    'path' => LengthAwarePaginator::resolveCurrentPath(),
-                    'query' => Arr::except(LengthAwarePaginator::resolveQueryString(), 'page.number'),
-                    'pageName' => 'page[number]',
                 ]
             );
         });
