@@ -25,6 +25,8 @@ use Symfony\Component\Mime\Email;
 
 class CustomMailer extends Mailer
 {
+    private $data;
+
     /**
      * Send a new message using a view.
      *
@@ -34,6 +36,8 @@ class CustomMailer extends Mailer
      */
     public function send($view, array $data = [], $callback = null)
     {
+        $this->data = $data;
+
         if ($view instanceof MailableContract) {
             return $this->sendMailable($view);
         }
@@ -134,9 +138,9 @@ class CustomMailer extends Mailer
 
             // If the message is a forward, reply or send then use the verp domain
             if (isset($data['emailType']) && in_array($data['emailType'], ['F', 'R', 'S'])) {
-                $message->returnPath($verpLocalPart.'@'.$data['verpDomain']);
+                $symfonyMessage->returnPath($verpLocalPart.'@'.$data['verpDomain']);
             } else {
-                $message->returnPath($verpLocalPart.'@'.config('anonaddy.domain'));
+                $symfonyMessage->returnPath($verpLocalPart.'@'.config('anonaddy.domain'));
             }
 
             try {
@@ -246,10 +250,24 @@ class CustomMailer extends Mailer
     {
         try {
             $envelopeMessage = clone $message;
-            // This allows us to have the To: header set as the alias whilst still delivering to the correct RCPT TO.
-            if ($aliasTo = $message->getHeaders()->get('Alias-To')) {
-                $message->to($aliasTo->getValue());
-                $message->getHeaders()->remove('Alias-To');
+
+            // Add in original Tos that have been updated
+            if ($tos = $this->data['tos'] ?? null) {
+                foreach ($tos as $key => $to) {
+                    if ($key === 0) {
+                        // This allows us to have the To: header set as the alias whilst still delivering to the correct RCPT TO for forwards.
+                        $message->to($to); // In order to override recipient email for forwards
+                    } else {
+                        $message->addTo($to);
+                    }
+                }
+            }
+
+            // Add in original CCs that have been updated
+            if ($ccs = $this->data['ccs'] ?? null) {
+                foreach ($ccs as $cc) {
+                    $message->addCc($cc);
+                }
             }
 
             // Add the original sender header here to prevent it altering the envelope from address

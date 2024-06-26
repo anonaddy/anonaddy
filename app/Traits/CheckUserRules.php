@@ -6,8 +6,12 @@ use Illuminate\Support\Str;
 
 trait CheckUserRules
 {
+    protected $emailType;
+
     public function checkRules(string $emailType)
     {
+        $this->emailType = $emailType;
+
         $method = "activeRulesFor{$emailType}Ordered";
         $this->user->{$method}->each(function ($rule) {
             // Check if the conditions of the rule are satisfied
@@ -53,8 +57,8 @@ trait CheckUserRules
             case 'alias':
                 return $this->conditionSatisfied($this->alias->email, $condition);
                 break;
-            case 'displayFrom':
-                return $this->conditionSatisfied($this->displayFrom, $condition);
+            case 'alias_description':
+                return $this->conditionSatisfied($this->alias->description, $condition);
                 break;
         }
     }
@@ -142,6 +146,26 @@ trait CheckUserRules
                 $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
                 $this->size = 0;
                 exit(0);
+                break;
+            case 'removeAttachments':
+                $this->email->rawAttachments = [];
+                break;
+            case 'forwardTo':
+                // Only apply on forwards
+                if ($this->emailType !== 'Forwards') {
+                    break;
+                }
+
+                $recipient = $this->user->verifiedRecipients()->select(['id', 'email', 'should_encrypt', 'fingerprint'])->find($action['value']);
+
+                if (! $recipient) {
+                    break;
+                }
+
+                $this->recipientId = $recipient->id;
+                $this->fingerprint = $recipient->should_encrypt && ! $this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
+
+                $this->email->to[0]['address'] = $recipient->email;
                 break;
             case 'webhook':
                 // http payload to url

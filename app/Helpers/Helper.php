@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 function user()
 {
@@ -24,4 +25,18 @@ function randomString(int $length): string
     }
 
     return $str;
+}
+
+function stripEmailExtension(string $email): string
+{
+    if (! Str::contains($email, '@')) {
+        return $email;
+    }
+
+    // Strip the email of extensions
+    [$localPart, $domain] = explode('@', strtolower($email));
+    // Remove plus extension from local part if present
+    $localPart = Str::contains($localPart, '+') ? Str::before($localPart, '+') : $localPart;
+
+    return $localPart.'@'.$domain;
 }

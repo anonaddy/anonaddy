@@ -159,7 +159,7 @@
     <Modal
       :open="createRuleModalOpen"
       @close="createRuleModalOpen = false"
-      max-width="md:max-w-2xl"
+      max-width="md:max-w-3xl"
     >
       <template v-slot:title> Create new rule </template>
       <template v-slot:content>
@@ -209,7 +209,7 @@
                 <div
                   class="w-full flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0"
                 >
-                  <span>If</span>
+                  <span>If the</span>
                   <span class="sm:ml-2">
                     <div class="relative">
                       <select
@@ -370,6 +370,23 @@
                     </div>
                   </span>
 
+                  <multiselect
+                    v-if="createRuleObject.actions[key].type === 'forwardTo'"
+                    class="sm:!ml-4 flex"
+                    v-model="createRuleObject.actions[key].value"
+                    :options="recipientOptions"
+                    mode="single"
+                    value-prop="id"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :searchable="false"
+                    :allow-empty="true"
+                    placeholder="Select recipient"
+                    label="email"
+                    track-by="email"
+                  >
+                  </multiselect>
+
                   <span
                     v-else-if="createRuleObject.actions[key].type === 'banner'"
                     class="sm:ml-4 flex"
@@ -468,7 +485,7 @@
       </template>
     </Modal>
 
-    <Modal :open="editRuleModalOpen" @close="closeEditModal" max-width="md:max-w-2xl">
+    <Modal :open="editRuleModalOpen" @close="closeEditModal" max-width="md:max-w-3xl">
       <template v-slot:title> Edit rule </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700">
@@ -517,7 +534,7 @@
                 <div
                   class="w-full flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0"
                 >
-                  <span>If</span>
+                  <span>If the</span>
                   <span class="sm:ml-2">
                     <div class="relative">
                       <select
@@ -674,6 +691,23 @@
                       />
                     </div>
                   </span>
+
+                  <multiselect
+                    v-if="editRuleObject.actions[key].type === 'forwardTo'"
+                    class="sm:!ml-4 flex"
+                    v-model="editRuleObject.actions[key].value"
+                    :options="recipientOptions"
+                    mode="single"
+                    value-prop="id"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :searchable="false"
+                    :allow-empty="true"
+                    placeholder="Select recipient"
+                    label="email"
+                    track-by="email"
+                  >
+                  </multiselect>
 
                   <span
                     v-else-if="editRuleObject.actions[key].type === 'banner'"
@@ -836,12 +870,17 @@ import Toggle from '../Components/Toggle.vue'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
 import draggable from 'vuedraggable'
+import Multiselect from '@vueform/multiselect'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, FunnelIcon } from '@heroicons/vue/24/outline'
 import { PlusIcon } from '@heroicons/vue/20/solid'
 
 const props = defineProps({
   initialRows: {
+    type: Array,
+    required: true,
+  },
+  recipientOptions: {
     type: Array,
     required: true,
   },
@@ -891,15 +930,19 @@ const conditionTypeOptions = [
   },
   {
     value: 'sender',
-    label: 'the sender',
+    label: 'sender email',
   },
   {
     value: 'subject',
-    label: 'the subject',
+    label: 'subject',
   },
   {
     value: 'alias',
-    label: 'the alias',
+    label: 'alias email',
+  },
+  {
+    value: 'alias_description',
+    label: 'alias description',
   },
 ]
 const actionTypeOptions = [
@@ -926,6 +969,14 @@ const actionTypeOptions = [
   {
     value: 'block',
     label: 'block the email',
+  },
+  {
+    value: 'removeAttachments',
+    label: 'remove attachments',
+  },
+  {
+    value: 'forwardTo',
+    label: 'forward to',
   },
 ]
 
@@ -1188,7 +1239,9 @@ const reorderRules = (displaySuccess = true) => {
 }
 
 const conditionMatchOptions = (object, key) => {
-  if (_.includes(['sender', 'subject', 'alias'], object.conditions[key].type)) {
+  if (
+    _.includes(['sender', 'subject', 'alias', 'alias_description'], object.conditions[key].type)
+  ) {
     return [
       'contains',
       'does not contain',
@@ -1280,6 +1333,10 @@ const ruleActionChange = action => {
     action.value = 'top'
   } else if (action.type === 'block') {
     action.value = true
+  } else if (action.type === 'removeAttachments') {
+    action.value = true
+  } else if (action.type === 'forwardTo') {
+    action.value = ''
   }
 }
 

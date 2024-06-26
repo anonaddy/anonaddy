@@ -16,6 +16,10 @@ class EmailData
 
     public $reply_to_address;
 
+    public $ccs;
+
+    public $tos;
+
     public $originalCc;
 
     public $originalTo;
@@ -80,6 +84,9 @@ class EmailData
                 $this->reply_to_address = $parser->getAddresses('reply-to')[0]['address'];
             }
         }
+
+        $this->ccs = collect($parser->getAddresses('cc'))->all();
+        $this->tos = collect($parser->getAddresses('to'))->all();
 
         if ($originalCc = $parser->getHeader('cc')) {
             $this->originalCc = $originalCc;

@@ -31,6 +31,10 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $sender;
 
+    protected $ccs;
+
+    protected $tos;
+
     protected $emailSubject;
 
     protected $emailText;
@@ -65,6 +69,52 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->user = $user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
+
+        $this->ccs = $emailData->ccs;
+        $this->tos = $emailData->tos;
+
+        // Replace alias reply/send CCs back to proper emails
+        if (count($this->ccs)) {
+            $this->ccs = collect($this->ccs)
+                ->map(function ($cc) {
+                    return [
+                        'display' => null,
+                        'address' => Str::replaceLast('=', '@', Str::between($cc['address'], $this->alias->local_part.'+', '@'.$this->alias->domain)),
+                    ];
+                })
+                ->filter(fn ($cc) => filter_var($cc['address'], FILTER_VALIDATE_EMAIL))
+                ->map(function ($cc) {
+                    // Only add in display if it exists
+                    if ($cc['display']) {
+                        return $cc['display'].' <'.$cc['address'].'>';
+                    }
+
+                    return '<'.$cc['address'].'>';
+                })
+                ->toArray();
+        }
+
+        // Replace alias reply/send Tos back to proper emails
+        if (count($this->tos)) {
+            $this->tos = collect($this->tos)
+                ->map(function ($to) {
+                    return [
+                        'display' => null,
+                        'address' => Str::replaceLast('=', '@', Str::between($to['address'], $this->alias->local_part.'+', '@'.$this->alias->domain)),
+                    ];
+                })
+                ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
+                ->map(function ($to) {
+                    // Only add in display if it exists
+                    if ($to['display']) {
+                        return $to['display'].' <'.$to['address'].'>';
+                    }
+
+                    return '<'.$to['address'].'>';
+                })
+                ->toArray();
+        }
+
         $this->emailSubject = $emailData->subject;
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
@@ -168,6 +218,8 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'needsDkimSignature' => $this->needsDkimSignature(),
             'aliasDomain' => $this->alias->domain,
             'verpDomain' => $this->verpDomain ?? $this->alias->domain,
+            'ccs' => $this->ccs,
+            'tos' => $this->tos,
         ]);
 
         if ($this->alias->isCustomDomain() && ! $this->needsDkimSignature()) {
@@ -229,14 +281,22 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     private function removeRealEmailAndTextBanner($text)
     {
+        // Replace <alias+hello=example.com@johndoe.anonaddy.com> with <hello@example.com>
+        $destination = $this->email->to[0]['address'];
+
         return Str::of(str_ireplace($this->sender, '', $text))
+            ->replace($this->alias->local_part.'+'.Str::replaceLast('@', '=', $destination).'@'.$this->alias->domain, $destination)
             ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '');
     }
 
     private function removeRealEmailAndHtmlBanner($html)
     {
+        // Replace <alias+hello=example.com@johndoe.anonaddy.com> with <hello@example.com>
+        $destination = $this->email->to[0]['address'];
+
         // Reply may be HTML but have a plain text banner
         return Str::of(str_ireplace($this->sender, '', $html))
+            ->replace($this->alias->local_part.'+'.Str::replaceLast('@', '=', $destination).'@'.$this->alias->domain, $destination)
             ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
             ->replaceMatches('/(?s)(<tr((?!<tr).)*?'.preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/')."(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mi", '');
     }

@@ -41,7 +41,7 @@ class EmailUsersWithTokenExpiringSoon extends Command
      */
     public function handle()
     {
-        User::with(['defaultUsername', 'defaultRecipient'])
+        User::with(['defaultUsername', 'defaultRecipient', 'tokens'])
             ->whereHas('tokens', function ($query) {
                 $query->whereDate('expires_at', now()->addWeek());
             })

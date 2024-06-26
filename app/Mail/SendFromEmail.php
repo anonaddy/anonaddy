@@ -31,6 +31,10 @@ class SendFromEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $sender;
 
+    protected $ccs;
+
+    protected $tos;
+
     protected $emailSubject;
 
     protected $emailText;
@@ -61,6 +65,52 @@ class SendFromEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->user = $user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
+
+        $this->ccs = $emailData->ccs;
+        $this->tos = $emailData->tos;
+
+        // Replace alias reply/send CCs back to proper emails
+        if (count($this->ccs)) {
+            $this->ccs = collect($this->ccs)
+                ->map(function ($cc) {
+                    return [
+                        'display' => null,
+                        'address' => Str::replaceLast('=', '@', Str::between($cc['address'], $this->alias->local_part.'+', '@'.$this->alias->domain)),
+                    ];
+                })
+                ->filter(fn ($cc) => filter_var($cc['address'], FILTER_VALIDATE_EMAIL))
+                ->map(function ($cc) {
+                    // Only add in display if it exists
+                    if ($cc['display']) {
+                        return $cc['display'].' <'.$cc['address'].'>';
+                    }
+
+                    return '<'.$cc['address'].'>';
+                })
+                ->toArray();
+        }
+
+        // Replace alias reply/send Tos back to proper emails
+        if (count($this->tos)) {
+            $this->tos = collect($this->tos)
+                ->map(function ($to) {
+                    return [
+                        'display' => null,
+                        'address' => Str::replaceLast('=', '@', Str::between($to['address'], $this->alias->local_part.'+', '@'.$this->alias->domain)),
+                    ];
+                })
+                ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
+                ->map(function ($to) {
+                    // Only add in display if it exists
+                    if ($to['display']) {
+                        return $to['display'].' <'.$to['address'].'>';
+                    }
+
+                    return '<'.$to['address'].'>';
+                })
+                ->toArray();
+        }
+
         $this->emailSubject = $emailData->subject;
         $this->emailText = $emailData->text;
         $this->emailHtml = $emailData->html;
@@ -152,6 +202,8 @@ class SendFromEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'needsDkimSignature' => $this->needsDkimSignature(),
             'aliasDomain' => $this->alias->domain,
             'verpDomain' => $this->verpDomain ?? $this->alias->domain,
+            'ccs' => $this->ccs,
+            'tos' => $this->tos,
         ]);
 
         if ($this->alias->isCustomDomain() && ! $this->needsDkimSignature()) {
