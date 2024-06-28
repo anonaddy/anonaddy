@@ -2,7 +2,11 @@
 
 # Your API key expires soon
 
+@if($tokenName)
+Your API key named "**{{ $tokenName }}**" on your addy.io account expires in **one weeks time**.
+@else
 One of the API keys on your addy.io account will expire in **one weeks time**.
+@endif
 
 If you are not using this API key for the browser extensions, mobile apps or to access the API then you do not need to take any action.
 

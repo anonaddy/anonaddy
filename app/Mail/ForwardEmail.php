@@ -33,6 +33,10 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $sender;
 
+    protected $ccs;
+
+    protected $tos;
+
     protected $originalCc;
 
     protected $originalTo;
@@ -105,8 +109,69 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->user = $alias->user;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
+        $this->ccs = $emailData->ccs;
+        $this->tos = $emailData->tos;
         $this->originalCc = $emailData->originalCc ?? null;
         $this->originalTo = $emailData->originalTo ?? null;
+
+        // Create and swap with alias reply-to addresses to allow easy reply-all
+        if (count($this->ccs)) {
+            $this->ccs = collect($this->ccs)
+                ->map(function ($cc) {
+                    // Leave alias email Cc as it is
+                    if (stripEmailExtension($cc['address']) === $this->alias->email) {
+                        return [
+                            'display' => $cc['display'] != $cc['address'] ? $cc['display'] : null,
+                            'address' => $this->alias->email,
+                        ];
+                    }
+
+                    return [
+                        'display' => $cc['display'] != $cc['address'] ? $cc['display'] : null,
+                        'address' => $this->alias->local_part.'+'.Str::replaceLast('@', '=', $cc['address']).'@'.$this->alias->domain,
+                    ];
+                })
+                ->filter(fn ($cc) => filter_var($cc['address'], FILTER_VALIDATE_EMAIL))
+                ->map(function ($cc) {
+                    // Only add in display if it exists
+                    if ($cc['display']) {
+                        return $cc['display'].' <'.$cc['address'].'>';
+                    }
+
+                    return '<'.$cc['address'].'>';
+                })
+                ->toArray();
+        }
+
+        // Create and swap with alias reply-to addresses to allow easy reply-all
+        if (count($this->tos)) {
+            $this->tos = collect($this->tos)
+                ->map(function ($to) {
+                    // Leave alias email To as it is
+                    if (stripEmailExtension($to['address']) === $this->alias->email) {
+                        return [
+                            'display' => $to['display'] != $to['address'] ? $to['display'] : null,
+                            'address' => $this->alias->email,
+                        ];
+                    }
+
+                    return [
+                        'display' => $to['display'] != $to['address'] ? $to['display'] : null,
+                        'address' => $this->alias->local_part.'+'.Str::replaceLast('@', '=', $to['address']).'@'.$this->alias->domain,
+                    ];
+                })
+                ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
+                ->map(function ($to) {
+                    // Only add in display if it exists
+                    if ($to['display']) {
+                        return $to['display'].' <'.$to['address'].'>';
+                    }
+
+                    return '<'.$to['address'].'>';
+                })
+                ->toArray();
+        }
+
         $this->displayFrom = $emailData->display_from;
         $this->replyToAddress = $emailData->reply_to_address ?? $this->sender;
         $this->emailSubject = $emailData->subject;
@@ -172,10 +237,6 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
                 $message->getHeaders()
                     ->addTextHeader('Feedback-ID', 'F:'.$this->alias->id.':anonaddy');
-
-                // This header is used to set the To: header as the alias just before sending.
-                $message->getHeaders()
-                    ->addTextHeader('Alias-To', $this->alias->email);
 
                 $message->getHeaders()->remove('Message-ID');
 
@@ -327,6 +388,8 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'shouldBlock' => $this->size === 0,
             'needsDkimSignature' => $this->needsDkimSignature(),
             'verpDomain' => $this->verpDomain ?? $this->alias->domain,
+            'ccs' => $this->ccs,
+            'tos' => $this->tos,
         ]);
 
         if (isset($replyToEmail)) {

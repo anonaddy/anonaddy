@@ -43,6 +43,7 @@ This is the source code for self-hosting addy.io.
 - [What is the max email size limit?](#what-is-the-max-email-size-limit)
 - [What happens if I have a subscription but then cancel it?](#what-happens-if-i-have-a-subscription-but-then-cancel-it)
 - [If I subscribe will Stripe see my real email address?](#if-i-subscribe-will-stripe-see-my-real-email-address)
+- [Do you offer student discount?](#do-you-offer-student-discount)
 - [How do you prevent spammers?](#how-do-you-prevent-spammers)
 - [What do you use to do DNS lookups on domain names?](#what-do-you-use-to-do-dns-lookups-on-domain-names)
 - [Is there a limit to how many emails I can forward?](#is-there-a-limit-to-how-many-emails-i-can-forward)
@@ -362,6 +363,10 @@ You will not be able to activate any of the above again until you resubscribe.
 ## If I subscribe will Stripe see my real email address?
 
 When you subscribe you can choose which email to provide to Stripe, feel free to use an alias. This email will be used for notifications from Stripe such as; if your card payment fails or if your card has expired.
+
+## Do you offer student discount?
+
+Currently, addy.io does not offer any student discounts.
 
 ## How do you prevent spammers?
 

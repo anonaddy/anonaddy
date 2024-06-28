@@ -200,9 +200,9 @@ class ReceiveEmail extends Command
                     }
 
                     if ($this->parser->getHeader('In-Reply-To') && $alias) {
-                        $this->handleReply($user, $recipient, $alias);
+                        $this->handleReply($user, $alias, $validEmailDestination);
                     } else {
-                        $this->handleSendFrom($user, $recipient, $alias ?? null, $aliasable ?? null);
+                        $this->handleSendFrom($user, $recipient, $alias ?? null, $aliasable ?? null, $validEmailDestination);
                     }
                 } elseif ($verifiedRecipient?->can_reply_send === false) {
                     // Notify user that they have not allowed this recipient to reply and send from aliases
@@ -232,18 +232,16 @@ class ReceiveEmail extends Command
         }
     }
 
-    protected function handleReply($user, $recipient, $alias)
+    protected function handleReply($user, $alias, $destination)
     {
-        $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
-
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'R');
 
         $message = new ReplyToEmail($user, $alias, $emailData);
 
-        Mail::to($sendTo)->queue($message);
+        Mail::to($destination)->queue($message);
     }
 
-    protected function handleSendFrom($user, $recipient, $alias, $aliasable)
+    protected function handleSendFrom($user, $recipient, $alias, $aliasable, $destination)
     {
         if (is_null($alias)) {
             $alias = $user->aliases()->create([
@@ -258,13 +256,11 @@ class ReceiveEmail extends Command
             $alias->refresh();
         }
 
-        $sendTo = Str::replaceLast('=', '@', $recipient['extension']);
-
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'S');
 
         $message = new SendFromEmail($user, $alias, $emailData);
 
-        Mail::to($sendTo)->queue($message);
+        Mail::to($destination)->queue($message);
     }
 
     protected function handleForward($user, $recipient, $alias, $aliasable, $isSpam)
@@ -470,8 +466,7 @@ class ReceiveEmail extends Command
             ->allow(config('anonaddy.limit'))
             ->every(3600)
             ->then(
-                function () {
-                },
+                function () {},
                 function () use ($user) {
                     $user->update(['defer_until' => now()->addHour()]);
 

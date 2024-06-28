@@ -19,6 +19,8 @@ class TokenExpiringSoon extends Mailable implements ShouldBeEncrypted, ShouldQue
 
     protected $recipient;
 
+    protected $token;
+
     /**
      * Create a new message instance.
      *
@@ -28,6 +30,7 @@ class TokenExpiringSoon extends Mailable implements ShouldBeEncrypted, ShouldQue
     {
         $this->user = $user;
         $this->recipient = $user->defaultRecipient;
+        $this->token = $user->tokens()->whereDate('expires_at', now()->addWeek())->first();
     }
 
     /**
@@ -45,6 +48,7 @@ class TokenExpiringSoon extends Mailable implements ShouldBeEncrypted, ShouldQue
                 'recipientId' => $this->user->default_recipient_id,
                 'emailType' => 'TES',
                 'fingerprint' => $this->recipient->should_encrypt ? $this->recipient->fingerprint : null,
+                'tokenName' => $this->token?->name,
             ])
             ->withSymfonyMessage(function (Email $message) {
                 $message->getHeaders()

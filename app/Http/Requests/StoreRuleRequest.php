@@ -41,6 +41,7 @@ class StoreRuleRequest extends FormRequest
                     'subject',
                     'sender',
                     'alias',
+                    'alias_description',
                 ]),
             ],
             'conditions.*.match' => [
@@ -79,13 +80,21 @@ class StoreRuleRequest extends FormRequest
                     'encryption',
                     'banner',
                     'block',
-                    'webhook',
+                    'removeAttachments',
+                    'forwardTo',
+                    //'webhook',
                 ]),
             ],
-            'actions.*.value' => [
-                'required',
-                'max:50',
-            ],
+            'actions.*.value' => Rule::forEach(function ($value, $attribute, $data, $action) {
+                if ($action['type'] === 'forwardTo') {
+                    return [Rule::in(user()->verifiedRecipients()->pluck('id')->toArray())]; // Must be a valid verified recipient
+                }
+
+                return [
+                    'required',
+                    'max:50',
+                ];
+            }),
             'operator' => [
                 'required',
                 'in:AND,OR',
