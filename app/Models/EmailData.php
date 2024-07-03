@@ -85,8 +85,17 @@ class EmailData
             }
         }
 
-        $this->ccs = collect($parser->getAddresses('cc'))->all();
-        $this->tos = collect($parser->getAddresses('to'))->all();
+        try {
+            $this->ccs = collect($parser->getAddresses('cc'))->all();
+        } catch (\Throwable $e) {
+            $this->ccs = [];
+        }
+
+        try {
+            $this->tos = collect($parser->getAddresses('to'))->all();
+        } catch (\Throwable $e) {
+            $this->tos = [];
+        }
 
         if ($originalCc = $parser->getHeader('cc')) {
             $this->originalCc = $originalCc;

@@ -40,7 +40,7 @@
     >
       <template #table-column="props">
         <span v-if="props.column.label == 'Key'">
-          Key
+          {{ props.column.label }}
           <span
             class="tooltip outline-none"
             :data-tippy-content="`Use this to attach recipients to new aliases as they are created e.g. alias+key@${$page.props.user.username}.anonaddy.com. You can attach multiple recipients by doing alias+2.3.4@${$page.props.user.username}.anonaddy.com. Separating each key by a full stop.`"
@@ -49,7 +49,7 @@
           </span>
         </span>
         <span v-else-if="props.column.label == 'Alias Count'">
-          Alias Count
+          {{ props.column.label }}
           <span
             class="tooltip outline-none"
             data-tippy-content="This shows the total number of aliases that either the recipient is directly assigned to, or where the recipient is set as the default for a custom domain or username."

@@ -144,33 +144,37 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         }
 
         // Create and swap with alias reply-to addresses to allow easy reply-all
-        if (count($this->tos)) {
-            $this->tos = collect($this->tos)
-                ->map(function ($to) {
-                    // Leave alias email To as it is
-                    if (stripEmailExtension($to['address']) === $this->alias->email) {
-                        return [
-                            'display' => $to['display'] != $to['address'] ? $to['display'] : null,
-                            'address' => $this->alias->email,
-                        ];
-                    }
-
+        $this->tos = collect($this->tos)
+            ->when(! count($this->tos), function ($tos) {
+                return $tos->push([
+                    'display' => null,
+                    'address' => $this->alias->email,
+                ]);
+            })
+            ->map(function ($to) {
+                // Leave alias email To as it is
+                if (stripEmailExtension($to['address']) === $this->alias->email) {
                     return [
                         'display' => $to['display'] != $to['address'] ? $to['display'] : null,
-                        'address' => $this->alias->local_part.'+'.Str::replaceLast('@', '=', $to['address']).'@'.$this->alias->domain,
+                        'address' => $this->alias->email,
                     ];
-                })
-                ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
-                ->map(function ($to) {
-                    // Only add in display if it exists
-                    if ($to['display']) {
-                        return $to['display'].' <'.$to['address'].'>';
-                    }
+                }
 
-                    return '<'.$to['address'].'>';
-                })
-                ->toArray();
-        }
+                return [
+                    'display' => $to['display'] != $to['address'] ? $to['display'] : null,
+                    'address' => $this->alias->local_part.'+'.Str::replaceLast('@', '=', $to['address']).'@'.$this->alias->domain,
+                ];
+            })
+            ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
+            ->map(function ($to) {
+                // Only add in display if it exists
+                if ($to['display']) {
+                    return $to['display'].' <'.$to['address'].'>';
+                }
+
+                return '<'.$to['address'].'>';
+            })
+            ->toArray();
 
         $this->displayFrom = $emailData->display_from;
         $this->replyToAddress = $emailData->reply_to_address ?? $this->sender;

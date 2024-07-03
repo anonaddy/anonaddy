@@ -284,6 +284,15 @@
                 data-tippy-content="'Select All' is only available when the page size is 25"
               ></div>
             </span>
+            <span v-else-if="props.column.label == 'Active'">
+              {{ props.column.label }}
+              <span
+                class="tooltip outline-none"
+                data-tippy-content="When an alias is deactivated, any messages sent to it will be silently discarded. The sender will not be notified of the unsuccessful delivery."
+              >
+                <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+              </span>
+            </span>
             <span v-else :class="selectedRows.length > 0 ? 'blur-sm' : ''">
               {{ props.column.label }}
             </span>
