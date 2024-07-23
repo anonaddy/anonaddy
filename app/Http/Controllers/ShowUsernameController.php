@@ -44,7 +44,7 @@ class ShowUsernameController extends Controller
         $username = user()->usernames()->findOrFail($id);
 
         return Inertia::render('Usernames/Edit', [
-            'initialUsername' => $username->only(['id', 'user_id', 'username', 'description', 'from_name', 'can_login', 'updated_at']),
+            'initialUsername' => $username->only(['id', 'user_id', 'username', 'description', 'from_name', 'can_login', 'auto_create_regex', 'updated_at']),
         ]);
     }
 }

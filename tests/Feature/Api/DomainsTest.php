@@ -218,6 +218,37 @@ class DomainsTest extends TestCase
     }
 
     #[Test]
+    public function user_can_update_domain_auto_create_regex()
+    {
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
+            'auto_create_regex' => '^prefix',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('^prefix', $response->getData()->data->auto_create_regex);
+    }
+
+    #[Test]
+    public function domain_auto_create_regex_must_be_valid()
+    {
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
+            'auto_create_regex' => '///',
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrorFor('auto_create_regex');
+    }
+
+    #[Test]
     public function user_can_delete_domain()
     {
         $domain = Domain::factory()->create([

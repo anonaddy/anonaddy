@@ -40,6 +40,8 @@ class EmailData
 
     public $listUnsubscribe;
 
+    public $listUnsubscribePost;
+
     public $inReplyTo;
 
     public $references;
@@ -113,6 +115,7 @@ class EmailData
         $this->size = $size;
         $this->messageId = base64_encode(Str::remove(['<', '>'], $parser->getHeader('Message-ID')));
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
+        $this->listUnsubscribePost = base64_encode($parser->getHeader('List-Unsubscribe-Post'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
         $this->originalEnvelopeFrom = $sender;

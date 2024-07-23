@@ -52,7 +52,7 @@
           {{ props.column.label }}
           <span
             class="tooltip outline-none"
-            data-tippy-content="When catch-all is disabled, only aliases that already exist for the username will forward messages. They will not be automatically created on-the-fly."
+            data-tippy-content="When catch-all is disabled, only aliases that already exist for the username will forward messages. They will not be automatically created on-the-fly unless you are using auto create regex."
           >
             <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
           </span>

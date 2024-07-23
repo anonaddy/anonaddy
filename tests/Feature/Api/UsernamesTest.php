@@ -295,6 +295,37 @@ class UsernamesTest extends TestCase
     }
 
     #[Test]
+    public function user_can_update_username_auto_create_regex()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
+            'auto_create_regex' => '^prefix',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('^prefix', $response->getData()->data->auto_create_regex);
+    }
+
+    #[Test]
+    public function username_auto_create_regex_must_be_valid()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
+            'auto_create_regex' => '///',
+        ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrorFor('auto_create_regex');
+    }
+
+    #[Test]
     public function user_can_delete_username()
     {
         $username = Username::factory()->create([

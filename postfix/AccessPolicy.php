@@ -191,7 +191,7 @@ try {
                 ->leftJoin('users', 'usernames.user_id', '=', 'users.id')
                 ->whereRaw('? IN ('.$concatDomainsStatement.')', [$aliasDomain, ...$dotDomains])
                 ->selectRaw('CASE
-                WHEN ? AND usernames.catch_all = 0 THEN ?
+                WHEN ? AND usernames.catch_all = 0 AND (usernames.auto_create_regex IS NULL OR ? NOT REGEXP usernames.auto_create_regex) THEN ?
                 WHEN usernames.active = 0 THEN ?
                 WHEN users.reject_until > NOW() THEN ?
                 WHEN users.defer_until > NOW() THEN ?
@@ -199,6 +199,7 @@ try {
                 ELSE "DUNNO"
                 END', [
                     $noAliasExists,
+                    $aliasLocalPart,
                     ACTION_DOES_NOT_EXIST,
                     ACTION_USERNAME_DISCARD,
                     ACTION_REJECT,
@@ -214,7 +215,7 @@ try {
                 ->leftJoin('users', 'domains.user_id', '=', 'users.id')
                 ->where('domains.domain', $aliasDomain)
                 ->selectRaw('CASE
-                WHEN ? AND domains.catch_all = 0 THEN ?
+                WHEN ? AND domains.catch_all = 0 AND (domains.auto_create_regex IS NULL OR ? NOT REGEXP domains.auto_create_regex) THEN ?
                 WHEN domains.active = 0 THEN ?
                 WHEN users.reject_until > NOW() THEN ?
                 WHEN users.defer_until > NOW() THEN ?
@@ -222,6 +223,7 @@ try {
                 ELSE "DUNNO"
                 END', [
                     $noAliasExists,
+                    $aliasLocalPart,
                     ACTION_DOES_NOT_EXIST,
                     ACTION_DOMAIN_DISCARD,
                     ACTION_REJECT,

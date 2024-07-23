@@ -81,6 +81,8 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $listUnsubscribe;
 
+    protected $listUnsubscribePost;
+
     protected $inReplyTo;
 
     protected $references;
@@ -187,6 +189,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->size = $emailData->size;
         $this->messageId = $emailData->messageId;
         $this->listUnsubscribe = $emailData->listUnsubscribe;
+        $this->listUnsubscribePost = $emailData->listUnsubscribePost;
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
         $this->originalEnvelopeFrom = $emailData->originalEnvelopeFrom;
@@ -255,6 +258,12 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                 if ($this->listUnsubscribe) {
                     $message->getHeaders()
                         ->addTextHeader('List-Unsubscribe', base64_decode($this->listUnsubscribe));
+
+                    // Only check if has original List-Unsubscribe
+                    if ($this->listUnsubscribePost) {
+                        $message->getHeaders()
+                            ->addTextHeader('List-Unsubscribe-Post', base64_decode($this->listUnsubscribePost));
+                    }
                 }
 
                 if ($this->inReplyTo) {

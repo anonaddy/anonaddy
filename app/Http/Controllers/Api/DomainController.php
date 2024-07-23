@@ -55,6 +55,10 @@ class DomainController extends Controller
             $domain->from_name = $request->from_name;
         }
 
+        if ($request->has('auto_create_regex')) {
+            $domain->auto_create_regex = $request->auto_create_regex;
+        }
+
         $domain->save();
 
         return new DomainResource($domain->refresh()->load('defaultRecipient')->loadCount('aliases'));

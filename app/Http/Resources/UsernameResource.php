@@ -19,6 +19,7 @@ class UsernameResource extends JsonResource
             'default_recipient' => new RecipientResource($this->whenLoaded('defaultRecipient')),
             'active' => $this->active,
             'catch_all' => $this->catch_all,
+            'auto_create_regex' => $this->auto_create_regex,
             'can_login' => $this->can_login,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),

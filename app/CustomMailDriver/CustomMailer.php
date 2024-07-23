@@ -103,6 +103,7 @@ class CustomMailer extends Mailer
 
             $options = (new DkimOptions())->headersToIgnore([
                 'List-Unsubscribe',
+                'List-Unsubscribe-Post',
                 'Return-Path',
                 'Feedback-ID',
                 'Content-Type',
