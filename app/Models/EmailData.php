@@ -176,7 +176,7 @@ class EmailData
             } else {
                 if (! str_contains($contentType, '/')) {
                     if (self::$mimeTypes === null) {
-                        self::$mimeTypes = new MimeTypes();
+                        self::$mimeTypes = new MimeTypes;
                     }
                     $contentType = self::$mimeTypes->getMimeTypes($contentType)[0] ?? 'application/octet-stream';
                 }
@@ -203,7 +203,7 @@ class EmailData
     private function attemptToDecrypt($part)
     {
         try {
-            $gnupg = new \gnupg();
+            $gnupg = new \gnupg;
 
             $gnupg->cleardecryptkeys();
             $gnupg->adddecryptkey(config('anonaddy.signing_key_fingerprint'), null);
@@ -214,7 +214,7 @@ class EmailData
 
             if ($decrypted) {
 
-                $decryptedParser = new Parser();
+                $decryptedParser = new Parser;
                 $decryptedParser->setText($decrypted);
 
                 // Set decrypted data as subject (as may have encrypted subject too), html and text
@@ -235,7 +235,7 @@ class EmailData
     private function attemptToDecryptInline($text)
     {
         try {
-            $gnupg = new \gnupg();
+            $gnupg = new \gnupg;
 
             $gnupg->cleardecryptkeys();
             $gnupg->adddecryptkey(config('anonaddy.signing_key_fingerprint'), null);

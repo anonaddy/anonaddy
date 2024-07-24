@@ -54,7 +54,7 @@ class SpamReplySendAttempt extends Notification implements ShouldBeEncrypted, Sh
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Attempted reply/send from alias has failed')
             ->markdown('mail.spam_reply_send_attempt', [
                 'aliasEmail' => $this->aliasEmail,

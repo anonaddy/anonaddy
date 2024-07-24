@@ -29,7 +29,7 @@ class DomainController extends Controller
 
     public function store(StoreDomainRequest $request)
     {
-        $domain = new Domain();
+        $domain = new Domain;
         $domain->domain = $request->domain;
 
         if (! $domain->checkVerification()) {

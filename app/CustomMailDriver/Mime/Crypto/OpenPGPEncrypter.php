@@ -220,7 +220,7 @@ class OpenPGPEncrypter
         }
 
         if (! $this->gnupg) {
-            $this->gnupg = new \gnupg();
+            $this->gnupg = new \gnupg;
         }
 
         $this->gnupg->seterrormode(\gnupg::ERROR_EXCEPTION);

@@ -44,7 +44,7 @@ class DefaultRecipientUpdated extends Notification implements ShouldBeEncrypted,
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Your default recipient has just been updated')
             ->markdown('mail.default_recipient_updated', [
                 'defaultRecipient' => $notifiable->email,

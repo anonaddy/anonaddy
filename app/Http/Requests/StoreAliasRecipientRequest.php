@@ -29,7 +29,7 @@ class StoreAliasRecipientRequest extends FormRequest
                 'bail',
                 'array',
                 'max:10',
-                new VerifiedRecipientId(),
+                new VerifiedRecipientId,
             ],
         ];
     }

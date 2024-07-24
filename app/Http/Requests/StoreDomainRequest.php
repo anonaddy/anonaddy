@@ -33,9 +33,9 @@ class StoreDomainRequest extends FormRequest
                 'string',
                 'max:50',
                 'unique:domains',
-                new ValidDomain(),
-                new NotLocalDomain(),
-                new NotUsedAsRecipientDomain(),
+                new ValidDomain,
+                new NotLocalDomain,
+                new NotUsedAsRecipientDomain,
             ],
         ];
     }

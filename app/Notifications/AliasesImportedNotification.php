@@ -59,7 +59,7 @@ class AliasesImportedNotification extends Notification implements ShouldBeEncryp
         $recipient = $notifiable->defaultRecipient;
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Your aliases import has finished')
             ->markdown('mail.aliases_import_finished', [
                 'totalRows' => $this->totalRows,

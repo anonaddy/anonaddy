@@ -50,7 +50,7 @@ class DomainUnverifiedForSending extends Notification implements ShouldBeEncrypt
         $recipient = $notifiable->defaultRecipient;
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Your domain has been unverified for sending on addy.io')
             ->markdown('mail.domain_unverified_for_sending', [
                 'domain' => $this->domain,

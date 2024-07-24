@@ -31,7 +31,7 @@ class UpdateUsernameRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:100',
-                new ValidRegex(),
+                new ValidRegex,
             ],
         ];
     }

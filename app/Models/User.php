@@ -414,7 +414,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new CustomVerifyEmail());
+        $this->notify(new CustomVerifyEmail);
     }
 
     /**
@@ -546,7 +546,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function deleteKeyFromKeyring($fingerprint): void
     {
-        $gnupg = new \gnupg();
+        $gnupg = new \gnupg;
 
         $recipientsUsingFingerprint = $this
             ->recipients()

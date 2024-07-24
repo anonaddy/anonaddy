@@ -35,7 +35,7 @@ class IncorrectOtpNotification extends Notification implements ShouldBeEncrypted
         $recipient = $notifiable->defaultRecipient;
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Failed Two Factor Authentication Login Attempt')
             ->markdown('mail.failed_login_attempt', [
                 'userId' => $notifiable->id,

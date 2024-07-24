@@ -33,7 +33,7 @@ class TestAutoCreateRegexRequest extends FormRequest
             ],
             'local_part' => [
                 'required',
-                new ValidAliasLocalPart(),
+                new ValidAliasLocalPart,
             ],
         ];
     }

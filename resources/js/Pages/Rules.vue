@@ -236,6 +236,7 @@
                     <div class="relative sm:mr-4">
                       <select
                         v-model="createRuleObject.conditions[key].match"
+                        @change="ruleConditionMatchChange(createRuleObject.conditions[key])"
                         :id="`create_rule_condition_matches_${key}`"
                         class="block appearance-none w-full sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
@@ -561,6 +562,7 @@
                     <div class="relative sm:mr-4">
                       <select
                         v-model="editRuleObject.conditions[key].match"
+                        @change="ruleConditionMatchChange(editRuleObject.conditions[key])"
                         :id="`edit_rule_condition_matches_${key}`"
                         class="block appearance-none w-full sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
@@ -1251,6 +1253,8 @@ const conditionMatchOptions = (object, key) => {
       'does not start with',
       'ends with',
       'does not end with',
+      'matches regex',
+      'does not match regex',
     ]
   }
 
@@ -1274,13 +1278,28 @@ const deleteCondition = (object, key) => {
 }
 
 const addValueToCondition = (object, key) => {
+  if (!object.conditions[key].currentConditionValue) {
+    return (errors.value.ruleConditions = `You must enter a value to insert`)
+  }
+
   if (object.conditions[key].values.length >= 10) {
     return (errors.value.ruleConditions = `You cannot add more than 10 values per condition`)
   }
 
-  if (object.conditions[key].currentConditionValue) {
-    object.conditions[key].values.push(object.conditions[key].currentConditionValue)
+  if (['matches regex', 'does not match regex'].includes(object.conditions[key].match)) {
+    try {
+      let re = new RegExp(object.conditions[key].currentConditionValue)
+      re.test('')
+    } catch (e) {
+      return (errors.value.ruleConditions = `Please enter a valid regular expression`)
+    }
+
+    if (object.conditions[key].values.length >= 1) {
+      return (errors.value.ruleConditions = `You can only add 1 regex value`)
+    }
   }
+
+  object.conditions[key].values.push(object.conditions[key].currentConditionValue)
 
   // Reset current conditon value input
   object.conditions[key].currentConditionValue = ''
@@ -1321,6 +1340,17 @@ const resetCreateRuleObject = () => {
     forwards: false,
     replies: false,
     sends: false,
+  }
+}
+
+const ruleConditionMatchChange = condition => {
+  errors.value.ruleConditions = ''
+
+  if (
+    condition.match === 'matches regex' ||
+    (condition.match === 'does not match regex' && condition.values.length >= 1)
+  ) {
+    condition.values = condition.values.splice(0, 1)
   }
 }
 

@@ -31,7 +31,7 @@ class UpdateDomainRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:100',
-                new ValidRegex(),
+                new ValidRegex,
             ],
         ];
     }

@@ -32,7 +32,7 @@ class UsernameReminder extends Notification implements ShouldBeEncrypted, Should
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('addy.io Username Reminder')
             ->markdown('mail.username_reminder', [
                 'username' => $notifiable->user->username,

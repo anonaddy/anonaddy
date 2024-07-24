@@ -108,7 +108,16 @@ trait CheckUserRules
                     return ! Str::endsWith($variable, $value);
                 });
                 break;
-                // regex preg_match?
+            case 'matches regex':
+                return $values->contains(function ($value) use ($variable) {
+                    return Str::isMatch("/{$value}/", $variable);
+                });
+                break;
+            case 'does not match regex':
+                return $values->contains(function ($value) use ($variable) {
+                    return ! Str::isMatch("/{$value}/", $variable);
+                });
+                break;
         }
     }
 

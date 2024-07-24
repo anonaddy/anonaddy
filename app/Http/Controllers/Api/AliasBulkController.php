@@ -217,7 +217,7 @@ class AliasBulkController extends Controller
             'recipient_ids' => [
                 'array',
                 'max:10',
-                new VerifiedRecipientId(),
+                new VerifiedRecipientId,
             ],
             'recipient_ids.*' => 'required|uuid|distinct',
         ]);

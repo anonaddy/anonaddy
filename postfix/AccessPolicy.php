@@ -32,7 +32,7 @@ try {
     $dotenv = Dotenv\Dotenv::create($repository, dirname(__DIR__));
     $dotenv->load();
 
-    $database = new Database();
+    $database = new Database;
 
     $database->addConnection([
         'driver' => 'mysql',
@@ -171,7 +171,7 @@ try {
             // If the alias is inactive or deleted then increment the blocked count
             Database::table('aliases')
                 ->where('email', $aliasEmail)
-                ->increment('emails_blocked', 1, ['last_blocked' => new DateTime()]);
+                ->increment('emails_blocked', 1, ['last_blocked' => new DateTime]);
 
             sendAction($aliasAction);
         } elseif ($aliasHasSharedDomain || in_array($aliasAction, [ACTION_REJECT, ACTION_DEFER])) {
@@ -344,5 +344,5 @@ function endsWith($haystack, $needles)
 
 function logData($data)
 {
-    file_put_contents(__DIR__.'/../storage/logs/postfix-access-policy.log', '['.(new DateTime())->format('Y-m-d H:i:s').'] '.$data.PHP_EOL, FILE_APPEND);
+    file_put_contents(__DIR__.'/../storage/logs/postfix-access-policy.log', '['.(new DateTime)->format('Y-m-d H:i:s').'] '.$data.PHP_EOL, FILE_APPEND);
 }

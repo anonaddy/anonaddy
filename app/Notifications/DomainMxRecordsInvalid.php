@@ -47,7 +47,7 @@ class DomainMxRecordsInvalid extends Notification implements ShouldBeEncrypted, 
         $recipient = $notifiable->defaultRecipient;
         $fingerprint = $recipient->should_encrypt ? $recipient->fingerprint : null;
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject("Your domain's MX records no longer point to addy.io")
             ->markdown('mail.domain_mx_records_invalid', [
                 'domain' => $this->domain,

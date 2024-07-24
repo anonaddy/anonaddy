@@ -58,7 +58,7 @@ class FailedDeliveryNotification extends Notification implements ShouldBeEncrypt
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('New failed delivery on addy.io')
             ->markdown('mail.failed_delivery_notification', [
                 'aliasEmail' => $this->aliasEmail,

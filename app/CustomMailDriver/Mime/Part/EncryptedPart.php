@@ -86,7 +86,7 @@ class EncryptedPart extends AbstractPart
 
     public function getPreparedHeaders(): Headers
     {
-        return clone new Headers();
+        return clone new Headers;
     }
 
     public function asDebugString(): string
@@ -104,7 +104,7 @@ class EncryptedPart extends AbstractPart
 
     private function getEncoder(): ContentEncoderInterface
     {
-        return new RawContentEncoder();
+        return new RawContentEncoder;
     }
 
     public function __sleep(): array
