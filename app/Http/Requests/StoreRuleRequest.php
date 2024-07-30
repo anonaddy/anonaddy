@@ -46,7 +46,6 @@ class StoreRuleRequest extends FormRequest
                 ]),
             ],
             'conditions.*.match' => [
-                'sometimes',
                 'required',
                 Rule::in([
                     'is exactly',
