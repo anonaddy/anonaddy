@@ -15,7 +15,7 @@ class ValidRegex implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (@preg_match("/{$value}/", '') === false) {
-            $fail('Invalid regular expression.');
+            $fail("{$attribute} is an invalid regular expression.");
         }
     }
 }

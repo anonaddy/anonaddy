@@ -58,26 +58,18 @@ class StoreRuleRequest extends FormRequest
                     'does not end with',
                 ]),
             ],
-            'conditions.*.values' => Rule::forEach(function ($value, $attribute, $data, $condition) {
-                if (in_array($condition['match'], ['matches regex', 'does not match regex'])) {
-                    return [
-                        'required',
-                        'array',
-                        'min:1',
-                        'max:1',
-                    ];
-                }
-
-                return [
-                    'required',
-                    'array',
-                    'min:1',
-                    'max:10',
-                ];
-            }),
+            'conditions.*.values' => [
+                'required',
+                'array',
+                'min:1',
+                'max:10',
+            ],
             'conditions.*.values.*' => Rule::forEach(function ($value, $attribute, $data) {
                 if (in_array(array_values($data)[1], ['matches regex', 'does not match regex'])) {
-                    return [new ValidRegex];
+                    return [
+                        new ValidRegex,
+                        'distinct',
+                    ];
                 }
 
                 return ['distinct'];

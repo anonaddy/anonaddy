@@ -1293,10 +1293,6 @@ const addValueToCondition = (object, key) => {
     } catch (e) {
       return (errors.value.ruleConditions = `Please enter a valid regular expression`)
     }
-
-    if (object.conditions[key].values.length >= 1) {
-      return (errors.value.ruleConditions = `You can only add 1 regex value`)
-    }
   }
 
   object.conditions[key].values.push(object.conditions[key].currentConditionValue)
@@ -1345,13 +1341,6 @@ const resetCreateRuleObject = () => {
 
 const ruleConditionMatchChange = condition => {
   errors.value.ruleConditions = ''
-
-  if (
-    condition.match === 'matches regex' ||
-    (condition.match === 'does not match regex' && condition.values.length >= 1)
-  ) {
-    condition.values = condition.values.splice(0, 1)
-  }
 }
 
 const ruleActionChange = action => {
