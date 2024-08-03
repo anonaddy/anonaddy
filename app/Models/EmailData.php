@@ -40,6 +40,8 @@ class EmailData
 
     public $listUnsubscribe;
 
+    public $listUnsubscribePost;
+
     public $inReplyTo;
 
     public $references;
@@ -85,8 +87,17 @@ class EmailData
             }
         }
 
-        $this->ccs = collect($parser->getAddresses('cc'))->all();
-        $this->tos = collect($parser->getAddresses('to'))->all();
+        try {
+            $this->ccs = collect($parser->getAddresses('cc'))->all();
+        } catch (\Throwable $e) {
+            $this->ccs = [];
+        }
+
+        try {
+            $this->tos = collect($parser->getAddresses('to'))->all();
+        } catch (\Throwable $e) {
+            $this->tos = [];
+        }
 
         if ($originalCc = $parser->getHeader('cc')) {
             $this->originalCc = $originalCc;
@@ -104,6 +115,7 @@ class EmailData
         $this->size = $size;
         $this->messageId = base64_encode(Str::remove(['<', '>'], $parser->getHeader('Message-ID')));
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
+        $this->listUnsubscribePost = base64_encode($parser->getHeader('List-Unsubscribe-Post'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
         $this->originalEnvelopeFrom = $sender;
@@ -164,7 +176,7 @@ class EmailData
             } else {
                 if (! str_contains($contentType, '/')) {
                     if (self::$mimeTypes === null) {
-                        self::$mimeTypes = new MimeTypes();
+                        self::$mimeTypes = new MimeTypes;
                     }
                     $contentType = self::$mimeTypes->getMimeTypes($contentType)[0] ?? 'application/octet-stream';
                 }
@@ -191,7 +203,7 @@ class EmailData
     private function attemptToDecrypt($part)
     {
         try {
-            $gnupg = new \gnupg();
+            $gnupg = new \gnupg;
 
             $gnupg->cleardecryptkeys();
             $gnupg->adddecryptkey(config('anonaddy.signing_key_fingerprint'), null);
@@ -202,7 +214,7 @@ class EmailData
 
             if ($decrypted) {
 
-                $decryptedParser = new Parser();
+                $decryptedParser = new Parser;
                 $decryptedParser->setText($decrypted);
 
                 // Set decrypted data as subject (as may have encrypted subject too), html and text
@@ -223,7 +235,7 @@ class EmailData
     private function attemptToDecryptInline($text)
     {
         try {
-            $gnupg = new \gnupg();
+            $gnupg = new \gnupg;
 
             $gnupg->cleardecryptkeys();
             $gnupg->adddecryptkey(config('anonaddy.signing_key_fingerprint'), null);

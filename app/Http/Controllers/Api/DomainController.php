@@ -29,7 +29,7 @@ class DomainController extends Controller
 
     public function store(StoreDomainRequest $request)
     {
-        $domain = new Domain();
+        $domain = new Domain;
         $domain->domain = $request->domain;
 
         if (! $domain->checkVerification()) {
@@ -53,6 +53,10 @@ class DomainController extends Controller
 
         if ($request->has('from_name')) {
             $domain->from_name = $request->from_name;
+        }
+
+        if ($request->has('auto_create_regex')) {
+            $domain->auto_create_regex = $request->auto_create_regex;
         }
 
         $domain->save();

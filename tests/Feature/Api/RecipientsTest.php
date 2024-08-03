@@ -208,7 +208,7 @@ class RecipientsTest extends TestCase
     #[Test]
     public function user_can_add_gpg_key_to_recipient()
     {
-        $gnupg = new \gnupg();
+        $gnupg = new \gnupg;
         $gnupg->deletekey('26A987650243B28802524E2F809FD0D502E2F695');
 
         $recipient = Recipient::factory()->create([
@@ -257,7 +257,7 @@ class RecipientsTest extends TestCase
     #[Test]
     public function user_can_remove_gpg_key_from_recipient()
     {
-        $gnupg = new \gnupg();
+        $gnupg = new \gnupg;
         $gnupg->import(file_get_contents(base_path('tests/keys/AnonAddyPublicKey.asc')));
 
         $recipient = Recipient::factory()->create([

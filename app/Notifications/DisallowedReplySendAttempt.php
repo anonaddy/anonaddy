@@ -56,7 +56,7 @@ class DisallowedReplySendAttempt extends Notification implements ShouldBeEncrypt
     {
         $fingerprint = $notifiable->should_encrypt ? $notifiable->fingerprint : null;
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Disallowed reply/send from alias')
             ->markdown('mail.disallowed_reply_send_attempt', [
                 'aliasEmail' => $this->aliasEmail,

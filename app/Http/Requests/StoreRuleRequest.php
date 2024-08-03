@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ValidRegex;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -45,7 +46,6 @@ class StoreRuleRequest extends FormRequest
                 ]),
             ],
             'conditions.*.match' => [
-                'sometimes',
                 'required',
                 Rule::in([
                     'is exactly',
@@ -64,9 +64,16 @@ class StoreRuleRequest extends FormRequest
                 'min:1',
                 'max:10',
             ],
-            'conditions.*.values.*' => [
-                'distinct',
-            ],
+            'conditions.*.values.*' => Rule::forEach(function ($value, $attribute, $data) {
+                if (in_array(array_values($data)[1], ['matches regex', 'does not match regex'])) {
+                    return [
+                        new ValidRegex,
+                        'distinct',
+                    ];
+                }
+
+                return ['distinct'];
+            }),
             'actions' => [
                 'required',
                 'array',

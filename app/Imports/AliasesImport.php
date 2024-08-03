@@ -158,7 +158,7 @@ class AliasesImport implements ShouldQueue, SkipsEmptyRows, SkipsOnError, SkipsO
                 'required',
                 'max:64',
                 'string',
-                new ValidAliasLocalPart(),
+                new ValidAliasLocalPart,
             ],
             'domain' => [
                 'bail',

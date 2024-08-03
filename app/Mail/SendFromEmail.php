@@ -266,15 +266,16 @@ class SendFromEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
     private function removeRealEmailAndTextBanner($text)
     {
         return Str::of(str_ireplace($this->sender, '', $text))
-            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '');
+            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mis', '')
+            ->replaceMatches('/(This email was sent to).*?(to deactivate this alias)/mis', '');
     }
 
     private function removeRealEmailAndHtmlBanner($html)
     {
         // Reply may be HTML but have a plain text banner
         return Str::of(str_ireplace($this->sender, '', $html))
-            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
-            ->replaceMatches('/(?s)(<tr((?!<tr).)*?'.preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/')."(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mi", '');
+            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mis', '')
+            ->replaceMatches('/(?s)(<tr((?!<tr).)*?'.preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/').'(\/|%2F)deactivate(\/|%2F).*?\/tr>)/mis', '');
     }
 
     /**

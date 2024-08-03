@@ -47,7 +47,7 @@ class ShowDomainController extends Controller
         $domain = user()->domains()->findOrFail($id);
 
         return Inertia::render('Domains/Edit', [
-            'initialDomain' => $domain->only(['id', 'user_id', 'domain', 'description', 'from_name', 'domain_sending_verified_at', 'domain_mx_validated_at', 'updated_at']),
+            'initialDomain' => $domain->only(['id', 'user_id', 'domain', 'description', 'from_name', 'domain_sending_verified_at', 'domain_mx_validated_at', 'auto_create_regex', 'updated_at']),
         ]);
     }
 }

@@ -205,7 +205,7 @@ class Recipient extends Model
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new CustomVerifyEmail());
+        $this->notify(new CustomVerifyEmail);
     }
 
     /**
@@ -215,7 +215,7 @@ class Recipient extends Model
      */
     public function sendUsernameReminderNotification()
     {
-        $this->notify(new UsernameReminder());
+        $this->notify(new UsernameReminder);
     }
 
     /**

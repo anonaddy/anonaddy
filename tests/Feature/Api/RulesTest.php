@@ -470,7 +470,7 @@ class RulesTest extends TestCase
 
     protected function getParser($file)
     {
-        $parser = new Parser();
+        $parser = new Parser;
 
         // Fix some edge cases in from name e.g. "\" John Doe \"" <johndoe@example.com>
         $parser->addMiddleware(function ($mimePart, $next) {

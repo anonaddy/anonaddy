@@ -55,14 +55,14 @@ class CreateUser extends Command
                     'regex:/^[a-zA-Z0-9]*$/',
                     'max:20',
                     'unique:usernames,username',
-                    new NotDeletedUsername(),
+                    new NotDeletedUsername,
                 ],
                 'email' => [
                     'required',
                     'email:rfc,dns',
                     'max:254',
-                    new RegisterUniqueRecipient(),
-                    new NotLocalRecipient(),
+                    new RegisterUniqueRecipient,
+                    new NotLocalRecipient,
                 ],
             ]);
 

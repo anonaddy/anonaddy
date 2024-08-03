@@ -27,7 +27,7 @@ class SendIncorrectOtpNotification
             // Log in auth.log
             Log::channel('auth')->info('Failed OTP Notification sent: '.$user->username);
 
-            $user->notify(new IncorrectOtpNotification());
+            $user->notify(new IncorrectOtpNotification);
         }
     }
 }

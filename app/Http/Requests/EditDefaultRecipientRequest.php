@@ -30,7 +30,7 @@ class EditDefaultRecipientRequest extends FormRequest
                 'required',
                 'email:rfc,dns',
                 'max:254',
-                new RegisterUniqueRecipient(),
+                new RegisterUniqueRecipient,
                 'not_in:'.$this->user()->email,
             ],
             'current' => 'required|string|current_password',

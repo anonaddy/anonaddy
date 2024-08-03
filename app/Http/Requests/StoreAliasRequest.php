@@ -51,7 +51,7 @@ class StoreAliasRequest extends FormRequest
                 'nullable',
                 'array',
                 'max:10',
-                new VerifiedRecipientId(),
+                new VerifiedRecipientId,
             ],
         ];
     }
@@ -65,7 +65,7 @@ class StoreAliasRequest extends FormRequest
             Rule::unique('aliases', 'local_part')->where(function ($query) {
                 return $query->where('domain', $this->validationData()['domain']);
             }),
-            new ValidAliasLocalPart(),
+            new ValidAliasLocalPart,
         ], function () {
             $format = $this->validationData()['format'] ?? 'random_characters';
 

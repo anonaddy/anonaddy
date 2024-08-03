@@ -74,8 +74,8 @@ trait CheckUserRules
                 });
                 break;
             case 'is not':
-                return $values->contains(function ($value) use ($variable) {
-                    return $variable !== $value;
+                return ! $values->contains(function ($value) use ($variable) {
+                    return $variable === $value;
                 });
                 break;
             case 'contains':
@@ -84,8 +84,8 @@ trait CheckUserRules
                 });
                 break;
             case 'does not contain':
-                return $values->contains(function ($value) use ($variable) {
-                    return ! Str::contains($variable, $value);
+                return ! $values->contains(function ($value) use ($variable) {
+                    return Str::contains($variable, $value);
                 });
                 break;
             case 'starts with':
@@ -94,8 +94,8 @@ trait CheckUserRules
                 });
                 break;
             case 'does not start with':
-                return $values->contains(function ($value) use ($variable) {
-                    return ! Str::startsWith($variable, $value);
+                return ! $values->contains(function ($value) use ($variable) {
+                    return Str::startsWith($variable, $value);
                 });
                 break;
             case 'ends with':
@@ -104,11 +104,20 @@ trait CheckUserRules
                 });
                 break;
             case 'does not end with':
-                return $values->contains(function ($value) use ($variable) {
-                    return ! Str::endsWith($variable, $value);
+                return ! $values->contains(function ($value) use ($variable) {
+                    return Str::endsWith($variable, $value);
                 });
                 break;
-                // regex preg_match?
+            case 'matches regex':
+                return $values->contains(function ($value) use ($variable) {
+                    return Str::isMatch("/{$value}/", $variable);
+                });
+                break;
+            case 'does not match regex':
+                return ! $values->contains(function ($value) use ($variable) {
+                    return Str::isMatch("/{$value}/", $variable);
+                });
+                break;
         }
     }
 

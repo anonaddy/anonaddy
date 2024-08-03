@@ -13,6 +13,6 @@ class AliasExportController extends Controller
             return back()->withErrors(['aliases_export' => 'You don\'t have any aliases to export.']);
         }
 
-        return Excel::download(new AliasesExport(), 'aliases-'.now()->toDateString().'.csv');
+        return Excel::download(new AliasesExport, 'aliases-'.now()->toDateString().'.csv');
     }
 }

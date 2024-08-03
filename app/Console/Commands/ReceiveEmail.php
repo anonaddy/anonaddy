@@ -454,7 +454,7 @@ class ReceiveEmail extends Command
         }
 
         if ($user->nearBandwidthLimit() && ! Cache::has("user:{$user->id}:near-bandwidth")) {
-            $user->notify(new NearBandwidthLimit());
+            $user->notify(new NearBandwidthLimit);
 
             Cache::put("user:{$user->id}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
         }
@@ -491,7 +491,7 @@ class ReceiveEmail extends Command
 
     protected function getParser($file)
     {
-        $parser = new Parser();
+        $parser = new Parser;
 
         // Fix some edge cases in from name e.g. "\" John Doe \"" <johndoe@example.com>
         $parser->addMiddleware(function ($mimePart, $next) {

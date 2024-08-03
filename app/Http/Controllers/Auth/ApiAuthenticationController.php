@@ -85,7 +85,7 @@ class ApiAuthenticationController extends Controller
             ], 401);
         }
 
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $lastTimeStamp = Cache::get('2fa_ts:'.$user->id, 0);
 
         $timestamp = $google2fa->verifyKeyNewer($user->two_factor_secret, $request->otp, $lastTimeStamp, config('google2fa.window'));

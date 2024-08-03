@@ -32,7 +32,7 @@ try {
     $dotenv = Dotenv\Dotenv::create($repository, dirname(__DIR__));
     $dotenv->load();
 
-    $database = new Database();
+    $database = new Database;
 
     $database->addConnection([
         'driver' => 'mysql',
@@ -171,7 +171,7 @@ try {
             // If the alias is inactive or deleted then increment the blocked count
             Database::table('aliases')
                 ->where('email', $aliasEmail)
-                ->increment('emails_blocked', 1, ['last_blocked' => new DateTime()]);
+                ->increment('emails_blocked', 1, ['last_blocked' => new DateTime]);
 
             sendAction($aliasAction);
         } elseif ($aliasHasSharedDomain || in_array($aliasAction, [ACTION_REJECT, ACTION_DEFER])) {
@@ -191,7 +191,7 @@ try {
                 ->leftJoin('users', 'usernames.user_id', '=', 'users.id')
                 ->whereRaw('? IN ('.$concatDomainsStatement.')', [$aliasDomain, ...$dotDomains])
                 ->selectRaw('CASE
-                WHEN ? AND usernames.catch_all = 0 THEN ?
+                WHEN ? AND usernames.catch_all = 0 AND (usernames.auto_create_regex IS NULL OR ? NOT REGEXP usernames.auto_create_regex) THEN ?
                 WHEN usernames.active = 0 THEN ?
                 WHEN users.reject_until > NOW() THEN ?
                 WHEN users.defer_until > NOW() THEN ?
@@ -199,6 +199,7 @@ try {
                 ELSE "DUNNO"
                 END', [
                     $noAliasExists,
+                    $aliasLocalPart,
                     ACTION_DOES_NOT_EXIST,
                     ACTION_USERNAME_DISCARD,
                     ACTION_REJECT,
@@ -214,7 +215,7 @@ try {
                 ->leftJoin('users', 'domains.user_id', '=', 'users.id')
                 ->where('domains.domain', $aliasDomain)
                 ->selectRaw('CASE
-                WHEN ? AND domains.catch_all = 0 THEN ?
+                WHEN ? AND domains.catch_all = 0 AND (domains.auto_create_regex IS NULL OR ? NOT REGEXP domains.auto_create_regex) THEN ?
                 WHEN domains.active = 0 THEN ?
                 WHEN users.reject_until > NOW() THEN ?
                 WHEN users.defer_until > NOW() THEN ?
@@ -222,6 +223,7 @@ try {
                 ELSE "DUNNO"
                 END', [
                     $noAliasExists,
+                    $aliasLocalPart,
                     ACTION_DOES_NOT_EXIST,
                     ACTION_DOMAIN_DISCARD,
                     ACTION_REJECT,
@@ -342,5 +344,5 @@ function endsWith($haystack, $needles)
 
 function logData($data)
 {
-    file_put_contents(__DIR__.'/../storage/logs/postfix-access-policy.log', '['.(new DateTime())->format('Y-m-d H:i:s').'] '.$data.PHP_EOL, FILE_APPEND);
+    file_put_contents(__DIR__.'/../storage/logs/postfix-access-policy.log', '['.(new DateTime)->format('Y-m-d H:i:s').'] '.$data.PHP_EOL, FILE_APPEND);
 }

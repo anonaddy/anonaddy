@@ -284,6 +284,15 @@
                 data-tippy-content="'Select All' is only available when the page size is 25"
               ></div>
             </span>
+            <span v-else-if="props.column.label == 'Active'">
+              {{ props.column.label }}
+              <span
+                class="tooltip outline-none"
+                data-tippy-content="When an alias is deactivated, any messages sent to it will be silently discarded. The sender will not be notified of the unsuccessful delivery."
+              >
+                <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+              </span>
+            </span>
             <span v-else :class="selectedRows.length > 0 ? 'blur-sm' : ''">
               {{ props.column.label }}
             </span>
@@ -1252,6 +1261,38 @@
         </div>
       </template>
     </Modal>
+    <Modal :open="newAliasModalOpen" @close="newAliasModalOpen = false">
+      <template v-slot:title> Your New Alias is: </template>
+      <template v-slot:content>
+        <p class="my-8 text-grey-700">
+          <button
+            class="text-grey-400 tooltip outline-none"
+            data-tippy-content="Click to copy"
+            @click="clipboard(getNewAliasEmail())"
+          >
+            <span class="font-semibold text-indigo-800">{{
+              newAliasExtension ? `${newAliasLocalPart}+${newAliasExtension}` : newAliasLocalPart
+            }}</span
+            ><span class="font-semibold text-grey-500">@{{ newAliasDomain }}</span>
+          </button>
+        </p>
+
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+          <button
+            @click="clipboard(getNewAliasEmail())"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Copy
+          </button>
+          <button
+            @click="newAliasModalOpen = false"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Close
+          </button>
+        </div>
+      </template>
+    </Modal>
     <Modal :open="moreInfoOpen" @close="moreInfoOpen = false">
       <template v-slot:title> More information </template>
       <template v-slot:content>
@@ -1407,6 +1448,10 @@ const restoreAliasModalOpen = ref(false)
 const editAliasRecipientsLoading = ref(false)
 const editAliasRecipientsModalOpen = ref(false)
 const createAliasModalOpen = ref(false)
+const newAliasLocalPart = ref('')
+const newAliasExtension = ref('')
+const newAliasDomain = ref('')
+const newAliasModalOpen = ref(false)
 const createAliasLoading = ref(false)
 const createAliasDomain = ref(props.defaultAliasDomain)
 const createAliasLocalPart = ref('')
@@ -1656,14 +1701,19 @@ const createNewAlias = () => {
     )
     .then(({ data }) => {
       // Show active/inactive
-      router.visit(route('aliases.index'), {
+      router.reload({
         only: ['initialRows', 'search', 'currentAliasStatus', 'sort', 'sortDirection'],
         onSuccess: page => {
+          rows.value = page.props.initialRows.data
           createAliasLoading.value = false
           createAliasLocalPart.value = ''
           createAliasDescription.value = ''
           createAliasRecipientIds.value = []
           createAliasModalOpen.value = false
+          newAliasLocalPart.value = data.data.local_part
+          newAliasExtension.value = data.data.extension
+          newAliasDomain.value = data.data.domain
+          newAliasModalOpen.value = true
           successMessage('New alias created successfully')
         },
       })
@@ -2296,6 +2346,12 @@ const setSendFromAliasCopied = () => {
 
 const getAliasEmail = alias => {
   return alias.extension ? `${alias.local_part}+${alias.extension}@${alias.domain}` : alias.email
+}
+
+const getNewAliasEmail = () => {
+  return newAliasExtension.value
+    ? `${newAliasLocalPart.value}+${newAliasExtension.value}@${newAliasDomain.value}`
+    : `${newAliasLocalPart.value}@${newAliasDomain.value}`
 }
 
 const getAliasLocalPart = alias => {

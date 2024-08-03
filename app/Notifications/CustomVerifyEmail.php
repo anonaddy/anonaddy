@@ -37,7 +37,7 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldBeEncrypted, Should
         $recipientId = $notifiable instanceof User ? $notifiable->default_recipient_id : $notifiable->id;
         $userId = $notifiable instanceof User ? $notifiable->id : $notifiable->user_id;
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(Lang::get('Verify Email Address'))
             ->markdown('mail.verify_email', [
                 'verificationUrl' => $verificationUrl,

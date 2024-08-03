@@ -284,9 +284,11 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         // Replace <alias+hello=example.com@johndoe.anonaddy.com> with <hello@example.com>
         $destination = $this->email->to[0]['address'];
 
+        // Reply may be HTML but email client added HTML banner plain text version
         return Str::of(str_ireplace($this->sender, '', $text))
             ->replace($this->alias->local_part.'+'.Str::replaceLast('@', '=', $destination).'@'.$this->alias->domain, $destination)
-            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '');
+            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
+            ->replaceMatches('/(This email was sent to).*?(to deactivate this alias)/mis', '');
     }
 
     private function removeRealEmailAndHtmlBanner($html)

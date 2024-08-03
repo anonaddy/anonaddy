@@ -84,7 +84,7 @@ class CustomMailer extends Mailer
 
                 $recipient->update(['should_encrypt' => false]);
 
-                $recipient->notify(new GpgKeyExpired());
+                $recipient->notify(new GpgKeyExpired);
             }
 
             if ($encryptedSymfonyMessage) {
@@ -101,8 +101,9 @@ class CustomMailer extends Mailer
         if (isset($data['needsDkimSignature']) && $data['needsDkimSignature'] && ! is_null(config('anonaddy.dkim_signing_key'))) {
             $dkimSigner = new DkimSigner(config('anonaddy.dkim_signing_key'), $data['aliasDomain'], config('anonaddy.dkim_selector'));
 
-            $options = (new DkimOptions())->headersToIgnore([
+            $options = (new DkimOptions)->headersToIgnore([
                 'List-Unsubscribe',
+                'List-Unsubscribe-Post',
                 'Return-Path',
                 'Feedback-ID',
                 'Content-Type',

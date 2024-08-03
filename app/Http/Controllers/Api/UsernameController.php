@@ -46,6 +46,10 @@ class UsernameController extends Controller
             $username->from_name = $request->from_name;
         }
 
+        if ($request->has('auto_create_regex')) {
+            $username->auto_create_regex = $request->auto_create_regex;
+        }
+
         $username->save();
 
         return new UsernameResource($username->refresh()->load('defaultRecipient')->loadCount('aliases'));

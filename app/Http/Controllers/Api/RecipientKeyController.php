@@ -12,7 +12,7 @@ class RecipientKeyController extends Controller
 
     public function __construct()
     {
-        $this->gnupg = new \gnupg();
+        $this->gnupg = new \gnupg;
     }
 
     public function update(UpdateRecipientKeyRequest $request, $id)

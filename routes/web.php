@@ -33,6 +33,7 @@ use App\Http\Controllers\ShowRecipientController;
 use App\Http\Controllers\ShowRuleController;
 use App\Http\Controllers\ShowUsernameController;
 use App\Http\Controllers\StoreFailedDeliveryController;
+use App\Http\Controllers\TestAutoCreateRegexController;
 use App\Http\Controllers\UseReplyToController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -122,6 +123,8 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
 
     Route::get('/failed-deliveries', [ShowFailedDeliveryController::class, 'index'])->name('failed_deliveries.index');
     Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index'])->name('downloadable_failed_delivery.index');
+
+    Route::post('/test-auto-create-regex', [TestAutoCreateRegexController::class, 'index'])->name('test_auto_create_regex.index');
 });
 
 Route::group([

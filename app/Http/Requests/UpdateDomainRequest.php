@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ValidRegex;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateDomainRequest extends FormRequest
@@ -26,6 +27,12 @@ class UpdateDomainRequest extends FormRequest
         return [
             'description' => 'nullable|max:200',
             'from_name' => 'nullable|string|max:50',
+            'auto_create_regex' => [
+                'nullable',
+                'string',
+                'max:100',
+                new ValidRegex,
+            ],
         ];
     }
 }

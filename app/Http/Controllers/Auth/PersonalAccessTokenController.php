@@ -36,7 +36,7 @@ class PersonalAccessTokenController extends Controller
         return [
             'token' => new PersonalAccessTokenResource($token->accessToken),
             'accessToken' => $accessToken,
-            'qrCode' => (new QRCode())->render(config('app.url').'|'.$accessToken),
+            'qrCode' => (new QRCode)->render(config('app.url').'|'.$accessToken),
         ];
     }
 

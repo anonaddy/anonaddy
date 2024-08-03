@@ -38,6 +38,29 @@
       }"
       styleClass="vgt-table"
     >
+      <template #table-column="props">
+        <span v-if="props.column.label == 'Active'">
+          {{ props.column.label }}
+          <span
+            class="tooltip outline-none"
+            data-tippy-content="When a domain is deactivated, any messages sent to its aliases will be silently discarded. The sender will not be notified of the unsuccessful delivery."
+          >
+            <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+          </span>
+        </span>
+        <span v-else-if="props.column.label == 'Catch-All'">
+          {{ props.column.label }}
+          <span
+            class="tooltip outline-none"
+            data-tippy-content="When catch-all is disabled, only aliases that already exist for the domain will forward messages. They will not be automatically created on-the-fly unless you are using auto create regex."
+          >
+            <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
+          </span>
+        </span>
+        <span v-else>
+          {{ props.column.label }}
+        </span>
+      </template>
       <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
@@ -677,12 +700,14 @@ const columns = [
     label: 'Active',
     field: 'active',
     type: 'boolean',
+    sortable: false,
     globalSearchDisabled: true,
   },
   {
     label: 'Catch-All',
     field: 'catch_all',
     type: 'boolean',
+    sortable: false,
     globalSearchDisabled: true,
   },
   {
@@ -969,7 +994,7 @@ const closeCheckRecordsModal = () => {
 }
 
 const validDomain = domain => {
-  let re = /(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]\.)+[a-zA-Z]{2,63}$)/
+  let re = /(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9]\.)+[a-zA-Z0-9-]{2,63}$)/
   return re.test(domain)
 }
 

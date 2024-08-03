@@ -31,11 +31,11 @@ class StoreDomainRequest extends FormRequest
                 'bail',
                 'required',
                 'string',
-                'max:50',
+                'max:100',
                 'unique:domains',
-                new ValidDomain(),
-                new NotLocalDomain(),
-                new NotUsedAsRecipientDomain(),
+                new ValidDomain,
+                new NotLocalDomain,
+                new NotUsedAsRecipientDomain,
             ],
         ];
     }
