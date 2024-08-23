@@ -88,8 +88,8 @@ class UsernamesTest extends TestCase
         ]);
 
         $response->assertStatus(403);
-        $this->assertEquals(3, $this->user->username_count);
-        $this->assertCount(4, $this->user->usernames);
+        $this->assertEquals(2, $this->user->username_count);
+        $this->assertCount(3, $this->user->usernames);
     }
 
     #[Test]
