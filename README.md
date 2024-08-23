@@ -409,7 +409,7 @@ If you get close to your limit (over 80%) you'll be sent an email letting you kn
 
 ## Can I login using an additional username?
 
-Yes, you can login with any of your usernames. You can add 1 additional username as a Lite user and up to 10 additional usernames as a Pro user for totals of 2 and 11 respectively (including the one you signed up with).
+Yes, you can login with any of your usernames. You can add 5 additional username as a Lite user and up to 20 additional usernames as a Pro user for totals of 6 and 21 respectively (including the one you signed up with).
 
 ## I'm not receiving any emails, what's wrong?
 

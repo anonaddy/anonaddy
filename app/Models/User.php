@@ -499,7 +499,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasReachedUsernameLimit()
     {
-        return $this->username_count >= config('anonaddy.additional_username_limit');
+        return $this->usernames()->count() >= config('anonaddy.additional_username_limit');
     }
 
     public function isVerifiedRecipient($email)
