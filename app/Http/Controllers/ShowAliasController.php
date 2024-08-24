@@ -58,6 +58,7 @@ class ShowAliasController extends Controller
                     'last_blocked',
                     'last_replied',
                     'last_sent',
+                    'last_used',
                     'active',
                     'created_at',
                     'updated_at',
@@ -73,6 +74,7 @@ class ShowAliasController extends Controller
                     '-last_blocked',
                     '-last_replied',
                     '-last_sent',
+                    '-last_used',
                     '-active',
                     '-created_at',
                     '-updated_at',
@@ -95,10 +97,12 @@ class ShowAliasController extends Controller
 
         $sort = $request->session()->get('aliasesSort', 'created_at');
         $direction = $request->session()->get('aliasesSortDirection', 'desc');
+        $compareOperator = $request->session()->get('aliasesSortCompareOperator', '>');
 
         if ($request->has('sort')) {
             $direction = strpos($request->input('sort'), '-') === 0 ? 'desc' : 'asc';
             $sort = ltrim($request->input('sort'), '-');
+            $compareOperator = $direction === 'desc' ? '>' : '<';
 
             $request->session()->put('aliasesSort', $sort);
             $request->session()->put('aliasesSortDirection', $direction);
@@ -115,9 +119,30 @@ class ShowAliasController extends Controller
             ->when($request->input('username'), function ($query, $id) {
                 return $query->belongsToAliasable('App\Models\Username', $id);
             })
-            ->when($sort !== 'created_at' || $direction !== 'desc', function ($query) use ($sort, $direction) {
+            ->when($sort !== 'created_at' || $direction !== 'desc', function ($query) use ($sort, $direction, $compareOperator) {
                 if ($sort === 'created_at') {
                     return $query->orderBy($sort, $direction);
+                }
+
+                // If sort is last_used then order by all and return
+                if ($sort === 'last_used') {
+                    return $query
+                        ->orderByRaw(
+                            "CASE
+                            WHEN (last_forwarded {$compareOperator} last_replied
+                            OR (last_forwarded IS NOT NULL
+                            AND last_replied IS NULL))
+                            AND (last_forwarded {$compareOperator} last_sent
+                            OR (last_forwarded IS NOT NULL
+                            AND last_sent IS NULL))
+                                THEN last_forwarded
+                            WHEN last_replied {$compareOperator} last_sent
+                            OR (last_replied IS NOT NULL
+                            AND last_sent IS NULL)
+                                THEN last_replied
+                            ELSE last_sent
+                        END {$direction}"
+                        )->orderBy('created_at', 'desc');
                 }
 
                 // Secondary order by latest first

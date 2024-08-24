@@ -1003,7 +1003,7 @@ const validateNewDomain = e => {
 
   if (!newDomain.value) {
     errors.value.newDomain = 'Domain name required'
-  } else if (newDomain.value.length > 50) {
+  } else if (newDomain.value.length > 100) {
     errors.value.newDomain = 'That domain name is too long'
   } else if (!validDomain(newDomain.value)) {
     errors.value.newDomain = 'Please enter a valid domain name'

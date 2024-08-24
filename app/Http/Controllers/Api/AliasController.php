@@ -29,7 +29,30 @@ class AliasController extends Controller
             ->when($request->input('sort'), function ($query, $sort) {
                 $direction = strpos($sort, '-') === 0 ? 'desc' : 'asc';
                 $sort = ltrim($sort, '-');
+                $compareOperator = $direction === 'desc' ? '>' : '<';
 
+                // If sort is last_used then order by all and return
+                if ($sort === 'last_used') {
+                    return $query
+                        ->orderByRaw(
+                            "CASE
+                            WHEN (last_forwarded {$compareOperator} last_replied
+                            OR (last_forwarded IS NOT NULL
+                            AND last_replied IS NULL))
+                            AND (last_forwarded {$compareOperator} last_sent
+                            OR (last_forwarded IS NOT NULL
+                            AND last_sent IS NULL))
+                                THEN last_forwarded
+                            WHEN last_replied {$compareOperator} last_sent
+                            OR (last_replied IS NOT NULL
+                            AND last_sent IS NULL)
+                                THEN last_replied
+                            ELSE last_sent
+                        END {$direction}"
+                        )->orderBy('created_at', 'desc');
+                }
+
+                // If sort is created at then simply return as no need for secondary sorting below
                 if ($sort === 'created_at') {
                     return $query->orderBy($sort, $direction);
                 }

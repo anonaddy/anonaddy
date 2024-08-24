@@ -1576,6 +1576,10 @@ const sortOptions = [
     label: 'Last Sent At',
   },
   {
+    value: 'last_used',
+    label: 'Last Used At',
+  },
+  {
     value: 'updated_at',
     label: 'Updated At',
   },
