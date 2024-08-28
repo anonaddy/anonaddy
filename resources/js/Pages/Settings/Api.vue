@@ -21,13 +21,21 @@
               class="text-indigo-700"
               >Firefox</a
             >
-            or
+            ,
             <a
               href="https://chrome.google.com/webstore/detail/addyio-anonymous-email-fo/iadbdpnoknmbdeolbapdackdcogdmjpe"
               target="_blank"
               rel="nofollow noopener noreferrer"
               class="text-indigo-700"
-              >Chrome / Brave</a
+              >Chrome, Brave</a
+            >
+            or
+            <a
+              href="https://microsoftedge.microsoft.com/addons/detail/addyio-anonymous-email/ohjlgpcfncgkijjfmabldlgnccmgcehl"
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              class="text-indigo-700"
+              >Edge</a
             >
             to create new aliases. They can also be used with the mobile apps. Simply paste a key
             you've created into the browser extension or mobile apps to get started. Your API access
