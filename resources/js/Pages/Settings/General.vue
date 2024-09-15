@@ -952,6 +952,111 @@
           </form>
         </div>
       </div>
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900">Webhook</h3>
+          <p class="text-base text-grey-700">
+            Receive webhook to your desired URL for every incoming email. Each webhook will be sent
+            with the signature attached in the header of the request. The signature is created using
+            the signing key you provide below. The receiving end is reponsible to verify that the
+            signature match.
+          </p>
+          <p class="text-base text-grey-700">If set to empty, no webhook will be sent</p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="webhookForm.post(route('settings.webhook'), { preserveScroll: true })"
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label for="webhook-url" class="block text-sm font-medium leading-6 text-grey-600"
+                  >Webhook URL</label
+                >
+                <div class="relative mt-2">
+                  <input
+                    v-model="webhookForm.webhook_url"
+                    type="text"
+                    name="webhook_url"
+                    id="webhook-url"
+                    class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      webhookForm.errors.webhook_url
+                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
+                        : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                    "
+                    placeholder="https://www.example.com"
+                    :aria-invalid="webhookForm.errors.webhook_url ? 'true' : undefined"
+                    :aria-describedby="
+                      webhookForm.errors.webhook_url ? 'webhook-url-error' : undefined
+                    "
+                  />
+                  <div
+                    v-if="webhookForm.errors.webhook_url"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="webhookForm.errors.webhook_url"
+                  class="mt-2 text-sm text-red-600"
+                  id="webhook-url-error"
+                >
+                  {{ webhookForm.errors.webhook_url }}
+                </p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label for="signing-key" class="block text-sm font-medium leading-6 text-grey-600"
+                  >Signing Key</label
+                >
+                <div class="relative mt-2">
+                  <input
+                    v-model="webhookForm.signing_key"
+                    type="text"
+                    name="signing_key"
+                    id="signing-key"
+                    class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      webhookForm.errors.signing_key
+                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
+                        : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                    "
+                    placeholder=""
+                    :aria-invalid="webhookForm.errors.signing_key ? 'true' : undefined"
+                    :aria-describedby="
+                      webhookForm.errors.signing_key ? 'signing-key-error' : undefined
+                    "
+                  />
+                  <div
+                    v-if="webhookForm.errors.signing_key"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="webhookForm.errors.signing_key"
+                  class="mt-2 text-sm text-red-600"
+                  id="signing-key-error"
+                >
+                  {{ webhookForm.errors.signing_key }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="webhookForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update Webhook
+              <loader v-if="webhookForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   </SettingsLayout>
 </template>
@@ -1003,6 +1108,14 @@ const props = defineProps({
     required: true,
   },
   emailSubject: {
+    type: String,
+    required: true,
+  },
+  webhookUrl: {
+    type: String,
+    required: true,
+  },
+  signingKey: {
     type: String,
     required: true,
   },
@@ -1109,5 +1222,10 @@ const bannerLocationForm = useForm({
 
 const emailSubjectForm = useForm({
   email_subject: props.emailSubject,
+})
+
+const webhookForm = useForm({
+  webhook_url: props.webhookUrl,
+  signing_key: props.signingKey,
 })
 </script>

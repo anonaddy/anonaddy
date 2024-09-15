@@ -30,6 +30,8 @@ class SettingController extends Controller
             'emailSubject' => user()->email_subject ?? '',
             'bannerLocation' => user()->banner_location,
             'domainOptions' => user()->domainOptions(),
+            'webhookUrl' => user()->webhook_url,
+            'signingKey' => user()->signing_key
         ]);
     }
 

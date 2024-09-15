@@ -35,6 +35,7 @@ use App\Http\Controllers\ShowUsernameController;
 use App\Http\Controllers\StoreFailedDeliveryController;
 use App\Http\Controllers\TestAutoCreateRegexController;
 use App\Http\Controllers\UseReplyToController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -158,6 +159,8 @@ Route::group([
     Route::post('/from-name', [FromNameController::class, 'update'])->name('settings.from_name');
 
     Route::post('/email-subject', [EmailSubjectController::class, 'update'])->name('settings.email_subject');
+
+    Route::post('/webhook', [WebhookController::class, 'update'])->name('settings.webhook');
 
     Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
 
