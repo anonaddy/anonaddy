@@ -24,7 +24,7 @@ class UpdateWebhookRequest extends FormRequest
     public function rules()
     {
         return [
-            'webhook_url' => 'nullable|string',
+            'webhook_url' => 'nullable|url:http,https',
             'signing_key' => 'required_with:webhook_url|string|max:255'
         ];
     }
