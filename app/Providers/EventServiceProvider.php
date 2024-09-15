@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use App\Listeners\CheckIfShouldBlock;
 use App\Listeners\SendIncorrectOtpNotification;
+use App\Listeners\SendEmailPendingWebhook;
+use App\Listeners\SendEmailSentWebhook;
+use App\Listeners\SendFailedWebhookNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,9 +26,16 @@ class EventServiceProvider extends ServiceProvider
         ],
         MessageSending::class => [
             CheckIfShouldBlock::class,
+            SentEmailPendingWebhook::class
+        ],
+        MessageSent::class => [
+            SendEmailSentWebhook::class,
         ],
         LoginFailed::class => [
             SendIncorrectOtpNotification::class,
+        ],
+        FinalWebhookCallFailedEvent::class => [
+            SendFailedWebhookNotification::class
         ],
     ];
 
