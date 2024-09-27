@@ -62,7 +62,7 @@ class ApiAuthenticationTest extends TestCase
         ]);
 
         $response->assertUnauthorized();
-        $response->assertExactJson(['error' => 'The provided credentials are incorrect']);
+        $response->assertExactJson(['message' => 'The provided credentials are incorrect.']);
     }
 
     #[Test]
@@ -120,7 +120,7 @@ class ApiAuthenticationTest extends TestCase
         ]);
 
         $response->assertForbidden();
-        $response->assertExactJson(['error' => 'Security key authentication is not currently supported from the extension or mobile apps, please use an API key to login instead']);
+        $response->assertExactJson(['message' => 'Security key authentication is not currently supported from the extension or mobile apps, please use an API key to login instead.']);
     }
 
     #[Test]
@@ -156,7 +156,7 @@ class ApiAuthenticationTest extends TestCase
         ]);
 
         $response2->assertUnauthorized();
-        $response2->assertExactJson(['error' => 'The \'One Time Password\' typed was wrong']);
+        $response2->assertExactJson(['message' => 'The \'One Time Password\' typed was wrong.']);
 
         $response3 = $this->withHeaders([
             'X-CSRF-TOKEN' => $csrfToken,
@@ -168,5 +168,89 @@ class ApiAuthenticationTest extends TestCase
 
         $response3->assertSuccessful();
         $this->assertEquals($this->user->tokens[0]->token, hash('sha256', $response3->json()['api_key']));
+    }
+
+    #[Test]
+    public function user_can_logout_via_api()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        $this->user->defaultUsername->username = 'janedoe';
+        $this->user->defaultUsername->save();
+
+        $token = $this->user->createToken('New');
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token->plainTextToken,
+        ])->json('POST', '/api/auth/logout', []);
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'tokenable_id' => $this->user->id,
+        ]);
+    }
+
+    #[Test]
+    public function user_can_delete_account_via_api()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        $this->user->defaultUsername->username = 'janedoe';
+        $this->user->defaultUsername->save();
+
+        $token = $this->user->createToken('New');
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token->plainTextToken,
+        ])->json('POST', '/api/auth/delete-account', [
+            'password' => 'mypassword',
+        ]);
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('usernames', [
+            'username' => 'janedoe',
+        ]);
+    }
+
+    #[Test]
+    public function user_must_enter_correct_password_to_delete_account()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        $this->user->defaultUsername->username = 'janedoe';
+        $this->user->defaultUsername->save();
+
+        $token = $this->user->createToken('New');
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token->plainTextToken,
+        ])->json('POST', '/api/auth/delete-account', [
+            'password' => 'incorrect',
+        ]);
+
+        $response->assertJsonValidationErrorFor('password');
+        $this->assertDatabaseHas('usernames', [
+            'username' => 'janedoe',
+        ]);
+    }
+
+    #[Test]
+    public function user_must_have_valid_api_key_to_delete_account()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        $this->user->defaultUsername->username = 'janedoe';
+        $this->user->defaultUsername->save();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer invalid-api-key',
+        ])->json('POST', '/api/auth/delete-account', [
+            'password' => 'mypassword',
+        ]);
+
+        $response->assertUnauthorized();
+        $this->assertDatabaseHas('usernames', [
+            'username' => 'janedoe',
+        ]);
     }
 }
