@@ -1162,7 +1162,7 @@
         </p>
         <p class="mt-4 text-grey-700">
           To send from an alias you must send the email from a <b>verified recipient</b> on your
-          addy.io account.
+          account.
         </p>
         <label for="send_from_alias" class="block font-medium leading-6 text-grey-600 text-sm my-2">
           Alias to send from

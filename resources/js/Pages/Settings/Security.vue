@@ -721,7 +721,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="disableKey"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disable:cursor-not-allowed"
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="disableKeyLoading"
             >
               Disable
@@ -771,7 +771,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="deleteKey"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disable:cursor-not-allowed"
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="deleteKeyLoading"
             >
               Remove

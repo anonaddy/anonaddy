@@ -205,7 +205,7 @@
           <div class="text-center">
             <img :src="qrCode" class="inline-block" alt="QR Code" />
             <p class="text-left text-sm text-grey-700">
-              You can scan this QR code to automatically login to the addy.io mobile app by Stjin.
+              You can scan this QR code to automatically login to the addy.io mobile app.
             </p>
           </div>
           <div class="mt-6">

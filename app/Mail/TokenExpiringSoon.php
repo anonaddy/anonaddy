@@ -41,7 +41,7 @@ class TokenExpiringSoon extends Mailable implements ShouldBeEncrypted, ShouldQue
     public function build()
     {
         return $this
-            ->subject('Your addy.io API key expires soon')
+            ->subject('Your '.config('app.name').' API key expires soon')
             ->markdown('mail.token_expiring_soon', [
                 'user' => $this->user,
                 'userId' => $this->user->id,

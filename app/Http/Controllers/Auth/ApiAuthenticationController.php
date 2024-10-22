@@ -38,11 +38,8 @@ class ApiAuthenticationController extends Controller
         }
 
         if (! $user->hasVerifiedDefaultRecipient()) {
-            // Send email verification email
-            $user->sendApiRegistrationEmailVerificationNotification($request->device_name, $request->expiration);
-
             return response()->json([
-                'message' => 'Your email address is not verified. A fresh verification email has just been sent to you.',
+                'message' => 'Your email address is not verified.',
             ], 401);
         }
 

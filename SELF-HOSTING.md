@@ -260,7 +260,6 @@ smtpd_recipient_restrictions =
    reject_rhsbl_reverse_client dbl.spamhaus.org,
    reject_rhsbl_sender dbl.spamhaus.org,
    reject_rbl_client zen.spamhaus.org
-   reject_rbl_client dul.dnsbl.sorbs.net
 
 # Block clients that speak too early.
 smtpd_data_restrictions = reject_unauth_pipelining
@@ -1359,11 +1358,8 @@ npm run production
 # Run any database migrations
 php artisan migrate --force
 
-# Clear cache
-php artisan config:cache
-php artisan view:cache
-php artisan route:cache
-php artisan event:cache
+# Cache config, events, routes and views
+php artisan optimize
 
 # Restart queue workers to reflect changes
 php artisan queue:restart
