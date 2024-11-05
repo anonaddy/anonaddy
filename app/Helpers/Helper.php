@@ -52,14 +52,19 @@ function stripEmailExtension(string $email): string
      *
      * @return \App\Models\User
      */
-function createUser(string $username, string $email, string|null $password = null) 
+function createUser(string $username, string $email, string|null $password = null, bool $emailVerified = false) 
 {
     $userId = Uuid::uuid4();
 
     $recipient = Recipient::create([
         'email' => $email,
-        'user_id' => $userId,
+        'user_id' => $userId,    
     ]);
+
+    if ($emailVerified)
+    {
+        $recipient->markEmailAsVerified();    
+    }
 
     $usernameModel = Username::create([
         'username' => $username,

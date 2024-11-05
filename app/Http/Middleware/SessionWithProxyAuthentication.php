@@ -94,7 +94,7 @@ class SessionWithProxyAuthentication extends AuthenticateSession
             $userId = $this->getValidUserIdForUsername($username);
             if ($userId === null)
             {
-                $userId = createUser($username, $email)->id;
+                $userId = createUser($username, $email, emailVerified: true)->id;
             }
 
             Auth::loginUsingId($userId);
