@@ -39,12 +39,9 @@ class ProxyAuthentication extends AuthenticateSession
      */
     public function handle($request, Closure $next)
     {
-        if (!Auth::check() && $request != null && $this->isProxyAuthenticationEnabled)
+        if ($this->isProxyAuthenticationEnabled && $this->hasProxyAuthenticationHeaders($request))
         {
-            $this->handleProxyAuthentication($request);
-            return tap($next($request), function () use ($request) {
-                $this->handleProxyAuthentication($request);
-            });
+            return $this->handleProxyAuthentication($request, $next);
         }
         else
         {
@@ -52,16 +49,34 @@ class ProxyAuthentication extends AuthenticateSession
         }
     }
 
-    private function handleProxyAuthentication(Request $request)
+    private function handleProxyAuthentication(Request $request, Closure $next)
     {
-        $username = $request->header($this->usernameHeaderName);
-        $email = $request->header($this->emailHeaderName);
-
-        if ($this->isNullOrEmptyString($username) || $this->isNullOrEmptyString($email))
+        if (!Auth::check())
         {
-            abort(401);
+            $username = $request->header($this->usernameHeaderName);
+            $email = $request->header($this->emailHeaderName);
+
+            if ($this->isNullOrEmptyString($username) || $this->isNullOrEmptyString($email))
+            {
+                abort(400);
+            }
+
+            $userId = $this->getValidUserIdForUsername($username);
+
+            if ($userId === null)
+            {
+                $userId = createUser($username, $email)->id;
+            }
+
+            Auth::loginUsingId($userId);
+            $request->session()->regenerate();
         }
 
+        return $next($request);
+    }
+
+    private function getValidUserIdForUsername(string $username) : string|null
+    {
         $usernameModel = Username::select(['user_id', 'username', 'can_login'])
             ->where('username', $username)
             ->first();
@@ -69,22 +84,18 @@ class ProxyAuthentication extends AuthenticateSession
         if ($usernameModel !== null && $usernameModel->can_login === false)
         {
             abort(401);
-        }
+        } 
 
-        if ($usernameModel === null)
-        {
-            $userId = createUser($username, $email)->id;
-        }
-        else
-        {
-            $userId = $usernameModel->user_id;
-        }
-
-        Auth::loginUsingId($userId);
-        $request->session()->regenerate();
+        return $usernameModel?->user_id;
     }
 
-    private function isNullOrEmptyString(string|null $str){
+    private function hasProxyAuthenticationHeaders(Request $request): bool 
+    {
+        return $request->hasHeader($this->usernameHeaderName) && $request->hasHeader($this->emailHeaderName);
+    }
+
+    private function isNullOrEmptyString(string|null $str)
+    {
         return $str === null || trim($str) === '';
     }
 }
