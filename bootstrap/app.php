@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\Middleware\AuthenticateSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -34,7 +35,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class, // Must be the last item!
-        ]);
+        ], replace: [
+            'auth.session' => \App\Http\MiddleWare\ProxyAuthentication::class
+        ],
+    
+    );
 
         $middleware->alias([
             '2fa' => \App\Http\Middleware\VerifyTwoFactorAuth::class,

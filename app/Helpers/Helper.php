@@ -1,7 +1,13 @@
 <?php
 
+use App\Models\Recipient;
+use App\Models\User;
+use App\Models\Username;
+
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Ramsey\Uuid\Uuid;
 
 function user()
 {
@@ -39,4 +45,36 @@ function stripEmailExtension(string $email): string
     $localPart = Str::contains($localPart, '+') ? Str::before($localPart, '+') : $localPart;
 
     return $localPart.'@'.$domain;
+}
+
+ /**
+     * Create a new user instance
+     *
+     * @return \App\Models\User
+     */
+function createUser(string $username, string $email, string|null $password = null) 
+{
+    $userId = Uuid::uuid4();
+
+    $recipient = Recipient::create([
+        'email' => $email,
+        'user_id' => $userId,
+    ]);
+
+    $usernameModel = Username::create([
+        'username' => $username,
+        'user_id' => $userId,
+    ]);
+
+    $twoFactor = app('pragmarx.google2fa');
+
+    $passwordHash = $password === null ? '' : Hash::make($password);
+
+    return User::create([
+        'id' => $userId,
+        'default_username_id' => $usernameModel->id,
+        'default_recipient_id' => $recipient->id,
+        'password' => $passwordHash,
+        'two_factor_secret' => $twoFactor->generateSecretKey(),
+    ]);
 }
