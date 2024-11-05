@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 
-class ProxyAuthentication extends AuthenticateSession 
+class SessionWithProxyAuthentication extends AuthenticateSession 
 {
     private bool $isProxyAuthenticationEnabled;
     private string $usernameHeaderName;
