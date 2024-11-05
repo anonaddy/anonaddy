@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SessionWithProxyAuthentication extends AuthenticateSession 
 {
+    private const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
     private bool $isProxyAuthenticationEnabled;
     private string $usernameHeaderName;
     private string $emailHeaderName;
@@ -31,7 +32,6 @@ class SessionWithProxyAuthentication extends AuthenticateSession
         parent::__construct($auth);
     }
 
-
     /**
      * Handle an incoming request.
      *
@@ -39,40 +39,71 @@ class SessionWithProxyAuthentication extends AuthenticateSession
      */
     public function handle($request, Closure $next)
     {
-        if ($this->isProxyAuthenticationEnabled && $this->hasProxyAuthenticationHeaders($request))
+        if ($this->isProxyAuthenticationEnabled)
         {
             return $this->handleProxyAuthentication($request, $next);
         }
-        else
-        {
-            return parent::handle($request, $next);
-        }
+
+        return parent::handle($request, $next);
     }
 
     private function handleProxyAuthentication(Request $request, Closure $next)
     {
-        if (!Auth::check())
+        $loggedInUsername = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
+        $username = $request->header($this->usernameHeaderName);
+        $email = $request->header($this->emailHeaderName);
+        
+        $loggedOut = $this->LogoutWhenNeeded($request, $loggedInUsername, $username);
+        $loggedIn = $this->LoginWhenNeeded($request, $username, $email);
+        
+        if ($loggedOut || $loggedIn)
         {
-            $username = $request->header($this->usernameHeaderName);
-            $email = $request->header($this->emailHeaderName);
+            return redirect('/');
+        }
 
-            if ($this->isNullOrEmptyString($username) || $this->isNullOrEmptyString($email))
+        return parent::handle($request, $next); 
+    }
+
+    private function LogoutWhenNeeded(Request $request, string|null $loggedInUsername, string|null $username): bool
+    {
+        if (Auth::check())
+        {
+            $loggedInElsewhereButCurrentlyHasHeaders = $this->isNullOrEmptyString($loggedInUsername) && $this->hasProxyAuthenticationHeaders($request);
+            $loggedInFromProxyButCurrentlyNoHeaders = !$this->isNullOrEmptyString($loggedInUsername) && !$this->hasProxyAuthenticationHeaders($request);
+            $loggedinFromProxyButUsernameDoesNotMatch = !$this->isNullOrEmptyString($loggedInUsername) && $loggedInUsername !== $username;
+
+            if ($loggedInElsewhereButCurrentlyHasHeaders ||
+                $loggedInFromProxyButCurrentlyNoHeaders ||
+                $loggedinFromProxyButUsernameDoesNotMatch)
             {
-                abort(400);
+                Auth::logout();
+                $request->session()->regenerate();
+                $request->session()->forget(self::proxyAuthenticationUsernameSessionKey);
+                return true;
             }
+        }
 
+        return false;
+    }
+
+    private function LoginWhenNeeded(Request $request, string|null $username, string|null $email) : bool
+    {
+        $notloggedInButHeadersProvided = !Auth::check() && !$this->isNullOrEmptyString($username) && !$this->isNullOrEmptyString($email);
+        if ($notloggedInButHeadersProvided)
+        {
             $userId = $this->getValidUserIdForUsername($username);
-
             if ($userId === null)
             {
                 $userId = createUser($username, $email)->id;
             }
 
             Auth::loginUsingId($userId);
+            $request->session()->put(self::proxyAuthenticationUsernameSessionKey, $username);
             $request->session()->regenerate();
+            return true;
         }
 
-        return $next($request);
+        return false;
     }
 
     private function getValidUserIdForUsername(string $username) : string|null
