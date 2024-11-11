@@ -145,4 +145,44 @@ class ProxyAuthenticationTest extends TestCase
             ->assertRedirect('/aliases')
             ->assertSessionHasNoErrors();
     }
+
+    #[Test]
+    public function unauthenticated_when_user_with_proxy_headers_cannot_login()
+    {
+        $userBar = $this->createUser('bar', null); 
+        $username = Username::where('username', 'bar')->first();
+        $username->disallowLogin();
+        $username->save();
+
+        
+        $response = $this
+            ->withHeaders([
+                'X-Name' => 'bar',
+                'X-Email' => 'bar@foo.com'
+            ])
+            ->get('/login');
+
+        $response
+            ->assertStatus(401);
+    }
+
+    #[Test]
+    public function unauthenticated_when_user_with_proxy_headers_deactivated()
+    {
+        $userBar = $this->createUser('bar', null); 
+        $username = Username::where('username', 'bar')->first();
+        $username->deactivate();
+        $username->save();
+
+        
+        $response = $this
+            ->withHeaders([
+                'X-Name' => 'bar',
+                'X-Email' => 'bar@foo.com'
+            ])
+            ->get('/login');
+
+        $response
+            ->assertStatus(401);
+    }
 }

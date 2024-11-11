@@ -109,11 +109,11 @@ class ProxyAuthentication
 
     private function getValidUserIdForUsername(string $username) : string|null
     {
-        $usernameModel = Username::select(['user_id', 'username', 'can_login'])
+        $usernameModel = Username::select(['user_id', 'username', 'can_login', 'active'])
             ->where('username', $username)
             ->first();
 
-        if ($usernameModel !== null && $usernameModel->can_login === false)
+        if ($usernameModel !== null && ($usernameModel->can_login === false || $usernameModel->active === false))
         {
             abort(401);
         } 
