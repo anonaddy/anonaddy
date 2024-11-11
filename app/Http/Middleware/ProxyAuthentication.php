@@ -51,8 +51,8 @@ class ProxyAuthentication
         $username = $request->header($this->usernameHeaderName);
         $email = $request->header($this->emailHeaderName);
         
-        $loggedOut = $this->LogoutWhenNeeded($request, $loggedInUsername, $username);
-        $loggedIn = $this->LoginWhenNeeded($request, $username, $email);
+        $loggedOut = $this->logoutWhenNeeded($request, $loggedInUsername, $username);
+        $loggedIn = $this->loginWhenNeeded($request, $username, $email);
         
         if ($loggedIn)
         {
@@ -66,7 +66,7 @@ class ProxyAuthentication
         return $next($request);
     }
 
-    private function LogoutWhenNeeded(Request $request, string|null $loggedInUsername, string|null $username) : bool
+    private function logoutWhenNeeded(Request $request, string|null $loggedInUsername, string|null $username) : bool
     {
         if (Auth::check())
         {
@@ -87,7 +87,7 @@ class ProxyAuthentication
         return false;
     }
 
-    private function LoginWhenNeeded(Request $request, string|null $username, string|null $email) : bool
+    private function loginWhenNeeded(Request $request, string|null $username, string|null $email) : bool
     {
         $notloggedInButHeadersProvided = !Auth::check() && !$this->isNullOrEmptyString($username) && !$this->isNullOrEmptyString($email);
         if ($notloggedInButHeadersProvided)
