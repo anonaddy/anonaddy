@@ -60,7 +60,7 @@ class ProxyAuthentication
         }
         if ($loggedOut)
         {
-            return redirect('/');
+            return redirect('/login');
         }
 
         return $next($request);
