@@ -34,12 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $middleware->web(append: [
+            \App\Http\MiddleWare\ProxyAuthentication::class,
             \App\Http\Middleware\HandleInertiaRequests::class, // Must be the last item!
-        ], replace: [
-            'auth.session' => \App\Http\MiddleWare\SessionWithProxyAuthentication::class
-        ],
-    
-    );
+            ]
+        );
 
         $middleware->alias([
             '2fa' => \App\Http\Middleware\VerifyTwoFactorAuth::class,

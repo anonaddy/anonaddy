@@ -4,14 +4,12 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Models\Username;
-use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 
-class SessionWithProxyAuthentication extends AuthenticateSession 
+class ProxyAuthentication
 {
     private const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
     private bool $isProxyAuthenticationEnabled;
@@ -24,12 +22,11 @@ class SessionWithProxyAuthentication extends AuthenticateSession
      *
      * @return void
      */
-    public function __construct(AuthFactory  $auth)
+    public function __construct()
     {
         $this->isProxyAuthenticationEnabled = config('anonaddy.use_proxy_authentication');
         $this->usernameHeaderName = config('anonaddy.proxy_authentication_username_header');
         $this->emailHeaderName = config('anonaddy.proxy_authentication_email_header');
-        parent::__construct($auth);
     }
 
     /**
@@ -37,17 +34,17 @@ class SessionWithProxyAuthentication extends AuthenticateSession
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next) : Response
     {
         if ($this->isProxyAuthenticationEnabled)
         {
             return $this->handleProxyAuthentication($request, $next);
         }
 
-        return parent::handle($request, $next);
+        return $next($request);
     }
 
-    private function handleProxyAuthentication(Request $request, Closure $next)
+    private function handleProxyAuthentication(Request $request, Closure $next) : Response
     {
         $loggedInUsername = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
         $username = $request->header($this->usernameHeaderName);
@@ -61,10 +58,10 @@ class SessionWithProxyAuthentication extends AuthenticateSession
             return redirect('/');
         }
 
-        return parent::handle($request, $next); 
+        return $next($request);
     }
 
-    private function LogoutWhenNeeded(Request $request, string|null $loggedInUsername, string|null $username): bool
+    private function LogoutWhenNeeded(Request $request, string|null $loggedInUsername, string|null $username) : bool
     {
         if (Auth::check())
         {
@@ -120,12 +117,12 @@ class SessionWithProxyAuthentication extends AuthenticateSession
         return $usernameModel?->user_id;
     }
 
-    private function hasProxyAuthenticationHeaders(Request $request): bool 
+    private function hasProxyAuthenticationHeaders(Request $request) : bool 
     {
         return $request->hasHeader($this->usernameHeaderName) && $request->hasHeader($this->emailHeaderName);
     }
 
-    private function isNullOrEmptyString(string|null $str)
+    private function isNullOrEmptyString(string|null $str) : bool
     {
         return $str === null || trim($str) === '';
     }
