@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 
+
 class ProxyAuthentication
 {
     private const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
@@ -53,7 +54,11 @@ class ProxyAuthentication
         $loggedOut = $this->LogoutWhenNeeded($request, $loggedInUsername, $username);
         $loggedIn = $this->LoginWhenNeeded($request, $username, $email);
         
-        if ($loggedOut || $loggedIn)
+        if ($loggedIn)
+        {
+            return getLoginRedirectResponse();
+        }
+        if ($loggedOut)
         {
             return redirect('/');
         }
@@ -74,8 +79,7 @@ class ProxyAuthentication
                 $loggedinFromProxyButUsernameDoesNotMatch)
             {
                 Auth::logout();
-                $request->session()->regenerate();
-                $request->session()->forget(self::proxyAuthenticationUsernameSessionKey);
+                $request->session()->flush();
                 return true;
             }
         }

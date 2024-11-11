@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\LoginRedirect;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -82,4 +84,24 @@ function createUser(string $username, string $email, string|null $password = nul
         'password' => $passwordHash,
         'two_factor_secret' => $twoFactor->generateSecretKey(),
     ]);
+}
+
+function getLoginRedirectUri() : string
+{
+    // Dynamic redirect setting to allow users to choose to go to /aliases page instead etc.
+    return match (user()->login_redirect) {
+        LoginRedirect::ALIASES => '/aliases',
+        LoginRedirect::RECIPIENTS => '/recipients',
+        LoginRedirect::USERNAMES => '/usernames',
+        LoginRedirect::DOMAINS => '/domains',
+        default => '/',
+    };
+}
+
+function getLoginRedirectResponse() : RedirectResponse
+{
+    // If the intended path is just the dashboard then ignore and use the user's login redirect instead
+    $redirectTo = getLoginRedirectUri();
+    $intended = session()->pull('url.intended');
+    return $intended === url('/') ? redirect()->to($redirectTo) : redirect()->intended($intended ?? $redirectTo);
 }
