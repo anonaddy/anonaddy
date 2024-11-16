@@ -23,7 +23,7 @@ class StorePersonalAccessTokenRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => [
                 'required',
                 'string',
@@ -35,10 +35,15 @@ class StorePersonalAccessTokenRequest extends FormRequest
                 'max:5',
                 'in:day,week,month,year',
             ],
-            'password' => [
+        ];
+
+        if (!usesProxyAuthentication()){
+            $rules['password'] = [
                 'required',
                 'string',
-            ],
-        ];
+            ];
+        }
+
+        return $rules;
     }
 }
