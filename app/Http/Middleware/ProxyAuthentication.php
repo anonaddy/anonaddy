@@ -49,7 +49,7 @@ class ProxyAuthentication
     {
         $loggedInUsername = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
         $username = $request->header($this->usernameHeaderName);
-        $email = $request->header($this->emailHeaderName);
+        $email = strtolower($request->header($this->emailHeaderName));
         
         $loggedOut = $this->logoutWhenNeeded($request, $loggedInUsername, $username);
         $loggedIn = $this->loginWhenNeeded($request, $username, $email);
@@ -101,6 +101,9 @@ class ProxyAuthentication
             Auth::loginUsingId($userId);
             $request->session()->put(self::proxyAuthenticationUsernameSessionKey, $username);
             $request->session()->regenerate();
+
+            $this->updateDefaultRecipientIfNeeded($email);
+            
             return true;
         }
 
@@ -129,5 +132,18 @@ class ProxyAuthentication
     private function isNullOrEmptyString(string|null $str) : bool
     {
         return $str === null || trim($str) === '';
+    }
+
+    private function updateDefaultRecipientIfNeeded(string $email) : void 
+    {
+        $recipient = Auth::user()->defaultRecipient;
+
+        if ($recipient->email === $email)
+        {
+            return;
+        }
+
+        $recipient->email = $email;
+        $recipient->save();
     }
 }
