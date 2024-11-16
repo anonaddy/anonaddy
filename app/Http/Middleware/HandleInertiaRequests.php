@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\GitVersionHelper;
+use App\Http\Middleware\ProxyAuthentication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
@@ -58,6 +59,7 @@ class HandleInertiaRequests extends Middleware
             },
             'version' => GitVersionHelper::version(),
             'updateAvailable' => GitVersionHelper::updateAvailable(),
+            'usesProxyAuthentication' => $request->session()->has(ProxyAuthentication::proxyAuthenticationUsernameSessionKey),
         ]);
     }
 }

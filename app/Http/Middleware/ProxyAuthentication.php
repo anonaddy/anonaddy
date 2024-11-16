@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProxyAuthentication
 {
-    private const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
+    public const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
     private bool $isProxyAuthenticationEnabled;
     private string $usernameHeaderName;
     private string $emailHeaderName;
