@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\LoginRedirect;
+use App\Http\Middleware\ProxyAuthentication;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
@@ -104,4 +105,9 @@ function getLoginRedirectResponse() : RedirectResponse
     $redirectTo = getLoginRedirectUri();
     $intended = session()->pull('url.intended');
     return $intended === url('/') ? redirect()->to($redirectTo) : redirect()->intended($intended ?? $redirectTo);
+}
+
+function usesProxyAuthentication(): bool
+{
+    return session()->has(ProxyAuthentication::proxyAuthenticationUsernameSessionKey);
 }
