@@ -110,6 +110,6 @@ const tabs = computed(() => allTabs.filter(tab => tab.enabled));
 const selectedTabName = ref(_.find(allTabs, ['current', true]).name)
 
 const visitTab = () => {
-  router.visit(_.find(tabs, ['name', selectedTabName.value]).href)
+  router.visit(_.find(allTabs, ['name', selectedTabName.value]).href)
 }
 </script>
