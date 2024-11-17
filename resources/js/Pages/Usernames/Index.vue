@@ -16,7 +16,7 @@
           </button>
         </p>
       </div>
-      <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none" v-if="!$page.props.usesProxyAuthentication">
         <button
           type="button"
           @click="openAddUsernameModal"

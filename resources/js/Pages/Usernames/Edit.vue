@@ -97,7 +97,7 @@
             <loader v-if="username.fromNameLoading" />
           </button>
         </div>
-        <div class="pt-8">
+        <div class="pt-8" v-if="!$page.props.usesProxyAuthentication">
           <label
             for="can_login"
             class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default"
