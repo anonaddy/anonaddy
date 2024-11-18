@@ -3,9 +3,14 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\User;
 use App\Models\Username;
+use App\Rules\NotBlacklisted;
+use App\Rules\NotDeletedUsername;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -14,6 +19,7 @@ class ProxyAuthentication
 {
     public const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
     private bool $isProxyAuthenticationEnabled;
+    private string $externalUserIdHeaderName;
     private string $usernameHeaderName;
     private string $emailHeaderName;
 
@@ -26,6 +32,7 @@ class ProxyAuthentication
     public function __construct()
     {
         $this->isProxyAuthenticationEnabled = config('anonaddy.use_proxy_authentication');
+        $this->externalUserIdHeaderName = config('anonaddy.proxy_authentication_external_user_id_header');
         $this->usernameHeaderName = config('anonaddy.proxy_authentication_username_header');
         $this->emailHeaderName = config('anonaddy.proxy_authentication_email_header');
     }
@@ -47,12 +54,13 @@ class ProxyAuthentication
 
     private function handleProxyAuthentication(Request $request, Closure $next) : Response
     {
-        $loggedInUsername = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
+        $loggedInExternalUserId = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
+        $externalUserId = $request->header($this->externalUserIdHeaderName);
         $username = $request->header($this->usernameHeaderName);
         $email = strtolower($request->header($this->emailHeaderName));
         
-        $loggedOut = $this->logoutWhenNeeded($request, $loggedInUsername, $username);
-        $loggedIn = $this->loginWhenNeeded($request, $username, $email);
+        $loggedOut = $this->logoutWhenNeeded($request, $loggedInExternalUserId, $externalUserId);
+        $loggedIn = $this->loginWhenNeeded($request, $externalUserId, $username, $email);
         
         if ($loggedIn)
         {
@@ -66,13 +74,13 @@ class ProxyAuthentication
         return $next($request);
     }
 
-    private function logoutWhenNeeded(Request $request, string|null $loggedInUsername, string|null $username) : bool
+    private function logoutWhenNeeded(Request $request, string|null $loggedInExternalUserId, string|null $externalUserId) : bool
     {
         if (Auth::check())
         {
-            $loggedInElsewhereButCurrentlyHasHeaders = $this->isNullOrEmptyString($loggedInUsername) && $this->hasProxyAuthenticationHeaders($request);
-            $loggedInFromProxyButCurrentlyNoHeaders = !$this->isNullOrEmptyString($loggedInUsername) && !$this->hasProxyAuthenticationHeaders($request);
-            $loggedinFromProxyButUsernameDoesNotMatch = !$this->isNullOrEmptyString($loggedInUsername) && $loggedInUsername !== $username;
+            $loggedInElsewhereButCurrentlyHasHeaders = $this->isNullOrEmptyString($loggedInExternalUserId) && $this->hasProxyAuthenticationHeaders($request);
+            $loggedInFromProxyButCurrentlyNoHeaders = !$this->isNullOrEmptyString($loggedInExternalUserId) && !$this->hasProxyAuthenticationHeaders($request);
+            $loggedinFromProxyButUsernameDoesNotMatch = !$this->isNullOrEmptyString($loggedInExternalUserId) && $loggedInExternalUserId !== $externalUserId;
 
             if ($loggedInElsewhereButCurrentlyHasHeaders ||
                 $loggedInFromProxyButCurrentlyNoHeaders ||
@@ -87,19 +95,19 @@ class ProxyAuthentication
         return false;
     }
 
-    private function loginWhenNeeded(Request $request, string|null $username, string|null $email) : bool
+    private function loginWhenNeeded(Request $request, string|null $externalUserId, string|null $username, string|null $email) : bool
     {
-        $notloggedInButHeadersProvided = !Auth::check() && !$this->isNullOrEmptyString($username) && !$this->isNullOrEmptyString($email);
+        $notloggedInButHeadersProvided = !Auth::check() && !$this->isNullOrEmptyString($externalUserId) && !$this->isNullOrEmptyString($username) && !$this->isNullOrEmptyString($email);
         if ($notloggedInButHeadersProvided)
         {
-            $userId = $this->getValidUserIdForUsername($username);
+            $userId = $this->getValidUserIdForExternalId($externalUserId);
             if ($userId === null)
             {
-                $userId = createUser($username, $email, emailVerified: true)->id;
+                $userId = $this->createUser($username, $email, $externalUserId)->id;
             }
 
             Auth::loginUsingId($userId);
-            $request->session()->put(self::proxyAuthenticationUsernameSessionKey, $username);
+            $request->session()->put(self::proxyAuthenticationUsernameSessionKey, $externalUserId);
             $request->session()->regenerate();
 
             $this->updateDefaultRecipientIfNeeded($email);
@@ -110,13 +118,60 @@ class ProxyAuthentication
         return false;
     }
 
-    private function getValidUserIdForUsername(string $username) : string|null
+    private function createUser($username, $email, $externalId) : User
     {
-        $usernameModel = Username::select(['user_id', 'username', 'can_login', 'active'])
-            ->where('username', $username)
+        $input = ['username' => $username ];
+
+        $baseUsernamevalidator = Validator::make($input, ['username' => [
+                'bail',
+                'required',
+                'regex:/^[a-zA-Z0-9]*$/',
+                'max:20',
+                new NotBlacklisted
+            ]]);
+
+        if ($baseUsernamevalidator->fails()) 
+        {
+            abort(403);
+        }
+
+        $generatedUsername = $this->generateUniqueUsername($username);
+
+        if ($this->isNullOrEmptyString($generatedUsername))
+        {
+            abort(403);
+        }
+
+        return createUser($generatedUsername, $email, emailVerified: true, externalId: $externalId);
+    }
+
+    private function generateUniqueUsername(string $username) : string|null
+    {
+        $generatedUsername = $username;
+
+        for ($try = 1; $try < 10; $try++)
+        {
+            $input = ['username' => $generatedUsername ];
+            $uniqueValidator = Validator::make($input, ['username' => ['unique:usernames,username', new NotDeletedUsername]]);
+
+            if (!$uniqueValidator->fails())
+            {
+                return $generatedUsername;
+            }
+
+            $generatedUsername = $username . (string)$try;
+        }
+
+        return null;
+    }
+
+    private function getValidUserIdForExternalId(string $externalId) : string|null
+    {
+        $usernameModel = Username::select(['user_id', 'username', 'can_login'])
+            ->where('external_id', $externalId)
             ->first();
 
-        if ($usernameModel !== null && ($usernameModel->can_login === false || $usernameModel->active === false))
+        if ($usernameModel !== null && $usernameModel->can_login === false)
         {
             abort(401);
         } 
@@ -126,7 +181,9 @@ class ProxyAuthentication
 
     private function hasProxyAuthenticationHeaders(Request $request) : bool 
     {
-        return $request->hasHeader($this->usernameHeaderName) && $request->hasHeader($this->emailHeaderName);
+        return $request->hasHeader($this->usernameHeaderName) 
+            && $request->hasHeader($this->emailHeaderName)
+            && $request->hasHeader($this->externalUserIdHeaderName);
     }
 
     private function isNullOrEmptyString(string|null $str) : bool

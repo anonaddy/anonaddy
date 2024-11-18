@@ -9,6 +9,7 @@ use App\Models\Username;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Uuid;
 
@@ -55,7 +56,7 @@ function stripEmailExtension(string $email): string
      *
      * @return \App\Models\User
      */
-function createUser(string $username, string $email, string|null $password = null, bool $emailVerified = false) 
+function createUser(string $username, string $email, string|null $password = null, bool $emailVerified = false, string|null $externalId = null) 
 {
     $userId = Uuid::uuid4();
 
@@ -72,6 +73,7 @@ function createUser(string $username, string $email, string|null $password = nul
     $usernameModel = Username::create([
         'username' => $username,
         'user_id' => $userId,
+        'external_id' => $externalId,
     ]);
 
     $twoFactor = app('pragmarx.google2fa');
@@ -107,7 +109,7 @@ function getLoginRedirectResponse() : RedirectResponse
     return $intended === url('/') ? redirect()->to($redirectTo) : redirect()->intended($intended ?? $redirectTo);
 }
 
-function usesProxyAuthentication(): bool
+function usesExternalAuthentication(): bool
 {
-    return session()->has(ProxyAuthentication::proxyAuthenticationUsernameSessionKey);
+    return Auth::check() && user()->defaultUsername->external_id !== null;
 }

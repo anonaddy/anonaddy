@@ -392,7 +392,7 @@
                         </span>
                       </a>
                     </MenuItem>
-                    <MenuItem v-slot="{ active }" as="div" v-if="!$page.props.usesProxyAuthentication">
+                    <MenuItem v-slot="{ active }" as="div" v-if="!$page.props.usesExternalAuthentication">
                       <Link
                         :href="route('logout')"
                         method="post"

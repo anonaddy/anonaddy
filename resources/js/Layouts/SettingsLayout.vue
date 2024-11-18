@@ -83,7 +83,7 @@ const allTabs = [
     name: 'Security',
     href: route('settings.security'),
     current: route().current() === 'settings.security',
-    enabled: !page.props.usesProxyAuthentication
+    enabled: !page.props.usesExternalAuthentication
   },
   { 
     name: 'API Keys',
@@ -101,7 +101,7 @@ const allTabs = [
     name: 'Delete Account',
     href: route('settings.account'),
     current: route().current() === 'settings.account',
-    enabled: !page.props.usesProxyAuthentication
+    enabled: !page.props.usesExternalAuthentication
   },
 ]
 

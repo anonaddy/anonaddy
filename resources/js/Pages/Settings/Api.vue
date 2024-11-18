@@ -157,8 +157,8 @@
                 <option :value="null">No expiration</option>
               </select>
             </div>
-            <div v-if="$page.props.usesProxyAuthentication" class="py-2"></div>
-            <div v-if="!$page.props.usesProxyAuthentication">
+            <div v-if="$page.props.usesExternalAuthentication" class="py-2"></div>
+            <div v-if="!$page.props.usesExternalAuthentication">
               <label
               for="create-token-name"
               class="block text-sm my-2 font-medium leading-6 text-grey-600"
@@ -299,7 +299,7 @@ const store = () => {
     return (form.value.errors.expiration = ['Invalid expiration given.'])
   }
 
-  if (!form.value.password.length && !usePage().props.usesProxyAuthentication) {
+  if (!form.value.password.length && !usePage().props.usesExternalAuthentication) {
     return (form.value.errors.password = ['The password field is required.'])
   }
 

@@ -19,7 +19,7 @@ class VerifyTwoFactorAuth extends Middleware
     {
         $authenticator = app(Authenticator::class)->boot($request);
 
-        if ($authenticator->isAuthenticated() || ! $request->user()->two_factor_enabled || usesProxyAuthentication()) {
+        if ($authenticator->isAuthenticated() || ! $request->user()->two_factor_enabled || usesExternalAuthentication()) {
             return $next($request);
         }
 

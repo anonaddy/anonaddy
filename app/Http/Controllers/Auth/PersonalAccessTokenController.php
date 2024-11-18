@@ -18,7 +18,7 @@ class PersonalAccessTokenController extends Controller
 
     public function store(StorePersonalAccessTokenRequest $request)
     {
-        if (! Hash::check($request->password, user()->password) && !usesProxyAuthentication()) {
+        if (! Hash::check($request->password, user()->password) && !usesExternalAuthentication()) {
             throw ValidationException::withMessages(['password' => 'Incorrect password entered']);
         }
 

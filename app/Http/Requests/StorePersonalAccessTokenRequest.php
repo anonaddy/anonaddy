@@ -37,7 +37,7 @@ class StorePersonalAccessTokenRequest extends FormRequest
             ],
         ];
 
-        if (!usesProxyAuthentication()){
+        if (!usesExternalAuthentication()){
             $rules['password'] = [
                 'required',
                 'string',

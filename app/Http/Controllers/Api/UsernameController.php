@@ -27,7 +27,7 @@ class UsernameController extends Controller
             return response('', 403);
         }
 
-        $username = user()->usernames()->create(['username' => $request->username]);
+        $username = user()->usernames()->create(['username' => $request->username, 'can_login' => !usesExternalAuthentication()]);
 
         user()->increment('username_count');
 

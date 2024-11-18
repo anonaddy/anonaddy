@@ -16,7 +16,7 @@
           </button>
         </p>
       </div>
-      <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none" v-if="!$page.props.usesProxyAuthentication">
+      <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
         <button
           type="button"
           @click="openAddUsernameModal"
@@ -81,7 +81,7 @@
             class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full"
             >default</span
           >
-          <span v-else class="block text-grey-400 text-sm py-1">
+          <span v-else-if="!$page.props.usesExternalAuthentication" class="block text-grey-400 text-sm py-1">
             <button @click="openMakeDefaultModal(props.row)">Make Default</button>
           </span>
         </span>

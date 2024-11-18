@@ -12,6 +12,10 @@ class LoginableUsernameController extends Controller
     {
         $request->validate(['id' => 'required|string']);
 
+        if (usesExternalAuthentication()) {
+            return response('You cannot allow login because you\'re using external authentication', 403);
+        }
+
         $username = user()->usernames()->findOrFail($request->id);
 
         $username->allowLogin();
