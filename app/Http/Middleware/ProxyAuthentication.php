@@ -56,7 +56,7 @@ class ProxyAuthentication
     {
         $loggedInExternalUserId = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
         $externalUserId = $request->header($this->externalUserIdHeaderName);
-        $username = $request->header($this->usernameHeaderName);
+        $username = substr($request->header($this->usernameHeaderName), start: 0, length: 20);
         $email = strtolower($request->header($this->emailHeaderName));
         
         $loggedOut = $this->logoutWhenNeeded($request, $loggedInExternalUserId, $externalUserId);
@@ -124,9 +124,7 @@ class ProxyAuthentication
 
         $baseUsernamevalidator = Validator::make($input, ['username' => [
                 'bail',
-                'required',
                 'regex:/^[a-zA-Z0-9]*$/',
-                'max:20',
                 new NotBlacklisted
             ]]);
 
@@ -159,7 +157,7 @@ class ProxyAuthentication
                 return $generatedUsername;
             }
 
-            $generatedUsername = $username . (string)$try;
+            $generatedUsername = substr($username, start: 0, length: 19) . (string)$try;
         }
 
         return null;
