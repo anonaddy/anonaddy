@@ -56,7 +56,7 @@ class ProxyAuthentication
     {
         $loggedInExternalUserId = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
         $externalUserId = $request->header($this->externalUserIdHeaderName);
-        $username = substr($request->header($this->usernameHeaderName), start: 0, length: 20);
+        $username = substr($request->header($this->usernameHeaderName), offset: 0, length: 20);
         $email = strtolower($request->header($this->emailHeaderName));
         
         $loggedOut = $this->logoutWhenNeeded($request, $loggedInExternalUserId, $externalUserId);
@@ -157,7 +157,7 @@ class ProxyAuthentication
                 return $generatedUsername;
             }
 
-            $generatedUsername = substr($username, start: 0, length: 19) . (string)$try;
+            $generatedUsername = substr($username, offset: 0, length: 19) . (string)$try;
         }
 
         return null;
