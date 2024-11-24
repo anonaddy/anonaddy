@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProxyAuthentication
 {
-    public const proxyAuthenticationUsernameSessionKey = 'ProxyAuthenticationUsername';
+    public const proxyAuthenticationExternalUserIdSessionKey = 'ProxyAuthenticationExternalUserId';
     private bool $isProxyAuthenticationEnabled;
     private string $externalUserIdHeaderName;
     private string $usernameHeaderName;
@@ -54,7 +54,7 @@ class ProxyAuthentication
 
     private function handleProxyAuthentication(Request $request, Closure $next) : Response
     {
-        $loggedInExternalUserId = $request->session()->get(self::proxyAuthenticationUsernameSessionKey);
+        $loggedInExternalUserId = $request->session()->get(self::proxyAuthenticationExternalUserIdSessionKey);
         $externalUserId = $request->header($this->externalUserIdHeaderName);
         $username = substr($request->header($this->usernameHeaderName), offset: 0, length: 20);
         $email = strtolower($request->header($this->emailHeaderName));
@@ -107,7 +107,7 @@ class ProxyAuthentication
             }
 
             Auth::loginUsingId($userId);
-            $request->session()->put(self::proxyAuthenticationUsernameSessionKey, $externalUserId);
+            $request->session()->put(self::proxyAuthenticationExternalUserIdSessionKey, $externalUserId);
             $request->session()->regenerate();
 
             $this->updateDefaultRecipientIfNeeded($email);
