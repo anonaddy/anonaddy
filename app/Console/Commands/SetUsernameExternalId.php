@@ -74,7 +74,11 @@ class SetUsernameExternalId extends Command
             ->first();
 
         $username->external_id = $this->argument('external_id');
+        $username->can_login = true;
         $username->save();
+
+        $username->user->default_username = $username;
+        $username->user->save();
 
         $this->info('Username: "'. $username->username . '" set as external with id : "'. $username->external_id .'"');
         return 0;
