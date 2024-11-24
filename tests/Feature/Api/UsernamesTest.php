@@ -69,6 +69,32 @@ class UsernamesTest extends TestCase
     }
 
     #[Test]
+    public function user_created_username_can_login_when_using_normal_authentication()
+    {
+        $response = $this->json('POST', '/api/v1/usernames', [
+            'username' => 'janedoe',
+        ]);
+
+        
+        $username = Username::where('username', 'janedoe')->first();
+        $this->assertThat($username->can_login, $this->isTrue(), 'username can login');
+    }
+
+    #[Test]
+    public function user_created_username_cannot_login_when_using_external_authentication()
+    {
+        $this->user->defaultUsername->external_id = 'test';
+        $this->user->defaultUsername->save();
+
+        $response = $this->json('POST', '/api/v1/usernames', [
+            'username' => 'janedoe',
+        ]);
+
+        $username = Username::where('username', 'janedoe')->first();
+        $this->assertThat($username->can_login, $this->isFalse(), 'username cannot login');
+    }
+
+    #[Test]
     public function user_can_not_exceed_username_limit()
     {
         $this->json('POST', '/api/v1/usernames', [
