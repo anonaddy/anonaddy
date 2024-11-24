@@ -21,7 +21,7 @@ class SetUsernameExternalId extends Command
      *
      * @var string
      */
-    protected $signature = 'anonaddy:set-username-externalid {username} {externalid}';
+    protected $signature = 'anonaddy:set-username-externalid {username} {external_id}';
 
     /**
      * The console command description.
@@ -69,9 +69,7 @@ class SetUsernameExternalId extends Command
             return 1;
         }
 
-        $username = Username::select(['user_id', 'username', 'can_login', ])
-            ->where('username', $this->argument('username'))
-            ->first();
+        $username = Username::where('username', $this->argument('username'))->first();
 
         $username->external_id = $this->argument('external_id');
         $username->can_login = true;
