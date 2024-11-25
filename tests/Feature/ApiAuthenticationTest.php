@@ -213,6 +213,26 @@ class ApiAuthenticationTest extends TestCase
     }
 
     #[Test]
+    public function user_cannot_delete_account_via_api_when_external()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        $this->user->defaultUsername->username = 'janedoe';
+        $this->user->defaultUsername->external_id = 'test';
+        $this->user->defaultUsername->save();
+
+        $token = $this->user->createToken('New');
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token->plainTextToken,
+        ])->json('POST', '/api/auth/delete-account', [
+            'password' => 'mypassword',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    #[Test]
     public function user_must_enter_correct_password_to_delete_account()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
