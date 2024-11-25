@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('usernames', function (Blueprint $table) {
-            $table->string('external_id')->after('can_login')->nullable();
+            $table->string('external_id')
+                  ->after('can_login')
+                  ->nullable()
+                  ->unique();
         });
     }
 
@@ -22,6 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('usernames', function (Blueprint $table) {
+            $table->dropIndex('usernames_external_id_unique');
             $table->dropColumn('external_id');
         });
     }
