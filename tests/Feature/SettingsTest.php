@@ -166,6 +166,28 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
+    public function user_cannot_update_default_username_when_user_is_external()
+    {
+        $this->user->defaultUsername->external_id = 'test';
+        $this->user->defaultUsername->save();
+
+        $currentDefaultUsername = $this->user->defaultUsername;
+
+        $newDefaultUsername = Username::factory()->create([
+            'user_id' => $this->user->id,
+            'can_login' => false,
+        ]);
+
+        $this->assertNotEquals($currentDefaultUsername->id, $newDefaultUsername->id);
+
+        $response = $this->post('/settings/default-username', [
+            'id' => $newDefaultUsername->id,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    #[Test]
     public function user_can_update_default_alias_domain()
     {
         $defaultAliasDomain = $this->user->username.'.anonaddy.me';

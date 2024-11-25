@@ -280,6 +280,24 @@ class UsernamesTest extends TestCase
     }
 
     #[Test]
+    public function user_cannot_change_login_for_username_when_user_is_external()
+    {
+        $this->user->defaultUsername->external_id = 'test';
+        $this->user->defaultUsername->save();
+
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+            'can_login' => false,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/loginable-usernames/', [
+            'id' => $username->id,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    #[Test]
     public function user_cannot_disallow_login_for_default_username()
     {
         $username = $this->user->defaultUsername;
