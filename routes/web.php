@@ -51,9 +51,11 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['verify' => true, 'register' => config('anonaddy.enable_registration')]);
 
-// Get API access token
-Route::post('api/auth/login', [ApiAuthenticationController::class, 'login']);
-Route::post('api/auth/mfa', [ApiAuthenticationController::class, 'mfa']);
+// API login route needs CSRF middleware so that it can pass it to api/auth/mfa
+Route::controller(ApiAuthenticationController::class)->prefix('api/auth')->group(function () {
+    Route::post('/login', 'login');
+    Route::post('/mfa', 'mfa');
+});
 
 Route::controller(ForgotUsernameController::class)->group(function () {
     Route::get('/username/reminder', 'show')->name('username.reminder.show');

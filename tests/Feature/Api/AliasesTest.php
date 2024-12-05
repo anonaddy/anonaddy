@@ -441,6 +441,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
         ]);
 
@@ -482,6 +483,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
         ]);
 
@@ -544,6 +546,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
         ]);
 
@@ -575,6 +578,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
         ]);
 
@@ -607,6 +611,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
         ]);
 
@@ -637,6 +642,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
         ]);
 
@@ -669,6 +675,7 @@ class AliasesTest extends TestCase
             'ids' => [
                 $alias->id,
                 $alias2->id,
+                null,
             ],
             'recipient_ids' => [
                 $recipient->id,
@@ -678,6 +685,43 @@ class AliasesTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(2, $response->getData()->ids);
         $this->assertEquals('recipients updated for 2 aliases successfully', $response->getData()->message);
+        $this->assertDatabaseHas('alias_recipients', [
+            'alias_id' => $alias->id,
+            'recipient_id' => $recipient->id,
+        ]);
+    }
+
+    #[Test]
+    public function user_cannot_bulk_update_recipients_for_invalid_aliases()
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => true,
+        ]);
+
+        $alias2 = Alias::factory()->create([
+            'user_id' => '00000000-0000-0000-0000-000000000000',
+            'active' => true,
+        ]);
+
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases/recipients/bulk', [
+            'ids' => [
+                $alias->id,
+                $alias2->id,
+                null,
+            ],
+            'recipient_ids' => [
+                $recipient->id,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->getData()->ids);
+        $this->assertEquals('recipients updated for 1 alias successfully', $response->getData()->message);
         $this->assertDatabaseHas('alias_recipients', [
             'alias_id' => $alias->id,
             'recipient_id' => $recipient->id,

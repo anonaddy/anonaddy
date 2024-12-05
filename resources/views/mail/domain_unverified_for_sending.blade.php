@@ -2,7 +2,7 @@
 
 # Domain Unverified For Sending
 
-A recent DNS record check on your custom domain **{{ $domain }}** failed on addy.io. This means that your domain had been unverified for sending until the DNS records are added correctly.
+A recent DNS record check on your custom domain **{{ $domain }}** failed on {{ config('app.name') }}. This means that your domain had been unverified for sending until the DNS records are added correctly.
 
 The check failed for the following reason:
 
@@ -10,7 +10,7 @@ The check failed for the following reason:
 
 Please visit the domains page on the site by clicking the button below to resolve the issue.
 
-Emails for your custom domain will be sent from an addy.io domain in the mean time.
+Emails for your custom domain will be sent from an {{ config('app.name') }} domain in the mean time.
 
 @component('mail::button', ['url' => config('app.url').'/domains'])
 Check Domain

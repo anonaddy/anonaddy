@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GeneralAliasBulkRequest;
+use App\Http\Requests\RecipientsAliasBulkRequest;
 use App\Http\Resources\AliasResource;
 use App\Rules\VerifiedRecipientId;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
@@ -16,13 +17,8 @@ class AliasBulkController extends Controller
         $this->middleware('throttle:12,1');
     }
 
-    public function get(Request $request)
+    public function get(GeneralAliasBulkRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array|max:25|min:1',
-            'ids.*' => 'required|uuid|distinct',
-        ]);
-
         $aliases = user()->aliases()->withTrashed()
             ->whereIn('id', $request->ids)
             ->get();
@@ -35,13 +31,8 @@ class AliasBulkController extends Controller
         return AliasResource::collection($aliases);
     }
 
-    public function activate(Request $request)
+    public function activate(GeneralAliasBulkRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array|max:25|min:1',
-            'ids.*' => 'required|uuid|distinct',
-        ]);
-
         $aliasesWithTrashed = user()->aliases()->withTrashed()
             ->select(['id', 'user_id', 'active', 'deleted_at'])
             ->where('active', false)
@@ -75,13 +66,8 @@ class AliasBulkController extends Controller
         ], 200);
     }
 
-    public function deactivate(Request $request)
+    public function deactivate(GeneralAliasBulkRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array|max:25|min:1',
-            'ids.*' => 'required|uuid|distinct',
-        ]);
-
         $aliasIds = user()->aliases()
             ->where('active', true)
             ->whereIn('id', $request->ids)
@@ -100,13 +86,8 @@ class AliasBulkController extends Controller
         ], 200);
     }
 
-    public function delete(Request $request)
+    public function delete(GeneralAliasBulkRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array|max:25|min:1',
-            'ids.*' => 'required|uuid|distinct',
-        ]);
-
         $aliasIds = user()->aliases()
             ->whereIn('id', $request->ids)
             ->pluck('id');
@@ -129,13 +110,8 @@ class AliasBulkController extends Controller
         ], 200);
     }
 
-    public function forget(Request $request)
+    public function forget(GeneralAliasBulkRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array|max:25|min:1',
-            'ids.*' => 'required|uuid|distinct',
-        ]);
-
         $aliasIds = user()->aliases()->withTrashed()
             ->whereIn('id', $request->ids)
             ->pluck('id');
@@ -183,13 +159,8 @@ class AliasBulkController extends Controller
         ], 200);
     }
 
-    public function restore(Request $request)
+    public function restore(GeneralAliasBulkRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array|max:25|min:1',
-            'ids.*' => 'required|uuid|distinct',
-        ]);
-
         $aliasIds = user()->aliases()->onlyTrashed()
             ->whereIn('id', $request->ids)
             ->pluck('id');
@@ -209,7 +180,7 @@ class AliasBulkController extends Controller
         ], 200);
     }
 
-    public function recipients(Request $request)
+    public function recipients(RecipientsAliasBulkRequest $request)
     {
         $request->validate([
             'ids' => 'required|array|max:25|min:1',

@@ -24,9 +24,27 @@ class ApiAuthenticationLoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'username' => 'required|string',
-            'password' => 'required|string',
-            'device_name' => 'required|string|max:50',
+            'username' => [
+                'required',
+                'regex:/^[a-zA-Z0-9]*$/',
+                'min:1',
+                'max:20',
+            ],
+            'password' => [
+                'required',
+                'string',
+            ],
+            'device_name' => [
+                'required',
+                'string',
+                'max:50',
+            ],
+            'expiration' => [
+                'nullable',
+                'string',
+                'max:5',
+                'in:day,week,month,year',
+            ],
         ];
     }
 }

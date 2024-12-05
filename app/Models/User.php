@@ -430,6 +430,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasVerifiedDefaultRecipient()
     {
+        if (! isset($this->defaultRecipient->email_verified_at)) {
+            return false;
+        }
+
         return ! is_null($this->defaultRecipient->email_verified_at);
     }
 

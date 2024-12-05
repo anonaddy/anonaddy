@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\ReorderRuleController;
 use App\Http\Controllers\Api\RuleController;
 use App\Http\Controllers\Api\UsernameController;
 use App\Http\Controllers\Api\UsernameDefaultRecipientController;
+use App\Http\Controllers\Auth\ApiAuthenticationController;
 use App\Http\Controllers\RecipientVerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,12 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+// API auth routes for mobile apps and browser extension
+Route::controller(ApiAuthenticationController::class)->prefix('auth')->group(function () {
+    Route::post('/logout', 'logout');
+    Route::post('/delete-account', 'destroy');
+});
 
 Route::group([
     'middleware' => ['auth:sanctum', 'verified'],
