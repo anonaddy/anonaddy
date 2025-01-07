@@ -44,7 +44,7 @@ class ShowRecipientController extends Controller
 
         return Inertia::render('Recipients/Index', [
             'initialRows' => $recipients,
-            //'aliasesUsingDefaultCount' => user()->aliasesUsingDefaultCount(),
+            // 'aliasesUsingDefaultCount' => user()->aliasesUsingDefaultCount(),
             'search' => $validated['search'] ?? null,
         ]);
     }

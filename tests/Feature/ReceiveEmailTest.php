@@ -58,6 +58,8 @@ class ReceiveEmailTest extends TestCase
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
+        $this->assertEquals('Created automatically by catch-all', $this->user->aliases()->first()->description);
+
         Mail::assertQueued(ForwardEmail::class, function ($mail) {
             return $mail->hasTo($this->user->email);
         });

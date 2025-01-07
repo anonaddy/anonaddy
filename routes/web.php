@@ -82,7 +82,7 @@ Route::group([
 ], function () {
     Route::controller(WebauthnController::class)->group(function () {
         Route::get('keys', 'index')->name('webauthn.index');
-        //Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
+        // Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
         Route::post('keys', 'store')->name('webauthn.store');
         Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
         Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');

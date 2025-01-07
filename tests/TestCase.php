@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
             'anonaddy.dkim_signing_key' => file_get_contents(base_path('tests/keys/TestDkimSigningKey')),
         ]);
 
-        //$this->withoutExceptionHandling();
+        // $this->withoutExceptionHandling();
 
         TestResponse::macro('data', function ($key) {
             return $this->original->getData()[$key];

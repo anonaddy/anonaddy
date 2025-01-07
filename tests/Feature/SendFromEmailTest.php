@@ -138,6 +138,8 @@ class SendFromEmailTest extends TestCase
         ]);
         $this->assertEquals(1, $this->user->aliases()->count());
 
+        $this->assertEquals('Created automatically by catch-all', $this->user->aliases()->first()->description);
+
         Mail::assertQueued(SendFromEmail::class, function ($mail) {
             return $mail->hasTo('contact@ebay.com');
         });

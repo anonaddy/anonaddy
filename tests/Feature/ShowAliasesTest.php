@@ -74,9 +74,9 @@ class ShowAliasesTest extends TestCase
                 ->etc()
             )
         );
-        $this->assertTrue($response->data('page')['props']['initialRows']['data'][0]['id'] === $b->id);
-        $this->assertTrue($response->data('page')['props']['initialRows']['data'][1]['id'] === $c->id);
-        $this->assertTrue($response->data('page')['props']['initialRows']['data'][2]['id'] === $a->id);
+        $this->assertTrue($response->data('page')['props']['initialRows'][0]['id'] === $b->id);
+        $this->assertTrue($response->data('page')['props']['initialRows'][1]['id'] === $c->id);
+        $this->assertTrue($response->data('page')['props']['initialRows'][2]['id'] === $a->id);
     }
 
     #[Test]
@@ -127,7 +127,7 @@ class ShowAliasesTest extends TestCase
                 ->etc()
             )
         );
-        $this->assertEquals($aliasRecipient->recipient->email, $response->data('page')['props']['initialRows']['data'][0]['recipients'][0]['email']);
+        $this->assertEquals($aliasRecipient->recipient->email, $response->data('page')['props']['initialRows'][0]['recipients'][0]['email']);
     }
 
     #[Test]

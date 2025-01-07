@@ -12,7 +12,7 @@
         "bacon/bacon-qr-code": "^3.0",
         "chillerlan/php-qrcode": "^5.0",
         "guzzlehttp/guzzle": "^7.2",
-        "inertiajs/inertia-laravel": "^1.0",
+        "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.7",
