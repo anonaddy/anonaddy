@@ -205,6 +205,21 @@ class CustomMailer extends Mailer
                         $recipient = Recipient::find($failedDelivery->recipient_id);
                         $alias = Alias::find($failedDelivery->alias_id);
 
+                        if ($alias) {
+                            // Decrement the alias forward count due to failed delivery
+                            if ($emailType === 'F' && $alias->emails_forwarded > 0) {
+                                $alias->decrement('emails_forwarded');
+                            }
+
+                            if ($emailType === 'R' && $alias->emails_replied > 0) {
+                                $alias->decrement('emails_replied');
+                            }
+
+                            if ($emailType === 'S' && $alias->emails_sent > 0) {
+                                $alias->decrement('emails_sent');
+                            }
+                        }
+
                         $notifiable = $recipient?->email_verified_at ? $recipient : $user?->defaultRecipient;
 
                         // Notify user of failed delivery
