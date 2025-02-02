@@ -95,7 +95,7 @@
         <span v-else class="flex items-center justify-center outline-none" tabindex="-1">
           <a
             v-if="props.row.is_stored"
-            :href="'failed-deliveries/' + props.row.id + '/download'"
+            :href="'api/v1/failed-deliveries/' + props.row.id + '/download'"
             class="mr-4 text-indigo-500 hover:text-indigo-800 font-medium"
           >
             Download
