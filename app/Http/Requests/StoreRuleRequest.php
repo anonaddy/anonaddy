@@ -89,7 +89,7 @@ class StoreRuleRequest extends FormRequest
                     'block',
                     'removeAttachments',
                     'forwardTo',
-                    //'webhook',
+                    // 'webhook',
                 ]),
             ],
             'actions.*.value' => Rule::forEach(function ($value, $attribute, $data, $action) {

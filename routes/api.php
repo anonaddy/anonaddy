@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\RuleController;
 use App\Http\Controllers\Api\UsernameController;
 use App\Http\Controllers\Api\UsernameDefaultRecipientController;
 use App\Http\Controllers\Auth\ApiAuthenticationController;
+use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\RecipientVerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -179,6 +180,8 @@ Route::group([
         Route::get('/failed-deliveries/{id}', 'show');
         Route::delete('/failed-deliveries/{id}', 'destroy');
     });
+
+    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index'])->middleware('subscribed');
 
     Route::get('/domain-options', [DomainOptionController::class, 'index']);
 

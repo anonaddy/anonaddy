@@ -21,6 +21,7 @@ class FailedDeliveryResource extends JsonResource
             'email_type' => $this->email_type,
             'status' => $this->status,
             'code' => $this->code,
+            'is_stored' => $this->is_stored,
             'attempted_at' => $this->attempted_at?->toDateTimeString(),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
