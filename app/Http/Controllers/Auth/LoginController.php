@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\LoginRedirect;
 use App\Http\Controllers\Controller;
 use App\Models\Username;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -41,18 +40,6 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
-    }
-
-    public function redirectTo()
-    {
-        // Dynamic redirect setting to allow users to choose to go to /aliases page instead etc.
-        return match (user()->login_redirect) {
-            LoginRedirect::ALIASES => '/aliases',
-            LoginRedirect::RECIPIENTS => '/recipients',
-            LoginRedirect::USERNAMES => '/usernames',
-            LoginRedirect::DOMAINS => '/domains',
-            default => '/',
-        };
     }
 
     public function username()
@@ -115,11 +102,7 @@ class LoginController extends Controller
             return $response;
         }
 
-        // If the intended path is just the dashboard then ignore and use the user's login redirect instead
-        $redirectTo = $this->redirectTo();
-        $intended = session()->pull('url.intended');
-
-        return $intended === url('/') ? redirect()->to($redirectTo) : redirect()->intended($intended ?? $redirectTo);
+        return getLoginRedirectResponse();
     }
 
     /**
