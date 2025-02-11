@@ -21,7 +21,7 @@ class GeneralAliasBulkRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'ids' => Arr::whereNotNull($this->ids),
+            'ids' => Arr::whereNotNull($this->ids ?? []),
         ]);
     }
 

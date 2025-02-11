@@ -18,7 +18,6 @@ use App\Http\Controllers\DefaultRecipientController;
 use App\Http\Controllers\DefaultUsernameController;
 use App\Http\Controllers\DisplayFromFormatController;
 use App\Http\Controllers\DomainVerificationController;
-use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\EmailSubjectController;
 use App\Http\Controllers\FromNameController;
 use App\Http\Controllers\LoginRedirectController;
@@ -82,7 +81,7 @@ Route::group([
 ], function () {
     Route::controller(WebauthnController::class)->group(function () {
         Route::get('keys', 'index')->name('webauthn.index');
-        //Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
+        // Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
         Route::post('keys', 'store')->name('webauthn.store');
         Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
         Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');
@@ -124,7 +123,6 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
     Route::get('/rules', [ShowRuleController::class, 'index'])->name('rules.index');
 
     Route::get('/failed-deliveries', [ShowFailedDeliveryController::class, 'index'])->name('failed_deliveries.index');
-    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index'])->name('downloadable_failed_delivery.index');
 
     Route::post('/test-auto-create-regex', [TestAutoCreateRegexController::class, 'index'])->name('test_auto_create_regex.index');
 });

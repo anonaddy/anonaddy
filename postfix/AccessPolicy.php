@@ -93,7 +93,7 @@ try {
         exit(0);
     }
 
-    //$senderEmail = strtolower($args['sender']);
+    // $senderEmail = strtolower($args['sender']);
     [$aliasLocalPart, $aliasDomain] = explode('@', $aliasEmail);
 
     if (! mb_check_encoding($aliasLocalPart, 'ASCII')) {
@@ -272,7 +272,7 @@ function getIdFromVerp($verpLocalPart, $verpEmail)
     $parts = explode('_', $verpLocalPart);
 
     if (count($parts) !== 3) {
-        //logData('VERP invalid email: '.$verp);
+        // logData('VERP invalid email: '.$verp);
 
         return;
     }

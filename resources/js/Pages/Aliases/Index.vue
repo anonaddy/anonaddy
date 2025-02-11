@@ -1197,7 +1197,7 @@
             Send your message to this email
           </p>
           <div
-            @click="clipboard(sendFromAliasEmailToSendTo), setSendFromAliasCopied()"
+            @click="(clipboard(sendFromAliasEmailToSendTo), setSendFromAliasCopied())"
             class="flex items-center justify-between cursor-pointer text-sm font-medium border-t-4 rounded-sm text-green-800 border-green-600 bg-green-100 p-2 mb-3"
             role="alert"
           >

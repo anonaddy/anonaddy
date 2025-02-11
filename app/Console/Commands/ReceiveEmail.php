@@ -55,6 +55,12 @@ class ReceiveEmail extends Command
 
     protected $rawEmail;
 
+    protected $user;
+
+    protected $alias;
+
+    protected $inboundAlias;
+
     /**
      * Create a new command instance.
      *
@@ -75,22 +81,23 @@ class ReceiveEmail extends Command
         try {
             $this->exitIfFromSelf();
 
-            $recipients = $this->getRecipients();
+            $inboundAliases = $this->getInboundAliases();
 
             $file = $this->argument('file');
 
             $this->parser = $this->getParser($file);
             $this->senderFrom = $this->getSenderFrom();
 
-            // Divide the size of the email by the number of recipients (excluding any unsubscribe recipients) to prevent it being added multiple times.
-            $recipientCount = $recipients->where('domain', '!=', 'unsubscribe.'.config('anonaddy.domain'))->count();
+            $inboundAliasCount = $inboundAliases->where('domain', '!=', 'unsubscribe.'.config('anonaddy.domain'))->count();
 
-            $this->size = $this->option('size') / ($recipientCount ? $recipientCount : 1);
+            $this->size = $this->option('size') / ($inboundAliasCount ? $inboundAliasCount : 1);
 
-            foreach ($recipients as $recipient) {
+            foreach ($inboundAliases as $inboundAlias) {
+
+                $this->inboundAlias = $inboundAlias;
                 // Check if VERP bounce
-                if (substr($recipient['email'], 0, 2) === 'b_') {
-                    if ($outboundMessageId = $this->getIdFromVerp($recipient['email'])) {
+                if (substr($this->inboundAlias['email'], 0, 2) === 'b_') {
+                    if ($outboundMessageId = $this->getIdFromVerp($this->inboundAlias['email'])) {
                         // Is a valid bounce
                         $outboundMessage = OutboundMessage::with(['user', 'alias', 'recipient'])->find($outboundMessageId);
 
@@ -122,33 +129,33 @@ class ReceiveEmail extends Command
                         }
 
                         // If it is not a bounce (could be auto-reply) then redirect to alias
-                        $recipient['email'] = $bouncedAlias->email;
-                        $recipient['local_part'] = $bouncedAlias->local_part;
-                        $recipient['domain'] = $bouncedAlias->domain;
+                        $this->inboundAlias['email'] = $bouncedAlias->email;
+                        $this->inboundAlias['local_part'] = $bouncedAlias->local_part;
+                        $this->inboundAlias['domain'] = $bouncedAlias->domain;
                     }
                 }
 
                 // First determine if the alias already exists in the database
-                if ($alias = Alias::firstWhere('email', $recipient['local_part'].'@'.$recipient['domain'])) {
-                    $user = $alias->user;
+                if ($this->alias = Alias::firstWhere('email', $this->inboundAlias['local_part'].'@'.$this->inboundAlias['domain'])) {
+                    $this->user = $this->alias->user;
 
-                    if ($alias->aliasable_id) {
-                        $aliasable = $alias->aliasable;
+                    if ($this->alias->aliasable_id) {
+                        $aliasable = $this->alias->aliasable;
                     }
                 } else {
                     // Does not exist, must be a standard, username or custom domain alias
                     $parentDomain = collect(config('anonaddy.all_domains'))
-                        ->filter(function ($name) use ($recipient) {
-                            return Str::endsWith($recipient['domain'], $name);
+                        ->filter(function ($name) {
+                            return Str::endsWith($this->inboundAlias['domain'], $name);
                         })
                         ->first();
 
                     if (! empty($parentDomain)) {
                         // It is standard or username alias
-                        $subdomain = substr($recipient['domain'], 0, strrpos($recipient['domain'], '.'.$parentDomain)); // e.g. johndoe
+                        $subdomain = substr($this->inboundAlias['domain'], 0, strrpos($this->inboundAlias['domain'], '.'.$parentDomain)); // e.g. johndoe
 
                         if ($subdomain === 'unsubscribe') {
-                            $this->handleUnsubscribe($recipient);
+                            $this->handleUnsubscribe();
 
                             continue;
                         }
@@ -156,36 +163,36 @@ class ReceiveEmail extends Command
                         // Check if this is an username or standard alias
                         if (! empty($subdomain)) {
                             $username = Username::where('username', $subdomain)->first();
-                            $user = $username->user;
+                            $this->user = $username->user;
                             $aliasable = $username;
                         }
                     } else {
                         // It is a custom domain
-                        if ($customDomain = Domain::where('domain', $recipient['domain'])->first()) {
-                            $user = $customDomain->user;
+                        if ($customDomain = Domain::where('domain', $this->inboundAlias['domain'])->first()) {
+                            $this->user = $customDomain->user;
                             $aliasable = $customDomain;
                         }
                     }
 
-                    if (! isset($user) && ! empty(config('anonaddy.admin_username'))) {
-                        $user = Username::where('username', config('anonaddy.admin_username'))->first()?->user;
+                    if (! isset($this->user) && ! empty(config('anonaddy.admin_username'))) {
+                        $this->user = Username::where('username', config('anonaddy.admin_username'))->first()?->user;
                     }
                 }
 
                 // If there is still no user or the user has no verified default recipient then continue.
-                if (! isset($user) || ! $user->hasVerifiedDefaultRecipient()) {
+                if (! isset($this->user) || ! $this->user->hasVerifiedDefaultRecipient()) {
                     continue;
                 }
 
-                $this->checkBandwidthLimit($user);
+                $this->checkBandwidthLimit();
 
-                $this->checkRateLimit($user);
+                $this->checkRateLimit();
 
                 // Check whether this email is a reply/send from or a new email to be forwarded.
-                $destination = Str::replaceLast('=', '@', $recipient['extension']);
+                $destination = Str::replaceLast('=', '@', $this->inboundAlias['extension']);
                 $validEmailDestination = filter_var($destination, FILTER_VALIDATE_EMAIL);
                 if ($validEmailDestination) {
-                    $verifiedRecipient = $user->getVerifiedRecipientByEmail($this->senderFrom);
+                    $verifiedRecipient = $this->user->getVerifiedRecipientByEmail($this->senderFrom);
                 } else {
                     $verifiedRecipient = null;
                 }
@@ -194,24 +201,24 @@ class ReceiveEmail extends Command
                     // Check if the Dmarc allow or spam headers are present from Rspamd
                     if (! $this->parser->getHeader('X-AnonAddy-Dmarc-Allow')) {
                         // Notify user and exit
-                        $verifiedRecipient->notify(new SpamReplySendAttempt($recipient, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+                        $verifiedRecipient->notify(new SpamReplySendAttempt($this->inboundAlias, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
 
                         exit(0);
                     }
 
-                    if ($this->parser->getHeader('In-Reply-To') && $alias) {
-                        $this->handleReply($user, $alias, $validEmailDestination);
+                    if ($this->parser->getHeader('In-Reply-To') && $this->alias) {
+                        $this->handleReply($validEmailDestination);
                     } else {
-                        $this->handleSendFrom($user, $recipient, $alias ?? null, $aliasable ?? null, $validEmailDestination);
+                        $this->handleSendFrom($aliasable ?? null, $validEmailDestination);
                     }
                 } elseif ($verifiedRecipient?->can_reply_send === false) {
                     // Notify user that they have not allowed this recipient to reply and send from aliases
-                    $verifiedRecipient->notify(new DisallowedReplySendAttempt($recipient, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+                    $verifiedRecipient->notify(new DisallowedReplySendAttempt($this->inboundAlias, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
 
                     exit(0);
                 } else {
                     // Check if the spam header is present from Rspamd
-                    $this->handleForward($user, $recipient, $alias ?? null, $aliasable ?? null, $this->parser->getHeader('X-AnonAddy-Spam') === 'Yes');
+                    $this->handleForward($aliasable ?? null, $this->parser->getHeader('X-AnonAddy-Spam') === 'Yes');
                 }
             }
         } catch (\Throwable $e) {
@@ -223,70 +230,72 @@ class ReceiveEmail extends Command
         }
     }
 
-    protected function handleUnsubscribe($recipient)
+    protected function handleUnsubscribe()
     {
-        $alias = Alias::find($recipient['local_part']);
+        $alias = Alias::find($this->inboundAlias['local_part']);
 
         if ($alias && $alias->user->isVerifiedRecipient($this->senderFrom) && $this->parser->getHeader('X-AnonAddy-Dmarc-Allow')) {
             $alias->deactivate();
         }
     }
 
-    protected function handleReply($user, $alias, $destination)
+    protected function handleReply($destination)
     {
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'R');
 
-        $message = new ReplyToEmail($user, $alias, $emailData);
+        $message = new ReplyToEmail($this->user, $this->alias, $emailData);
 
         Mail::to($destination)->queue($message);
     }
 
-    protected function handleSendFrom($user, $recipient, $alias, $aliasable, $destination)
+    protected function handleSendFrom($aliasable, $destination)
     {
-        if (is_null($alias)) {
-            $alias = $user->aliases()->create([
-                'email' => $recipient['local_part'].'@'.$recipient['domain'],
-                'local_part' => $recipient['local_part'],
-                'domain' => $recipient['domain'],
+        if (is_null($this->alias)) {
+            $this->alias = $this->user->aliases()->create([
+                'email' => $this->inboundAlias['local_part'].'@'.$this->inboundAlias['domain'],
+                'local_part' => $this->inboundAlias['local_part'],
+                'domain' => $this->inboundAlias['domain'],
                 'aliasable_id' => $aliasable?->id,
                 'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null,
+                'description' => 'Created automatically by catch-all',
             ]);
 
             // Hydrate all alias fields
-            $alias->refresh();
+            $this->alias->refresh();
         }
 
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'S');
 
-        $message = new SendFromEmail($user, $alias, $emailData);
+        $message = new SendFromEmail($this->user, $this->alias, $emailData);
 
         Mail::to($destination)->queue($message);
     }
 
-    protected function handleForward($user, $recipient, $alias, $aliasable, $isSpam)
+    protected function handleForward($aliasable, $isSpam)
     {
-        if (is_null($alias)) {
+        if (is_null($this->alias)) {
             // This is a new alias
-            $alias = new Alias([
-                'email' => $recipient['local_part'].'@'.$recipient['domain'],
-                'local_part' => $recipient['local_part'],
-                'domain' => $recipient['domain'],
+            $this->alias = new Alias([
+                'email' => $this->inboundAlias['local_part'].'@'.$this->inboundAlias['domain'],
+                'local_part' => $this->inboundAlias['local_part'],
+                'domain' => $this->inboundAlias['domain'],
                 'aliasable_id' => $aliasable?->id,
                 'aliasable_type' => $aliasable ? 'App\\Models\\'.class_basename($aliasable) : null,
+                'description' => 'Created automatically by catch-all',
             ]);
 
-            if ($user->hasExceededNewAliasLimit()) {
+            if ($this->user->hasExceededNewAliasLimit()) {
                 $this->error('4.2.1 New aliases per hour limit exceeded for user.');
 
                 exit(1);
             }
 
-            if ($recipient['extension'] !== '') {
-                $alias->extension = $recipient['extension'];
+            if ($this->inboundAlias['extension'] !== '') {
+                $this->alias->extension = $this->inboundAlias['extension'];
 
-                $keys = explode('.', $recipient['extension']);
+                $keys = explode('.', $this->inboundAlias['extension']);
 
-                $recipientIds = $user
+                $recipientIds = $this->user
                     ->recipients()
                     ->select(['id', 'email_verified_at'])
                     ->oldest()
@@ -299,22 +308,22 @@ class ReceiveEmail extends Command
                     ->toArray();
             }
 
-            $user->aliases()->save($alias);
+            $this->user->aliases()->save($this->alias);
 
             // Hydrate all alias fields
-            $alias->refresh();
+            $this->alias->refresh();
 
             if (isset($recipientIds)) {
-                $alias->recipients()->sync($recipientIds);
+                $this->alias->recipients()->sync($recipientIds);
             }
         }
 
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
-        $alias->verifiedRecipientsOrDefault()->each(function ($recipient) use ($alias, $emailData, $isSpam) {
-            $message = (new ForwardEmail($alias, $emailData, $recipient, $isSpam));
+        $this->alias->verifiedRecipientsOrDefault()->each(function ($aliasRecipient) use ($emailData, $isSpam) {
+            $message = (new ForwardEmail($this->alias, $emailData, $aliasRecipient, $isSpam));
 
-            Mail::to($recipient->email)->queue($message);
+            Mail::to($aliasRecipient->email)->queue($message);
         });
     }
 
@@ -443,32 +452,32 @@ class ReceiveEmail extends Command
         exit(0);
     }
 
-    protected function checkBandwidthLimit($user)
+    protected function checkBandwidthLimit()
     {
-        if ($user->hasReachedBandwidthLimit()) {
-            $user->update(['reject_until' => now()->endOfMonth()]);
+        if ($this->user->hasReachedBandwidthLimit()) {
+            $this->user->update(['reject_until' => now()->endOfMonth()]);
 
             $this->error('4.2.1 Bandwidth limit exceeded for user. Please try again later.');
 
             exit(1);
         }
 
-        if ($user->nearBandwidthLimit() && ! Cache::has("user:{$user->id}:near-bandwidth")) {
-            $user->notify(new NearBandwidthLimit);
+        if ($this->user->nearBandwidthLimit() && ! Cache::has("user:{$this->user->id}:near-bandwidth")) {
+            $this->user->notify(new NearBandwidthLimit);
 
-            Cache::put("user:{$user->id}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
+            Cache::put("user:{$this->user->id}:near-bandwidth", now()->toDateTimeString(), now()->addDay());
         }
     }
 
-    protected function checkRateLimit($user)
+    protected function checkRateLimit()
     {
-        \Illuminate\Support\Facades\Redis::throttle("user:{$user->id}:limit:emails")
+        \Illuminate\Support\Facades\Redis::throttle("user:{$this->user->id}:limit:emails")
             ->allow(config('anonaddy.limit'))
             ->every(3600)
             ->then(
                 function () {},
-                function () use ($user) {
-                    $user->update(['defer_until' => now()->addHour()]);
+                function () {
+                    $this->user->update(['defer_until' => now()->addHour()]);
 
                     $this->error('4.2.1 Rate limit exceeded for user. Please try again later.');
 
@@ -477,7 +486,7 @@ class ReceiveEmail extends Command
             );
     }
 
-    protected function getRecipients()
+    protected function getInboundAliases()
     {
         return collect($this->option('recipient'))->map(function ($item, $key) {
             return [

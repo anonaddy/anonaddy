@@ -31,4 +31,11 @@ class ImportAliasesRequest extends FormRequest
             ],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'aliases_import' => 'Please check that your file type is CSV, make sure that it has at least 2 rows of aliases and is less than 1MB in size.',
+        ];
+    }
 }
