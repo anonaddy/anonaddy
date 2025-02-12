@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\CustomMailDriver\Mime\Part\InlineImagePart;
+use App\CustomMailDriver\Mime\Part\CustomDataPart;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\User;
@@ -168,11 +168,25 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
                 if ($this->emailInlineAttachments) {
                     foreach ($this->emailInlineAttachments as $attachment) {
-                        $part = new InlineImagePart(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+                        $part = new CustomDataPart(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
 
                         $part->asInline();
 
                         $part->setContentId(base64_decode($attachment['contentId']));
+                        $part->setFileName(base64_decode($attachment['file_name']));
+
+                        $message->addPart($part);
+                    }
+                }
+
+                if ($this->emailAttachments) {
+                    foreach ($this->emailAttachments as $attachment) {
+                        $part = new CustomDataPart(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+
+                        // Only set content-id if present
+                        if ($attachment['contentId']) {
+                            $part->setContentId(base64_decode($attachment['contentId']));
+                        }
                         $part->setFileName(base64_decode($attachment['file_name']));
 
                         $message->addPart($part);
@@ -197,14 +211,6 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             $this->email->text('emails.reply.text')->with([
                 'text' => base64_decode($this->emailText),
             ]);
-        }
-
-        foreach ($this->emailAttachments as $attachment) {
-            $this->email->attachData(
-                base64_decode($attachment['stream']),
-                base64_decode($attachment['file_name']),
-                ['mime' => base64_decode($attachment['mime'])]
-            );
         }
 
         $this->checkRules('Replies');
