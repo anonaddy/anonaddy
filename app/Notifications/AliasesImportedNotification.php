@@ -70,7 +70,6 @@ class AliasesImportedNotification extends Notification implements ShouldBeEncryp
                 'userId' => $notifiable->id,
                 'recipientId' => $recipient->id,
                 'emailType' => 'AIF',
-                'hasVerifiedEmail' => $recipient->hasVerifiedEmail(),
                 'fingerprint' => $fingerprint,
             ])
             ->withSymfonyMessage(function (Email $message) {
