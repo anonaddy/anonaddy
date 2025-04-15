@@ -614,7 +614,7 @@ sudo service postfix restart
 
 ## Installing Redis
 
-Redis is an advanced key-value store that we will use for caching, sessions, queues and more. To install Redis, run the following commands (instructions from [https://redis.io/docs/getting-started/installation/install-redis-on-linux/](https://redis.io/docs/getting-started/installation/install-redis-on-linux/)):
+Redis is an advanced key-value store that we will use for caching, sessions, queues and more. To install Redis, run the following commands (instructions from [https://redis.io/docs/latest/operate/oss_and_stack/install/archive/install-redis/install-redis-on-linux/](https://redis.io/docs/latest/operate/oss_and_stack/install/archive/install-redis/install-redis-on-linux/)):
 
 ```bash
 # Install prerequisites

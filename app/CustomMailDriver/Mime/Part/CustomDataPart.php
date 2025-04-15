@@ -21,11 +21,19 @@ class CustomDataPart extends DataPart
 
     public function getContentId(): string
     {
+        if (! isset($this->cid)) {
+            return $this->cid = $this->generateContentId();
+        }
+
         return $this->cid ?: $this->cid = $this->generateContentId();
     }
 
     public function hasContentId(): bool
     {
+        if (! isset($this->cid)) {
+            return false;
+        }
+
         return $this->cid !== null;
     }
 
