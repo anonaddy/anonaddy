@@ -206,6 +206,15 @@ class ReceiveEmail extends Command
                         exit(0);
                     }
 
+                    // If the alias has toggle on "Only allow recipients directly attached to this alias to reply/send" then check if verifiedRecipient is directly attached to the alias
+                    if ($this->alias?->attached_recipients_only) {
+                        if (! $this->alias->verifiedRecipients()->pluck('recipients.id')->contains($verifiedRecipient->id)) {
+                            $verifiedRecipient->notify(new DisallowedReplySendAttempt($this->inboundAlias, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+
+                            exit(0);
+                        }
+                    }
+
                     if ($this->parser->getHeader('In-Reply-To') && $this->alias) {
                         $this->handleReply($validEmailDestination);
                     } else {

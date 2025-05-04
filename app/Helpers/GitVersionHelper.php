@@ -31,6 +31,7 @@ class GitVersionHelper
                 $response = Http::get('https://api.github.com/repos/anonaddy/anonaddy/releases/latest');
             } catch (Exception $e) {
                 report($e);
+
                 return '0.0.0';
             }
 

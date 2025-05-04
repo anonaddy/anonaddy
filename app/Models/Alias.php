@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Alias extends Model
@@ -33,6 +34,7 @@ class Alias extends Model
         'active',
         'description',
         'from_name',
+        'attached_recipients_only',
         'email',
         'local_part',
         'extension',
@@ -56,6 +58,7 @@ class Alias extends Model
         'aliasable_id' => 'string',
         'aliasable_type' => 'string',
         'active' => 'boolean',
+        'attached_recipients_only' => 'boolean',
         'last_forwarded' => 'datetime',
         'last_blocked' => 'datetime',
         'last_replied' => 'datetime',
@@ -125,6 +128,33 @@ class Alias extends Model
     public function recipients()
     {
         return $this->belongsToMany(Recipient::class, 'alias_recipients')->withPivot('id')->using(AliasRecipient::class);
+    }
+
+
+    /**
+     * Detach all recipients from this alias.
+     *
+     * @return int
+     */
+    public function detachAllRecipients()
+    {
+        return DB::table('alias_recipients')->where('alias_id', $this->id)->delete();
+    }
+
+    /**
+     * Detach specific recipients from this alias.
+     *
+     * @param  array|string  $recipientIds
+     * @return int
+     */
+    public function detachRecipients($recipientIds)
+    {
+        $recipientIds = is_array($recipientIds) ? $recipientIds : [$recipientIds];
+
+        return DB::table('alias_recipients')
+            ->where('alias_id', $this->id)
+            ->whereIn('recipient_id', $recipientIds)
+            ->delete();
     }
 
     /**

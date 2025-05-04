@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class Recipient extends Model
 {
@@ -61,7 +62,7 @@ class Recipient extends Model
                 $recipient->user->deleteKeyFromKeyring($recipient->fingerprint);
             }
 
-            $recipient->aliases()->detach();
+            $recipient->detachAllAliases();
         });
     }
 
@@ -118,6 +119,32 @@ class Recipient extends Model
     public function aliases()
     {
         return $this->belongsToMany(Alias::class, 'alias_recipients')->using(AliasRecipient::class);
+    }
+
+    /**
+     * Detach all aliases from this recipient.
+     *
+     * @return int
+     */
+    public function detachAllAliases()
+    {
+        return DB::table('alias_recipients')->where('recipient_id', $this->id)->delete();
+    }
+
+    /**
+     * Detach specific aliases from this recipient.
+     *
+     * @param  array|string  $aliasIds
+     * @return int
+     */
+    public function detachAliases($aliasIds)
+    {
+        $aliasIds = is_array($aliasIds) ? $aliasIds : [$aliasIds];
+
+        return DB::table('alias_recipients')
+            ->where('recipient_id', $this->id)
+            ->whereIn('alias_id', $aliasIds)
+            ->delete();
     }
 
     /**

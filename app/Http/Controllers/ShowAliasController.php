@@ -224,7 +224,7 @@ class ShowAliasController extends Controller
         $alias = user()->aliases()->withTrashed()->findOrFail($id);
 
         return Inertia::render('Aliases/Edit', [
-            'initialAlias' => $alias->only(['id', 'user_id', 'local_part', 'extension', 'domain', 'email', 'active', 'description', 'from_name', 'deleted_at', 'updated_at']),
+            'initialAlias' => $alias->only(['id', 'user_id', 'local_part', 'extension', 'domain', 'email', 'active', 'description', 'from_name', 'attached_recipients_only', 'deleted_at', 'updated_at']),
         ]);
     }
 }

@@ -53,7 +53,7 @@ class OutboundMessage extends Model
      */
     public function alias()
     {
-        return $this->belongsTo(Alias::class);
+        return $this->belongsTo(Alias::class)->withTrashed();
     }
 
     public function markAsBounced()

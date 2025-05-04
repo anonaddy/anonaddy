@@ -103,6 +103,26 @@
           </button>
         </div>
 
+        <div class="pt-8">
+          <label
+            for="can_reply_send"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
+            >Limit Replies/Sends to attached recipients only</label
+          >
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
+            Toggle this option to only allow verified recipients that are <b>directly</b> attached
+            to this alias to reply or send from it. If this option is enabled and no recipients are
+            directly attached then it will <b>not be possible to reply/send</b> from this alias.
+          </p>
+          <Toggle
+            id="can_reply_send"
+            class="mt-4"
+            v-model="alias.attached_recipients_only"
+            @on="enableAttachedRecipientsOnly"
+            @off="disableAttachedRecipientsOnly"
+          />
+        </div>
+
         <div class="pt-5">
           <span
             class="mt-2 text-sm text-grey-500 tooltip"
@@ -122,6 +142,7 @@ import { notify } from '@kyvg/vue3-notification'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
 import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
+import Toggle from '../../Components/Toggle.vue'
 
 const props = defineProps({
   initialAlias: {
@@ -166,6 +187,36 @@ const editFromName = () => {
     })
     .catch(error => {
       alias.value.fromNameLoading = false
+      errorMessage()
+    })
+}
+
+const enableAttachedRecipientsOnly = () => {
+  axios
+    .post(
+      `/api/v1/attached-recipients-only`,
+      JSON.stringify({
+        id: alias.value.id,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+    .then(response => {
+      successMessage('Attached recipients only enabled')
+    })
+    .catch(error => {
+      errorMessage()
+    })
+}
+
+const disableAttachedRecipientsOnly = () => {
+  axios
+    .delete(`/api/v1/attached-recipients-only/${alias.value.id}`)
+    .then(response => {
+      successMessage('Attached recipients only disabled')
+    })
+    .catch(error => {
       errorMessage()
     })
 }
