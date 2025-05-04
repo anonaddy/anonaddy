@@ -106,10 +106,10 @@
         <div class="pt-8">
           <label
             for="can_reply_send"
-            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default"
             >Limit Replies/Sends to attached recipients only</label
           >
-          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
+          <p class="mt-1 text-base text-grey-700">
             Toggle this option to only allow verified recipients that are <b>directly</b> attached
             to this alias to reply or send from it. If this option is enabled and no recipients are
             directly attached then it will <b>not be possible to reply/send</b> from this alias.
