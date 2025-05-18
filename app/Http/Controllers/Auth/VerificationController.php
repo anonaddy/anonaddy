@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Notifications\DefaultRecipientUpdated;
+use App\Notifications\NewRecipientVerified;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
@@ -89,8 +90,21 @@ class VerificationController extends Controller
             return redirect($this->redirectPath());
         }
 
-        if ($verifiable->markEmailAsVerified() && $verifiable instanceof User) {
-            event(new Verified($verifiable));
+        if ($verifiable->markEmailAsVerified()) {
+            if ($verifiable instanceof User) {
+                event(new Verified($verifiable));
+            }
+
+            if ($verifiable instanceof Recipient && ! $verifiable->pending) {
+
+                $defaultRecipient = $verifiable->user?->defaultRecipient;
+
+                if ($defaultRecipient) {
+                    // Notify the user's current default recipient that a new recipient has just been added and verified
+                    $defaultRecipient->notify(new NewRecipientVerified($verifiable->email));
+                }
+            }
+
         }
 
         if ($request->user() !== null) {

@@ -585,6 +585,7 @@ return [
         'offers',
         'online',
         'openid',
+        'openpgpkey',
         'order',
         'orders',
         'overview',

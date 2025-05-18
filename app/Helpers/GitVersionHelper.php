@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -25,7 +26,14 @@ class GitVersionHelper
 
         // Cache latestVersion for 1 day
         $latestVersion = Cache::remember('app-latest-version', now()->addDay(), function () {
-            $response = Http::get('https://api.github.com/repos/anonaddy/anonaddy/releases/latest');
+
+            try {
+                $response = Http::get('https://api.github.com/repos/anonaddy/anonaddy/releases/latest');
+            } catch (Exception $e) {
+                report($e);
+
+                return '0.0.0';
+            }
 
             return Str::of($response->json('tag_name', 'v0.0.0'))->after('v')->trim();
         });

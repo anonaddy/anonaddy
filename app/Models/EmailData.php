@@ -186,7 +186,6 @@ class EmailData
                         'stream' => base64_encode(stream_get_contents($attachment->getStream())),
                         'file_name' => base64_encode($attachment->getFileName()),
                         'mime' => base64_encode($contentType),
-                        'contentDisposition' => base64_encode($attachment->getContentDisposition()),
                         'contentId' => base64_encode($attachment->getContentID()),
                     ];
                 } else {
@@ -194,6 +193,7 @@ class EmailData
                         'stream' => base64_encode(stream_get_contents($attachment->getStream())),
                         'file_name' => base64_encode($attachment->getFileName()),
                         'mime' => base64_encode($contentType),
+                        'contentId' => base64_encode($attachment->getContentID()),
                     ];
                 }
             }

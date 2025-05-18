@@ -81,6 +81,7 @@ class StoreRuleRequest extends FormRequest
             ],
             'actions.*.type' => [
                 'required',
+                'distinct',
                 Rule::in([
                     'subject',
                     'displayFrom',

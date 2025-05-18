@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AliasRecipientController;
 use App\Http\Controllers\Api\AllowedRecipientController;
 use App\Http\Controllers\Api\ApiTokenDetailController;
 use App\Http\Controllers\Api\AppVersionController;
+use App\Http\Controllers\Api\AttachedRecipientOnlyController;
 use App\Http\Controllers\Api\CatchAllDomainController;
 use App\Http\Controllers\Api\CatchAllUsernameController;
 use App\Http\Controllers\Api\ChartDataController;
@@ -77,6 +78,11 @@ Route::group([
     Route::controller(ActiveAliasController::class)->group(function () {
         Route::post('/active-aliases', 'store');
         Route::delete('/active-aliases/{id}', 'destroy');
+    });
+
+    Route::controller(AttachedRecipientOnlyController::class)->group(function () {
+        Route::post('/attached-recipients-only', 'store');
+        Route::delete('/attached-recipients-only/{id}', 'destroy');
     });
 
     Route::post('/alias-recipients', [AliasRecipientController::class, 'store']);

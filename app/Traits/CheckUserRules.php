@@ -157,7 +157,7 @@ trait CheckUserRules
                 exit(0);
                 break;
             case 'removeAttachments':
-                $this->email->rawAttachments = [];
+                $this->emailAttachments = [];
                 break;
             case 'forwardTo':
                 // Only apply on forwards

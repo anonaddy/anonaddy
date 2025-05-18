@@ -91,6 +91,7 @@ class FailedDelivery extends Model
                 'FDN' => 'Failed Delivery',
                 'DMI' => 'Domain MX Invalid',
                 'DRU' => 'Default Recipient Updated',
+                'NRV' => 'New Recipient Verified',
                 'FLA' => 'Failed Login Attempt',
                 'TES' => 'Token Expiring Soon',
                 'UR' => 'Username Reminder',
@@ -143,6 +144,6 @@ class FailedDelivery extends Model
      */
     public function alias()
     {
-        return $this->belongsTo(Alias::class);
+        return $this->belongsTo(Alias::class)->withTrashed();
     }
 }
