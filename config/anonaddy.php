@@ -38,6 +38,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Non-Admin Username Subdomains
+    |--------------------------------------------------------------------------
+    |
+    | If set to false this will prevent any non-admin users from being able to create
+    | username subdomain aliases at any domains that have been set for 'all_domains' below
+    |
+    */
+
+    'non_admin_username_subdomains' => env('ANONADDY_NON_ADMIN_USERNAME_SUBDOMAINS', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Non-Admin Shared Domains
     |--------------------------------------------------------------------------
     |
