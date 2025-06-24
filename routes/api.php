@@ -187,7 +187,7 @@ Route::group([
         Route::delete('/failed-deliveries/{id}', 'destroy');
     });
 
-    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index'])->middleware('subscribed');
+    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index']);
 
     Route::get('/domain-options', [DomainOptionController::class, 'index']);
 

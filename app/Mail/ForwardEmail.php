@@ -467,6 +467,16 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     private function getUserDisplayFrom($displayFrom)
     {
+        // If there is no display from name
+        if ($displayFrom === $this->sender) {
+            return match ($this->user->display_from_format) {
+                DisplayFromFormat::BRACKETS => str_replace('@', '(a)', $this->sender),
+                DisplayFromFormat::DOMAINONLY => Str::afterLast($this->sender, '@'),
+                DisplayFromFormat::NONE => null,
+                default => str_replace('@', ' at ', $this->sender),
+            };
+        }
+
         // Check user display_from_format settings and then return correct format
         return match ($this->user->display_from_format) {
             DisplayFromFormat::DEFAULT => str_replace('@', ' at ', $displayFrom." '".$this->sender."'"),
