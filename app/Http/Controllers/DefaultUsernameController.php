@@ -10,6 +10,10 @@ class DefaultUsernameController extends Controller
     {
         $username = user()->usernames()->findOrFail($request->id);
 
+        if (usesExternalAuthentication()) {
+            return response('You cannot change default username because you\'re using external authentication', 403);
+        }
+
         // Ensure username can be used to login
         $username->allowLogin();
 
