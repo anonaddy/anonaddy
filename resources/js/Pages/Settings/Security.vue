@@ -543,7 +543,8 @@
               >
                 <input
                   type="submit"
-                  class="text-indigo-900 bg-transparent cursor-pointer"
+                  :disabled="regenerateTwoFactorForm.processing"
+                  class="text-indigo-900 bg-transparent cursor-pointer disabled:cursor-not-allowed"
                   value="Click here to regenerate your secret key"
                 />
 

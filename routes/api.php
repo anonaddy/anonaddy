@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ChartDataController;
 use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\DomainDefaultRecipientController;
 use App\Http\Controllers\Api\DomainOptionController;
+use App\Http\Controllers\Api\DownloadableFailedDeliveryController;
 use App\Http\Controllers\Api\EncryptedRecipientController;
 use App\Http\Controllers\Api\FailedDeliveryController;
 use App\Http\Controllers\Api\InlineEncryptedRecipientController;
@@ -26,11 +27,11 @@ use App\Http\Controllers\Api\ProtectedHeadersRecipientController;
 use App\Http\Controllers\Api\RecipientController;
 use App\Http\Controllers\Api\RecipientKeyController;
 use App\Http\Controllers\Api\ReorderRuleController;
+use App\Http\Controllers\Api\ResendableFailedDeliveryController;
 use App\Http\Controllers\Api\RuleController;
 use App\Http\Controllers\Api\UsernameController;
 use App\Http\Controllers\Api\UsernameDefaultRecipientController;
 use App\Http\Controllers\Auth\ApiAuthenticationController;
-use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\RecipientVerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -188,6 +189,7 @@ Route::group([
     });
 
     Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index']);
+    Route::post('/failed-deliveries/{id}/resend', [ResendableFailedDeliveryController::class, 'index']);
 
     Route::get('/domain-options', [DomainOptionController::class, 'index']);
 

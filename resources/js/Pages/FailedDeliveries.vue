@@ -101,6 +101,20 @@
             Download
           </a>
           <button
+            v-if="
+              props.row.is_stored &&
+              !props.row.quarantined &&
+              !props.row.resent &&
+              props.row.email_type === 'Forward'
+            "
+            @click="openResendModal(props.row)"
+            as="button"
+            type="button"
+            class="mr-4 text-indigo-500 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium"
+          >
+            Resend
+          </button>
+          <button
             @click="openDeleteModal(props.row.id)"
             as="button"
             type="button"
@@ -136,6 +150,53 @@
         You don't have any failed delivery attempts to display.
       </p>
     </div>
+
+    <Modal :open="resendFailedDeliveryModalOpen" @close="closeResendModal">
+      <template v-slot:title> Resend Failed Delivery </template>
+      <template v-slot:content>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          You can choose to resend to the original recipient or select a different one below. You
+          can choose multiple recipients.
+        </p>
+        <p class="my-4 text-grey-700 dark:text-grey-200">
+          Leave the select input empty if you would like to resend to the original recipient
+          <b v-if="failedDeliveryToResend.recipient">{{ failedDeliveryToResend.recipient.email }}</b
+          >.
+        </p>
+        <multiselect
+          v-model="failedDeliveryRecipientsToResend"
+          mode="tags"
+          value-prop="id"
+          :options="recipientOptions"
+          :close-on-select="true"
+          :clear-on-select="false"
+          :searchable="true"
+          :max="10"
+          class="p-0"
+          placeholder="Select recipient(s)"
+          label="email"
+          track-by="email"
+        >
+        </multiselect>
+        <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+          <button
+            type="button"
+            @click="resendFailedDelivery(failedDeliveryToResend.id)"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            :disabled="resendFailedDeliveryLoading"
+          >
+            Resend failed delivery
+            <loader v-if="resendFailedDeliveryLoading" />
+          </button>
+          <button
+            @click="closeResendModal"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Cancel
+          </button>
+        </div>
+      </template>
+    </Modal>
 
     <Modal :open="deleteFailedDeliveryModalOpen" @close="closeDeleteModal">
       <template v-slot:title> Delete Failed Delivery </template>
@@ -204,10 +265,15 @@ import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
 import { notify } from '@kyvg/vue3-notification'
 import { VueGoodTable } from 'vue-good-table-next'
+import Multiselect from '@vueform/multiselect'
 import { InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
   initialRows: {
+    type: Array,
+    required: true,
+  },
+  recipientOptions: {
     type: Array,
     required: true,
   },
@@ -218,9 +284,13 @@ const props = defineProps({
 
 const rows = ref(props.initialRows)
 
+const resendFailedDeliveryLoading = ref(false)
+const resendFailedDeliveryModalOpen = ref(false)
 const deleteFailedDeliveryLoading = ref(false)
 const deleteFailedDeliveryModalOpen = ref(false)
 const moreInfoOpen = ref(false)
+const failedDeliveryToResend = ref({})
+const failedDeliveryRecipientsToResend = ref([])
 const failedDeliveryIdToDelete = ref(null)
 const tippyInstance = ref(null)
 const errors = ref({})
@@ -271,6 +341,30 @@ const columns = [
   },
 ]
 
+const resendFailedDelivery = id => {
+  resendFailedDeliveryLoading.value = true
+
+  axios
+    .post(
+      `/api/v1/failed-deliveries/${id}/resend`,
+      JSON.stringify({
+        recipient_ids: failedDeliveryRecipientsToResend.value,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+    .then(response => {
+      resendFailedDeliveryModalOpen.value = false
+      resendFailedDeliveryLoading.value = false
+    })
+    .catch(error => {
+      errorMessage()
+      resendFailedDeliveryLoading.value = false
+      resendFailedDeliveryModalOpen.value = false
+    })
+}
+
 const deleteFailedDelivery = id => {
   deleteFailedDeliveryLoading.value = true
 
@@ -286,6 +380,17 @@ const deleteFailedDelivery = id => {
       deleteFailedDeliveryLoading.value = false
       deleteFailedDeliveryModalOpen.value = false
     })
+}
+
+const openResendModal = failedDelivery => {
+  resendFailedDeliveryModalOpen.value = true
+  failedDeliveryToResend.value = failedDelivery
+}
+
+const closeResendModal = () => {
+  resendFailedDeliveryModalOpen.value = false
+  failedDeliveryToResend.value = {}
+  failedDeliveryRecipientsToResend.value = []
 }
 
 const openDeleteModal = id => {

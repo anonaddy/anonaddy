@@ -62,12 +62,23 @@ class EmailData
 
     public $isInlineEncrypted;
 
-    public function __construct(Parser $parser, $sender, $size, $emailType = 'F')
+    public $resendFromEmail;
+
+    public function __construct(Parser $parser, $sender, $size, $emailType = 'F', $resend = false)
     {
-        if (isset($parser->getAddresses('from')[0]['address'])) {
-            if (filter_var($parser->getAddresses('from')[0]['address'], FILTER_VALIDATE_EMAIL)) {
-                $this->sender = $parser->getAddresses('from')[0]['address'];
+        try {
+            // Fix "input is not rfc822 compliant: not in < bracket" error
+            if (isset($parser->getAddresses('from')[0]['address'])) {
+                if (filter_var($parser->getAddresses('from')[0]['address'], FILTER_VALIDATE_EMAIL)) {
+                    if ($resend) {
+                        $this->resendFromEmail = $parser->getAddresses('from')[0]['address'];
+                    } else {
+                        $this->sender = $parser->getAddresses('from')[0]['address'];
+                    }
+                }
             }
+        } catch (\Throwable $e) {
+            $this->sender = $sender;
         }
 
         // If we can't get a From header then use the envelope from
@@ -100,11 +111,11 @@ class EmailData
         }
 
         if ($originalCc = $parser->getHeader('cc')) {
-            $this->originalCc = $originalCc;
+            $this->originalCc = $resend ? $parser->getHeader('X-AnonAddy-Original-Cc') : $originalCc;
         }
 
         if ($originalTo = $parser->getHeader('to')) {
-            $this->originalTo = $originalTo;
+            $this->originalTo = $resend ? $parser->getHeader('X-AnonAddy-Original-To') : $originalTo;
         }
 
         $this->subject = base64_encode($parser->getHeader('subject'));
@@ -118,9 +129,17 @@ class EmailData
         $this->listUnsubscribePost = base64_encode($parser->getHeader('List-Unsubscribe-Post'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
-        $this->originalEnvelopeFrom = $sender;
-        $this->originalFromHeader = base64_encode($parser->getHeader('From'));
-        $this->originalReplyToHeader = base64_encode($parser->getHeader('Reply-To'));
+
+        if ($resend) {
+            $this->originalFromHeader = base64_encode($parser->getHeader('X-AnonAddy-Original-From-Header'));
+            $this->originalEnvelopeFrom = $parser->getHeader('X-AnonAddy-Original-Envelope-From');
+            $this->originalReplyToHeader = base64_encode($parser->getHeader('X-AnonAddy-Original-Reply-To-Header'));
+        } else {
+            $this->originalFromHeader = base64_encode($parser->getHeader('From'));
+            $this->originalEnvelopeFrom = $sender;
+            $this->originalReplyToHeader = base64_encode($parser->getHeader('Reply-To'));
+        }
+
         $this->originalSenderHeader = base64_encode($parser->getHeader('Sender'));
         $this->authenticationResults = $parser->getHeader('X-AnonAddy-Authentication-Results');
         $this->receivedHeaders = $parser->getRawHeader('Received');
@@ -217,8 +236,10 @@ class EmailData
                 $decryptedParser = new Parser;
                 $decryptedParser->setText($decrypted);
 
-                // Set decrypted data as subject (as may have encrypted subject too), html and text
-                $this->subject = base64_encode($decryptedParser->getHeader('subject'));
+                // Set decrypted data as subject if present (as may have encrypted subject too), html and text
+                if ($decryptedParser->getHeader('subject')) {
+                    $this->subject = base64_encode($decryptedParser->getHeader('subject'));
+                }
                 $this->text = base64_encode($decryptedParser->getMessageBody('text'));
                 $this->html = base64_encode($decryptedParser->getMessageBody('html'));
                 // Add attachments

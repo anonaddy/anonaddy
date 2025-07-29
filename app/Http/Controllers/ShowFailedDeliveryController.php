@@ -18,7 +18,7 @@ class ShowFailedDeliveryController extends Controller
         $failedDeliveries = user()
             ->failedDeliveries()
             ->with(['recipient:id,email', 'alias:id,email'])
-            ->select(['alias_id', 'email_type', 'code', 'attempted_at', 'created_at', 'id', 'user_id', 'recipient_id', 'remote_mta', 'sender', 'destination', 'is_stored'])
+            ->select(['alias_id', 'email_type', 'code', 'attempted_at', 'created_at', 'id', 'user_id', 'recipient_id', 'remote_mta', 'sender', 'destination', 'is_stored', 'resent'])
             ->latest()
             ->get();
 
@@ -32,6 +32,7 @@ class ShowFailedDeliveryController extends Controller
 
         return Inertia::render('FailedDeliveries', [
             'initialRows' => $failedDeliveries,
+            'recipientOptions' => fn () => user()->verifiedRecipients()->select(['id', 'email'])->get(),
             'search' => $validated['search'] ?? null,
         ]);
     }

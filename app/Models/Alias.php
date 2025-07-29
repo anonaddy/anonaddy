@@ -130,7 +130,6 @@ class Alias extends Model
         return $this->belongsToMany(Recipient::class, 'alias_recipients')->withPivot('id')->using(AliasRecipient::class);
     }
 
-
     /**
      * Detach all recipients from this alias.
      *

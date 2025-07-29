@@ -1722,6 +1722,7 @@ const createNewAlias = () => {
           newAliasExtension.value = data.data.extension
           newAliasDomain.value = data.data.domain
           newAliasModalOpen.value = true
+          debounceToolips()
           successMessage('New alias created successfully')
         },
       })
