@@ -133,6 +133,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Webauthn logging
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the channel to which Webauthn will log messages.
+    | This value should correspond with one of your loggers that is already
+    | present in your "logging" configuration file. If left as null, it will
+    | use the default logger for the application.
+    |
+    */
+
+    'log' => 'null',
+
+    /*
+    |--------------------------------------------------------------------------
     | Session name
     |--------------------------------------------------------------------------
     |
@@ -265,6 +279,23 @@ return [
     */
 
     'user_verification' => 'discouraged',
+
+        /*
+    |--------------------------------------------------------------------------
+    | The resident key
+    |--------------------------------------------------------------------------
+    |
+    | When userless is set to 'preferred' or 'required', the resident key will be
+    | forced to be 'required' automatically.
+    |
+    | See https://www.w3.org/TR/webauthn/#enum-residentKeyRequirement
+    |
+    | Supported: "null", "required", "preferred", "discouraged".
+    | Forced to "required" when userless is true.
+    |
+    */
+
+    'resident_key' => null,
 
     /*
     |--------------------------------------------------------------------------

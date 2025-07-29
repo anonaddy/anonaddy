@@ -190,8 +190,9 @@
         </div>
         <div v-show="accessToken">
           <p class="my-4 text-grey-700">
-            This is your new personal access key. <b>This is the only time the key will ever be
-            displayed</b>, so please make a note of it in a safe place (e.g. password manager)!
+            This is your new personal access key.
+            <b>This is the only time the key will ever be displayed</b>, so please make a note of it
+            in a safe place (e.g. password manager)!
           </p>
           <textarea
             v-model="accessToken"

@@ -385,8 +385,8 @@
                 </span>
                 <button
                   @click="
-                    ;(aliasIdToEdit = props.row.id),
-                      (aliasDescriptionToEdit = props.row.description)
+                    ;((aliasIdToEdit = props.row.id),
+                      (aliasDescriptionToEdit = props.row.description))
                   "
                 >
                   <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
@@ -395,7 +395,7 @@
               <div v-else>
                 <button
                   class="inline-block text-grey-300 text-sm py-1 border border-transparent"
-                  @click=";(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = '')"
+                  @click=";((aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = ''))"
                 >
                   Add description
                 </button>
@@ -695,10 +695,10 @@
         It doesn't look like you have any aliases yet!
       </h3>
       <div v-if="subdomain">
-        <p class="mb-4 text-md text-grey-700">There {{ domain ? 'are two ways' : 'is one way'}} to create new aliases.</p>
-        <h3 class="mb-2 text-lg text-indigo-800 font-semibold">
-          Create aliases on the fly
-        </h3>
+        <p class="mb-4 text-md text-grey-700">
+          There {{ domain ? 'are two ways' : 'is one way' }} to create new aliases.
+        </p>
+        <h3 class="mb-2 text-lg text-indigo-800 font-semibold">Create aliases on the fly</h3>
         <p class="mb-2 text-grey-700">
           To create aliases on the fly all you have to do is make up any new alias and give that out
           instead of your real email address.
@@ -720,19 +720,20 @@
         </p>
       </div>
       <div v-if="domain">
-        <p v-if="!subdomain" class="mb-4 text-md text-grey-700">There is one way to create new aliases.</p>
-        <h3 class="mb-2 text-lg text-indigo-800 font-semibold">
-          Create a unique random alias
-        </h3>
+        <p v-if="!subdomain" class="mb-4 text-md text-grey-700">
+          There is one way to create new aliases.
+        </p>
+        <h3 class="mb-2 text-lg text-indigo-800 font-semibold">Create a unique random alias</h3>
         <p class="mb-2 text-grey-700">
-          You can click the button above to create a random alias that will look something like this:
+          You can click the button above to create a random alias that will look something like
+          this:
         </p>
         <p class="mb-2 text-grey-700">
           <b>x481n904@{{ domain }}</b>
         </p>
         <p clas="text-grey-700">
-          This is useful if you do not wish to include your username in the email as a potential link
-          between aliases.
+          This is useful if you do not wish to include your username in the email as a potential
+          link between aliases.
         </p>
       </div>
       <div class="mt-4">
@@ -1312,8 +1313,8 @@
         </p>
         <p class="mt-4 text-grey-700">
           <b>Shared Domain Aliases</b> - A shared domain alias is any alias that has a domain name
-          that is also shared with other users. Aliases with shared domain names must be pre-generated and cannot be
-          created on-the-fly like standard aliases.
+          that is also shared with other users. Aliases with shared domain names must be
+          pre-generated and cannot be created on-the-fly like standard aliases.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">

@@ -105,14 +105,15 @@
             }}</span>
             <button
               @click="
-                ;(domainIdToEdit = props.row.id), (domainDescriptionToEdit = props.row.description)
+                ;((domainIdToEdit = props.row.id),
+                  (domainDescriptionToEdit = props.row.description))
               "
             >
               <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
           <div v-else class="flex justify-center">
-            <button @click=";(domainIdToEdit = props.row.id), (domainDescriptionToEdit = '')">
+            <button @click=";((domainIdToEdit = props.row.id), (domainDescriptionToEdit = ''))">
               <icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
