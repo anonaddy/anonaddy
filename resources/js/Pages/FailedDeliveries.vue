@@ -110,7 +110,7 @@
             @click="openResendModal(props.row)"
             as="button"
             type="button"
-            class="mr-4 text-indigo-500 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium"
+            class="mr-4 text-indigo-500 hover:text-indigo-800 font-medium"
           >
             Resend
           </button>
@@ -154,11 +154,11 @@
     <Modal :open="resendFailedDeliveryModalOpen" @close="closeResendModal">
       <template v-slot:title> Resend Failed Delivery </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700 dark:text-grey-200">
+        <p class="mt-4 text-grey-700">
           You can choose to resend to the original recipient or select a different one below. You
           can choose multiple recipients.
         </p>
-        <p class="my-4 text-grey-700 dark:text-grey-200">
+        <p class="my-4 text-grey-700">
           Leave the select input empty if you would like to resend to the original recipient
           <b v-if="failedDeliveryToResend.recipient">{{ failedDeliveryToResend.recipient.email }}</b
           >.
@@ -190,7 +190,7 @@
           </button>
           <button
             @click="closeResendModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
