@@ -85,6 +85,8 @@ class RegisterController extends Controller
             'email' => [
                 'bail',
                 'required',
+                'string',
+                'ascii',
                 'email:rfc,dns',
                 'max:254',
                 'confirmed',
