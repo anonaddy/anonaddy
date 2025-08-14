@@ -1,7 +1,0 @@
-{
-  "require": {
-      "illuminate/database": "^11.0",
-      "vlucas/phpdotenv": "^5.5",
-      "paragonie/constant_time_encoding": "^3.0"
-  }
-}
