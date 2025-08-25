@@ -217,13 +217,13 @@
                   <div
                     v-if="search"
                     @click="
-                      ;(searchForm.search = ''),
+                      ;((searchForm.search = ''),
                         $inertia.visit(
                           route(route().current(), omit(route().params, ['search', 'page'])),
                           {
                             only: ['initialRows', 'search'],
                           },
-                        )
+                        ))
                     "
                     class="absolute inset-y-0 right-0 cursor-pointer flex items-center pr-3 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >

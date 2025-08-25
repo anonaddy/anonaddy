@@ -19,6 +19,7 @@ class OutboundMessage extends Model
         'alias_id',
         'recipient_id',
         'email_type',
+        'encrypted',
         'bounced',
     ];
 
@@ -27,6 +28,7 @@ class OutboundMessage extends Model
         'user_id' => 'string',
         'alias_id' => 'string',
         'recipient_id' => 'string',
+        'encrypted' => 'boolean',
         'bounced' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -53,7 +55,7 @@ class OutboundMessage extends Model
      */
     public function alias()
     {
-        return $this->belongsTo(Alias::class);
+        return $this->belongsTo(Alias::class)->withTrashed();
     }
 
     public function markAsBounced()

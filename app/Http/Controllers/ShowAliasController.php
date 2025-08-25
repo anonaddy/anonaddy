@@ -205,8 +205,8 @@ class ShowAliasController extends Controller
         return Inertia::render('Aliases/Index', [
             'initialRows' => fn () => $aliases,
             'recipientOptions' => fn () => user()->verifiedRecipients()->select(['id', 'email'])->get(),
-            'domain' => fn () => config('anonaddy.domain'),
-            'subdomain' => fn () => user()->username.'.'.config('anonaddy.domain'),
+            'domain' => fn () => user()->canCreateSharedDomainAliases() ? config('anonaddy.domain') : null,
+            'subdomain' => fn () => user()->canCreateUsernameSubdomainAliases() ? user()->username.'.'.config('anonaddy.domain') : null,
             'domainOptions' => fn () => user()->domainOptions(),
             'defaultAliasDomain' => fn () => user()->default_alias_domain,
             'defaultAliasFormat' => fn () => user()->default_alias_format,
@@ -224,7 +224,7 @@ class ShowAliasController extends Controller
         $alias = user()->aliases()->withTrashed()->findOrFail($id);
 
         return Inertia::render('Aliases/Edit', [
-            'initialAlias' => $alias->only(['id', 'user_id', 'local_part', 'extension', 'domain', 'email', 'active', 'description', 'from_name', 'deleted_at', 'updated_at']),
+            'initialAlias' => $alias->only(['id', 'user_id', 'local_part', 'extension', 'domain', 'email', 'active', 'description', 'from_name', 'attached_recipients_only', 'deleted_at', 'updated_at']),
         ]);
     }
 }

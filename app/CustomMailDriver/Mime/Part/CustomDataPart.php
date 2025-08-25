@@ -5,7 +5,7 @@ namespace App\CustomMailDriver\Mime\Part;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\DataPart;
 
-class InlineImagePart extends DataPart
+class CustomDataPart extends DataPart
 {
     /**
      * Sets the content-id of the file.
@@ -21,11 +21,19 @@ class InlineImagePart extends DataPart
 
     public function getContentId(): string
     {
+        if (! isset($this->cid)) {
+            return $this->cid = $this->generateContentId();
+        }
+
         return $this->cid ?: $this->cid = $this->generateContentId();
     }
 
     public function hasContentId(): bool
     {
+        if (! isset($this->cid)) {
+            return false;
+        }
+
         return $this->cid !== null;
     }
 
@@ -50,11 +58,11 @@ class InlineImagePart extends DataPart
     {
         $headers = parent::getPreparedHeaders();
 
-        if ($this->cid !== null) {
+        if (isset($this->cid) && $this->cid !== null) {
             $headers->setHeaderBody('Id', 'Content-ID', $this->cid);
         }
 
-        if ($this->filename !== null) {
+        if (isset($this->filename) && $this->filename !== null) {
             $headers->setHeaderParameter('Content-Disposition', 'filename', $this->filename);
         }
 

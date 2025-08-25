@@ -39,7 +39,7 @@ class CheckDomainsSendingVerification extends Command
      */
     public function handle()
     {
-        Domain::with('user.defaultUsername')
+        Domain::with(['user.defaultUsername', 'user.defaultRecipient'])
             ->whereNotNull('domain_sending_verified_at')->get()
             ->each(function ($domain) {
                 try {

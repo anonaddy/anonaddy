@@ -146,7 +146,7 @@ class ReceiveEmail extends Command
                     // Does not exist, must be a standard, username or custom domain alias
                     $parentDomain = collect(config('anonaddy.all_domains'))
                         ->filter(function ($name) {
-                            return Str::endsWith($this->inboundAlias['domain'], $name);
+                            return Str::endsWith($this->inboundAlias['domain'], '.'.$name);
                         })
                         ->first();
 
@@ -204,6 +204,15 @@ class ReceiveEmail extends Command
                         $verifiedRecipient->notify(new SpamReplySendAttempt($this->inboundAlias, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
 
                         exit(0);
+                    }
+
+                    // If the alias has toggle on "Only allow recipients directly attached to this alias to reply/send" then check if verifiedRecipient is directly attached to the alias
+                    if ($this->alias?->attached_recipients_only) {
+                        if (! $this->alias->verifiedRecipients()->pluck('recipients.id')->contains($verifiedRecipient->id)) {
+                            $verifiedRecipient->notify(new DisallowedReplySendAttempt($this->inboundAlias, $this->senderFrom, $this->parser->getHeader('X-AnonAddy-Authentication-Results')));
+
+                            exit(0);
+                        }
                     }
 
                     if ($this->parser->getHeader('In-Reply-To') && $this->alias) {
@@ -401,11 +410,18 @@ class ReceiveEmail extends Command
                 }
             }
 
+            if (isset($undeliveredMessageHeaders['X-anonaddy-resend'])) {
+                $isResend = $undeliveredMessageHeaders['X-anonaddy-resend'] === 'Yes' ? true : false;
+            } else {
+                $isResend = false;
+            }
+
             $failedDelivery = $user->failedDeliveries()->create([
                 'id' => $failedDeliveryId,
                 'recipient_id' => $recipient->id ?? null,
                 'alias_id' => $alias->id ?? null,
                 'is_stored' => $isStored ?? false,
+                'resent' => $isResend, // If this is already a resend then do not allow further resend attempts
                 'bounce_type' => $bounceType,
                 'remote_mta' => $remoteMta ?? null,
                 'sender' => $undeliveredMessageHeaders['X-anonaddy-original-sender'] ?? null,

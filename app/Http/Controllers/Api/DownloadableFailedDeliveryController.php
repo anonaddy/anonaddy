@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\APi;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 class DownloadableFailedDeliveryController extends Controller

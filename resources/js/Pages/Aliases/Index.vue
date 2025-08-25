@@ -385,8 +385,8 @@
                 </span>
                 <button
                   @click="
-                    ;(aliasIdToEdit = props.row.id),
-                      (aliasDescriptionToEdit = props.row.description)
+                    ;((aliasIdToEdit = props.row.id),
+                      (aliasDescriptionToEdit = props.row.description))
                   "
                 >
                   <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
@@ -395,7 +395,7 @@
               <div v-else>
                 <button
                   class="inline-block text-grey-300 text-sm py-1 border border-transparent"
-                  @click=";(aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = '')"
+                  @click=";((aliasIdToEdit = props.row.id), (aliasDescriptionToEdit = ''))"
                 >
                   Add description
                 </button>
@@ -694,42 +694,48 @@
       <h3 class="mt-2 text-lg font-medium text-grey-900">
         It doesn't look like you have any aliases yet!
       </h3>
-      <p class="mb-4 text-md text-grey-700">There are two ways to create new aliases.</p>
-      <h3 class="mb-2 text-lg text-indigo-800 font-semibold">
-        Option 1: Create aliases on the fly
-      </h3>
-      <p class="mb-2 text-grey-700">
-        To create aliases on the fly all you have to do is make up any new alias and give that out
-        instead of your real email address.
-      </p>
-      <p class="mb-2 text-grey-700">
-        Let's say you're signing up to <b>example.com</b> you could enter
-        <b>example@{{ subdomain }}</b> as your email address.
-      </p>
-      <p class="mb-2 text-grey-700">
-        The alias will show up here automatically as soon as it has forwarded its first email.
-      </p>
-      <p class="mb-2 text-grey-700">
-        If you start receiving spam to the alias you can simply deactivate it or delete it all
-        together!
-      </p>
-      <p class="mb-4 text-grey-700">
-        Try it out now by sending an email to <b>first@{{ subdomain }}</b> and then refresh this
-        page.
-      </p>
-      <h3 class="mb-2 text-lg text-indigo-800 font-semibold">
-        Option 2: Create a unique random alias
-      </h3>
-      <p class="mb-2 text-grey-700">
-        You can click the button above to create a random alias that will look something like this:
-      </p>
-      <p class="mb-2 text-grey-700">
-        <b>x481n904@{{ domain }}</b>
-      </p>
-      <p clas="text-grey-700">
-        This is useful if you do not wish to include your username in the email as a potential link
-        between aliases.
-      </p>
+      <div v-if="subdomain">
+        <p class="mb-4 text-md text-grey-700">
+          There {{ domain ? 'are two ways' : 'is one way' }} to create new aliases.
+        </p>
+        <h3 class="mb-2 text-lg text-indigo-800 font-semibold">Create aliases on the fly</h3>
+        <p class="mb-2 text-grey-700">
+          To create aliases on the fly all you have to do is make up any new alias and give that out
+          instead of your real email address.
+        </p>
+        <p class="mb-2 text-grey-700">
+          Let's say you're signing up to <b>example.com</b> you could enter
+          <b>example@{{ subdomain }}</b> as your email address.
+        </p>
+        <p class="mb-2 text-grey-700">
+          The alias will show up here automatically as soon as it has forwarded its first email.
+        </p>
+        <p class="mb-2 text-grey-700">
+          If you start receiving spam to the alias you can simply deactivate it or delete it all
+          together!
+        </p>
+        <p class="mb-4 text-grey-700">
+          Try it out now by sending an email to <b>first@{{ subdomain }}</b> and then refresh this
+          page.
+        </p>
+      </div>
+      <div v-if="domain">
+        <p v-if="!subdomain" class="mb-4 text-md text-grey-700">
+          There is one way to create new aliases.
+        </p>
+        <h3 class="mb-2 text-lg text-indigo-800 font-semibold">Create a unique random alias</h3>
+        <p class="mb-2 text-grey-700">
+          You can click the button above to create a random alias that will look something like
+          this:
+        </p>
+        <p class="mb-2 text-grey-700">
+          <b>x481n904@{{ domain }}</b>
+        </p>
+        <p clas="text-grey-700">
+          This is useful if you do not wish to include your username in the email as a potential
+          link between aliases.
+        </p>
+      </div>
       <div class="mt-4">
         <button
           @click="createAliasModalOpen = true"
@@ -745,7 +751,7 @@
     <Modal :open="createAliasModalOpen" @close="createAliasModalOpen = false">
       <template v-slot:title> Create new alias </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p v-if="subdomain" class="mt-4 text-grey-700">
           Other aliases e.g. alias@{{ subdomain }} can also be created automatically when they
           receive their first email.
         </p>
@@ -1307,9 +1313,8 @@
         </p>
         <p class="mt-4 text-grey-700">
           <b>Shared Domain Aliases</b> - A shared domain alias is any alias that has a domain name
-          that is also shared with other users. For example anyone can generate an alias with the
-          @{{ domain }} domain. Aliases with shared domain names must be pre-generated and cannot be
-          created on-the-fly like standard aliases.
+          that is also shared with other users. Aliases with shared domain names must be
+          pre-generated and cannot be created on-the-fly like standard aliases.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">
@@ -1368,11 +1373,11 @@ const props = defineProps({
   },
   domain: {
     type: String,
-    required: true,
+    required: false,
   },
   subdomain: {
     type: String,
-    required: true,
+    required: false,
   },
   domainOptions: {
     type: Array,
@@ -1718,6 +1723,7 @@ const createNewAlias = () => {
           newAliasExtension.value = data.data.extension
           newAliasDomain.value = data.data.domain
           newAliasModalOpen.value = true
+          debounceToolips()
           successMessage('New alias created successfully')
         },
       })

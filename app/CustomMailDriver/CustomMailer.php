@@ -88,12 +88,14 @@ class CustomMailer extends Mailer
             }
 
             if ($encryptedSymfonyMessage) {
+                $encrypted = true;
                 $symfonyMessage = $encryptedSymfonyMessage;
             }
         }
 
         // Already encrypted
         if (isset($data['encryptedParts']) && $data['encryptedParts']) {
+            $encrypted = true;
             $symfonyMessage = (new AlreadyEncrypted($data['encryptedParts']))->update($symfonyMessage);
         }
 
@@ -246,6 +248,7 @@ class CustomMailer extends Mailer
                             'alias_id' => $data['aliasId'] ?? null,
                             'recipient_id' => $data['recipientId'] ?? null,
                             'email_type' => $data['emailType'],
+                            'encrypted' => $encrypted ?? false,
                         ]);
                     } catch (Exception $e) {
                         report($e);

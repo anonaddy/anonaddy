@@ -11,12 +11,14 @@ use App\Http\Controllers\Api\AliasRecipientController;
 use App\Http\Controllers\Api\AllowedRecipientController;
 use App\Http\Controllers\Api\ApiTokenDetailController;
 use App\Http\Controllers\Api\AppVersionController;
+use App\Http\Controllers\Api\AttachedRecipientOnlyController;
 use App\Http\Controllers\Api\CatchAllDomainController;
 use App\Http\Controllers\Api\CatchAllUsernameController;
 use App\Http\Controllers\Api\ChartDataController;
 use App\Http\Controllers\Api\DomainController;
 use App\Http\Controllers\Api\DomainDefaultRecipientController;
 use App\Http\Controllers\Api\DomainOptionController;
+use App\Http\Controllers\Api\DownloadableFailedDeliveryController;
 use App\Http\Controllers\Api\EncryptedRecipientController;
 use App\Http\Controllers\Api\FailedDeliveryController;
 use App\Http\Controllers\Api\InlineEncryptedRecipientController;
@@ -25,11 +27,11 @@ use App\Http\Controllers\Api\ProtectedHeadersRecipientController;
 use App\Http\Controllers\Api\RecipientController;
 use App\Http\Controllers\Api\RecipientKeyController;
 use App\Http\Controllers\Api\ReorderRuleController;
+use App\Http\Controllers\Api\ResendableFailedDeliveryController;
 use App\Http\Controllers\Api\RuleController;
 use App\Http\Controllers\Api\UsernameController;
 use App\Http\Controllers\Api\UsernameDefaultRecipientController;
 use App\Http\Controllers\Auth\ApiAuthenticationController;
-use App\Http\Controllers\DownloadableFailedDeliveryController;
 use App\Http\Controllers\RecipientVerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -77,6 +79,11 @@ Route::group([
     Route::controller(ActiveAliasController::class)->group(function () {
         Route::post('/active-aliases', 'store');
         Route::delete('/active-aliases/{id}', 'destroy');
+    });
+
+    Route::controller(AttachedRecipientOnlyController::class)->group(function () {
+        Route::post('/attached-recipients-only', 'store');
+        Route::delete('/attached-recipients-only/{id}', 'destroy');
     });
 
     Route::post('/alias-recipients', [AliasRecipientController::class, 'store']);
@@ -181,7 +188,8 @@ Route::group([
         Route::delete('/failed-deliveries/{id}', 'destroy');
     });
 
-    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index'])->middleware('subscribed');
+    Route::get('/failed-deliveries/{id}/download', [DownloadableFailedDeliveryController::class, 'index']);
+    Route::post('/failed-deliveries/{id}/resend', [ResendableFailedDeliveryController::class, 'index']);
 
     Route::get('/domain-options', [DomainOptionController::class, 'index']);
 
