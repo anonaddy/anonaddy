@@ -1282,8 +1282,8 @@ const addValueToCondition = (object, key) => {
     return (errors.value.ruleConditions = `You must enter a value to insert`)
   }
 
-  if (object.conditions[key].values.length >= 10) {
-    return (errors.value.ruleConditions = `You cannot add more than 10 values per condition`)
+  if (object.conditions[key].values.length >= 50) {
+    return (errors.value.ruleConditions = `You cannot add more than 50 values per condition`)
   }
 
   if (['matches regex', 'does not match regex'].includes(object.conditions[key].match)) {

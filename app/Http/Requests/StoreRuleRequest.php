@@ -62,7 +62,7 @@ class StoreRuleRequest extends FormRequest
                 'required',
                 'array',
                 'min:1',
-                'max:10',
+                'max:50',
             ],
             'conditions.*.values.*' => Rule::forEach(function ($value, $attribute, $data) {
                 if (in_array(array_values($data)[1], ['matches regex', 'does not match regex'])) {
