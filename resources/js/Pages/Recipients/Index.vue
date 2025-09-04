@@ -129,6 +129,7 @@
               @click="clipboard(props.row.fingerprint)"
               class="tooltip"
               :data-tippy-content="props.row.fingerprint"
+              aria-label="Copy fingerprint"
             >
               <icon name="fingerprint" class="block w-6 h-6 text-grey-300 fill-current mx-2" />
             </button>
@@ -136,6 +137,7 @@
               @click="openDeleteRecipientKeyModal(props.row)"
               class="tooltip"
               data-tippy-content="Remove public key"
+              aria-label="Remove public key"
             >
               <icon name="delete" class="block w-6 h-6 text-grey-300 fill-current" />
             </button>

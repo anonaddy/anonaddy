@@ -48,7 +48,7 @@
 
     <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600">Bandwidth ({{ month }})</h3>
 
-    <div class="mt-6" aria-hidden="true">
+    <div class="mt-6">
       <div class="overflow-hidden rounded-full bg-grey-100 relative">
         <div
           class="relative h-8 flex items-center justify-end rounded-full bg-gradient-to-r z-10 min-w-[25%] sm:min-w-fit"

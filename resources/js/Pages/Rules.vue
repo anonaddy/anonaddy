@@ -67,6 +67,7 @@
                   <icon
                     name="menu"
                     class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
+                    aria-label="Reorder"
                   />
                 </td>
                 <td scope="row" class="p-3">

@@ -92,10 +92,10 @@
               tabindex="0"
               autofocus
             />
-            <button @click="domainIdToEdit = domainDescriptionToEdit = ''">
+            <button @click="domainIdToEdit = domainDescriptionToEdit = ''" aria-label="Cancel">
               <icon name="close" class="inline-block w-6 h-6 text-red-300 fill-current" />
             </button>
-            <button @click="editDomain(rows[props.row.originalIndex])">
+            <button @click="editDomain(rows[props.row.originalIndex])" aria-label="Save">
               <icon name="save" class="inline-block w-6 h-6 text-cyan-500 fill-current" />
             </button>
           </div>
@@ -108,12 +108,16 @@
                 ;((domainIdToEdit = props.row.id),
                   (domainDescriptionToEdit = props.row.description))
               "
+              aria-label="Edit"
             >
               <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
           <div v-else class="flex justify-center">
-            <button @click=";((domainIdToEdit = props.row.id), (domainDescriptionToEdit = ''))">
+            <button
+              @click=";((domainIdToEdit = props.row.id), (domainDescriptionToEdit = ''))"
+              aria-label="Add description"
+            >
               <icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
@@ -127,12 +131,18 @@
             >
               {{ $filters.truncate(props.row.default_recipient.email, 30) }}
             </span>
-            <button @click="openDomainDefaultRecipientModal(props.row)">
+            <button
+              @click="openDomainDefaultRecipientModal(props.row)"
+              aria-label="Edit Default Recipient"
+            >
               <icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
           <div class="flex justify-center" v-else>
-            <button @click="openDomainDefaultRecipientModal(props.row)">
+            <button
+              @click="openDomainDefaultRecipientModal(props.row)"
+              aria-label="Add Default Recipient"
+            >
               <icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>

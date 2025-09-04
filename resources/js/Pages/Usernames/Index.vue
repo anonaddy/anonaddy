@@ -100,10 +100,10 @@
               tabindex="0"
               autofocus
             />
-            <button @click="usernameIdToEdit = usernameDescriptionToEdit = ''">
+            <button @click="usernameIdToEdit = usernameDescriptionToEdit = ''" aria-label="Cancel">
               <Icon name="close" class="inline-block w-6 h-6 text-red-300 fill-current" />
             </button>
-            <button @click="editUsername(rows[props.row.originalIndex])">
+            <button @click="editUsername(rows[props.row.originalIndex])" aria-label="Save">
               <Icon name="save" class="inline-block w-6 h-6 text-cyan-500 fill-current" />
             </button>
           </div>
@@ -116,12 +116,16 @@
                 ;((usernameIdToEdit = props.row.id),
                   (usernameDescriptionToEdit = props.row.description))
               "
+              aria-label="Edit"
             >
               <Icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
           <div v-else class="flex justify-center">
-            <button @click=";((usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = ''))">
+            <button
+              @click=";((usernameIdToEdit = props.row.id), (usernameDescriptionToEdit = ''))"
+              aria-label="Add description"
+            >
               <Icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
@@ -135,12 +139,18 @@
             >
               {{ $filters.truncate(props.row.default_recipient.email, 30) }}
             </span>
-            <button @click="openUsernameDefaultRecipientModal(props.row)">
+            <button
+              @click="openUsernameDefaultRecipientModal(props.row)"
+              aria-label="Edit Default Recipient"
+            >
               <Icon name="edit" class="inline-block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
           <div class="flex justify-center" v-else>
-            <button @click="openUsernameDefaultRecipientModal(props.row)">
+            <button
+              @click="openUsernameDefaultRecipientModal(props.row)"
+              aria-label="Add Default Recipient"
+            >
               <Icon name="plus" class="block w-6 h-6 text-grey-300 fill-current" />
             </button>
           </div>
