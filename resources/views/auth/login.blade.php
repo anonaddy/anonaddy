@@ -3,10 +3,6 @@
 @section('content')
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">
         <div class="w-full max-w-md">
-
-            <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="addy.io Logo" src="/svg/logo.svg">
-            </div>
             <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form class="" method="POST" action="{{ route('login') }}">
                     @csrf
@@ -14,7 +10,7 @@
                     <div class="px-6 py-8 md:p-10">
 
                         <h1 class="text-center font-bold text-3xl">
-                            Welcome Back!
+                            Self-Hosted Instance Login
                         </h1>
 
                         <div class="mx-auto mt-6 w-24 border-b-2 border-grey-200"></div>

@@ -57,6 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_recipient_id',
         'password',
         'two_factor_enabled',
+        'webauthn_enabled',
         'two_factor_secret',
         'two_factor_backup_code',
     ];
@@ -90,6 +91,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_recipient_id' => 'string',
         'catch_all' => 'boolean',
         'two_factor_enabled' => 'boolean',
+        'webauthn_enabled' => 'boolean',
         'use_reply_to' => 'boolean',
         'store_failed_deliveries' => 'boolean',
         'save_alias_last_used' => 'boolean',
@@ -649,5 +651,30 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canCreateUsernameSubdomainAliases()
     {
         return config('anonaddy.non_admin_username_subdomains') || $this->isAdminUser();
+    }
+
+    /**
+     * Check if user has any 2FA method enabled
+     */
+    public function hasAnyTwoFactorEnabled()
+    {
+        return $this->hasTotpEnabled() || $this->hasWebauthnEnabled();
+    }
+
+    /**
+     * Check if user has TOTP enabled
+     */
+    public function hasTotpEnabled()
+    {
+        return $this->two_factor_enabled;
+    }
+
+    /**
+     * Check if user has WebAuthn enabled
+     */
+    public function hasWebauthnEnabled()
+    {
+        // Fallback to old logic - check if user has enabled webauthn keys
+        return $this->webauthn_enabled;
     }
 }

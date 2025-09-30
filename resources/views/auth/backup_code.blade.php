@@ -3,9 +3,6 @@
 @section('content')
     <div class="p-6 bg-indigo-900 min-h-screen flex justify-center items-center">
         <div class="w-full max-w-md">
-            <div class="flex justify-center text-white mb-6 text-5xl font-bold">
-                <img class="w-48" alt="addy.io Logo" src="/svg/logo.svg">
-            </div>
             <div class="flex flex-col break-words bg-white border-2 rounded-lg shadow-lg overflow-hidden">
                 <form method="POST" action="{{ route('login.backup_code.login') }}">
                     @csrf
@@ -27,7 +24,7 @@
                                 Backup Code
                             </label>
 
-                            <input id="backup_code" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('backup_code') ? ' border border-red-500' : '' }}" name="backup_code" required autofocus>
+                            <input id="backup_code" type="text" class="appearance-none bg-grey-100 rounded w-full p-3 text-grey-700 focus:ring{{ $errors->has('backup_code') ? ' border border-red-500' : '' }}" name="backup_code" placeholder="****************************************" required autofocus>
 
                             @if ($errors->has('backup_code'))
                                 <p class="text-red-500 text-xs italic mt-4">

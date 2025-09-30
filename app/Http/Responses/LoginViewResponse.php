@@ -5,6 +5,7 @@ namespace App\Http\Responses;
 use Illuminate\Support\Facades\Response;
 use LaravelWebauthn\Facades\Webauthn;
 use LaravelWebauthn\Http\Responses\LoginViewResponse as LoginViewResponseBase;
+use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 class LoginViewResponse extends LoginViewResponseBase
 {
@@ -16,7 +17,15 @@ class LoginViewResponse extends LoginViewResponseBase
      */
     public function toResponse($request)
     {
-        if (! Webauthn::enabled($request->user())) {
+        // If user has no 2FA methods enabled, redirect home
+        if (! $request->user()->hasAnyTwoFactorEnabled()) {
+            return Response::redirectTo('/');
+        }
+
+        // Check if user is already authenticated with any 2FA method, if so then redirect home
+        $totpAuthenticator = app(Authenticator::class)->boot($request);
+
+        if ($totpAuthenticator->isAuthenticated() || Webauthn::check()) {
             return Response::redirectTo('/');
         }
 

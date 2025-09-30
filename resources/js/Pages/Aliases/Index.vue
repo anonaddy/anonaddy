@@ -9,7 +9,7 @@
         <p class="mt-2 text-sm text-grey-700">
           A list of all the aliases
           {{
-            Object.keys(route().params).length
+            Object.keys(route().params).length || currentAliasStatus !== 'active_inactive'
               ? 'found for your search or filters'
               : 'in your account'
           }}
@@ -34,7 +34,11 @@
 
     <!-- Filters -->
     <div
-      v-if="rows.length || Object.keys(route().params).length"
+      v-if="
+        rows.length ||
+        Object.keys(route().params).length ||
+        currentAliasStatus !== 'active_inactive'
+      "
       class="flex flex-col sm:flex-row justify-between items-center mb-4 bg-white rounded-lg shadow"
     >
       <div class="relative py-4 flex items-center space-x-1.5 px-4 text-sm sm:px-6">
@@ -674,7 +678,10 @@
       </div>
     </div>
 
-    <div v-else-if="Object.keys(route().params).length" class="text-center">
+    <div
+      v-else-if="Object.keys(route().params).length || currentAliasStatus !== 'active_inactive'"
+      class="text-center"
+    >
       <AtSymbolIcon class="mx-auto h-16 w-16 text-grey-400" />
       <h3 class="mt-2 text-lg font-medium text-grey-900">
         No Aliases found for that search or with those filters
@@ -1500,8 +1507,10 @@ const displayOptions = [
   {
     value: 'active_inactive',
     label: 'Active and Inactive',
-    params: {},
-    omit: ['page', 'active', 'deleted'],
+    params: {
+      active: 'both',
+    },
+    omit: ['page', 'deleted'],
   },
   {
     value: 'active',

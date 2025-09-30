@@ -48,20 +48,29 @@
                     </form>
 
                     <div class="mt-4">
-                        <button onclick="authenticateDevice()" class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ml-auto">
-                            Authenticate
+                        <button onclick="authenticateDevice()" class="flex justify-center bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded ml-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                            </svg> Authenticate
                         </button>
                     </div>
 
                 </div>
 
-                <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 flex flex-wrap justify-between">
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <input type="submit" class="bg-transparent cursor-pointer no-underline font-medium text-indigo-600 hover:text-indigo-500" value="{{ __('Logout') }}">
-                    </form>
-                    <a class="font-medium text-indigo-600 hover:text-indigo-500" href="{{ route('login.backup_code.index') }}">Use backup code</a>
+                @if (Auth::user()->two_factor_enabled)
+                <div class="px-6 md:px-10 py-4 bg-grey-50 border-t border-grey-100 text-center">
+                    <a  class="flex justify-center font-medium text-indigo-600 hover:text-indigo-500" href="{{ route('login.2fa') }}"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>Use Authentication App (TOTP) Instead</a>
                 </div>
+                @endif
+            </div>
+            <div class="flex justify-between mt-6">
+                <form action="{{ route('logout') }}" method="POST" class="text-xs">
+                    {{ csrf_field() }}
+                    <input type="submit" class="bg-transparent cursor-pointer text-white hover:text-indigo-50 no-underline" value="{{ __('Logout') }}">
+                </form>
+                <a class="text-xs text-white hover:text-indigo-50" href="{{ route('login.backup_code.index') }}">Use backup code</a>
             </div>
         </div>
     </div>

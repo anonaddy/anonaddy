@@ -15,10 +15,6 @@ class RegisterViewResponse extends RegisterViewResponseBase
      */
     public function toResponse($request)
     {
-        if ($request->user()?->two_factor_enabled) {
-            return Response::redirectTo('/');
-        }
-
         $view = config('webauthn.views.register', '');
 
         return $request->wantsJson()

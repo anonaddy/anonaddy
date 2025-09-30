@@ -18,6 +18,10 @@ class WebauthnEnabledKeyController extends Controller
 
         $webauthnKey->enable();
 
+        if (! user()->webauthn_enabled) {
+            user()->update(['webauthn_enabled' => true]);
+        }
+
         return response('', 201);
     }
 
@@ -30,6 +34,11 @@ class WebauthnEnabledKeyController extends Controller
         $webauthnKey = user()->webauthnKeys()->findOrFail($id);
 
         $webauthnKey->disable();
+
+        // If it is last enabled key then set webauthn_enabled to false on user model too
+        if (user()->webauthnKeys()->where('enabled', true)->doesntExist()) {
+            user()->update(['webauthn_enabled' => false]);
+        }
 
         return response('', 204);
     }

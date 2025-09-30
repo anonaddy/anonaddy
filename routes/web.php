@@ -81,7 +81,7 @@ Route::group([
 ], function () {
     Route::controller(WebauthnController::class)->group(function () {
         Route::get('keys', 'index')->name('webauthn.index');
-        // Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
+        Route::get('keys/create', 'create')->name('webauthn.create');
         Route::post('keys', 'store')->name('webauthn.store');
         Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
         Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');
@@ -93,7 +93,7 @@ Route::group([
     });
 });
 
-Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
+Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::get('/', [ShowDashboardController::class, 'index'])->name('dashboard.index');
 
     Route::controller(ShowAliasController::class)->group(function () {
@@ -128,7 +128,7 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
 });
 
 Route::group([
-    'middleware' => ['auth', '2fa', 'webauthn'],
+    'middleware' => ['auth', '2fa'],
     'prefix' => 'settings',
 ], function () {
     Route::controller(SettingController::class)->group(function () {

@@ -32,12 +32,15 @@ class TwoFactorAuthController extends Controller
             return redirect(url()->previous().'#two-factor')->withErrors(['two_factor_token' => 'The token you entered was incorrect']);
         }
 
-        user()->webauthnKeys()->delete();
+        $code = null;
+        $data = ['two_factor_enabled' => true];
 
-        user()->update([
-            'two_factor_enabled' => true,
-            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
-        ]);
+        // If the user doesn't already have webauthn enabled then generate a new backup code.
+        if (! user()->webauthn_enabled) {
+            $data['two_factor_backup_code'] = bcrypt($code = Str::random(40));
+        }
+
+        user()->update($data);
 
         $this->authenticator->login();
 

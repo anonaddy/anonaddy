@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\PrepareCreationData;
 use Illuminate\Http\Request;
-use LaravelWebauthn\Actions\PrepareCreationData;
 use LaravelWebauthn\Actions\ValidateKeyCreation;
 use LaravelWebauthn\Contracts\DestroyResponse;
 use LaravelWebauthn\Contracts\RegisterSuccessResponse;
@@ -27,13 +27,13 @@ class WebauthnController extends ControllersWebauthnController
     /**
      * Return the register data to attempt a Webauthn registration.
      */
-    /* public function create(Request $request): RegisterViewResponse
+    public function create(Request $request): RegisterViewResponse
     {
         $publicKey = app(PrepareCreationData::class)($request->user());
 
         return app(RegisterViewResponse::class)
             ->setPublicKey($request, $publicKey);
-    } */
+    }
 
     /**
      * Validate and create the Webauthn request.
@@ -52,10 +52,6 @@ class WebauthnController extends ControllersWebauthnController
             $request->only(['id', 'rawId', 'response', 'type']),
             $request->input('name')
         );
-
-        user()->update([
-            'two_factor_enabled' => false,
-        ]);
 
         return app(RegisterSuccessResponse::class)
             ->setWebauthnKey($request, $webauthnKey);

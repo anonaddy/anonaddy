@@ -348,8 +348,8 @@
             Disable Authentication App (TOTP)
           </h3>
           <p class="text-base text-grey-700">
-            To disable two-factor authentication enter your password below. You can always enable it
-            again later if you wish.
+            To disable TOTP authentication enter your password below. You can always enable it again
+            later if you wish.
           </p>
         </div>
         <div class="mt-4">
@@ -409,280 +409,281 @@
               :disabled="disableTwoFactorForm.processing"
               class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
-              Disable Two-Factor Authentication
+              Disable TOTP Two-Factor Authentication
               <loader v-if="disableTwoFactorForm.processing" />
             </button>
           </form>
         </div>
       </div>
-      <div v-else>
-        <div v-if="webauthnEnabled">
-          <div class="py-10">
-            <div class="space-y-1">
-              <h3 class="text-lg font-medium leading-6 text-grey-900">
-                Device/Passkey Authentication (WebAuthn)
-              </h3>
-              <p class="text-base text-grey-700">
-                Hardware security keys and Passkeys that you have registered for 2nd factor
-                authentication. To remove a key simply click the delete button next to it. Disabled
-                keys cannot be used to login. Disabling all keys will turn off 2FA on your account.
-              </p>
-            </div>
-            <div class="mt-4">
-              <p class="mb-0" v-if="keys.length === 0">You have not registered any keys.</p>
 
-              <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
-                <div class="table-row">
-                  <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
-                  <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
-                  <div class="table-cell p-1 md:p-4 font-semibold">Enabled</div>
-                  <div class="table-cell p-1 md:p-4 text-right">
-                    <a href="/webauthn/keys/create" class="text-indigo-700">Add New Key</a>
+      <div v-if="!twoFactorEnabled" class="divide-y divide-grey-200">
+        <div class="py-10">
+          <div class="space-y-1">
+            <h3 class="text-lg font-medium leading-6 text-grey-900">
+              Enable Authentication App (TOTP)
+            </h3>
+            <p class="text-base text-grey-700">
+              TOTP two-factor authentication requires the use of Google Authenticator or another
+              compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively,
+              you can use the code below. Make sure that you write down your secret code in a safe
+              place.
+            </p>
+          </div>
+          <div class="mt-4">
+            <span v-html="qrCode"></span>
+            <p class="mb-2">Secret: {{ authSecret }}</p>
+            <form
+              @submit.prevent="
+                regenerateTwoFactorForm.post(route('settings.2fa_regenerate'), {
+                  preserveScroll: true,
+                })
+              "
+            >
+              <input
+                type="submit"
+                :disabled="regenerateTwoFactorForm.processing"
+                class="text-indigo-900 bg-transparent cursor-pointer disabled:cursor-not-allowed"
+                value="Click here to regenerate your secret key"
+              />
+
+              <p
+                v-if="$page.props.errors.regenerate_2fa"
+                class="mt-2 text-sm text-red-600"
+                id="enable-two-factor-error"
+              >
+                {{ $page.props.errors.regenerate_2fa }}
+              </p>
+            </form>
+            <form
+              class="mt-6"
+              @submit.prevent="
+                enableTwoFactorForm.post(route('settings.2fa_enable'), {
+                  preserveScroll: page => Object.keys(page.props.errors).length,
+                  onSuccess: () => {
+                    enableTwoFactorForm.reset()
+                    twoFactorEnabled = true
+                  },
+                })
+              "
+            >
+              <div class="grid grid-cols-1 mb-6">
+                <div class="mb-4">
+                  <label
+                    for="enable-two-factor"
+                    class="block text-sm font-medium leading-6 text-grey-600"
+                    >Two-Factor Token</label
+                  >
+                  <div class="relative mt-2">
+                    <input
+                      v-model="enableTwoFactorForm.two_factor_token"
+                      type="text"
+                      name="two_factor_token"
+                      id="enable-two-factor"
+                      required
+                      class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                      :class="
+                        enableTwoFactorForm.errors.two_factor_token
+                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
+                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                      "
+                      placeholder="123456"
+                      :aria-invalid="
+                        enableTwoFactorForm.errors.two_factor_token ? 'true' : undefined
+                      "
+                      :aria-describedby="
+                        enableTwoFactorForm.errors.two_factor_token
+                          ? 'enable-two-factor-error'
+                          : undefined
+                      "
+                    />
+                    <div
+                      v-if="enableTwoFactorForm.errors.two_factor_token"
+                      class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+                    >
+                      <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                    </div>
                   </div>
+                  <p
+                    v-if="enableTwoFactorForm.errors.two_factor_token"
+                    class="mt-2 text-sm text-red-600"
+                    id="enable-two-factor-error"
+                  >
+                    {{ enableTwoFactorForm.errors.two_factor_token }}
+                  </p>
                 </div>
-                <div
-                  v-for="key in keys"
-                  :key="key.id"
-                  class="table-row even:bg-grey-50 odd:bg-white"
-                >
-                  <div class="table-cell p-1 md:p-4">{{ key.name }}</div>
-                  <div class="table-cell p-1 md:p-4">{{ $filters.timeAgo(key.created_at) }}</div>
-                  <div class="table-cell p-1 md:p-4">
-                    <svg
-                      v-if="key.enabled"
-                      class="h-5 w-5 inline-block mr-2"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
+                <div>
+                  <label
+                    for="enable-two-factor-current"
+                    class="block text-sm font-medium leading-6 text-grey-600"
+                    >Current Password</label
+                  >
+                  <div class="relative mt-2">
+                    <input
+                      v-model="enableTwoFactorForm.current"
+                      type="password"
+                      name="current"
+                      id="enable-two-factor-current"
+                      required
+                      class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                      :class="
+                        enableTwoFactorForm.errors.current
+                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
+                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                      "
+                      placeholder="********"
+                      :aria-invalid="enableTwoFactorForm.errors.current ? 'true' : undefined"
+                      :aria-describedby="
+                        enableTwoFactorForm.errors.current
+                          ? 'enable-two-factor-current-error'
+                          : undefined
+                      "
+                    />
+                    <div
+                      v-if="enableTwoFactorForm.errors.current"
+                      class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
                     >
-                      <g fill="none" fill-rule="evenodd">
-                        <circle cx="10" cy="10" r="10" fill="#91E697"></circle>
-                        <polyline
-                          stroke="#0E7817"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          points="6 10 8.667 12.667 14 7.333"
-                        ></polyline>
-                      </g>
-                    </svg>
-                    <svg
-                      v-else
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      class="h-5 w-5 inline-block mr-2"
-                    >
-                      <g fill="none" fill-rule="evenodd">
-                        <circle cx="10" cy="10" r="10" fill="#FF9B9B"></circle>
-                        <polyline
-                          stroke="#AB091E"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          points="14 6 6 14"
-                        ></polyline>
-                        <polyline
-                          stroke="#AB091E"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          points="6 6 14 14"
-                        ></polyline>
-                      </g>
-                    </svg>
+                      <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                    </div>
                   </div>
-                  <div class="table-cell p-1 md:p-4 text-right">
-                    <button
-                      v-if="key.enabled"
-                      class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      @click="showDisableKeyModal(key)"
-                    >
-                      Disable
-                    </button>
-                    <button
-                      v-else
-                      class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      @click="enableKey(key)"
-                    >
-                      Enable
-                      <loader v-if="key.enableKeyLoading" />
-                    </button>
-                    <button
-                      class="text-red-500 font-bold cursor-pointer sm:ml-4 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      @click="showDeleteKeyModal(key)"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <p
+                    v-if="enableTwoFactorForm.errors.current"
+                    class="mt-2 text-sm text-red-600"
+                    id="enable-two-factor-current-error"
+                  >
+                    {{ enableTwoFactorForm.errors.current }}
+                  </p>
                 </div>
               </div>
-            </div>
+
+              <button
+                type="submit"
+                :disabled="enableTwoFactorForm.processing"
+                class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+              >
+                Verify and Enable
+                <loader v-if="enableTwoFactorForm.processing" />
+              </button>
+            </form>
           </div>
         </div>
-        <div v-else class="divide-y divide-grey-200">
-          <div class="py-10">
-            <div class="space-y-1">
-              <h3 class="text-lg font-medium leading-6 text-grey-900">
-                Enable Authentication App (TOTP)
-              </h3>
-              <p class="text-base text-grey-700">
-                TOTP two-factor authentication requires the use of Google Authenticator or another
-                compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively,
-                you can use the code below. Make sure that you write down your secret code in a safe
-                place.
-              </p>
-            </div>
-            <div class="mt-4">
-              <span v-html="qrCode"></span>
-              <p class="mb-2">Secret: {{ authSecret }}</p>
-              <form
-                @submit.prevent="
-                  regenerateTwoFactorForm.post(route('settings.2fa_regenerate'), {
-                    preserveScroll: true,
-                  })
-                "
-              >
-                <input
-                  type="submit"
-                  :disabled="regenerateTwoFactorForm.processing"
-                  class="text-indigo-900 bg-transparent cursor-pointer disabled:cursor-not-allowed"
-                  value="Click here to regenerate your secret key"
-                />
-
-                <p
-                  v-if="$page.props.errors.regenerate_2fa"
-                  class="mt-2 text-sm text-red-600"
-                  id="enable-two-factor-error"
-                >
-                  {{ $page.props.errors.regenerate_2fa }}
-                </p>
-              </form>
-              <form
-                class="mt-6"
-                @submit.prevent="
-                  enableTwoFactorForm.post(route('settings.2fa_enable'), {
-                    preserveScroll: page => Object.keys(page.props.errors).length,
-                    onSuccess: () => enableTwoFactorForm.reset(),
-                  })
-                "
-              >
-                <div class="grid grid-cols-1 mb-6">
-                  <div class="mb-4">
-                    <label
-                      for="enable-two-factor"
-                      class="block text-sm font-medium leading-6 text-grey-600"
-                      >Two-Factor Token</label
-                    >
-                    <div class="relative mt-2">
-                      <input
-                        v-model="enableTwoFactorForm.two_factor_token"
-                        type="text"
-                        name="two_factor_token"
-                        id="enable-two-factor"
-                        required
-                        class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
-                        :class="
-                          enableTwoFactorForm.errors.two_factor_token
-                            ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                            : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
-                        "
-                        placeholder="123456"
-                        :aria-invalid="
-                          enableTwoFactorForm.errors.two_factor_token ? 'true' : undefined
-                        "
-                        :aria-describedby="
-                          enableTwoFactorForm.errors.two_factor_token
-                            ? 'enable-two-factor-error'
-                            : undefined
-                        "
-                      />
-                      <div
-                        v-if="enableTwoFactorForm.errors.two_factor_token"
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
-                      >
-                        <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
-                      </div>
-                    </div>
-                    <p
-                      v-if="enableTwoFactorForm.errors.two_factor_token"
-                      class="mt-2 text-sm text-red-600"
-                      id="enable-two-factor-error"
-                    >
-                      {{ enableTwoFactorForm.errors.two_factor_token }}
-                    </p>
-                  </div>
-                  <div>
-                    <label
-                      for="enable-two-factor-current"
-                      class="block text-sm font-medium leading-6 text-grey-600"
-                      >Current Password</label
-                    >
-                    <div class="relative mt-2">
-                      <input
-                        v-model="enableTwoFactorForm.current"
-                        type="password"
-                        name="current"
-                        id="enable-two-factor-current"
-                        required
-                        class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
-                        :class="
-                          enableTwoFactorForm.errors.current
-                            ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                            : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
-                        "
-                        placeholder="********"
-                        :aria-invalid="enableTwoFactorForm.errors.current ? 'true' : undefined"
-                        :aria-describedby="
-                          enableTwoFactorForm.errors.current
-                            ? 'enable-two-factor-current-error'
-                            : undefined
-                        "
-                      />
-                      <div
-                        v-if="enableTwoFactorForm.errors.current"
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
-                      >
-                        <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
-                      </div>
-                    </div>
-                    <p
-                      v-if="enableTwoFactorForm.errors.current"
-                      class="mt-2 text-sm text-red-600"
-                      id="enable-two-factor-current-error"
-                    >
-                      {{ enableTwoFactorForm.errors.current }}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  :disabled="enableTwoFactorForm.processing"
-                  class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
-                >
-                  Verify and Enable
-                  <loader v-if="enableTwoFactorForm.processing" />
-                </button>
-              </form>
-            </div>
+      </div>
+      <div v-if="!keys.length" class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900">
+            Enable Device/Passkey Authentication (WebAuthn)
+          </h3>
+          <p class="text-base text-grey-700">
+            WebAuthn is a new W3C global standard for secure authentication. You can use any
+            hardware key such as a Yubikey, Solokey, NitroKey etc.
+          </p>
+        </div>
+        <div class="mt-4">
+          <a
+            type="button"
+            :href="route('webauthn.create')"
+            class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-center"
+          >
+            Register New Key
+          </a>
+        </div>
+      </div>
+      <div v-else>
+        <div class="py-10">
+          <div class="space-y-1">
+            <h3 class="text-lg font-medium leading-6 text-grey-900">
+              Device/Passkey Authentication (WebAuthn)
+            </h3>
+            <p class="text-base text-grey-700">
+              Hardware security keys and Passkeys that you have registered for 2nd factor
+              authentication. To remove a key simply click the delete button next to it. Disabled
+              keys cannot be used to login. If you disable all keys
+              <b>Two-Factor Authentication</b> will
+              {{ twoFactorEnabled ? 'still be enabled as you have TOTP 2FA' : 'be turned off' }} on
+              your account.
+            </p>
           </div>
-          <div class="py-10">
-            <div class="space-y-1">
-              <h3 class="text-lg font-medium leading-6 text-grey-900">
-                Enable Device/Passkey Authentication (WebAuthn)
-              </h3>
-              <p class="text-base text-grey-700">
-                WebAuthn is a new W3C global standard for secure authentication. You can use any
-                hardware key such as a Yubikey, Solokey, NitroKey etc.
-              </p>
-            </div>
-            <div class="mt-4">
-              <a
-                type="button"
-                :href="route('webauthn.create')"
-                class="block bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-center"
-              >
-                Register New Key
-              </a>
+          <div class="mt-4">
+            <p class="mb-0" v-if="keys.length === 0">You have not registered any keys.</p>
+
+            <div class="table w-full text-sm md:text-base" v-if="keys.length > 0">
+              <div class="table-row">
+                <div class="table-cell p-1 md:p-4 font-semibold">Name</div>
+                <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
+                <div class="table-cell p-1 md:p-4 font-semibold">Enabled</div>
+                <div class="table-cell p-1 md:p-4 text-right">
+                  <a href="/webauthn/keys/create" class="text-indigo-700">Add New Key</a>
+                </div>
+              </div>
+              <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
+                <div class="table-cell p-1 md:p-4">{{ key.name }}</div>
+                <div class="table-cell p-1 md:p-4">{{ $filters.timeAgo(key.created_at) }}</div>
+                <div class="table-cell p-1 md:p-4">
+                  <svg
+                    v-if="key.enabled"
+                    class="h-5 w-5 inline-block mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <g fill="none" fill-rule="evenodd">
+                      <circle cx="10" cy="10" r="10" fill="#91E697"></circle>
+                      <polyline
+                        stroke="#0E7817"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        points="6 10 8.667 12.667 14 7.333"
+                      ></polyline>
+                    </g>
+                  </svg>
+                  <svg
+                    v-else
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    class="h-5 w-5 inline-block mr-2"
+                  >
+                    <g fill="none" fill-rule="evenodd">
+                      <circle cx="10" cy="10" r="10" fill="#FF9B9B"></circle>
+                      <polyline
+                        stroke="#AB091E"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        points="14 6 6 14"
+                      ></polyline>
+                      <polyline
+                        stroke="#AB091E"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        points="6 6 14 14"
+                      ></polyline>
+                    </g>
+                  </svg>
+                </div>
+                <div class="table-cell p-1 md:p-4 text-right">
+                  <button
+                    v-if="key.enabled"
+                    class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    @click="showDisableKeyModal(key)"
+                  >
+                    Disable
+                  </button>
+                  <button
+                    v-else
+                    class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    @click="enableKey(key)"
+                  >
+                    Enable
+                    <loader v-if="key.enableKeyLoading" />
+                  </button>
+                  <button
+                    class="text-red-500 font-bold cursor-pointer sm:ml-4 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    @click="showDeleteKeyModal(key)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -692,13 +693,16 @@
     <Modal :open="disableKeyModalOpen" @close="closeDisableKeyModal">
       <template v-slot:title> Disable Key </template>
       <template v-slot:content>
-        <p v-if="enabledKeys.length <= 1" class="my-4 text-grey-700">
+        <p
+          v-if="enabledKeys.length <= 1 && !twoFactorEnabled"
+          class="my-4 text-grey-700 dark:text-grey-200"
+        >
           Once this key is disabled, <b>Two-Factor Authentication</b> will be disabled on your
           account as you do not have any other enabled keys.
         </p>
-        <p v-else class="my-4 text-grey-700">
+        <p v-else class="my-4 text-grey-700 dark:text-grey-200">
           Once this key is disabled, <b>Two-Factor Authentication</b> will still be enabled as you
-          have other enabled keys associated with your account.
+          have {{ twoFactorEnabled ? 'TOTP 2FA' : 'other enabled keys' }} on your account.
         </p>
         <div class="mt-6">
           <label
@@ -742,13 +746,16 @@
     <Modal :open="deleteKeyModalOpen" @close="closeDeleteKeyModal">
       <template v-slot:title> Remove Key </template>
       <template v-slot:content>
-        <p v-if="enabledKeys.length <= 1" class="my-4 text-grey-700">
+        <p
+          v-if="enabledKeys.length <= 1 && !twoFactorEnabled"
+          class="my-4 text-grey-700 dark:text-grey-200"
+        >
           Once this key is removed, <b>Two-Factor Authentication</b> will be disabled on your
           account as you do not have any other enabled keys.
         </p>
-        <p v-else class="my-4 text-grey-700">
+        <p v-else class="my-4 text-grey-700 dark:text-grey-200">
           Once this key is removed, <b>Two-Factor Authentication</b> will still be enabled as you
-          have other enabled keys associated with your account.
+          have {{ twoFactorEnabled ? 'TOTP 2FA' : 'other enabled keys' }} on your account.
         </p>
         <div class="mt-6">
           <label
@@ -800,11 +807,11 @@ import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 import Modal from '../../Components/Modal.vue'
 
 const props = defineProps({
-  twoFactorEnabled: {
+  initialTwoFactorEnabled: {
     type: Boolean,
     required: true,
   },
-  webauthnEnabled: {
+  initialWebauthnEnabled: {
     type: Boolean,
     required: true,
   },
@@ -826,6 +833,8 @@ const props = defineProps({
 })
 
 const keys = ref(props.initialKeys)
+const twoFactorEnabled = ref(props.initialTwoFactorEnabled)
+const webauthnEnabled = ref(props.initialWebauthnEnabled)
 
 const enabledKeys = computed(() => _.filter(keys.value, key => key.enabled))
 
@@ -908,6 +917,10 @@ const deleteKey = () => {
           deleteKeyModalOpen.value = false
           keyToDelete.value = null
           deleteKeyCurrentPassword.value = ''
+          // If no more keys then set webauthnEnabled to false
+          if (!keys.length) {
+            webauthnEnabled.value = false
+          }
 
           keys.value = props.initialKeys
           successMessage('Key Successfully Removed')
