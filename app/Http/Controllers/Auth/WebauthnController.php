@@ -74,6 +74,7 @@ class WebauthnController extends ControllersWebauthnController
 
         // Using vendor Facade to ensure disabled keys are included
         if (! Webauthn::hasKey(user())) {
+            user()->update(['webauthn_enabled' => false]);
             // Remove session value when last key is deleted
             Webauthn::logout();
         }
