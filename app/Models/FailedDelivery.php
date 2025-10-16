@@ -183,16 +183,14 @@ class FailedDelivery extends Model
 
         $emailData = new EmailData($parser, $this->sender, strlen($email), 'F', true);
 
-        $isSpam = $parser->getHeader('X-AnonAddy-Spam') === 'Yes';
-
         if ($verifiedRecipientIds) {
             $recipients = $this->user->verifiedRecipients()->find($verifiedRecipientIds);
         } else {
             $recipients = $this->alias->verifiedRecipientsOrDefault();
         }
 
-        $recipients->each(function ($aliasRecipient) use ($emailData, $isSpam) {
-            $message = new ForwardEmail($this->alias, $emailData, $aliasRecipient, $isSpam, true);
+        $recipients->each(function ($aliasRecipient) use ($emailData) {
+            $message = new ForwardEmail($this->alias, $emailData, $aliasRecipient, true);
 
             Mail::to($aliasRecipient->email)->queue($message);
         });

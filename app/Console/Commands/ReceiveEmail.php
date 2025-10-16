@@ -14,6 +14,7 @@ use App\Notifications\DisallowedReplySendAttempt;
 use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
 use App\Notifications\SpamReplySendAttempt;
+use App\Services\UserRuleChecker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -226,8 +227,7 @@ class ReceiveEmail extends Command
 
                     exit(0);
                 } else {
-                    // Check if the spam header is present from Rspamd
-                    $this->handleForward($aliasable ?? null, $this->parser->getHeader('X-AnonAddy-Spam') === 'Yes');
+                    $this->handleForward($aliasable ?? null);
                 }
             }
         } catch (\Throwable $e) {
@@ -252,7 +252,21 @@ class ReceiveEmail extends Command
     {
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'R');
 
-        $message = new ReplyToEmail($this->user, $this->alias, $emailData);
+        // Check user rules and get rule IDs that have satisfied conditions
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForReplies($this->user, $emailData, $this->alias);
+        $ruleIds = null;
+
+        if (! empty($ruleIdsAndActions)) {
+            if (UserRuleChecker::shouldBlockEmail($ruleIdsAndActions)) {
+                $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
+
+                exit(0);
+            }
+
+            $ruleIds = array_keys($ruleIdsAndActions);
+        }
+
+        $message = new ReplyToEmail($this->user, $this->alias, $emailData, $ruleIds);
 
         Mail::to($destination)->queue($message);
     }
@@ -271,16 +285,36 @@ class ReceiveEmail extends Command
 
             // Hydrate all alias fields
             $this->alias->refresh();
+            $isNewAlias = true;
         }
 
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'S');
 
-        $message = new SendFromEmail($this->user, $this->alias, $emailData);
+        // Check user rules and get rule IDs that have satisfied conditions
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForSends($this->user, $emailData, $this->alias);
+        $ruleIds = null;
+
+        if (! empty($ruleIdsAndActions)) {
+            if (UserRuleChecker::shouldBlockEmail($ruleIdsAndActions)) {
+                // If it is a new alias that has been created on the fly, delete it.
+                if ($isNewAlias ?? false) {
+                    $this->alias->forceDelete();
+                } else {
+                    $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
+                }
+
+                exit(0);
+            }
+
+            $ruleIds = array_keys($ruleIdsAndActions);
+        }
+
+        $message = new SendFromEmail($this->user, $this->alias, $emailData, $ruleIds);
 
         Mail::to($destination)->queue($message);
     }
 
-    protected function handleForward($aliasable, $isSpam)
+    protected function handleForward($aliasable)
     {
         if (is_null($this->alias)) {
             // This is a new alias
@@ -325,12 +359,45 @@ class ReceiveEmail extends Command
             if (isset($recipientIds)) {
                 $this->alias->recipients()->sync($recipientIds);
             }
+
+            $isNewAlias = true;
         }
 
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
-        $this->alias->verifiedRecipientsOrDefault()->each(function ($aliasRecipient) use ($emailData, $isSpam) {
-            $message = (new ForwardEmail($this->alias, $emailData, $aliasRecipient, $isSpam));
+        // Check user rules and get rule IDs that have satisfied conditions
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $this->alias);
+        $ruleIds = null;
+
+        $recipientsToForwardTo = $this->alias->verifiedRecipientsOrDefault();
+
+        if (! empty($ruleIdsAndActions)) {
+            if (UserRuleChecker::shouldBlockEmail($ruleIdsAndActions)) {
+                // If it is a new alias that has been created on the fly, delete it.
+                if ($isNewAlias ?? false) {
+                    $this->alias->forceDelete();
+                } else {
+                    $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
+                }
+
+                exit(0);
+            }
+
+            $ruleIds = array_keys($ruleIdsAndActions);
+
+            $forwardToRecipientIds = UserRuleChecker::getRecipientIdsToForwardToFromRuleIdsAndActions($ruleIdsAndActions);
+
+            if (! empty($forwardToRecipientIds)) {
+                $recipients = $this->user->verifiedRecipients()->whereIn('id', $forwardToRecipientIds)->get();
+
+                if ($recipients) {
+                    $recipientsToForwardTo = $this->user->verifiedRecipients()->whereIn('id', $forwardToRecipientIds)->get();
+                }
+            }
+        }
+
+        $recipientsToForwardTo->each(function ($aliasRecipient) use ($emailData, $ruleIds) {
+            $message = (new ForwardEmail($this->alias, $emailData, $aliasRecipient, $ruleIds));
 
             Mail::to($aliasRecipient->email)->queue($message);
         });

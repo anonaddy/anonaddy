@@ -87,7 +87,7 @@ class RegisterController extends Controller
                 'required',
                 'string',
                 'ascii',
-                'email:rfc,dns',
+                App::environment(['local', 'testing']) ? 'email:rfc' : 'email:rfc,dns',
                 'max:254',
                 'confirmed',
                 new RegisterUniqueRecipient,

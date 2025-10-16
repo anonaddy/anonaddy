@@ -7,7 +7,7 @@ use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\User;
 use App\Notifications\FailedDeliveryNotification;
-use App\Traits\CheckUserRules;
+use App\Traits\ApplyUserRules;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,7 +19,7 @@ use Throwable;
 
 class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
-    use CheckUserRules;
+    use ApplyUserRules;
     use Queueable;
     use SerializesModels;
 
@@ -59,12 +59,14 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $verpDomain;
 
+    protected $ruleIds;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user, Alias $alias, EmailData $emailData)
+    public function __construct(User $user, Alias $alias, EmailData $emailData, $ruleIds = null)
     {
         $this->user = $user;
         $this->alias = $alias;
@@ -125,6 +127,7 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->size = $emailData->size;
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
+        $this->ruleIds = $ruleIds;
     }
 
     /**
@@ -213,7 +216,9 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             ]);
         }
 
-        $this->checkRules('Replies');
+        if ($this->ruleIds) {
+            $this->applyRulesByIds($this->ruleIds);
+        }
 
         $this->email->with([
             'userId' => $this->user->id,

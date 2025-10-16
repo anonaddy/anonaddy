@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Rules\NotLocalRecipient;
 use App\Rules\UniqueRecipient;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\App;
 
 class StoreRecipientRequest extends FormRequest
 {
@@ -31,7 +32,7 @@ class StoreRecipientRequest extends FormRequest
                 'required',
                 'string',
                 'ascii',
-                'email:rfc,dns',
+                App::environment(['local', 'testing']) ? 'email:rfc' : 'email:rfc,dns',
                 'max:254',
                 new UniqueRecipient,
                 new NotLocalRecipient,

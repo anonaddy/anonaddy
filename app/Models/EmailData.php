@@ -58,6 +58,10 @@ class EmailData
 
     public $receivedHeaders;
 
+    public $failedDmarc;
+
+    public $isSpam;
+
     public $encryptedParts;
 
     public $isInlineEncrypted;
@@ -143,6 +147,9 @@ class EmailData
         $this->originalSenderHeader = base64_encode($parser->getHeader('Sender'));
         $this->authenticationResults = $parser->getHeader('X-AnonAddy-Authentication-Results');
         $this->receivedHeaders = $parser->getRawHeader('Received');
+
+        $this->isSpam = $parser->getHeader('X-AnonAddy-Spam') === 'Yes';
+        $this->failedDmarc = Str::contains($this->authenticationResults, 'dmarc=fail');
 
         $isReplyOrSend = in_array($emailType, ['R', 'S']);
 

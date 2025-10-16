@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\App;
 
 class EditDefaultRecipientRequest extends FormRequest
 {
@@ -28,9 +30,12 @@ class EditDefaultRecipientRequest extends FormRequest
             'email' => [
                 'bail',
                 'required',
-                'email:rfc,dns',
+                'string',
+                'ascii',
+                App::environment(['local', 'testing']) ? 'email:rfc' : 'email:rfc,dns',
                 'max:254',
                 new RegisterUniqueRecipient,
+                new NotLocalRecipient,
                 'not_in:'.$this->user()->email,
             ],
             'current' => 'required|string|current_password',

@@ -1899,16 +1899,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.32.1",
+            "version": "v12.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "d41e4ba47706ec85bda85fe9362515592871cd21"
+                "reference": "f9ec5a5d88bc8c468f17b59f88e05c8ac3c8d687"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/d41e4ba47706ec85bda85fe9362515592871cd21",
-                "reference": "d41e4ba47706ec85bda85fe9362515592871cd21",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/f9ec5a5d88bc8c468f17b59f88e05c8ac3c8d687",
+                "reference": "f9ec5a5d88bc8c468f17b59f88e05c8ac3c8d687",
                 "shasum": ""
             },
             "require": {
@@ -2020,7 +2020,7 @@
                 "league/flysystem-sftp-v3": "^3.25.1",
                 "mockery/mockery": "^1.6.10",
                 "opis/json-schema": "^2.4.1",
-                "orchestra/testbench-core": "^10.6.5",
+                "orchestra/testbench-core": "^10.7.0",
                 "pda/pheanstalk": "^5.0.6|^7.0.0",
                 "php-http/discovery": "^1.15",
                 "phpstan/phpstan": "^2.0",
@@ -2114,7 +2114,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-09-30T12:22:56+00:00"
+            "time": "2025-10-14T13:58:31+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -2241,16 +2241,16 @@
         },
         {
             "name": "laravel/serializable-closure",
-            "version": "v2.0.5",
+            "version": "v2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/serializable-closure.git",
-                "reference": "3832547db6e0e2f8bb03d4093857b378c66eceed"
+                "reference": "038ce42edee619599a1debb7e81d7b3759492819"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/3832547db6e0e2f8bb03d4093857b378c66eceed",
-                "reference": "3832547db6e0e2f8bb03d4093857b378c66eceed",
+                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/038ce42edee619599a1debb7e81d7b3759492819",
+                "reference": "038ce42edee619599a1debb7e81d7b3759492819",
                 "shasum": ""
             },
             "require": {
@@ -2298,7 +2298,7 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-            "time": "2025-09-22T17:29:40+00:00"
+            "time": "2025-10-09T13:42:30+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3248,16 +3248,16 @@
         },
         {
             "name": "mews/captcha",
-            "version": "3.4.6",
+            "version": "3.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mewebstudio/captcha.git",
-                "reference": "cead591ddc544b2b80a4136897893dd3bd70e7a7"
+                "reference": "2622c4f90dd621f19fe57e03e45f6f099509e839"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/cead591ddc544b2b80a4136897893dd3bd70e7a7",
-                "reference": "cead591ddc544b2b80a4136897893dd3bd70e7a7",
+                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/2622c4f90dd621f19fe57e03e45f6f099509e839",
+                "reference": "2622c4f90dd621f19fe57e03e45f6f099509e839",
                 "shasum": ""
             },
             "require": {
@@ -3315,9 +3315,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mewebstudio/captcha/issues",
-                "source": "https://github.com/mewebstudio/captcha/tree/3.4.6"
+                "source": "https://github.com/mewebstudio/captcha/tree/3.4.7"
             },
-            "time": "2025-04-16T15:40:08+00:00"
+            "time": "2025-10-11T14:42:33+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -11440,16 +11440,16 @@
         },
         {
             "name": "spatie/laravel-ray",
-            "version": "1.40.2",
+            "version": "1.41.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ray.git",
-                "reference": "1d1b31eb83cb38b41975c37363c7461de6d86b25"
+                "reference": "7b9cfdb024a390171397c14dbf321727d940bac5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ray/zipball/1d1b31eb83cb38b41975c37363c7461de6d86b25",
-                "reference": "1d1b31eb83cb38b41975c37363c7461de6d86b25",
+                "url": "https://api.github.com/repos/spatie/laravel-ray/zipball/7b9cfdb024a390171397c14dbf321727d940bac5",
+                "reference": "7b9cfdb024a390171397c14dbf321727d940bac5",
                 "shasum": ""
             },
             "require": {
@@ -11469,9 +11469,9 @@
                 "guzzlehttp/guzzle": "^7.3",
                 "laravel/framework": "^7.20 || ^8.19 || ^9.0 || ^10.0 || ^11.0 || ^12.0",
                 "orchestra/testbench-core": "^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
-                "pestphp/pest": "^1.22 || ^2.0 || ^3.0",
+                "pestphp/pest": "^1.22 || ^2.0 || ^3.0 || ^4.0",
                 "phpstan/phpstan": "^1.10.57 || ^2.0.2",
-                "phpunit/phpunit": "^9.3 || ^10.1 || ^11.0.10",
+                "phpunit/phpunit": "^9.3 || ^10.1 || ^11.0.10 || ^12.4",
                 "rector/rector": "^0.19.2 || ^1.0.1 || ^2.0.0",
                 "spatie/pest-plugin-snapshots": "^1.1 || ^2.0",
                 "symfony/var-dumper": "^4.2 || ^5.1 || ^6.0 || ^7.0.3"
@@ -11512,7 +11512,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-ray/issues",
-                "source": "https://github.com/spatie/laravel-ray/tree/1.40.2"
+                "source": "https://github.com/spatie/laravel-ray/tree/1.41.0"
             },
             "funding": [
                 {
@@ -11524,7 +11524,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2025-03-27T08:26:55+00:00"
+            "time": "2025-10-16T10:19:22+00:00"
         },
         {
             "name": "spatie/macroable",
@@ -11578,16 +11578,16 @@
         },
         {
             "name": "spatie/ray",
-            "version": "1.42.0",
+            "version": "1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ray.git",
-                "reference": "152250ce7c490bf830349fa30ba5200084e95860"
+                "reference": "ee9c0477e0b7e5ff49e62cd1f4f75be27da91dbe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ray/zipball/152250ce7c490bf830349fa30ba5200084e95860",
-                "reference": "152250ce7c490bf830349fa30ba5200084e95860",
+                "url": "https://api.github.com/repos/spatie/ray/zipball/ee9c0477e0b7e5ff49e62cd1f4f75be27da91dbe",
+                "reference": "ee9c0477e0b7e5ff49e62cd1f4f75be27da91dbe",
                 "shasum": ""
             },
             "require": {
@@ -11647,7 +11647,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/ray/issues",
-                "source": "https://github.com/spatie/ray/tree/1.42.0"
+                "source": "https://github.com/spatie/ray/tree/1.43.0"
             },
             "funding": [
                 {
@@ -11659,7 +11659,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2025-04-18T08:17:40+00:00"
+            "time": "2025-10-16T10:01:03+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
