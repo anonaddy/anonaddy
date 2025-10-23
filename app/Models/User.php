@@ -466,17 +466,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getBandwidthLimitMb()
     {
-        return round($this->getBandwidthLimit() / 1024 / 1024, 2);
+        return $this->getBandwidthLimit() >= 0 ? round($this->getBandwidthLimit() / 1024 / 1024, 2) : $this->getBandwidthLimit();
     }
 
     public function nearBandwidthLimit()
     {
-        return ($this->bandwidth / $this->getBandwidthLimit()) > 0.9;
+        return ($this->bandwidth / $this->getBandwidthLimit()) > 0.9 && $this->getBandwidthLimit() >= 0;
     }
 
     public function hasReachedBandwidthLimit()
     {
-        return $this->bandwidth >= $this->getBandwidthLimit();
+        return $this->bandwidth >= $this->getBandwidthLimit() && $this->getBandwidthLimit() >= 0;
     }
 
     public function hasExceededNewAliasLimit()
