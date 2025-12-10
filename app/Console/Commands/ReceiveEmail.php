@@ -15,7 +15,10 @@ use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
 use App\Notifications\SpamReplySendAttempt;
 use App\Services\UserRuleChecker;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -191,7 +194,12 @@ class ReceiveEmail extends Command
 
                 // Check whether this email is a reply/send from or a new email to be forwarded.
                 $destination = Str::replaceLast('=', '@', $this->inboundAlias['extension']);
-                $validEmailDestination = filter_var($destination, FILTER_VALIDATE_EMAIL);
+                $validEmailDestination = false;
+
+                if (App::environment('testing') ? filter_var($destination, FILTER_VALIDATE_EMAIL) : (new EmailValidator)->isValid($destination, new RFCValidation) || filter_var($destination, FILTER_VALIDATE_EMAIL)) {
+                    $validEmailDestination = $destination;
+                }
+
                 if ($validEmailDestination) {
                     $verifiedRecipient = $this->user->getVerifiedRecipientByEmail($this->senderFrom);
                 } else {
