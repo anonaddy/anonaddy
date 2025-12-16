@@ -58,7 +58,7 @@
           <span class="text-white px-4 font-semibold">{{ bandwidthMb }}MB</span>
         </div>
         <span class="h-8 absolute top-0 right-0 flex items-center pr-4 text-grey-600 font-semibold"
-          >{{ bandwidthLimit }}MB</span
+          >{{ bandwidthLimit >= 0 ? bandwidthLimit + 'MB' : '∞' }}</span
         >
       </div>
     </div>
@@ -257,7 +257,7 @@ onMounted(() => {
 })
 
 const bandwidthPercentage = computed(() => {
-  if (props.bandwidthMb) {
+  if (props.bandwidthMb && props.bandwidthLimit >= 0) {
     let percent = ((props.bandwidthMb / props.bandwidthLimit) * 100).toFixed(2)
 
     return percent > 100 ? 100 : percent
