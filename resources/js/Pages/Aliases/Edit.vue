@@ -5,13 +5,13 @@
 
     <div class="sm:flex sm:items-center mb-6">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold text-grey-900">Edit Alias</h1>
-        <p class="mt-2 text-sm text-grey-700">Make changes to your alias</p>
+        <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Edit Alias</h1>
+        <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">Make changes to your alias</p>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4">
-      <div class="space-y-8 divide-y divide-grey-200">
+    <div class="bg-white rounded-lg shadow p-4 dark:bg-grey-900">
+      <div class="space-y-8 divide-y divide-grey-200 dark:divide-grey-400">
         <div>
           <div class="flex items-center">
             <span
@@ -30,38 +30,46 @@
               data-tippy-content="Click to copy"
               @click="clipboard(getAliasEmail(alias))"
             >
-              <span class="font-semibold text-indigo-800">{{ getAliasLocalPart(alias) }}</span
-              ><span class="font-semibold text-grey-500">{{ '@' + alias.domain }}</span>
+              <span class="font-semibold text-indigo-800 dark:text-indigo-400">{{
+                getAliasLocalPart(alias)
+              }}</span
+              ><span class="font-semibold text-grey-500 dark:text-grey-200">{{
+                '@' + alias.domain
+              }}</span>
             </h3>
           </div>
-          <div v-if="alias.description" class="mt-2 text-sm text-grey-500">
+          <div v-if="alias.description" class="mt-2 text-sm text-grey-500 dark:text-grey-300">
             {{ alias.description }}
           </div>
         </div>
         <div class="pt-8">
-          <div class="block text-lg font-medium text-grey-700">Alias 'From Name'</div>
-          <p class="mt-1 text-base text-grey-700">
+          <div class="block text-lg font-medium text-grey-700 dark:text-grey-200">
+            Alias 'From Name'
+          </div>
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             The 'From Name' is shown when you send an email from an alias or reply anonymously to a
             forwarded email. If left blank, then the email alias itself will be used as the 'From
             Name' e.g. "{{ alias.email }}".
           </p>
-          <div class="mt-2 text-base text-grey-700">
+          <div class="mt-2 text-base text-grey-700 dark:text-grey-200">
             The 'From Name' that is used for an alias is determined by the following
             <b>priority</b>:
 
-            <ul class="list-decimal list-inside text-grey-700 text-base mt-2">
+            <ul class="list-decimal list-inside text-grey-700 text-base mt-2 dark:text-grey-200">
               <li><b>Alias 'From Name'</b></li>
               <li>Username or Custom Domain 'From Name'</li>
               <li>Global 'From Name' from the settings page</li>
             </ul>
           </div>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             If you set the 'From Name' for this specific alias, it will override the other settings.
           </p>
 
           <div class="mb-6">
             <div class="mt-6 grid grid-cols-1 mb-4">
-              <label for="from_name" class="block text-sm font-medium leading-6 text-grey-900"
+              <label
+                for="from_name"
+                class="block text-sm font-medium leading-6 text-grey-900 dark:text-white"
                 >Alias From Name</label
               >
               <div class="relative mt-2">
@@ -70,7 +78,7 @@
                   type="text"
                   name="from_name"
                   id="from_name"
-                  class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                  class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:text-white dark:bg-white/5"
                   :class="
                     errors.from_name
                       ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
@@ -106,10 +114,10 @@
         <div class="pt-8">
           <label
             for="can_reply_send"
-            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default"
+            class="block font-medium text-grey-700 dark:text-grey-200 text-lg pointer-events-none cursor-default"
             >Limit Replies/Sends to attached recipients only</label
           >
-          <p class="mt-1 text-base text-grey-700">
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             Toggle this option to only allow verified recipients that are <b>directly</b> attached
             to this alias to reply or send from it. If this option is enabled and no recipients are
             directly attached then it will <b>not be possible to reply/send</b> from this alias.
@@ -125,7 +133,7 @@
 
         <div class="pt-5">
           <span
-            class="mt-2 text-sm text-grey-500 tooltip"
+            class="mt-2 text-sm text-grey-500 dark:text-grey-300 tooltip"
             :data-tippy-content="$filters.formatDate(alias.updated_at)"
             >Last updated {{ $filters.timeAgo(alias.updated_at) }}.</span
           >

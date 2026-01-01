@@ -5,17 +5,17 @@
 
     <div class="sm:flex sm:items-center mb-6">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold text-grey-900">Edit Domain</h1>
-        <p class="mt-2 text-sm text-grey-700">Make changes to your Domain</p>
+        <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Edit Domain</h1>
+        <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">Make changes to your Domain</p>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4">
+    <div class="bg-white rounded-lg shadow p-4 dark:bg-grey-900">
       <div class="space-y-8 divide-y divide-grey-200">
         <div>
           <div class="flex items-center">
             <h3
-              class="text-xl font-medium leading-6 text-grey-900 cursor-pointer tooltip"
+              class="text-xl font-medium leading-6 text-grey-900 cursor-pointer tooltip dark:text-grey-100"
               data-tippy-content="Click to copy"
               @click="clipboard(domain.domain)"
             >
@@ -95,35 +95,39 @@
               </svg>
             </div>
           </div>
-          <div v-if="domain.description" class="mt-2 text-sm text-grey-500">
+          <div v-if="domain.description" class="mt-2 text-sm text-grey-500 dark:text-grey-300">
             {{ domain.description }}
           </div>
         </div>
         <div class="pt-8">
-          <div class="block text-lg font-medium text-grey-700">Domain 'From Name'</div>
-          <p class="mt-1 text-base text-grey-700">
+          <div class="block text-lg font-medium text-grey-700 dark:text-grey-200">
+            Domain 'From Name'
+          </div>
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             The 'From Name' is shown when you send an email from an alias or reply anonymously to a
             forwarded email. If left blank, then the email alias itself will be used as the 'From
             Name' e.g. "example@{{ domain.domain }}".
           </p>
-          <div class="mt-2 text-base text-grey-700">
+          <div class="mt-2 text-base text-grey-700 dark:text-grey-200">
             The 'From Name' that is used for an alias is determined by the following
             <b>priority</b>:
 
-            <ul class="list-decimal list-inside text-grey-700 text-base mt-2">
+            <ul class="list-decimal list-inside text-grey-700 text-base mt-2 dark:text-grey-200">
               <li>Alias 'From Name'</li>
               <li>Username or <b>Custom Domain 'From Name'</b></li>
               <li>Global 'From Name' from the settings page</li>
             </ul>
           </div>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             If you set the 'From Name' for this domain, it will override the global 'From Name'
             setting.
           </p>
 
           <div class="mb-6">
             <div class="mt-6 grid grid-cols-1 mb-4">
-              <label for="from_name" class="block text-sm font-medium leading-6 text-grey-900"
+              <label
+                for="from_name"
+                class="block text-sm font-medium leading-6 text-grey-900 dark:text-white"
                 >From Name</label
               >
               <div class="relative mt-2">
@@ -132,7 +136,7 @@
                   type="text"
                   name="from_name"
                   id="from_name"
-                  class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                  class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:bg-white/5 dark:text-white"
                   :class="
                     errors.from_name
                       ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
@@ -166,31 +170,34 @@
         </div>
 
         <div class="pt-8">
-          <div class="block text-lg font-medium text-grey-700">Alias Auto Create Regex</div>
-          <p class="mt-1 text-base text-grey-700">
+          <div class="block text-lg font-medium text-grey-700 dark:text-grey-200">
+            Alias Auto Create Regex
+          </div>
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             If you wish to create aliases on-the-fly but don't want to enable catch-all then you can
             enter a regular expression pattern below. If a new alias' local part matches the pattern
             then it will still be created on-the-fly even though catch-all is disabled.
           </p>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             Note: <b>Catch-All must be disabled</b> to use alias automatic creation with regex.
           </p>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             For example, if you only want aliases that start with "prefix" to be automatically
-            created, use the regex <span class="bg-cyan-200 px-1 rounded-md">^prefix</span>
+            created, use the regex
+            <span class="bg-cyan-200 px-1 rounded-md dark:text-grey-900">^prefix</span>
           </p>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             If you only want aliases that end with "suffix" to be automatically created, use the
-            regex <span class="bg-cyan-200 px-1 rounded-md">suffix$</span>
+            regex <span class="bg-cyan-200 px-1 rounded-md dark:text-grey-900">suffix$</span>
           </p>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             If you want to make sure the local part is fully matched you can start your regex with
-            <span class="bg-cyan-200 px-1 rounded-md">^</span> and end it with
-            <span class="bg-cyan-200 px-1 rounded-md">$</span> e.g.
-            <span class="bg-cyan-200 px-1 rounded-md">^prefix.*suffix$</span> which would match
-            "prefix-anything-here-suffix"
+            <span class="bg-cyan-200 px-1 rounded-m dark:text-grey-900">^</span> and end it with
+            <span class="bg-cyan-200 px-1 rounded-md dark:text-grey-900">$</span> e.g.
+            <span class="bg-cyan-200 px-1 rounded-md dark:text-grey-900">^prefix.*suffix$</span>
+            which would match "prefix-anything-here-suffix"
           </p>
-          <p class="mt-2 text-base text-grey-700">
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
             You can use
             <a
               href="https://regex101.com/"
@@ -206,7 +213,7 @@
             <div class="mt-6 grid grid-cols-1 mb-4">
               <label
                 for="auto_create_regex"
-                class="block text-sm font-medium leading-6 text-grey-900"
+                class="block text-sm font-medium leading-6 text-grey-900 dark:text-white"
                 >Auto Create Regex</label
               >
               <div class="relative mt-2">
@@ -215,7 +222,7 @@
                   type="text"
                   name="auto_create_regex"
                   id="auto_create_regex"
-                  class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                  class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:bg-white/5 dark:text-white"
                   :class="
                     errors.auto_create_regex
                       ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
@@ -251,19 +258,21 @@
             <loader v-if="domain.autoCreateRegexLoading" />
           </button>
 
-          <div class="block text-lg font-medium text-grey-700 pt-8">
+          <div class="block text-lg font-medium text-grey-700 pt-8 dark:text-grey-200">
             Test Alias Auto Create Regex
           </div>
-          <p class="mt-1 text-base text-grey-700">
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             You can test whether an alias local part will match the above regex pattern and be
             automatically created by entering the local part (left of @ symbol) below.
           </p>
-          <p class="mt-2 text-base text-grey-700">No aliases will be created when testing.</p>
+          <p class="mt-2 text-base text-grey-700 dark:text-grey-200">
+            No aliases will be created when testing.
+          </p>
           <div class="mb-6">
             <div class="mt-6 grid grid-cols-1 mb-4">
               <label
                 for="auto_create_regex"
-                class="block text-sm font-medium leading-6 text-grey-900"
+                class="block text-sm font-medium leading-6 text-grey-900 dark:text-white"
                 >Alias Local Part</label
               >
 
@@ -275,7 +284,7 @@
                       type="text"
                       name="test_auto_create_regex_local_part"
                       id="test_auto_create_regex_local_part"
-                      class="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-2 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                      class="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-2 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white"
                       :class="testAutoCreateRegexLocalPartClass"
                       placeholder="local-part"
                       aria-invalid="true"
@@ -298,7 +307,7 @@
                     </div>
                   </div>
                   <span
-                    class="inline-flex items-center rounded-r-md border border-l-0 border-grey-300 px-3 text-grey-500 sm:text-sm"
+                    class="inline-flex items-center rounded-r-md border border-l-0 border-grey-300 px-3 text-grey-500 sm:text-sm dark:text-grey-300"
                     >@{{ domain.domain }}</span
                   >
                 </div>
@@ -339,7 +348,7 @@
 
         <div class="pt-5">
           <span
-            class="mt-2 text-sm text-grey-500 tooltip"
+            class="mt-2 text-sm text-grey-500 tooltip dark:text-grey-300"
             :data-tippy-content="$filters.formatDate(domain.updated_at)"
             >Last updated {{ $filters.timeAgo(domain.updated_at) }}.</span
           >

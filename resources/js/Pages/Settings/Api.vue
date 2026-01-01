@@ -3,22 +3,16 @@
     <div class="divide-y divide-grey-200">
       <div class="pt-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">Manage your API Access Keys</h3>
-          <p class="text-base text-grey-700">
-            Your API access keys can be used with the
-            <a
-              href="https://github.com/anonaddy/browser-extension"
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              class="text-indigo-700"
-              >open-source</a
-            >
-            browser extension on
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Manage your API Access Keys
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            Your API access keys can be used with the browser extension on
             <a
               href="https://addons.mozilla.org/en-GB/firefox/addon/addy_io/"
               target="_blank"
               rel="nofollow noopener noreferrer"
-              class="text-indigo-700"
+              class="text-indigo-700 dark:text-indigo-400"
               >Firefox</a
             >
             ,
@@ -26,21 +20,30 @@
               href="https://chrome.google.com/webstore/detail/addyio-anonymous-email-fo/iadbdpnoknmbdeolbapdackdcogdmjpe"
               target="_blank"
               rel="nofollow noopener noreferrer"
-              class="text-indigo-700"
-              >Chrome, Brave</a
+              class="text-indigo-700 dark:text-indigo-400"
+              >Chrome</a
             >
-            or
+            ,
             <a
               href="https://microsoftedge.microsoft.com/addons/detail/addyio-anonymous-email/ohjlgpcfncgkijjfmabldlgnccmgcehl"
               target="_blank"
               rel="nofollow noopener noreferrer"
-              class="text-indigo-700"
+              class="text-indigo-700 dark:text-indigo-400"
               >Edge</a
             >
-            to create new aliases. They can also be used with the mobile apps. Simply paste a key
-            you've created into the browser extension or mobile apps to get started. Your API access
-            keys <b>are secret and should be treated like your password</b>. For more information
-            please see the <a href="/docs" class="text-indigo-700">API documentation</a>.
+            and
+            <a
+              href="https://apps.apple.com/app/addy-io-extension/id6670220050"
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              class="text-indigo-700 dark:text-indigo-400"
+              >Safari</a
+            >
+            to create new aliases. They can also be used with the official mobile apps. Simply paste
+            a key you've created into the browser extension or mobile apps to get started. Your API
+            access keys <b>are secret and should be treated like your password</b>. For more
+            information please see the
+            <a href="/docs" class="text-indigo-700 dark:text-indigo-400">API documentation</a>.
           </p>
         </div>
         <div class="mt-4">
@@ -52,17 +55,19 @@
           </button>
 
           <div class="mt-6">
-            <h3 class="text-lg font-medium leading-6 text-grey-900">Personal Access Keys</h3>
+            <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+              Personal Access Keys
+            </h3>
 
             <div class="my-4 w-24 border-b-2 border-grey-200"></div>
 
-            <p class="my-6 text-base text-grey-700">
+            <p class="my-6 text-base text-grey-700 dark:text-grey-200">
               Keys you have created that can be used to access the API. To revoke an access key
               simply click the delete button next to it.
             </p>
 
             <div>
-              <p class="mb-0 text-base text-grey-700" v-if="tokens.length === 0">
+              <p class="mb-0 text-base text-grey-700 dark:text-grey-200" v-if="tokens.length === 0">
                 You have not created any personal access tokens.
               </p>
 
@@ -77,7 +82,7 @@
                 <div
                   v-for="token in tokens"
                   :key="token.id"
-                  class="table-row even:bg-grey-50 odd:bg-white"
+                  class="table-row even:bg-grey-50 odd:bg-white dark:even:bg-grey-800 dark:odd:bg-grey-900"
                 >
                   <div class="table-cell p-1 md:p-4">{{ token.name }}</div>
                   <div class="table-cell p-1 md:p-4">{{ $filters.timeAgo(token.created_at) }}</div>
@@ -110,7 +115,7 @@
       <template v-else v-slot:title> Personal Access Key </template>
       <template v-slot:content>
         <div v-show="!accessToken">
-          <p class="mt-4 text-grey-700">
+          <p class="mt-4 text-grey-700 dark:text-grey-200">
             What's this API key going to be used for? Give it a short name so that you remember
             later. You can also select an expiry date for the key if you wish.
           </p>
@@ -124,14 +129,14 @@
             </div>
             <label
               for="create-token-name"
-              class="block text-sm my-2 font-medium leading-6 text-grey-600"
+              class="block text-sm my-2 font-medium leading-6 text-grey-600 dark:text-white"
               >Name</label
             >
             <input
               v-model="form.name"
               type="text"
               id="create-token-name"
-              class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+              class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:bg-white/5 text-grey-900 dark:text-white"
               :class="form.errors.name ? 'ring-red-500' : ''"
               placeholder="e.g. Firefox extension"
               required
@@ -139,7 +144,7 @@
             />
             <label
               for="create-token-expiration"
-              class="block font-medium leading-6 text-grey-600 text-sm my-2"
+              class="block font-medium leading-6 text-grey-600 text-sm my-2 dark:text-white"
             >
               Expiration
             </label>
@@ -147,26 +152,26 @@
               <select
                 v-model="form.expiration"
                 id="create-token-expiration"
-                class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                 :class="form.errors.expiration ? 'ring-red-500' : ''"
               >
-                <option value="day">1 day</option>
-                <option value="week">1 week</option>
-                <option value="month">1 month</option>
-                <option value="year">1 year</option>
-                <option :value="null">No expiration</option>
+                <option class="dark:bg-grey-900" value="day">1 day</option>
+                <option class="dark:bg-grey-900" value="week">1 week</option>
+                <option class="dark:bg-grey-900" value="month">1 month</option>
+                <option class="dark:bg-grey-900" value="year">1 year</option>
+                <option class="dark:bg-grey-900" :value="null">No expiration</option>
               </select>
             </div>
             <label
               for="create-token-name"
-              class="block text-sm my-2 font-medium leading-6 text-grey-600"
+              class="block text-sm my-2 font-medium leading-6 text-grey-600 dark:text-white"
               >Confirm Password</label
             >
             <input
               v-model="form.password"
               type="password"
               id="create-token-password"
-              class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6"
+              class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6 dark:bg-white/5 text-grey-900 dark:text-white"
               :class="form.errors.password ? 'ring-red-500' : ''"
               placeholder="********"
               required
@@ -182,14 +187,14 @@
             </button>
             <button
               @click="closeCreateTokenModal"
-              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>
           </div>
         </div>
         <div v-show="accessToken">
-          <p class="my-4 text-grey-700">
+          <p class="my-4 text-grey-700 dark:text-grey-200">
             This is your new personal access key.
             <b>This is the only time the key will ever be displayed</b>, so please make a note of it
             in a safe place (e.g. password manager)!
@@ -198,14 +203,14 @@
             v-model="accessToken"
             @click="selectTokenTextArea"
             id="token-text-area"
-            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-md break-all"
+            class="w-full appearance-none bg-grey-100 border border-transparent text-grey-700 focus:outline-none rounded p-3 text-md break-all dark:bg-white/5 dark:text-white"
             rows="2"
             readonly
           >
           </textarea>
           <div class="text-center">
             <img :src="qrCode" class="inline-block" alt="QR Code" />
-            <p class="text-left text-sm text-grey-700">
+            <p class="text-left text-sm mt-2 text-grey-700 dark:text-grey-200">
               You can scan this QR code to automatically login to the addy.io mobile app.
             </p>
           </div>
@@ -218,7 +223,7 @@
             </button>
             <button
               @click="closeCreateTokenModal"
-              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>
@@ -230,7 +235,7 @@
     <Modal :open="revokeTokenModalOpen" @close="closeRevokeTokenModal">
       <template v-slot:title> Revoke API Access Key </template>
       <template v-slot:content>
-        <p class="my-4 text-grey-700">
+        <p class="my-4 text-grey-700 dark:text-grey-200">
           Any browser extension, application or script using this API access key will no longer be
           able to access the API. This action cannot be undone.
         </p>
@@ -246,7 +251,7 @@
           </button>
           <button
             @click="closeRevokeTokenModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

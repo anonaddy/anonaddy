@@ -6,7 +6,9 @@
     <div class="container py-8">
       <div class="flex flex-wrap justify-center">
         <div class="w-full max-w-md">
-          <div class="px-6 py-8 md:px-10 flex flex-col break-words bg-white rounded-lg shadow-lg">
+          <div
+            class="px-6 py-8 md:px-10 flex flex-col break-words bg-white rounded-lg shadow-lg dark:bg-grey-900"
+          >
             <h1 class="text-center font-bold text-2xl">Verify Your Email Address</h1>
 
             <div class="mx-auto mt-6 w-24 border-b-2 border-grey-200"></div>
@@ -18,7 +20,9 @@
               </p>
               <p class="leading-normal mb-2 text-center">
                 If that email address is incorrect you can update it on the
-                <Link :href="route('settings.show')" class="text-indigo-700">settings page</Link>.
+                <Link :href="route('settings.show')" class="text-indigo-700 dark:text-indigo-400"
+                  >settings page</Link
+                >.
               </p>
               <p class="leading-normal mb-6 text-center">
                 You must verify your email <b>within 30 days</b> or your account will be
@@ -41,7 +45,7 @@
                 </button>
               </form>
 
-              <p class="text-sm text-grey-600 mt-4 text-center w-full">
+              <p class="text-sm text-grey-600 mt-4 text-center w-full dark:text-grey-200">
                 You can resend once per minute.
               </p>
             </div>

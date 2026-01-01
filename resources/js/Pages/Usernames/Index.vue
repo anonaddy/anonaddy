@@ -5,12 +5,12 @@
 
     <div class="sm:flex sm:items-center mb-6">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold text-grey-900">Usernames</h1>
-        <p class="mt-2 text-sm text-grey-700">
+        <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Usernames</h1>
+        <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           A list of all the usernames {{ search ? 'found for your search' : 'in your account' }}
           <button @click="moreInfoOpen = !moreInfoOpen">
             <InformationCircleIcon
-              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500 dark:text-grey-200"
               title="Click for more information"
             />
           </button>
@@ -64,13 +64,13 @@
       <template #table-row="props">
         <span
           v-if="props.column.field == 'created_at'"
-          class="tooltip outline-none cursor-default text-sm text-grey-500"
+          class="tooltip outline-none cursor-default text-sm text-grey-500 dark:text-grey-300"
           :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
           >{{ $filters.timeAgo(props.row.created_at) }}
         </span>
         <span v-else-if="props.column.field == 'username'">
           <button
-            class="tooltip outline-none font-medium text-grey-700"
+            class="tooltip outline-none font-medium text-grey-700 dark:text-grey-200"
             data-tippy-content="Click to copy"
             @click="clipboard(rows[props.row.originalIndex].username)"
           >
@@ -81,7 +81,7 @@
             class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full"
             >default</span
           >
-          <span v-else class="block text-grey-400 text-sm py-1">
+          <span v-else class="block text-grey-400 text-sm py-1 dark:text-grey-300">
             <button @click="openMakeDefaultModal(props.row)">Make Default</button>
           </span>
         </span>
@@ -92,7 +92,7 @@
               @keyup.esc="usernameIdToEdit = usernameDescriptionToEdit = ''"
               v-model="usernameDescriptionToEdit"
               type="text"
-              class="grow appearance-none bg-grey-50 border text-grey-700 focus:outline-none rounded px-2 py-1"
+              class="grow appearance-none bg-grey-50 border text-grey-700 focus:outline-none rounded px-2 py-1 dark:text-white dark:bg-white/5"
               :class="
                 usernameDescriptionToEdit.length > 200 ? 'border-red-500' : 'border-transparent'
               "
@@ -108,7 +108,7 @@
             </button>
           </div>
           <div v-else-if="props.row.description" class="flex items-centers">
-            <span class="outline-none text-grey-500 mr-2">{{
+            <span class="outline-none text-grey-500 mr-2 dark:text-grey-300">{{
               $filters.truncate(props.row.description, 60)
             }}</span>
             <button
@@ -133,7 +133,7 @@
         <span v-else-if="props.column.field === 'default_recipient'">
           <div v-if="props.row.default_recipient">
             <span
-              class="tooltip cursor-pointer font-medium text-grey-500 mr-2"
+              class="tooltip cursor-pointer font-medium text-grey-500 mr-2 dark:text-grey-300"
               data-tippy-content="Click to copy"
               @click="clipboard(rows[props.row.originalIndex].default_recipient.email)"
             >
@@ -162,11 +162,13 @@
               as="button"
               type="button"
               data-tippy-content="Click to view the aliases using this username"
-              class="text-indigo-600 hover:text-indigo-900 font-medium tooltip"
+              class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium tooltip"
               >{{ props.row.aliases_count.toLocaleString() }}</Link
             >
           </span>
-          <span v-else class="text-grey-500"> {{ props.row.aliases_count }}</span>
+          <span v-else class="text-grey-500 dark:text-grey-300">
+            {{ props.row.aliases_count }}</span
+          >
         </span>
         <span v-else-if="props.column.field === 'active'" class="flex items-center">
           <Toggle
@@ -187,7 +189,7 @@
             :href="route('usernames.edit', props.row.id)"
             as="button"
             type="button"
-            class="text-indigo-500 hover:text-indigo-800 font-medium"
+            class="text-indigo-500 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium"
             >Edit<span class="sr-only">, {{ props.row.username }}</span></Link
           >
           <button
@@ -195,7 +197,7 @@
             @click="openDeleteModal(props.row.id)"
             as="button"
             type="button"
-            class="text-indigo-500 hover:text-indigo-800 font-medium ml-4"
+            class="text-indigo-500 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium ml-4"
           >
             Delete<span class="sr-only">, {{ props.row.username }}</span>
           </button>
@@ -204,9 +206,13 @@
     </vue-good-table>
 
     <div v-else class="text-center">
-      <UsersIcon class="mx-auto h-16 w-16 text-grey-400" />
-      <h3 class="mt-2 text-lg font-medium text-grey-900">No Usernames found for that search</h3>
-      <p class="mt-1 text-md text-grey-500">Try entering a different search term.</p>
+      <UsersIcon class="mx-auto h-16 w-16 text-grey-400 dark:text-grey-200" />
+      <h3 class="mt-2 text-lg font-medium text-grey-900 dark:text-white">
+        No Usernames found for that search
+      </h3>
+      <p class="mt-1 text-md text-grey-500 dark:text-grey-200">
+        Try entering a different search term.
+      </p>
       <div class="mt-6">
         <Link
           :href="route('usernames.index')"
@@ -221,16 +227,12 @@
     <Modal :open="addUsernameModalOpen" @close="addUsernameModalOpen = false">
       <template v-slot:title> Add new username </template>
       <template v-slot:content>
-        <p v-if="usernameCount === 1" class="mt-4 text-grey-700">
-          Please <b>upgrade your account</b> to add a new username. <br />You can login with
-          <b>any of your usernames</b>.
-        </p>
-        <p v-else class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Please choose usernames carefully as you can only add a
           <b>maximum of {{ usernameCount }}</b
           >. You can login with <b>any of your usernames</b>.
         </p>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           You can prevent a username from being used to login by toggling the "can login" option.
         </p>
         <div class="mt-6">
@@ -240,7 +242,7 @@
           <input
             v-model="newUsername"
             type="text"
-            class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6"
+            class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6 dark:text-white dark:bg-white/5"
             :class="errors.newUsername ? 'ring-red-500' : ''"
             placeholder="johndoe"
             autofocus
@@ -256,7 +258,7 @@
             </button>
             <button
               @click="addUsernameModalOpen = false"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Cancel
             </button>
@@ -268,7 +270,7 @@
     <Modal :open="usernameDefaultRecipientModalOpen" @close="closeUsernameDefaultRecipientModal">
       <template v-slot:title> Update Default Recipient </template>
       <template v-slot:content>
-        <p class="my-4 text-grey-700">
+        <p class="my-4 text-grey-700 dark:text-grey-200">
           Select the default recipient for this username. This overrides the default recipient in
           your account settings. Leave it empty if you would like to use the default recipient in
           your account settings.
@@ -299,7 +301,7 @@
           </button>
           <button
             @click="closeUsernameDefaultRecipientModal()"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -310,7 +312,7 @@
     <Modal :open="deleteUsernameModalOpen" @close="closeDeleteModal">
       <template v-slot:title> Delete username </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Are you sure you want to permanently delete this username? This will also
           <b>permanently remove all aliases associated with this username</b>. You will no longer be
           able to receive any emails at this username subdomain.
@@ -328,7 +330,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -339,10 +341,10 @@
     <Modal :open="makeDefaultModalOpen" @close="closeMakeDefaultModal">
       <template v-slot:title> Make default username</template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           The default username for your account is used in the username reminder notification.
         </p>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           You will always be able to use your default username to login to your account.
         </p>
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
@@ -357,7 +359,7 @@
           </button>
           <button
             @click="closeMakeDefaultModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -368,26 +370,23 @@
     <Modal :open="moreInfoOpen" @close="moreInfoOpen = false">
       <template v-slot:title> More information </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           When you add a username here you will be able to use it exactly like the username you
           signed up with!
         </p>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           You can then separate aliases under your different usernames to reduce the chance of
           anyone linking ownership of them together. Great for compartmentalisation e.g. for work
           and personal emails.
         </p>
-        <p v-if="usernameCount === 1" class="mt-4 text-grey-700">
-          You need to upgrade your account to add any usernames.
-        </p>
-        <p v-else class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           You can add a maximum of <b>{{ usernameCount }}</b> usernames.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>

@@ -94,7 +94,7 @@ class UserRuleChecker
     /**
      * Check if a specific condition is satisfied
      */
-    protected function conditionSatisfied(string $variable, array $condition): bool
+    protected function conditionSatisfied($variable, array $condition): bool
     {
         $values = collect($condition['values']);
 

@@ -26,13 +26,13 @@
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <DialogPanel
-              class="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 w-full sm:p-6"
+              class="relative bg-white dark:bg-grey-900 rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 w-full sm:p-6"
               :class="maxWidth ? maxWidth : 'sm:max-w-lg'"
             >
               <div class="mt-3 text-center sm:mt-0 sm:text-left">
                 <DialogTitle
                   as="h2"
-                  class="text-2xl leading-tight font-medium text-grey-900 border-b-2 border-grey-100 pb-4"
+                  class="text-2xl leading-tight font-medium text-grey-900 dark:text-grey-100 border-b-2 border-grey-100 pb-4"
                 >
                   <slot name="title"></slot>
                 </DialogTitle>

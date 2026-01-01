@@ -27,8 +27,10 @@
       </div>
       <div class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">Update Password</h3>
-          <p class="text-base text-grey-700">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Update Password
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
             Ensure your account is using a long, random, unique password to stay secure. It is
             recommended to use a password manager such as Bitwarden. Updating your password will
             also logout your active sessions on other browsers and devices.
@@ -46,7 +48,9 @@
             <div class="grid grid-cols-1 mb-6">
               <div>
                 <div class="mb-4">
-                  <label for="current" class="block text-sm font-medium leading-6 text-grey-600"
+                  <label
+                    for="current"
+                    class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                     >Current Password</label
                   >
                   <div class="relative mt-2">
@@ -59,8 +63,8 @@
                       class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                       :class="
                         updatePasswordForm.errors.current
-                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:text-white dark:bg-white/5'
                       "
                       placeholder="********"
                       :aria-invalid="updatePasswordForm.errors.current ? 'true' : undefined"
@@ -85,7 +89,9 @@
                 </div>
 
                 <div class="mb-4">
-                  <label for="password" class="block text-sm font-medium leading-6 text-grey-600"
+                  <label
+                    for="password"
+                    class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                     >New Password</label
                   >
                   <div class="relative mt-2">
@@ -98,8 +104,8 @@
                       class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                       :class="
                         updatePasswordForm.errors.password
-                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:bg-white/5 dark:text-white'
                       "
                       placeholder="********"
                       :aria-invalid="updatePasswordForm.errors.password ? 'true' : undefined"
@@ -126,7 +132,7 @@
                 <div>
                   <label
                     for="password-confirm"
-                    class="block text-sm font-medium leading-6 text-grey-600"
+                    class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                     >Confirm New Password</label
                   >
                   <div class="relative mt-2">
@@ -135,7 +141,7 @@
                       name="password_confirmation"
                       id="password-confirm"
                       v-model="updatePasswordForm.password_confirmation"
-                      class="block w-full rounded-md border-0 py-1.5 text-grey-900 shadow-sm ring-1 ring-grey-300 placeholder:text-grey-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                      class="block w-full rounded-md border-0 py-1.5 text-grey-900 shadow-sm ring-1 ring-grey-300 placeholder:text-grey-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6 dark:bg-white/5 dark:text-white"
                       placeholder="********"
                       required
                     />
@@ -158,8 +164,10 @@
 
       <div class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">Browser Sessions</h3>
-          <p class="text-base text-grey-700">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Browser Sessions
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
             If necessary, you may logout of all of your other browser sessions across all of your
             devices. If you feel your account has been compromised, you should also update your
             password.
@@ -178,7 +186,7 @@
               <div>
                 <label
                   for="browser-sessions"
-                  class="block text-sm font-medium leading-6 text-grey-600"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                   >Current Password</label
                 >
                 <div class="relative mt-2">
@@ -191,8 +199,8 @@
                     class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                     :class="
                       browserSessionsForm.errors.current
-                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                        : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                        : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:bg-white/5 dark:text-white'
                     "
                     placeholder="********"
                     :aria-invalid="browserSessionsForm.errors.current ? 'true' : undefined"
@@ -231,15 +239,17 @@
 
       <div class="py-10">
         <div class="space-y-1">
-          <h2 class="text-xl font-medium leading-6 text-grey-900">Two-Factor Authentication</h2>
-          <p class="text-base text-grey-700">
+          <h2 class="text-xl font-medium leading-6 text-grey-900 dark:text-white">
+            Two-Factor Authentication
+          </h2>
+          <p class="text-base text-grey-700 dark:text-grey-200">
             Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of
             security to your account beyond your username and password. There are
             <b>multiple options for 2FA</b> - 1. Authentication App (e.g. Google Authenticator or
             another, Aegis, andOTP) 2. Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey) 3.
             Passkeys (which can be stored in a supported provider such as Bitwarden or 1Password).
           </p>
-          <p class="text-base text-grey-700">
+          <p class="text-base text-grey-700 dark:text-grey-200">
             When you login with 2FA enabled, you will be prompted to use a security key or enter a
             OTP (one time passcode) depending on which method you choose below. You can only have
             one method of 2nd factor authentication enabled at once.
@@ -249,8 +259,10 @@
 
       <div v-if="twoFactorEnabled || webauthnEnabled" class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">Generate New Backup Code</h3>
-          <p class="text-base text-grey-700">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Generate New Backup Code
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
             The backup code can be used in a situation where you have lost your 2FA device to allow
             you to access your account. If you've forgotten or lost your backup code then you can
             generate a new one by clicking the button below.
@@ -293,7 +305,9 @@
             "
           >
             <div class="mb-4">
-              <label for="new-backup-code" class="block text-sm font-medium leading-6 text-grey-600"
+              <label
+                for="new-backup-code"
+                class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                 >Current Password</label
               >
               <div class="relative mt-2">
@@ -306,8 +320,8 @@
                   class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                   :class="
                     newBackupCodeForm.errors.current
-                      ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                      : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                      ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                      : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:bg-white/5 dark:text-white'
                   "
                   placeholder="********"
                   :aria-invalid="newBackupCodeForm.errors.current ? 'true' : undefined"
@@ -344,10 +358,10 @@
 
       <div v-if="twoFactorEnabled" class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
             Disable Authentication App (TOTP)
           </h3>
-          <p class="text-base text-grey-700">
+          <p class="text-base text-grey-700 dark:text-grey-200">
             To disable TOTP authentication enter your password below. You can always enable it again
             later if you wish.
           </p>
@@ -365,7 +379,7 @@
               <div>
                 <label
                   for="disable-two-factor"
-                  class="block text-sm font-medium leading-6 text-grey-600"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                   >Current Password</label
                 >
                 <div class="relative mt-2">
@@ -378,8 +392,8 @@
                     class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                     :class="
                       disableTwoFactorForm.errors.current
-                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                        : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                        : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:bg-white/5 dark:text-white'
                     "
                     placeholder="********"
                     :aria-invalid="disableTwoFactorForm.errors.current ? 'true' : undefined"
@@ -419,10 +433,10 @@
       <div v-if="!twoFactorEnabled" class="divide-y divide-grey-200">
         <div class="py-10">
           <div class="space-y-1">
-            <h3 class="text-lg font-medium leading-6 text-grey-900">
+            <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
               Enable Authentication App (TOTP)
             </h3>
-            <p class="text-base text-grey-700">
+            <p class="text-base text-grey-700 dark:text-grey-200">
               TOTP two-factor authentication requires the use of Google Authenticator or another
               compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively,
               you can use the code below. Make sure that you write down your secret code in a safe
@@ -442,7 +456,7 @@
               <input
                 type="submit"
                 :disabled="regenerateTwoFactorForm.processing"
-                class="text-indigo-900 bg-transparent cursor-pointer disabled:cursor-not-allowed"
+                class="text-indigo-900 bg-transparent cursor-pointer disabled:cursor-not-allowed dark:text-indigo-400"
                 value="Click here to regenerate your secret key"
               />
 
@@ -470,7 +484,7 @@
                 <div class="mb-4">
                   <label
                     for="enable-two-factor"
-                    class="block text-sm font-medium leading-6 text-grey-600"
+                    class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                     >Two-Factor Token</label
                   >
                   <div class="relative mt-2">
@@ -483,8 +497,8 @@
                       class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                       :class="
                         enableTwoFactorForm.errors.two_factor_token
-                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:bg-white/5 dark:text-white'
                       "
                       placeholder="123456"
                       :aria-invalid="
@@ -514,7 +528,7 @@
                 <div>
                   <label
                     for="enable-two-factor-current"
-                    class="block text-sm font-medium leading-6 text-grey-600"
+                    class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                     >Current Password</label
                   >
                   <div class="relative mt-2">
@@ -527,8 +541,8 @@
                       class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                       :class="
                         enableTwoFactorForm.errors.current
-                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
-                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600'
+                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 dark:bg-white/5 dark:text-white'
+                          : 'text-grey-900 ring-grey-300 placeholder:text-grey-400 focus:ring-indigo-600 dark:bg-white/5 dark:text-white'
                       "
                       placeholder="********"
                       :aria-invalid="enableTwoFactorForm.errors.current ? 'true' : undefined"
@@ -569,10 +583,10 @@
       </div>
       <div v-if="!keys.length" class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
             Enable Device/Passkey Authentication (WebAuthn)
           </h3>
-          <p class="text-base text-grey-700">
+          <p class="text-base text-grey-700 dark:text-grey-200">
             WebAuthn is a new W3C global standard for secure authentication. You can use any
             hardware key such as a Yubikey, Solokey, NitroKey etc.
           </p>
@@ -590,10 +604,10 @@
       <div v-else>
         <div class="py-10">
           <div class="space-y-1">
-            <h3 class="text-lg font-medium leading-6 text-grey-900">
+            <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
               Device/Passkey Authentication (WebAuthn)
             </h3>
-            <p class="text-base text-grey-700">
+            <p class="text-base text-grey-700 dark:text-grey-200">
               Hardware security keys and Passkeys that you have registered for 2nd factor
               authentication. To remove a key simply click the delete button next to it. Disabled
               keys cannot be used to login. If you disable all keys
@@ -611,10 +625,16 @@
                 <div class="table-cell p-1 md:p-4 font-semibold">Created</div>
                 <div class="table-cell p-1 md:p-4 font-semibold">Enabled</div>
                 <div class="table-cell p-1 md:p-4 text-right">
-                  <a href="/webauthn/keys/create" class="text-indigo-700">Add New Key</a>
+                  <a href="/webauthn/keys/create" class="text-indigo-700 dark:text-indigo-400"
+                    >Add New Key</a
+                  >
                 </div>
               </div>
-              <div v-for="key in keys" :key="key.id" class="table-row even:bg-grey-50 odd:bg-white">
+              <div
+                v-for="key in keys"
+                :key="key.id"
+                class="table-row even:bg-grey-50 odd:bg-white dark:even:bg-grey-800 dark:odd:bg-grey-900"
+              >
                 <div class="table-cell p-1 md:p-4">{{ key.name }}</div>
                 <div class="table-cell p-1 md:p-4">{{ $filters.timeAgo(key.created_at) }}</div>
                 <div class="table-cell p-1 md:p-4">
@@ -663,14 +683,14 @@
                 <div class="table-cell p-1 md:p-4 text-right">
                   <button
                     v-if="key.enabled"
-                    class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-400"
                     @click="showDisableKeyModal(key)"
                   >
                     Disable
                   </button>
                   <button
                     v-else
-                    class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    class="text-indigo-500 font-bold cursor-pointer rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-400"
                     @click="enableKey(key)"
                   >
                     Enable
@@ -707,7 +727,7 @@
         <div class="mt-6">
           <label
             for="disable-key-current-password"
-            class="block font-medium leading-6 text-grey-600 text-sm my-2"
+            class="block font-medium leading-6 text-grey-600 dark:text-white text-sm my-2"
           >
             Current Password
           </label>
@@ -718,7 +738,7 @@
             v-model="disableKeyCurrentPassword"
             type="password"
             id="disable-key-current-password"
-            class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6"
+            class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6 dark:bg-white/5 text-grey-900 dark:text-white"
             :class="errors.disableKey ? 'ring-red-500' : ''"
             placeholder="********"
             autofocus
@@ -734,7 +754,7 @@
             </button>
             <button
               @click="closeDisableKeyModal"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>
@@ -760,7 +780,7 @@
         <div class="mt-6">
           <label
             for="delete-key-current-password"
-            class="block font-medium leading-6 text-grey-600 text-sm my-2"
+            class="block font-medium leading-6 text-grey-600 text-sm my-2 dark:text-white"
           >
             Current Password
           </label>
@@ -771,7 +791,7 @@
             v-model="deleteKeyCurrentPassword"
             type="password"
             id="delete-key-current-password"
-            class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6"
+            class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6 dark:bg-white/5 text-grey-900 dark:text-white"
             :class="errors.deleteKey ? 'ring-red-500' : ''"
             placeholder="********"
             autofocus
@@ -787,7 +807,7 @@
             </button>
             <button
               @click="closeDeleteKeyModal"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Close
             </button>

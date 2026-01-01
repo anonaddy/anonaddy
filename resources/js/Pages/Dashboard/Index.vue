@@ -19,25 +19,32 @@
       </div>
     </div>
 
-    <h1 class="text-2xl font-semibold text-grey-900">Dashboard</h1>
+    <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Dashboard</h1>
 
     <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
       <div
         v-for="item in stats"
         :key="item.id"
-        class="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
+        class="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6 dark:bg-grey-900"
       >
         <dt>
           <div class="absolute rounded-md bg-indigo-500 p-3">
             <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
           </div>
-          <p class="ml-16 truncate text-sm font-medium text-grey-500">{{ item.name }}</p>
+          <p class="ml-16 truncate text-sm font-medium text-grey-500 dark:text-grey-200">
+            {{ item.name }}
+          </p>
         </dt>
         <dd class="ml-16 flex items-baseline pb-6 sm:pb-7">
-          <p class="text-2xl font-semibold text-indigo-800">{{ item.stat.toLocaleString() }}</p>
-          <div class="absolute inset-x-0 bottom-0 bg-grey-50 px-4 py-4 sm:px-6">
+          <p class="text-2xl font-semibold text-indigo-800 dark:text-indigo-400">
+            {{ item.stat.toLocaleString() }}
+          </p>
+          <div class="absolute inset-x-0 bottom-0 bg-grey-50 px-4 py-4 sm:px-6 dark:bg-grey-900">
             <div class="text-sm">
-              <Link :href="item.url" class="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link
+                :href="item.url"
+                class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+              >
                 View all<span class="sr-only"> {{ item.name }} stats</span>
               </Link>
             </div>
@@ -46,10 +53,12 @@
       </div>
     </dl>
 
-    <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600">Bandwidth ({{ month }})</h3>
+    <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600 dark:text-grey-200">
+      Bandwidth ({{ month }})
+    </h3>
 
     <div class="mt-6">
-      <div class="overflow-hidden rounded-full bg-grey-100 relative">
+      <div class="overflow-hidden rounded-full bg-grey-100 relative dark:bg-grey-900">
         <div
           class="relative h-8 flex items-center justify-end rounded-full bg-gradient-to-r z-10 min-w-[25%] sm:min-w-fit"
           :class="bandwidthPercentageClass"
@@ -57,32 +66,40 @@
         >
           <span class="text-white px-4 font-semibold">{{ bandwidthMb }}MB</span>
         </div>
-        <span class="h-8 absolute top-0 right-0 flex items-center pr-4 text-grey-600 font-semibold"
+        <span
+          class="h-8 absolute top-0 right-0 flex items-center pr-4 text-grey-600 font-semibold dark:text-grey-200"
           >{{ bandwidthLimit }}MB</span
         >
       </div>
     </div>
 
     <div class="mt-6">
-      <h3 class="text-base font-semibold leading-6 text-grey-600">Aliases</h3>
+      <h3 class="text-base font-semibold leading-6 text-grey-600 dark:text-grey-200">Aliases</h3>
 
       <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <div
           v-for="item in aliasStats"
           :key="item.id"
-          class="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
+          class="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6 dark:bg-grey-900"
         >
           <dt>
             <div class="absolute rounded-md bg-indigo-500 p-3">
               <component :is="item.icon" class="h-6 w-6 text-white" aria-hidden="true" />
             </div>
-            <p class="ml-16 truncate text-sm font-medium text-grey-500">{{ item.name }}</p>
+            <p class="ml-16 truncate text-sm font-medium text-grey-500 dark:text-grey-200">
+              {{ item.name }}
+            </p>
           </dt>
           <dd class="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p class="text-2xl font-semibold text-indigo-800">{{ item.stat.toLocaleString() }}</p>
-            <div class="absolute inset-x-0 bottom-0 bg-grey-50 px-4 py-4 sm:px-6">
+            <p class="text-2xl font-semibold text-indigo-800 dark:text-indigo-400">
+              {{ item.stat.toLocaleString() }}
+            </p>
+            <div class="absolute inset-x-0 bottom-0 bg-grey-50 px-4 py-4 sm:px-6 dark:bg-grey-900">
               <div class="text-sm">
-                <Link :href="item.url" class="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link
+                  :href="item.url"
+                  class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                >
                   {{ item.id === 1 ? 'View All' : `View ${item.name}`
                   }}<span class="sr-only"> {{ item.name }} stats</span>
                 </Link>
@@ -92,72 +109,80 @@
         </div>
       </dl>
 
-      <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600">Stats</h3>
+      <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600 dark:text-grey-200">Stats</h3>
 
       <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow">
+        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow dark:bg-grey-900">
           <dt>
             <icon
               name="send"
               class="inline-block w-16 h-16 text-indigo-50 stroke-current absolute top-0 right-0"
             />
-            <p class="truncate text-sm font-medium text-grey-400">Emails Forwarded</p>
+            <p class="truncate text-sm font-medium text-grey-400 dark:text-grey-200">
+              Emails Forwarded
+            </p>
           </dt>
           <dd class="flex items-baseline">
-            <p class="text-3xl font-semibold text-indigo-800">
+            <p class="text-3xl font-semibold text-indigo-800 dark:text-indigo-400">
               {{ parseInt(totals.forwarded).toLocaleString() }}
             </p>
           </dd>
         </div>
-        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow">
+        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow dark:bg-grey-900">
           <dt>
             <icon
               name="blocked"
               class="inline-block w-16 h-16 text-indigo-50 stroke-current absolute top-0 right-0"
             />
-            <p class="truncate text-sm font-medium text-grey-400">Emails Blocked</p>
+            <p class="truncate text-sm font-medium text-grey-400 dark:text-grey-200">
+              Emails Blocked
+            </p>
           </dt>
           <dd class="flex items-baseline">
-            <p class="text-3xl font-semibold text-indigo-800">
+            <p class="text-3xl font-semibold text-indigo-800 dark:text-indigo-400">
               {{ parseInt(totals.blocked).toLocaleString() }}
             </p>
           </dd>
         </div>
-        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow">
+        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow dark:bg-grey-900">
           <dt>
             <icon
               name="corner-up-left"
               class="inline-block w-16 h-16 text-indigo-50 stroke-current absolute top-0 right-0"
             />
-            <p class="truncate text-sm font-medium text-grey-400">Email Replies</p>
+            <p class="truncate text-sm font-medium text-grey-400 dark:text-grey-200">
+              Email Replies
+            </p>
           </dt>
           <dd class="flex items-baseline">
-            <p class="text-3xl font-semibold text-indigo-800">
+            <p class="text-3xl font-semibold text-indigo-800 dark:text-indigo-400">
               {{ parseInt(totals.replies).toLocaleString() }}
             </p>
           </dd>
         </div>
-        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow">
+        <div class="relative overflow-hidden rounded-lg bg-white p-4 shadow dark:bg-grey-900">
           <dt>
             <icon
               name="arrow-right"
               class="inline-block w-16 h-16 text-indigo-50 stroke-current absolute top-0 right-0"
             />
-            <p class="truncate text-sm font-medium text-grey-400">Emails Sent</p>
+            <p class="truncate text-sm font-medium text-grey-400 dark:text-grey-200">Emails Sent</p>
           </dt>
           <dd class="flex items-baseline">
-            <p class="text-3xl font-semibold text-indigo-800">{{ totals.sent.toLocaleString() }}</p>
+            <p class="text-3xl font-semibold text-indigo-800 dark:text-indigo-400">
+              {{ totals.sent.toLocaleString() }}
+            </p>
           </dd>
         </div>
       </dl>
     </div>
 
-    <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600">
+    <h3 class="mt-6 text-base font-semibold leading-6 text-grey-600 dark:text-grey-200">
       Outbound Messages Last 7 Days <loader v-if="chartsLoading" />
     </h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div
-        class="mt-5 bg-white overflow-hidden shadow sm:rounded-lg p-4 flex justify-center max-h-80"
+        class="mt-5 bg-white overflow-hidden shadow sm:rounded-lg p-4 flex justify-center max-h-80 dark:bg-grey-900"
       >
         <outbound-messages-graph
           :forwards-data="forwardsData"
@@ -167,7 +192,7 @@
         />
       </div>
       <div
-        class="mt-5 bg-white overflow-hidden shadow sm:rounded-lg p-4 flex justify-center max-h-80"
+        class="mt-5 bg-white overflow-hidden shadow sm:rounded-lg p-4 flex justify-center max-h-80 dark:bg-grey-900"
       >
         <div v-if="!outboundMessageTotals" class="flex items-center justify-center">
           No data to display

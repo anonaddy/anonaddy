@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\WebauthnController;
 use App\Http\Controllers\Auth\WebauthnEnabledKeyController;
 use App\Http\Controllers\BannerLocationController;
 use App\Http\Controllers\BrowserSessionController;
+use App\Http\Controllers\DarkModeController;
 use App\Http\Controllers\DeactivateAliasController;
 use App\Http\Controllers\DefaultAliasDomainController;
 use App\Http\Controllers\DefaultAliasFormatController;
@@ -162,6 +163,8 @@ Route::group([
     Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
 
     Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
+
+    Route::post('/dark-mode', [DarkModeController::class, 'update'])->name('settings.dark_mode');
 
     Route::post('/save-alias-last-used', [SaveAliasLastUsedController::class, 'update'])->name('settings.save_alias_last_used');
 
