@@ -246,13 +246,13 @@
             Two-factor authentication, also known as 2FA or multi-factor, adds an extra layer of
             security to your account beyond your username and password. There are
             <b>multiple options for 2FA</b> - 1. Authentication App (e.g. Google Authenticator or
-            another, Aegis, andOTP) 2. Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey) 3.
+            another, Aegis, Ente Auth) 2. Hardware Security Key (e.g. YubiKey, SoloKey, Nitrokey) 3.
             Passkeys (which can be stored in a supported provider such as Bitwarden or 1Password).
           </p>
           <p class="text-base text-grey-700 dark:text-grey-200">
             When you login with 2FA enabled, you will be prompted to use a security key or enter a
-            OTP (one time passcode) depending on which method you choose below. You can only have
-            one method of 2nd factor authentication enabled at once.
+            OTP (one time passcode) depending on which method you choose below. You can have
+            both methods of 2nd factor authentication enabled at once if you wish.
           </p>
         </div>
       </div>
@@ -438,7 +438,7 @@
             </h3>
             <p class="text-base text-grey-700 dark:text-grey-200">
               TOTP two-factor authentication requires the use of Google Authenticator or another
-              compatible app such as Aegis or andOTP (both on F-droid) for Android. Alternatively,
+              compatible app such as Aegis or Ente Auth. Alternatively,
               you can use the code below. Make sure that you write down your secret code in a safe
               place.
             </p>
