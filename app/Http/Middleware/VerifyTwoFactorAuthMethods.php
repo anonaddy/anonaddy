@@ -18,8 +18,8 @@ class VerifyTwoFactorAuthMethods
     {
         $user = $request->user();
 
-        // If user has no 2FA methods enabled, continue
-        if (! $user->hasAnyTwoFactorEnabled()) {
+        // If user has no 2FA methods enabled or uses external authentication, continue
+        if (! $user->hasAnyTwoFactorEnabled() || usesExternalAuthentication()) {
             return $next($request);
         }
 
