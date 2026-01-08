@@ -62,7 +62,7 @@ class StoreRuleRequest extends FormRequest
                 'required',
                 'array',
                 'min:1',
-                'max:10',
+                'max:50',
             ],
             'conditions.*.values.*' => Rule::forEach(function ($value, $attribute, $data) {
                 if (in_array(array_values($data)[1], ['matches regex', 'does not match regex'])) {
@@ -79,23 +79,34 @@ class StoreRuleRequest extends FormRequest
                 'array',
                 'max:5',
             ],
-            'actions.*.type' => [
-                'required',
-                'distinct',
-                Rule::in([
-                    'subject',
-                    'displayFrom',
-                    'encryption',
-                    'banner',
-                    'block',
-                    'removeAttachments',
-                    'forwardTo',
-                    // 'webhook',
-                ]),
-            ],
+            'actions.*.type' => Rule::forEach(function ($value, $attribute, $data, $action) {
+                $rules = [
+                    'required',
+                    Rule::in([
+                        'subject',
+                        'displayFrom',
+                        'encryption',
+                        'banner',
+                        'block',
+                        'removeAttachments',
+                        'forwardTo',
+                        // 'webhook',
+                    ]),
+                ];
+
+                // If the action type is not forwardTo then do not allow duplicates
+                if ($action['type'] !== 'forwardTo') {
+                    $rules[] = 'distinct';
+                }
+
+                return $rules;
+            }),
             'actions.*.value' => Rule::forEach(function ($value, $attribute, $data, $action) {
                 if ($action['type'] === 'forwardTo') {
-                    return [Rule::in(user()->verifiedRecipients()->pluck('id')->toArray())]; // Must be a valid verified recipient
+                    return [
+                        Rule::in(user()->verifiedRecipients()->pluck('id')->toArray()),
+                        'distinct',
+                    ]; // Must be a valid verified recipient
                 }
 
                 return [

@@ -28,6 +28,7 @@ export default {
         700: '#35469C',
         800: '#2D3A8C',
         900: '#19216C',
+        950: '#1e1b4b',
       },
       cyan: {
         50: '#E1FCF8',
@@ -52,6 +53,7 @@ export default {
         700: '#3E4C59',
         800: '#323F4B',
         900: '#1F2933',
+        950: '#111827',
       },
       pink: {
         50: '#FFE3EC',
@@ -135,4 +137,5 @@ export default {
     },
   },
   plugins: [forms],
+  darkMode: 'selector',
 }

@@ -19,9 +19,16 @@ class BackupCodeController extends Controller
 
     public function index(Request $request)
     {
-        $authenticator = app(Authenticator::class)->boot($request);
+        // If user has no 2FA methods enabled, redirect to home
+        if (! $request->user()->hasAnyTwoFactorEnabled()) {
+            return redirect('/');
+        }
 
-        if (($authenticator->isAuthenticated() || ! $request->user()->two_factor_enabled) && ! Webauthn::enabled($request->user())) {
+        // Check if user is already authenticated with any 2FA method
+        $totpAuthenticator = app(Authenticator::class)->boot($request);
+        $webauthnAuthenticated = Webauthn::check();
+
+        if ($totpAuthenticator->isAuthenticated() || $webauthnAuthenticated) {
             return redirect('/');
         }
 
@@ -31,7 +38,7 @@ class BackupCodeController extends Controller
     public function login(Request $request)
     {
         $this->validate($request, [
-            'backup_code' => 'required',
+            'backup_code' => 'required|string|min:40|max:40',
         ]);
 
         if (! Hash::check($request->backup_code, user()->two_factor_backup_code)) {
@@ -44,6 +51,7 @@ class BackupCodeController extends Controller
 
         user()->update([
             'two_factor_enabled' => false,
+            'webauthn_enabled' => false,
             'two_factor_secret' => $twoFactor->generateSecretKey(),
             'two_factor_backup_code' => null,
         ]);

@@ -52,6 +52,14 @@ class WebauthnKey extends ModelsWebauthnKey
     ];
 
     /**
+     * Get the user for the key.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
      * Enabled the key for use.
      */
     public function enable()

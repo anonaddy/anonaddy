@@ -63,6 +63,6 @@ class ForgotUsernameController extends Controller
             ]);
         }
 
-        $request->validate(['email' => 'required|email:rfc']);
+        $request->validate(['email' => 'required|string|ascii|max:254|email:rfc']);
     }
 }

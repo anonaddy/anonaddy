@@ -19,7 +19,7 @@
     @routes
     @inertiaHead
 </head>
-<body class="bg-grey-50 antialiased text-grey-900">
+<body class="{{ $page['props']['user']['darkMode'] ? 'dark' : '' }}">
     @inertia
 </body>
 </html>

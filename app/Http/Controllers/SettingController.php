@@ -7,7 +7,6 @@ use App\Http\Resources\PersonalAccessTokenResource;
 use App\Jobs\DeleteAccount;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use LaravelWebauthn\Facades\Webauthn;
 
 class SettingController extends Controller
 {
@@ -25,6 +24,7 @@ class SettingController extends Controller
             'displayFromFormat' => user()->display_from_format->value,
             'useReplyTo' => user()->use_reply_to,
             'storeFailedDeliveries' => user()->store_failed_deliveries,
+            'darkMode' => user()->dark_mode,
             'saveAliasLastUsed' => user()->save_alias_last_used,
             'fromName' => user()->from_name ?? '',
             'emailSubject' => user()->email_subject ?? '',
@@ -43,16 +43,16 @@ class SettingController extends Controller
             user()->two_factor_secret
         );
 
-        // User has either webauthn or TOTP 2FA enabled
-        $hasTwoFactor = Webauthn::enabled(user()) || user()->two_factor_enabled;
+        // User has TOTP 2FA enabled
+        $alreadyHasTotpEnabled = user()->two_factor_enabled;
 
         return Inertia::render('Settings/Security', [
-            'authSecret' => $hasTwoFactor ? null : user()->two_factor_secret,
-            'qrCode' => $hasTwoFactor ? null : $qrCode,
+            'authSecret' => $alreadyHasTotpEnabled ? null : user()->two_factor_secret,
+            'qrCode' => $alreadyHasTotpEnabled ? null : $qrCode,
             'regeneratedBackupCode' => $request->session()->get('regeneratedBackupCode', null),
             'backupCode' => $request->session()->get('backupCode', null),
-            'twoFactorEnabled' => user()->two_factor_enabled,
-            'webauthnEnabled' => Webauthn::enabled(user()),
+            'initialTwoFactorEnabled' => user()->two_factor_enabled,
+            'initialWebauthnEnabled' => user()->webauthn_enabled,
             'initialKeys' => user()->webauthnKeys()->latest()->select(['id', 'name', 'enabled', 'created_at'])->get()->values(),
         ]);
     }

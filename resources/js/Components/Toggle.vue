@@ -11,7 +11,7 @@
     <span
       :class="[
         modelValue ? 'translate-x-5' : 'translate-x-0',
-        'pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200',
+        'pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200 dark:bg-grey-900',
       ]"
     >
       <span
@@ -49,7 +49,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { Switch } from '@headlessui/vue'
 
 const emit = defineEmits(['update:modelValue', 'on', 'off'])

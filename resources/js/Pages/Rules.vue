@@ -7,12 +7,12 @@
 
     <div class="sm:flex sm:items-center mb-6">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold text-grey-900">Rules</h1>
-        <p class="mt-2 text-sm text-grey-700">
+        <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Rules</h1>
+        <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           A list of all the rules {{ search ? 'found for your search' : 'in your account' }}
           <button @click="moreInfoOpen = !moreInfoOpen">
             <InformationCircleIcon
-              class="h-6 w-6 inline-block cursor-pointer text-grey-500"
+              class="h-6 w-6 inline-block cursor-pointer text-grey-500 dark:text-grey-200"
               title="Click for more information"
             />
           </button>
@@ -29,10 +29,12 @@
       </div>
     </div>
 
-    <div v-if="rows.length" class="bg-white shadow">
+    <div v-if="rows.length" class="bg-white dark:bg-grey-900 shadow">
       <div class="vgt-responsive">
         <table class="table-auto w-full">
-          <thead class="border-b border-grey-100 text-grey-400">
+          <thead
+            class="border-b border-grey-100 text-grey-400 dark:text-grey-200 dark:border-grey-300"
+          >
             <tr>
               <th scope="col" class="p-3"></th>
               <th scope="col" class="p-3 text-left">Created</th>
@@ -62,22 +64,25 @@
             @update="debounceToolips"
           >
             <template #item="{ element }">
-              <tr class="border-b border-grey-100 h-20">
+              <tr class="border-b border-grey-100 h-20 dark:border-grey-300">
                 <td scope="row" class="p-3">
                   <icon
                     name="menu"
                     class="handle block w-6 h-6 text-grey-300 fill-current cursor-pointer"
+                    aria-label="Reorder"
                   />
                 </td>
                 <td scope="row" class="p-3">
                   <span
-                    class="tooltip outline-none cursor-default text-sm text-grey-500"
+                    class="tooltip outline-none cursor-default text-sm text-grey-500 dark:text-grey-300"
                     :data-tippy-content="$filters.formatDate(element.created_at)"
                     >{{ $filters.timeAgo(element.created_at) }}
                   </span>
                 </td>
                 <td scope="row" class="p-3">
-                  <span class="font-medium text-grey-700">{{ element.name }}</span>
+                  <span class="font-medium text-grey-700 dark:text-grey-200">{{
+                    element.name
+                  }}</span>
                 </td>
                 <td scope="row" class="p-3">
                   <Toggle
@@ -89,7 +94,7 @@
                 <td scope="row" class="p-3">
                   <span
                     v-if="element.last_applied"
-                    class="tooltip outline-none cursor-default font-semibold text-indigo-800"
+                    class="tooltip outline-none cursor-default font-semibold text-indigo-800 dark:text-indigo-400"
                     :data-tippy-content="
                       $filters.timeAgo(element.last_applied) +
                       ' (' +
@@ -98,14 +103,16 @@
                     "
                     >{{ element.applied.toLocaleString() }}
                   </span>
-                  <span v-else>{{ element.applied.toLocaleString() }} </span>
+                  <span v-else class="dark:text-grey-300"
+                    >{{ element.applied.toLocaleString() }}
+                  </span>
                 </td>
                 <td scope="row" class="p-3 text-right w-0 min-w-fit whitespace-nowrap">
                   <button
                     @click="openEditModal(element)"
                     as="button"
                     type="button"
-                    class="text-indigo-500 hover:text-indigo-800 font-medium"
+                    class="text-indigo-500 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium"
                   >
                     Edit
                   </button>
@@ -113,7 +120,7 @@
                     @click="openDeleteModal(element.id)"
                     as="button"
                     type="button"
-                    class="text-indigo-500 hover:text-indigo-800 font-medium ml-4"
+                    class="text-indigo-500 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-500 font-medium ml-4"
                   >
                     Delete
                   </button>
@@ -126,9 +133,13 @@
     </div>
 
     <div v-else-if="search" class="text-center">
-      <FunnelIcon class="mx-auto h-16 w-16 text-grey-400" />
-      <h3 class="mt-2 text-lg font-medium text-grey-900">No Rules found for that search</h3>
-      <p class="mt-1 text-md text-grey-500">Try entering a different search term.</p>
+      <FunnelIcon class="mx-auto h-16 w-16 text-grey-400 dark:text-grey-200" />
+      <h3 class="mt-2 text-lg font-medium text-grey-900 dark:text-white">
+        No Rules found for that search
+      </h3>
+      <p class="mt-1 text-md text-grey-500 dark:text-grey-200">
+        Try entering a different search term.
+      </p>
       <div class="mt-6">
         <Link
           :href="route('rules.index')"
@@ -141,9 +152,11 @@
     </div>
 
     <div v-else class="text-center">
-      <FunnelIcon class="mx-auto h-16 w-16 text-grey-400" />
-      <h3 class="mt-2 text-lg font-medium text-grey-900">No Rules</h3>
-      <p class="mt-1 text-md text-grey-500">Get started by creating a new rule.</p>
+      <FunnelIcon class="mx-auto h-16 w-16 text-grey-400 dark:text-grey-200" />
+      <h3 class="mt-2 text-lg font-medium text-grey-900 dark:text-white">No Rules</h3>
+      <p class="mt-1 text-md text-grey-500 dark:text-grey-200">
+        Get started by creating a new rule.
+      </p>
       <div class="mt-6">
         <button
           @click="openCreateModal"
@@ -163,12 +176,15 @@
     >
       <template v-slot:title> Create new rule </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Rules work on all emails, including replies and also send froms. New conditions and
           actions will be added over time.
         </p>
 
-        <label for="rule_name" class="block font-medium leading-6 text-grey-600 text-sm my-2">
+        <label
+          for="rule_name"
+          class="block font-medium leading-6 text-grey-600 text-sm my-2 dark:text-white"
+        >
           Name
         </label>
         <p v-show="errors.ruleName" class="mb-3 text-red-500 text-sm">
@@ -178,14 +194,14 @@
           v-model="createRuleObject.name"
           id="rule_name"
           type="text"
-          class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+          class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:text-white dark:bg-white/5"
           :class="errors.ruleName ? 'ring-red-500' : ''"
           placeholder="Enter name"
           autofocus
         />
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Conditions</legend>
+          <legend class="px-2 leading-none text-sm dark:text-white">Conditions</legend>
 
           <!-- Loop for conditions -->
           <div v-for="(condition, key) in createRuleObject.conditions" :key="key">
@@ -195,33 +211,34 @@
                 <select
                   v-model="createRuleObject.operator"
                   :id="`create_rule_operator_${key}`"
-                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                  class="block appearance-none w-full text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                   required
                 >
-                  <option value="AND">AND</option>
-                  <option value="OR">OR</option>
+                  <option value="AND" class="dark:bg-grey-900">AND</option>
+                  <option value="OR" class="dark:bg-grey-900">OR</option>
                 </select>
               </div>
             </div>
 
-            <div class="p-2 w-full bg-grey-100">
+            <div class="p-2 w-full bg-grey-100 dark:bg-grey-800">
               <div class="flex">
                 <div
                   class="w-full flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0"
                 >
-                  <span>If the</span>
+                  <span class="text-nowrap dark:text-grey-200">If the</span>
                   <span class="sm:ml-2">
                     <div class="relative">
                       <select
                         v-model="createRuleObject.conditions[key].type"
                         :id="`create_rule_condition_types_${key}`"
-                        class="block appearance-none w-full sm:w-32 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="block appearance-none w-full sm:w-32 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionTypeOptions"
                           :key="option.value"
                           :value="option.value"
+                          class="dark:bg-grey-900"
                         >
                           {{ option.label }}
                         </option>
@@ -238,13 +255,14 @@
                         v-model="createRuleObject.conditions[key].match"
                         @change="ruleConditionMatchChange(createRuleObject.conditions[key])"
                         :id="`create_rule_condition_matches_${key}`"
-                        class="block appearance-none w-full sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="block appearance-none w-full sm:w-40 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionMatchOptions(createRuleObject, key)"
                           :key="option"
                           :value="option"
+                          class="dark:bg-grey-900"
                         >
                           {{ option }}
                         </option>
@@ -256,14 +274,14 @@
                         v-model="createRuleObject.conditions[key].currentConditionValue"
                         @keyup.enter="addValueToCondition(createRuleObect, key)"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2"
+                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleConditions ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
                       />
                       <button
                         @click="addValueToCondition(createRuleObject, key)"
-                        class="p-2 bg-grey-200 rounded-r text-grey-600"
+                        class="p-2 bg-grey-200 rounded-r text-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700"
                       >
                         Insert
                       </button>
@@ -306,7 +324,7 @@
           <!-- add condition button -->
           <button
             @click="addCondition(createRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add condition
           </button>
@@ -317,34 +335,35 @@
         </fieldset>
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Actions</legend>
+          <legend class="px-2 leading-none text-sm dark:text-white">Actions</legend>
 
           <!-- Loop for actions -->
           <div v-for="(action, key) in createRuleObject.actions" :key="key">
             <!-- AND/OR operator -->
             <div v-if="key !== 0" class="flex justify-center my-2">
-              <div class="relative">AND</div>
+              <div class="relative dark:text-grey-200">AND</div>
             </div>
 
-            <div class="p-2 w-full bg-grey-100">
+            <div class="p-2 w-full bg-grey-100 dark:bg-grey-800">
               <div class="flex">
                 <div
                   class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:items-center w-full"
                 >
-                  <span>Then</span>
+                  <span class="dark:text-grey-200">Then</span>
                   <span class="sm:ml-2">
                     <div class="relative">
                       <select
                         v-model="createRuleObject.actions[key].type"
                         @change="ruleActionChange(createRuleObject.actions[key])"
                         :id="`rule_action_types_${key}`"
-                        class="w-full block appearance-none text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="w-full block appearance-none text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in actionTypeOptions"
                           :key="option.value"
                           :value="option.value"
+                          class="dark:bg-grey-900"
                         >
                           {{ option.label }}
                         </option>
@@ -363,7 +382,7 @@
                       <input
                         v-model="createRuleObject.actions[key].value"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2"
+                        class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleActions ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
@@ -396,12 +415,12 @@
                       <select
                         v-model="createRuleObject.actions[key].value"
                         :id="`create_rule_action_banner_${key}`"
-                        class="w-full block appearance-none sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="w-full block appearance-none sm:w-40 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="off">Off</option>
+                        <option value="top" class="dark:bg-grey-900">Top</option>
+                        <option value="bottom" class="dark:bg-grey-900">Bottom</option>
+                        <option value="off" class="dark:bg-grey-900">Off</option>
                       </select>
                     </div>
                   </span>
@@ -421,7 +440,7 @@
           <!-- add action button -->
           <button
             @click="addAction(createRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add action
           </button>
@@ -432,7 +451,7 @@
         </fieldset>
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Apply rule on</legend>
+          <legend class="px-2 leading-none text-sm dark:text-white">Apply rule on</legend>
           <div class="w-full flex">
             <div class="relative flex items-center">
               <input
@@ -440,9 +459,11 @@
                 id="forwards"
                 name="forwards"
                 type="checkbox"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-grey-300 rounded"
+                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 dark:text-indigo-400 dark:bg-grey-950 border-grey-300 rounded"
               />
-              <label for="forwards" class="ml-2 text-sm text-grey-700">Forwards</label>
+              <label for="forwards" class="ml-2 text-sm text-grey-700 dark:text-grey-200"
+                >Forwards</label
+              >
             </div>
             <div class="relative flex items-center mx-4">
               <input
@@ -450,9 +471,11 @@
                 id="replies"
                 name="replies"
                 type="checkbox"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-grey-300 rounded"
+                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 dark:text-indigo-400 dark:bg-grey-950 border-grey-300 rounded"
               />
-              <label for="replies" class="ml-2 text-sm text-grey-700">Replies</label>
+              <label for="replies" class="ml-2 text-sm text-grey-700 dark:text-grey-200"
+                >Replies</label
+              >
             </div>
             <div class="relative flex items-center">
               <input
@@ -460,9 +483,9 @@
                 id="sends"
                 name="sends"
                 type="checkbox"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-grey-300 rounded"
+                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 dark:text-indigo-400 dark:bg-grey-950 border-grey-300 rounded"
               />
-              <label for="sends" class="ml-2 text-sm text-grey-700">Sends</label>
+              <label for="sends" class="ml-2 text-sm text-grey-700 dark:text-grey-200">Sends</label>
             </div>
           </div>
         </fieldset>
@@ -478,7 +501,7 @@
           </button>
           <button
             @click="createRuleModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -489,12 +512,15 @@
     <Modal :open="editRuleModalOpen" @close="closeEditModal" max-width="md:max-w-3xl">
       <template v-slot:title> Edit rule </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Rules work on all emails, including replies and also send froms. New conditions and
           actions will be added over time.
         </p>
 
-        <label for="edit_rule_name" class="block font-medium leading-6 text-grey-600 text-sm my-2">
+        <label
+          for="edit_rule_name"
+          class="block font-medium leading-6 text-grey-600 text-sm my-2 dark:text-white"
+        >
           Name
         </label>
         <p v-show="errors.ruleName" class="mb-3 text-red-500 text-sm">
@@ -504,14 +530,14 @@
           v-model="editRuleObject.name"
           id="edit_rule_name"
           type="text"
-          class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+          class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:text-white dark:bg-white/5"
           :class="errors.ruleName ? 'ring-red-500' : ''"
           placeholder="Enter name"
           autofocus
         />
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Conditions</legend>
+          <legend class="px-2 leading-none text-sm dark:text-white">Conditions</legend>
 
           <!-- Loop for conditions -->
           <div v-for="(condition, key) in editRuleObject.conditions" :key="key">
@@ -521,33 +547,34 @@
                 <select
                   v-model="editRuleObject.operator"
                   :id="`edit_rule_operator_${key}`"
-                  class="block appearance-none w-full text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                  class="block appearance-none w-full text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                   required
                 >
-                  <option value="AND">AND</option>
-                  <option value="OR">OR</option>
+                  <option value="AND" class="dark:bg-grey-900">AND</option>
+                  <option value="OR" class="dark:bg-grey-900">OR</option>
                 </select>
               </div>
             </div>
 
-            <div class="p-2 w-full bg-grey-100">
+            <div class="p-2 w-full bg-grey-100 dark:bg-grey-800">
               <div class="flex">
                 <div
                   class="w-full flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0"
                 >
-                  <span>If the</span>
+                  <span class="dark:text-grey-200">If the</span>
                   <span class="sm:ml-2">
                     <div class="relative">
                       <select
                         v-model="editRuleObject.conditions[key].type"
                         :id="`edit_rule_condition_types_${key}`"
-                        class="block appearance-none w-full sm:w-32 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="block appearance-none w-full sm:w-32 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionTypeOptions"
                           :key="option.value"
                           :value="option.value"
+                          class="dark:bg-grey-900"
                         >
                           {{ option.label }}
                         </option>
@@ -564,13 +591,14 @@
                         v-model="editRuleObject.conditions[key].match"
                         @change="ruleConditionMatchChange(editRuleObject.conditions[key])"
                         :id="`edit_rule_condition_matches_${key}`"
-                        class="block appearance-none w-full sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="block appearance-none w-full sm:w-40 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in conditionMatchOptions(editRuleObject, key)"
                           :key="option"
                           :value="option"
+                          class="dark:bg-grey-900"
                         >
                           {{ option }}
                         </option>
@@ -582,14 +610,14 @@
                         v-model="editRuleObject.conditions[key].currentConditionValue"
                         @keyup.enter="addValueToCondition(editRuleObect, key)"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2"
+                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-none p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleConditions ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
                       />
                       <button
                         @click="addValueToCondition(editRuleObject, key)"
-                        class="p-2 bg-grey-200 rounded-r text-grey-600"
+                        class="p-2 bg-grey-200 rounded-r text-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700"
                       >
                         Insert
                       </button>
@@ -629,7 +657,7 @@
           <!-- add condition button -->
           <button
             @click="addCondition(editRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add condition
           </button>
@@ -640,34 +668,35 @@
         </fieldset>
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Actions</legend>
+          <legend class="px-2 leading-none text-sm dark:text-white">Actions</legend>
 
           <!-- Loop for actions -->
           <div v-for="(action, key) in editRuleObject.actions" :key="key">
             <!-- AND/OR operator -->
             <div v-if="key !== 0" class="flex justify-center my-2">
-              <div class="relative">AND</div>
+              <div class="relative dark:text-grey-200">AND</div>
             </div>
 
-            <div class="p-2 w-full bg-grey-100">
+            <div class="p-2 w-full bg-grey-100 dark:bg-grey-800">
               <div class="flex">
                 <div
                   class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:items-center w-full"
                 >
-                  <span>Then</span>
+                  <span class="dark:text-grey-200">Then</span>
                   <span class="sm:ml-2">
                     <div class="relative">
                       <select
                         v-model="editRuleObject.actions[key].type"
                         @change="ruleActionChange(editRuleObject.actions[key])"
                         :id="`rule_action_types_${key}`"
-                        class="w-full block appearance-none text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="w-full block appearance-none text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
                           v-for="option in actionTypeOptions"
                           :key="option.value"
                           :value="option.value"
+                          class="dark:bg-grey-900"
                         >
                           {{ option.label }}
                         </option>
@@ -686,7 +715,7 @@
                       <input
                         v-model="editRuleObject.actions[key].value"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2"
+                        class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleActions ? 'border-red-500' : ''"
                         placeholder="Enter value"
                         autofocus
@@ -719,12 +748,12 @@
                       <select
                         v-model="editRuleObject.actions[key].value"
                         :id="`edit_rule_action_banner_${key}`"
-                        class="w-full block appearance-none sm:w-40 text-grey-700 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="w-full block appearance-none sm:w-40 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="off">Off</option>
+                        <option value="top" class="dark:bg-grey-900">Top</option>
+                        <option value="bottom" class="dark:bg-grey-900">Bottom</option>
+                        <option value="off" class="dark:bg-grey-900">Off</option>
                       </select>
                     </div>
                   </span>
@@ -744,7 +773,7 @@
           <!-- add action button -->
           <button
             @click="addAction(editRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add action
           </button>
@@ -755,7 +784,7 @@
         </fieldset>
 
         <fieldset class="border border-cyan-400 p-4 my-4 rounded-sm">
-          <legend class="px-2 leading-none text-sm">Apply rule on</legend>
+          <legend class="px-2 leading-none text-sm dark:text-white">Apply rule on</legend>
           <div class="w-full flex">
             <div class="relative flex items-center">
               <input
@@ -763,9 +792,11 @@
                 id="forwards"
                 name="forwards"
                 type="checkbox"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-grey-300 rounded"
+                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 dark:text-indigo-400 dark:bg-grey-950 border-grey-300 rounded"
               />
-              <label for="forwards" class="ml-2 text-sm text-grey-700">Forwards</label>
+              <label for="forwards" class="ml-2 text-sm text-grey-700 dark:text-grey-200"
+                >Forwards</label
+              >
             </div>
             <div class="relative flex items-center mx-4">
               <input
@@ -773,9 +804,11 @@
                 id="replies"
                 name="replies"
                 type="checkbox"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-grey-300 rounded"
+                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 dark:text-indigo-400 dark:bg-grey-950 border-grey-300 rounded"
               />
-              <label for="replies" class="ml-2 text-sm text-grey-700">Replies</label>
+              <label for="replies" class="ml-2 text-sm text-grey-700 dark:text-grey-200"
+                >Replies</label
+              >
             </div>
             <div class="relative flex items-center">
               <input
@@ -783,9 +816,9 @@
                 id="sends"
                 name="sends"
                 type="checkbox"
-                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-grey-300 rounded"
+                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 dark:text-indigo-400 dark:bg-grey-950 border-grey-300 rounded"
               />
-              <label for="sends" class="ml-2 text-sm text-grey-700">Sends</label>
+              <label for="sends" class="ml-2 text-sm text-grey-700 dark:text-grey-200">Sends</label>
             </div>
           </div>
         </fieldset>
@@ -801,7 +834,7 @@
           </button>
           <button
             @click="closeEditModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -812,7 +845,9 @@
     <Modal :open="deleteRuleModalOpen" @close="closeDeleteModal">
       <template v-slot:title> Delete rule </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">Are you sure you want to delete this rule?</p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          Are you sure you want to delete this rule?
+        </p>
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
@@ -825,7 +860,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -836,17 +871,17 @@
     <Modal :open="moreInfoOpen" @close="moreInfoOpen = false">
       <template v-slot:title> More information </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Rules can be used to perform different actions if certain conditions are met.
         </p>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           For example you could create a rule that checks if the alias is for your custom domain and
           if so then to replace the email subject.
         </p>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           You can choose to apply rules on forwards, replies and/or sends.
         </p>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Rules are applied in the order displayed on this page from top to bottom. You can re-order
           your rules by dragging them using the icon on the left of each row.
         </p>
@@ -854,7 +889,7 @@
         <div class="mt-6 flex flex-col">
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>
@@ -1282,8 +1317,8 @@ const addValueToCondition = (object, key) => {
     return (errors.value.ruleConditions = `You must enter a value to insert`)
   }
 
-  if (object.conditions[key].values.length >= 10) {
-    return (errors.value.ruleConditions = `You cannot add more than 10 values per condition`)
+  if (object.conditions[key].values.length >= 50) {
+    return (errors.value.ruleConditions = `You cannot add more than 50 values per condition`)
   }
 
   if (['matches regex', 'does not match regex'].includes(object.conditions[key].match)) {

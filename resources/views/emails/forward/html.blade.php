@@ -1,7 +1,7 @@
 @if($locationHtml === 'off' && ! $isSpam)
     {!! $html !!}
 @else
-    <table style="width:100%;">
+    <table style="width:100% !important;">
         <tbody>
             @if($isSpam)
                 @include('emails.forward.html_spam_warning')
@@ -10,7 +10,7 @@
                 @include('emails.forward.html_banner')
             @endif
             <tr>
-                <td style="padding:10px 0;width:100%;">
+                <td style="padding:10px 0 !important;width:100% !important;">
                     {!! $html !!}
                 </td>
             </tr>

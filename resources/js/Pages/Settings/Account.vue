@@ -3,8 +3,8 @@
     <div class="divide-y divide-grey-200">
       <div class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900">Danger Zone</h3>
-          <p class="text-base text-grey-700">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">Danger Zone</h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
             Once you delete your account, there is no going back.
             <b>This username will not be able to be used again</b>. Please make sure you are
             certain. Before deleting your account, please export any alias data or information that
@@ -14,7 +14,7 @@
               href="https://addy.io/faq/#what-happens-when-i-delete-my-account"
               rel="nofollow noopener noreferrer"
               target="_blank"
-              class="text-indigo-700 cursor-pointer"
+              class="text-indigo-700 cursor-pointer dark:text-indigo-400"
               >FAQ item</a
             >.
           </p>
@@ -25,7 +25,7 @@
               <div>
                 <label
                   for="current-password-delete"
-                  class="block text-sm font-medium leading-6 text-grey-600"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                   >Enter your password to confirm</label
                 >
                 <div class="relative mt-2">
@@ -34,7 +34,7 @@
                     type="password"
                     name="password"
                     id="current-password-delete"
-                    class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 dark:bg-white/5 dark:text-white"
                     :class="
                       deleteAccountForm.errors.password
                         ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500'
@@ -79,7 +79,7 @@
     <Modal :open="deleteAccountModalOpen" @close="deleteAccountModalOpen = false">
       <template v-slot:title> Delete Account </template>
       <template v-slot:content>
-        <p class="mt-4 text-grey-700">
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
           Are you sure you want to <b>permanently</b> delete your account and any aliases you've
           created?
         </p>
@@ -95,7 +95,7 @@
           </button>
           <button
             @click="deleteAccountModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>

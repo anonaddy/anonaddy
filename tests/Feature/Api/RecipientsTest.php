@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Domain;
 use App\Models\Recipient;
+use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\Test;

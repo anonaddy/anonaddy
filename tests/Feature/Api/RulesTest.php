@@ -6,6 +6,7 @@ use App\Mail\ForwardEmail;
 use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\Rule;
+use App\Services\UserRuleChecker;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
@@ -267,7 +268,12 @@ class RulesTest extends TestCase
 
         $emailData = new EmailData($parser, $sender, $size);
 
-        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
+        // Check user rules and get rule IDs that have satisfied conditions
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+
+        $ruleIds = array_keys($ruleIdsAndActions);
+
+        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient, false, $ruleIds);
 
         $email = $job->build();
 
@@ -336,7 +342,11 @@ class RulesTest extends TestCase
 
         $emailData = new EmailData($parser, $sender, $size);
 
-        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
+        // Check user rules and get rule IDs that have satisfied conditions
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+        $ruleIds = array_keys($ruleIdsAndActions);
+
+        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient, false, $ruleIds);
 
         $email = $job->build();
 
@@ -429,7 +439,11 @@ class RulesTest extends TestCase
 
         $emailData = new EmailData($parser, $sender, $size);
 
-        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient);
+        // Check user rules and get rule IDs that have satisfied conditions
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+        $ruleIds = array_keys($ruleIdsAndActions);
+
+        $job = new ForwardEmail($alias, $emailData, $this->user->defaultRecipient, false, $ruleIds);
 
         $email = $job->build();
 

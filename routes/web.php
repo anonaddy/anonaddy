@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\WebauthnController;
 use App\Http\Controllers\Auth\WebauthnEnabledKeyController;
 use App\Http\Controllers\BannerLocationController;
 use App\Http\Controllers\BrowserSessionController;
+use App\Http\Controllers\DarkModeController;
 use App\Http\Controllers\DeactivateAliasController;
 use App\Http\Controllers\DefaultAliasDomainController;
 use App\Http\Controllers\DefaultAliasFormatController;
@@ -81,7 +82,7 @@ Route::group([
 ], function () {
     Route::controller(WebauthnController::class)->group(function () {
         Route::get('keys', 'index')->name('webauthn.index');
-        // Route::get('keys/create', 'create')->name('webauthn.create'); // No need to override
+        Route::get('keys/create', 'create')->name('webauthn.create');
         Route::post('keys', 'store')->name('webauthn.store');
         Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
         Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');
@@ -93,7 +94,7 @@ Route::group([
     });
 });
 
-Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
+Route::middleware(['auth', 'verified', '2fa'])->group(function () {
     Route::get('/', [ShowDashboardController::class, 'index'])->name('dashboard.index');
 
     Route::controller(ShowAliasController::class)->group(function () {
@@ -128,7 +129,7 @@ Route::middleware(['auth', 'verified', '2fa', 'webauthn'])->group(function () {
 });
 
 Route::group([
-    'middleware' => ['auth', '2fa', 'webauthn'],
+    'middleware' => ['auth', '2fa'],
     'prefix' => 'settings',
 ], function () {
     Route::controller(SettingController::class)->group(function () {
@@ -162,6 +163,8 @@ Route::group([
     Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
 
     Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
+
+    Route::post('/dark-mode', [DarkModeController::class, 'update'])->name('settings.dark_mode');
 
     Route::post('/save-alias-last-used', [SaveAliasLastUsedController::class, 'update'])->name('settings.save_alias_last_used');
 

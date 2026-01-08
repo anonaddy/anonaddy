@@ -5,17 +5,19 @@
 
     <div class="sm:flex sm:items-center mb-6">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold text-grey-900">Edit Recipient</h1>
-        <p class="mt-2 text-sm text-grey-700">Make changes to your recipient email address</p>
+        <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Edit Recipient</h1>
+        <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
+          Make changes to your recipient email address
+        </p>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4">
+    <div class="bg-white rounded-lg shadow p-4 dark:bg-grey-900">
       <div class="space-y-8 divide-y divide-grey-200">
         <div>
           <div class="flex items-center">
             <h3
-              class="text-xl font-medium leading-6 text-grey-900 cursor-pointer tooltip"
+              class="text-xl font-medium leading-6 text-grey-900 cursor-pointer tooltip dark:text-grey-100"
               data-tippy-content="Click to copy"
               @click="clipboard(recipient.email)"
             >
@@ -40,10 +42,10 @@
         <div class="pt-8">
           <label
             for="can_reply_send"
-            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
             >Can Reply/Send from Aliases</label
           >
-          <p class="mt-1 text-base text-grey-700">
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             Toggle this option to determine whether this recipient is allowed to reply and send from
             your aliases. When set to off this recipient will not be able to reply or send from your
             aliases and you will be notified when an attempt is made.
@@ -60,10 +62,10 @@
         <div class="pt-8">
           <label
             for="hide_email_subject"
-            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
             >Hide Email Subject</label
           >
-          <p class="mt-1 text-base text-grey-700">
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             <span v-if="!recipient.fingerprint"
               >You <b>must add a PGP key before you can use this setting</b>.</span
             >
@@ -96,10 +98,10 @@
         <div class="pt-8">
           <label
             for="use_inline_encryption"
-            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
             >Use PGP/Inline Encryption</label
           >
-          <p class="mt-1 text-base text-grey-700">
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
             <span v-if="!recipient.fingerprint"
               >You <b>must add a PGP key before you can use this setting</b>.</span
             >

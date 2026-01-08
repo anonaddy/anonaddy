@@ -8,7 +8,7 @@ use App\Models\Alias;
 use App\Models\EmailData;
 use App\Models\Recipient;
 use App\Notifications\FailedDeliveryNotification;
-use App\Traits\CheckUserRules;
+use App\Traits\ApplyUserRules;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,7 +21,7 @@ use Throwable;
 
 class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 {
-    use CheckUserRules;
+    use ApplyUserRules;
     use Queueable;
     use SerializesModels;
 
@@ -65,6 +65,8 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $isSpam;
 
+    protected $failedDmarc;
+
     protected $resend;
 
     protected $resendFromEmail;
@@ -105,12 +107,14 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $verpDomain;
 
+    protected $ruleIds;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient, $isSpam = false, $resend = false)
+    public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient, $resend = false, $ruleIds = null)
     {
         $this->user = $alias->user;
         $this->alias = $alias;
@@ -209,7 +213,9 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->fingerprint = $recipient->should_encrypt && ! $this->isAlreadyEncrypted() ? $recipient->fingerprint : null;
 
         $this->bannerLocationText = $this->bannerLocationHtml = $this->isAlreadyEncrypted() || $resend ? 'off' : $this->alias->user->banner_location;
-        $this->isSpam = $isSpam;
+        $this->ruleIds = $ruleIds;
+        $this->isSpam = $emailData->isSpam;
+        $this->failedDmarc = $emailData->failedDmarc;
     }
 
     /**
@@ -402,12 +408,15 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
         $this->replacedSubject = $this->user->email_subject ? ' with subject "'.base64_decode($this->emailSubject).'"' : null;
 
-        $this->checkRules('Forwards');
+        if ($this->ruleIds) {
+            $this->applyRulesByIds($this->ruleIds);
+        }
 
         $this->email->with([
             'locationText' => $this->bannerLocationText,
             'locationHtml' => $this->bannerLocationHtml,
             'isSpam' => $this->isSpam,
+            'failedDmarc' => $this->failedDmarc,
             'deactivateUrl' => $this->deactivateUrl,
             'aliasEmail' => $this->alias->email,
             'aliasDomain' => $this->alias->domain,

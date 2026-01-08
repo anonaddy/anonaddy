@@ -38,8 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            '2fa' => \App\Http\Middleware\VerifyTwoFactorAuth::class,
-            'webauthn' => \App\Http\Middleware\VerifyWebauthn::class,
+            '2fa' => \App\Http\Middleware\VerifyTwoFactorAuthMethods::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
