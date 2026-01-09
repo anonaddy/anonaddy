@@ -30,6 +30,7 @@ class Username extends Model
         'active',
         'catch_all',
         'can_login',
+        'external_id',
     ];
 
     protected $casts = [
@@ -38,6 +39,7 @@ class Username extends Model
         'active' => 'boolean',
         'catch_all' => 'boolean',
         'can_login' => 'boolean',
+        'external_id' => 'string',
         'default_recipient_id' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

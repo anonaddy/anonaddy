@@ -58,6 +58,42 @@ class ApiTokensTest extends TestCase
     }
 
     #[Test]
+    public function user_cannot_create_api_token_without_password_when_user_is_internal()
+    {
+        $response = $this->post('/settings/personal-access-tokens', [
+            'name' => 'New'
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertSessionHasErrors('password');
+
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'name' => 'New',
+            'tokenable_id' => $this->user->id,
+        ]);
+    }
+
+    #[Test]
+    public function user_can_create_api_token_without_password_when_user_is_extenal()
+    {
+        $this->user->defaultUsername->external_id = 'test';
+        $this->user->defaultUsername->save();
+
+        $response = $this->post('/settings/personal-access-tokens', [
+            'name' => 'New'
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertNotNull($response->getData()->accessToken);
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'name' => 'New',
+            'tokenable_id' => $this->user->id,
+        ]);
+    }
+
+    #[Test]
     public function user_can_revoke_api_token()
     {
         $token = $this->user->createToken('New');

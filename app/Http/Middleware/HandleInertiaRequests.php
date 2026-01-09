@@ -59,6 +59,7 @@ class HandleInertiaRequests extends Middleware
             },
             'version' => GitVersionHelper::version(),
             'updateAvailable' => GitVersionHelper::updateAvailable(),
+            'usesExternalAuthentication' => usesExternalAuthentication(),
         ]);
     }
 }

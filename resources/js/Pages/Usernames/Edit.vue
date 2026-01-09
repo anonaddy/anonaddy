@@ -101,7 +101,7 @@
             <loader v-if="username.fromNameLoading" />
           </button>
         </div>
-        <div class="pt-8">
+        <div class="pt-8" v-if="!$page.props.usesExternalAuthentication">
           <label
             for="can_login"
             class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"

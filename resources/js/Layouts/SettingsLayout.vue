@@ -72,32 +72,49 @@
 </template>
 
 <script setup>
-import { Link, Head, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { Link, Head, router, usePage } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 
-const tabs = [
-  { name: 'General', href: route('settings.show'), current: route().current() === 'settings.show' },
+const page = usePage();
+
+const allTabs = [
+  { 
+    name: 'General',
+     href: route('settings.show'),
+     current: route().current() === 'settings.show',
+     enabled: true
+  },
   {
     name: 'Security',
     href: route('settings.security'),
     current: route().current() === 'settings.security',
+    enabled: !page.props.usesExternalAuthentication
   },
-  { name: 'API Keys', href: route('settings.api'), current: route().current() === 'settings.api' },
+  { 
+    name: 'API Keys',
+    href: route('settings.api'),
+    current: route().current() === 'settings.api',
+    enabled: true
+  },
   {
     name: 'Account Data',
     href: route('settings.data'),
     current: route().current() === 'settings.data',
+    enabled: true
   },
   {
     name: 'Delete Account',
     href: route('settings.account'),
     current: route().current() === 'settings.account',
+    enabled: !page.props.usesExternalAuthentication
   },
 ]
 
-const selectedTabName = ref(_.find(tabs, ['current', true]).name)
+const tabs = computed(() => allTabs.filter(tab => tab.enabled));
+
+const selectedTabName = ref(_.find(allTabs, ['current', true]).name)
 
 const visitTab = () => {
-  router.visit(_.find(tabs, ['name', selectedTabName.value]).href)
+  router.visit(_.find(allTabs, ['name', selectedTabName.value]).href)
 }
 </script>

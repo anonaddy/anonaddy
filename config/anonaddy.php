@@ -228,6 +228,47 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Use Proxy authentication
+    |--------------------------------------------------------------------------
+    |
+    | If enabled, a proxy can add a X-UserId, X-Name and X-Email (header name specified down below) to the request and auto login or register
+    | Make sure to only set this when behind a trusted proxy to prevent malicious 
+    |
+    */
+    'use_proxy_authentication' => env('ANONADDY_USE_PROXY_AUTHENTICATION', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Proxy authentication X-User header
+    |--------------------------------------------------------------------------
+    |
+    | Header name for the username that the Proxy authentication uses to authenticate
+    |
+    */
+    'proxy_authentication_external_user_id_header' => env('ANONADDY_PROXY_AUTHENTICATION_USER_ID_HEADER', 'X-User'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Proxy authentication X-Name header
+    |--------------------------------------------------------------------------
+    |
+    | Header name for the username that the Proxy authentication uses to authenticate
+    |
+    */
+    'proxy_authentication_username_header' => env('ANONADDY_PROXY_AUTHENTICATION_NAME_HEADER', 'X-Name'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Proxy authentication X-Email header
+    |--------------------------------------------------------------------------
+    |
+    | Header name for the email that the Proxy authentication uses
+    |
+    */
+    'proxy_authentication_email_header' => env('ANONADDY_PROXY_AUTHENTICATION_EMAIL_HEADER', 'X-Email'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Username Blacklist
     |--------------------------------------------------------------------------
     |

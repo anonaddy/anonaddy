@@ -3,19 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Recipient;
 use App\Models\User;
-use App\Models\Username;
 use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
 use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use Ramsey\Uuid\Uuid;
+
 
 class RegisterController extends Controller
 {
@@ -106,26 +103,6 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $userId = Uuid::uuid4();
-
-        $recipient = Recipient::create([
-            'email' => $data['email'],
-            'user_id' => $userId,
-        ]);
-
-        $username = Username::create([
-            'username' => $data['username'],
-            'user_id' => $userId,
-        ]);
-
-        $twoFactor = app('pragmarx.google2fa');
-
-        return User::create([
-            'id' => $userId,
-            'default_username_id' => $username->id,
-            'default_recipient_id' => $recipient->id,
-            'password' => Hash::make($data['password']),
-            'two_factor_secret' => $twoFactor->generateSecretKey(),
-        ]);
+        return createUser($data['username'], $data['email'], $data['password']);
     }
 }

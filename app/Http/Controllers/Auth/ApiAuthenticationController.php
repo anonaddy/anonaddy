@@ -158,6 +158,10 @@ class ApiAuthenticationController extends Controller
 
     public function destroy(DestroyAccountRequest $request)
     {
+        if (usesExternalAuthentication()) {
+            return response('You cannot remove account because you\'re using external authentication', 403);
+        }
+
         DeleteAccount::dispatch($request->user());
 
         return response()->json([], 204);

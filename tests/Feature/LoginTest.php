@@ -110,6 +110,55 @@ class LoginTest extends TestCase
     }
 
     #[Test]
+    public function user_should_provide_2fa_when_2fa_is_enabled_and_user_is_internal()
+    {
+        $this->user->update([
+            'two_factor_enabled' => true,
+            'two_factor_secret' => 'secret',
+            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
+        ]);
+
+        $response = $this->post('/login', [
+            'username' => 'johndoe',
+            'password' => 'mypassword',
+        ]);
+
+        $response
+            ->assertRedirect('/')
+            ->assertSessionHasNoErrors();
+
+        $secondFactor = $this->get('/recipients');
+
+        $secondFactor->assertSee('2nd Factor Authentication');
+    }
+
+    #[Test]
+    public function user_can_login_successfully_without_providing_2fa_when_external()
+    {
+        $this->user->update([
+            'two_factor_enabled' => true,
+            'two_factor_secret' => 'secret',
+            'two_factor_backup_code' => bcrypt($code = Str::random(40)),
+        ]);
+
+        $this->user->defaultUsername->external_id = 'test';
+        $this->user->defaultUsername->save();
+
+        $response = $this->post('/login', [
+            'username' => 'johndoe',
+            'password' => 'mypassword',
+        ]);
+
+        $response
+            ->assertRedirect('/')
+            ->assertSessionHasNoErrors();
+
+        $secondFactor = $this->get('/recipients');
+
+        $secondFactor->assertSee('Recipients');
+    }
+
+    #[Test]
     public function user_can_receive_username_reminder_email()
     {
         $this->withoutMiddleware();

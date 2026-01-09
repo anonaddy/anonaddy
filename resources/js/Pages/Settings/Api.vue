@@ -162,7 +162,9 @@
                 <option class="dark:bg-grey-900" :value="null">No expiration</option>
               </select>
             </div>
-            <label
+            <div v-if="$page.props.usesExternalAuthentication" class="py-2"></div>
+            <div v-if="!$page.props.usesExternalAuthentication">
+              <label
               for="create-token-name"
               class="block text-sm my-2 font-medium leading-6 text-grey-600 dark:text-white"
               >Confirm Password</label
@@ -176,6 +178,7 @@
               placeholder="********"
               required
             />
+            </div>   
             <button
               @click="store"
               class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -266,6 +269,7 @@ import { ref } from 'vue'
 import SettingsLayout from './../../Layouts/SettingsLayout.vue'
 import { notify } from '@kyvg/vue3-notification'
 import Modal from '../../Components/Modal.vue'
+import { usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
   initialTokens: {
@@ -301,7 +305,7 @@ const store = () => {
     return (form.value.errors.expiration = ['Invalid expiration given.'])
   }
 
-  if (!form.value.password.length) {
+  if (!form.value.password.length && !usePage().props.usesExternalAuthentication) {
     return (form.value.errors.password = ['The password field is required.'])
   }
 

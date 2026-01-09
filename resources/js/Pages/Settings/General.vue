@@ -1,7 +1,7 @@
 <template>
   <SettingsLayout>
     <div class="divide-y divide-grey-200">
-      <div class="py-10">
+      <div class="py-10" v-if="!$page.props.usesExternalAuthentication">
         <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">Update Email</h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
