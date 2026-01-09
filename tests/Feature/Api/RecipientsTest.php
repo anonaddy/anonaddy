@@ -270,8 +270,8 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/recipient-keys/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertNull($this->user->recipients[0]->fingerprint);
-        $this->assertFalse($this->user->recipients[0]->should_encrypt);
+        $this->assertNull($this->user->recipients()->find($recipient->id)->fingerprint);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->should_encrypt);
     }
 
     #[Test]
@@ -303,7 +303,7 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/encrypted-recipients/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->recipients[0]->should_encrypt);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->should_encrypt);
     }
 
     #[Test]
@@ -333,7 +333,7 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/allowed-recipients/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->recipients[1]->can_reply_send);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->can_reply_send);
     }
 
     #[Test]
@@ -365,7 +365,7 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/inline-encrypted-recipients/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->recipients[0]->inline_encryption);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->inline_encryption);
     }
 
     #[Test]
@@ -397,6 +397,66 @@ class RecipientsTest extends TestCase
         $response = $this->json('DELETE', '/api/v1/protected-headers-recipients/'.$recipient->id);
 
         $response->assertStatus(204);
-        $this->assertFalse($this->user->recipients[0]->protected_headers);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->protected_headers);
+    }
+
+    #[Test]
+    public function user_can_turn_on_remove_pgp_keys()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'remove_pgp_keys' => false,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/remove-pgp-keys-recipients/', [
+            'id' => $recipient->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $response->getData()->data->remove_pgp_keys);
+    }
+
+    #[Test]
+    public function user_can_turn_off_remove_pgp_keys()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'remove_pgp_keys' => true,
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/remove-pgp-keys-recipients/'.$recipient->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->remove_pgp_keys);
+    }
+
+    #[Test]
+    public function user_can_turn_on_remove_pgp_signatures()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'remove_pgp_signatures' => false,
+        ]);
+
+        $response = $this->json('POST', '/api/v1/remove-pgp-signatures-recipients/', [
+            'id' => $recipient->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $response->getData()->data->remove_pgp_signatures);
+    }
+
+    #[Test]
+    public function user_can_turn_off_remove_pgp_signatures()
+    {
+        $recipient = Recipient::factory()->create([
+            'user_id' => $this->user->id,
+            'remove_pgp_signatures' => true,
+        ]);
+
+        $response = $this->json('DELETE', '/api/v1/remove-pgp-signatures-recipients/'.$recipient->id);
+
+        $response->assertStatus(204);
+        $this->assertFalse($this->user->recipients()->find($recipient->id)->remove_pgp_signatures);
     }
 }

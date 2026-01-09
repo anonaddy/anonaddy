@@ -132,6 +132,58 @@
           />
         </div>
 
+        <div class="pt-8">
+          <label
+            for="remove_pgp_keys"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
+            >Remove PGP Keys from Replies/Sends</label
+          >
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
+            When enabled any attached PGP keys for replies/sends from this recipient will be
+            automatically removed. This is to prevent you from accidentally sending the PGP key of
+            your recipient which could inadvertently reveal your real email address. For example
+            Proton mail has an option to always attach your public PGP key to every email that you
+            send, this could expose your real email if sent through your aliases.
+          </p>
+          <p class="mt-4 text-base text-grey-700 dark:text-grey-200">
+            <b>Only disable this option if you are certain</b> that you can not accidentally send
+            the PGP key of your recipient when replying/sending from your aliases.
+          </p>
+          <Toggle
+            id="remove_pgp_keys"
+            class="mt-4"
+            v-model="recipient.remove_pgp_keys"
+            @on="turnOnRemovePgpKeys"
+            @off="turnOffRemovePgpKeys"
+          />
+        </div>
+
+        <div class="pt-8">
+          <label
+            for="remove_pgp_signatures"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
+            >Remove PGP Signatures from Replies/Sends</label
+          >
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
+            When enabled any attached PGP signatures for replies/sends from this recipient will be
+            automatically removed. This is to prevent you from accidentally signing an outbound
+            email with your recipient's PGP key which could inadvertently reveal your real email
+            address.
+          </p>
+          <p class="mt-4 text-base text-grey-700 dark:text-grey-200">
+            <b>Only disable this option if you are certain</b> that you can not accidentally sign
+            outbound emails using the PGP key of your recipient when replying/sending from your
+            aliases.
+          </p>
+          <Toggle
+            id="remove_pgp_signatures"
+            class="mt-4"
+            v-model="recipient.remove_pgp_signatures"
+            @on="turnOnRemovePgpSignatures"
+            @off="turnOffRemovePgpSignatures"
+          />
+        </div>
+
         <div class="pt-5">
           <span
             class="mt-2 text-sm text-grey-500 tooltip"
@@ -260,6 +312,78 @@ const turnOffProtectedHeaders = () => {
     .delete(`/api/v1/protected-headers-recipients/${recipient.value.id}`)
     .then(response => {
       successMessage('Hide email subject disabled')
+    })
+    .catch(error => {
+      errorMessage()
+    })
+}
+
+const turnOnRemovePgpKeys = () => {
+  axios
+    .post(
+      `/api/v1/remove-pgp-keys-recipients`,
+      JSON.stringify({
+        id: recipient.value.id,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+    .then(response => {
+      recipient.value.remove_pgp_keys = true
+      successMessage('Remove PGP keys enabled')
+    })
+    .catch(error => {
+      if (error.response.status === 422) {
+        errorMessage(error.response.data)
+      } else {
+        errorMessage()
+      }
+    })
+}
+
+const turnOffRemovePgpKeys = () => {
+  axios
+    .delete(`/api/v1/remove-pgp-keys-recipients/${recipient.value.id}`)
+    .then(response => {
+      recipient.value.remove_pgp_keys = false
+      successMessage('Remove PGP keys disabled')
+    })
+    .catch(error => {
+      errorMessage()
+    })
+}
+
+const turnOnRemovePgpSignatures = () => {
+  axios
+    .post(
+      `/api/v1/remove-pgp-signatures-recipients`,
+      JSON.stringify({
+        id: recipient.value.id,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+    .then(response => {
+      recipient.value.remove_pgp_signatures = true
+      successMessage('Remove PGP signatures enabled')
+    })
+    .catch(error => {
+      if (error.response.status === 422) {
+        errorMessage(error.response.data)
+      } else {
+        errorMessage()
+      }
+    })
+}
+
+const turnOffRemovePgpSignatures = () => {
+  axios
+    .delete(`/api/v1/remove-pgp-signatures-recipients/${recipient.value.id}`)
+    .then(response => {
+      recipient.value.remove_pgp_signatures = false
+      successMessage('Remove PGP signatures disabled')
     })
     .catch(error => {
       errorMessage()

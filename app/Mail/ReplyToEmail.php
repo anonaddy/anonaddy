@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\CustomMailDriver\Mime\Part\CustomDataPart;
 use App\Models\Alias;
 use App\Models\EmailData;
+use App\Models\Recipient;
 use App\Models\User;
 use App\Notifications\FailedDeliveryNotification;
 use App\Traits\ApplyUserRules;
@@ -28,6 +29,8 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
     protected $user;
 
     protected $alias;
+
+    protected $recipient;
 
     protected $sender;
 
@@ -66,10 +69,11 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
      *
      * @return void
      */
-    public function __construct(User $user, Alias $alias, EmailData $emailData, $ruleIds = null)
+    public function __construct(User $user, Alias $alias, Recipient $recipient, EmailData $emailData, $ruleIds = null)
     {
         $this->user = $user;
         $this->alias = $alias;
+        $this->recipient = $recipient;
         $this->sender = $emailData->sender;
 
         $this->ccs = $emailData->ccs;
@@ -184,13 +188,44 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
                 if ($this->emailAttachments) {
                     foreach ($this->emailAttachments as $attachment) {
-                        $part = new CustomDataPart(base64_decode($attachment['stream']), base64_decode($attachment['file_name']), base64_decode($attachment['mime']));
+                        $mime = base64_decode($attachment['mime']);
+                        $fileName = base64_decode($attachment['file_name']);
+
+                        // Remove attached PGP signatures if recipient has enabled it
+                        if ($this->recipient->remove_pgp_signatures) {
+                            if ($mime === 'application/pgp-signature') {
+                                continue;
+                            }
+
+                            // Check if .asc file is actually a signature by content
+                            if (str_ends_with(strtolower($fileName), '.asc')) {
+                                if (str_starts_with(base64_decode($attachment['stream']), '-----BEGIN PGP SIGNATURE-----')) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        // Remove attached PGP keys if recipient has enabled it
+                        if ($this->recipient->remove_pgp_keys) {
+                            if ($mime === 'application/pgp-keys') {
+                                continue;
+                            }
+
+                            // Check if .asc file is actually a key by content
+                            if (str_ends_with(strtolower($fileName), '.asc')) {
+                                if (str_starts_with(base64_decode($attachment['stream']), '-----BEGIN PGP PUBLIC KEY BLOCK-----')) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        $part = new CustomDataPart(base64_decode($attachment['stream']), $fileName, $mime);
 
                         // Only set content-id if present
                         if ($attachment['contentId']) {
                             $part->setContentId(base64_decode($attachment['contentId']));
                         }
-                        $part->setFileName(base64_decode($attachment['file_name']));
+                        $part->setFileName($fileName);
 
                         $message->addPart($part);
                     }

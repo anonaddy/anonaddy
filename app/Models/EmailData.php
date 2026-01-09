@@ -170,8 +170,7 @@ class EmailData
 
             }
         } else {
-            // If this is a reply or send from an alias then remove any public keys
-            $this->addAttachments($parser, $isReplyOrSend, $isReplyOrSend);
+            $this->addAttachments($parser);
         }
 
         if (preg_match('/^-----BEGIN PGP MESSAGE-----([A-Za-z0-9+=\/\n]+)-----END PGP MESSAGE-----$/', $parser->getMessageBody('text'))) {
@@ -183,19 +182,11 @@ class EmailData
         }
     }
 
-    private function addAttachments(Parser $parser, $removePublicKeys = false, $removeSignature = false)
+    private function addAttachments(Parser $parser)
     {
         foreach ($parser->getAttachments() as $attachment) {
             // Fix incorrect Content Types e.g. 'png', 'pdf', '.pdf', 'text'
             $contentType = $attachment->getContentType();
-
-            if ($removePublicKeys && $contentType === 'application/pgp-keys') {
-                continue;
-            }
-
-            if ($removeSignature && $contentType === 'application/pgp-signature') {
-                continue;
-            }
 
             if ($contentType === 'text') {
                 $this->text = base64_encode(stream_get_contents($attachment->getStream()));
@@ -250,7 +241,7 @@ class EmailData
                 $this->text = base64_encode($decryptedParser->getMessageBody('text'));
                 $this->html = base64_encode($decryptedParser->getMessageBody('html'));
                 // Add attachments
-                $this->addAttachments($decryptedParser, true, true);
+                $this->addAttachments($decryptedParser);
 
                 // Set encrypted parts to NULL
                 $this->encryptedParts = null;

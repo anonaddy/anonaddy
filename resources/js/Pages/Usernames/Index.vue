@@ -81,7 +81,10 @@
             class="ml-3 py-1 px-2 text-sm bg-yellow-200 text-yellow-900 rounded-full"
             >default</span
           >
-          <span v-else-if="!$page.props.usesExternalAuthentication"class="block text-grey-400 text-sm py-1 dark:text-grey-300">
+          <span
+            v-else-if="!$page.props.usesExternalAuthentication"
+            class="block text-grey-400 text-sm py-1 dark:text-grey-300"
+          >
             <button @click="openMakeDefaultModal(props.row)">Make Default</button>
           </span>
         </span>

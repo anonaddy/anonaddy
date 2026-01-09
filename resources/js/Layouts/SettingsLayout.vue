@@ -75,42 +75,42 @@
 import { Link, Head, router, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 
-const page = usePage();
+const page = usePage()
 
 const allTabs = [
-  { 
+  {
     name: 'General',
-     href: route('settings.show'),
-     current: route().current() === 'settings.show',
-     enabled: true
+    href: route('settings.show'),
+    current: route().current() === 'settings.show',
+    enabled: true,
   },
   {
     name: 'Security',
     href: route('settings.security'),
     current: route().current() === 'settings.security',
-    enabled: !page.props.usesExternalAuthentication
+    enabled: !page.props.usesExternalAuthentication,
   },
-  { 
+  {
     name: 'API Keys',
     href: route('settings.api'),
     current: route().current() === 'settings.api',
-    enabled: true
+    enabled: true,
   },
   {
     name: 'Account Data',
     href: route('settings.data'),
     current: route().current() === 'settings.data',
-    enabled: true
+    enabled: true,
   },
   {
     name: 'Delete Account',
     href: route('settings.account'),
     current: route().current() === 'settings.account',
-    enabled: !page.props.usesExternalAuthentication
+    enabled: !page.props.usesExternalAuthentication,
   },
 ]
 
-const tabs = computed(() => allTabs.filter(tab => tab.enabled));
+const tabs = computed(() => allTabs.filter(tab => tab.enabled))
 
 const selectedTabName = ref(_.find(allTabs, ['current', true]).name)
 

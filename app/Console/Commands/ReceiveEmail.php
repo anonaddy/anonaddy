@@ -225,9 +225,9 @@ class ReceiveEmail extends Command
                     }
 
                     if ($this->parser->getHeader('In-Reply-To') && $this->alias) {
-                        $this->handleReply($validEmailDestination);
+                        $this->handleReply($validEmailDestination, $verifiedRecipient);
                     } else {
-                        $this->handleSendFrom($aliasable ?? null, $validEmailDestination);
+                        $this->handleSendFrom($aliasable ?? null, $validEmailDestination, $verifiedRecipient);
                     }
                 } elseif ($verifiedRecipient?->can_reply_send === false) {
                     // Notify user that they have not allowed this recipient to reply and send from aliases
@@ -256,7 +256,7 @@ class ReceiveEmail extends Command
         }
     }
 
-    protected function handleReply($destination)
+    protected function handleReply($destination, $verifiedRecipient)
     {
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'R');
 
@@ -274,12 +274,12 @@ class ReceiveEmail extends Command
             $ruleIds = array_keys($ruleIdsAndActions);
         }
 
-        $message = new ReplyToEmail($this->user, $this->alias, $emailData, $ruleIds);
+        $message = new ReplyToEmail($this->user, $this->alias, $verifiedRecipient, $emailData, $ruleIds);
 
         Mail::to($destination)->queue($message);
     }
 
-    protected function handleSendFrom($aliasable, $destination)
+    protected function handleSendFrom($aliasable, $destination, $verifiedRecipient)
     {
         if (is_null($this->alias)) {
             $this->alias = $this->user->aliases()->create([
@@ -317,7 +317,7 @@ class ReceiveEmail extends Command
             $ruleIds = array_keys($ruleIdsAndActions);
         }
 
-        $message = new SendFromEmail($this->user, $this->alias, $emailData, $ruleIds);
+        $message = new SendFromEmail($this->user, $this->alias, $verifiedRecipient, $emailData, $ruleIds);
 
         Mail::to($destination)->queue($message);
     }

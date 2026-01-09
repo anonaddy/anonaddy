@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\LoginableUsernameController;
 use App\Http\Controllers\Api\ProtectedHeadersRecipientController;
 use App\Http\Controllers\Api\RecipientController;
 use App\Http\Controllers\Api\RecipientKeyController;
+use App\Http\Controllers\Api\RemovePgpKeysRecipientController;
+use App\Http\Controllers\Api\RemovePgpSignaturesRecipientController;
 use App\Http\Controllers\Api\ReorderRuleController;
 use App\Http\Controllers\Api\ResendableFailedDeliveryController;
 use App\Http\Controllers\Api\RuleController;
@@ -115,6 +117,15 @@ Route::group([
     Route::controller(ProtectedHeadersRecipientController::class)->group(function () {
         Route::post('/protected-headers-recipients', 'store');
         Route::delete('/protected-headers-recipients/{id}', 'destroy');
+    });
+    Route::controller(RemovePgpKeysRecipientController::class)->group(function () {
+        Route::post('/remove-pgp-keys-recipients', 'store');
+        Route::delete('/remove-pgp-keys-recipients/{id}', 'destroy');
+    });
+
+    Route::controller(RemovePgpSignaturesRecipientController::class)->group(function () {
+        Route::post('/remove-pgp-signatures-recipients', 'store');
+        Route::delete('/remove-pgp-signatures-recipients/{id}', 'destroy');
     });
 
     Route::controller(AllowedRecipientController::class)->group(function () {

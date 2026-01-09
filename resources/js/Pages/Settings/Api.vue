@@ -165,20 +165,20 @@
             <div v-if="$page.props.usesExternalAuthentication" class="py-2"></div>
             <div v-if="!$page.props.usesExternalAuthentication">
               <label
-              for="create-token-name"
-              class="block text-sm my-2 font-medium leading-6 text-grey-600 dark:text-white"
-              >Confirm Password</label
-            >
-            <input
-              v-model="form.password"
-              type="password"
-              id="create-token-password"
-              class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6 dark:bg-white/5 text-grey-900 dark:text-white"
-              :class="form.errors.password ? 'ring-red-500' : ''"
-              placeholder="********"
-              required
-            />
-            </div>   
+                for="create-token-name"
+                class="block text-sm my-2 font-medium leading-6 text-grey-600 dark:text-white"
+                >Confirm Password</label
+              >
+              <input
+                v-model="form.password"
+                type="password"
+                id="create-token-password"
+                class="block w-full rounded-md border-0 py-2 pr-10 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-base sm:leading-6 mb-6 dark:bg-white/5 text-grey-900 dark:text-white"
+                :class="form.errors.password ? 'ring-red-500' : ''"
+                placeholder="********"
+                required
+              />
+            </div>
             <button
               @click="store"
               class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

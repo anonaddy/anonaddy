@@ -16,6 +16,8 @@ class RecipientResource extends JsonResource
             'should_encrypt' => $this->should_encrypt,
             'inline_encryption' => $this->inline_encryption,
             'protected_headers' => $this->protected_headers,
+            'remove_pgp_keys' => $this->remove_pgp_keys,
+            'remove_pgp_signatures' => $this->remove_pgp_signatures,
             'fingerprint' => $this->fingerprint,
             'email_verified_at' => $this->email_verified_at?->toDateTimeString(),
             'aliases' => [],

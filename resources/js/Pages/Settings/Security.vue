@@ -251,8 +251,8 @@
           </p>
           <p class="text-base text-grey-700 dark:text-grey-200">
             When you login with 2FA enabled, you will be prompted to use a security key or enter a
-            OTP (one time passcode) depending on which method you choose below. You can have
-            both methods of 2nd factor authentication enabled at once if you wish.
+            OTP (one time passcode) depending on which method you choose below. You can have both
+            methods of 2nd factor authentication enabled at once if you wish.
           </p>
         </div>
       </div>
@@ -438,9 +438,8 @@
             </h3>
             <p class="text-base text-grey-700 dark:text-grey-200">
               TOTP two-factor authentication requires the use of Google Authenticator or another
-              compatible app such as Aegis or Ente Auth. Alternatively,
-              you can use the code below. Make sure that you write down your secret code in a safe
-              place.
+              compatible app such as Aegis or Ente Auth. Alternatively, you can use the code below.
+              Make sure that you write down your secret code in a safe place.
             </p>
           </div>
           <div class="mt-4">
