@@ -227,6 +227,24 @@ class Domain extends Model
                 });
     }
 
+    public function requiredRecords()
+    {
+        $all_dns_records = null;
+        try {
+            $all_dns_records = dns_get_record($this->domain.'.', DNS_ALL);
+        } catch (Exception $e) {
+            Log::info('DNS Get All Records Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
+            $all_dns_records = 'Error retrieving DNS records: '.$e->getMessage();
+        }
+        return [
+            'expected' => [
+            ],
+            'got' =>  [
+            ],
+            'all_dns_records' => $all_dns_records,
+        ];
+    }}
+
     /**
      * Checks if the domain has the correct MX records.
      */
