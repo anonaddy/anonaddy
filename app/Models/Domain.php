@@ -232,7 +232,7 @@ class Domain extends Model
                 ->first();
     }
 
-    private function getSpfValue()
+    private function getSpfExample()
     {
         return 'v=spf1 include:spf.'.config('anonaddy.domain').' mx -all';
     }
@@ -241,7 +241,6 @@ class Domain extends Model
     {
         return "/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/'
     }
-
 
     private function getSpfRecords()
     {
@@ -337,7 +336,7 @@ class Domain extends Model
             $hasMX = false;
         }
 
-        $spfValue = $this->getSpfValue()
+        $spfValue = $this->getSpfExample()
         try {
             $spf = $this->getSpfRecords()
             $hasSpf = $spf->isNotEmpty();
