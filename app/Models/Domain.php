@@ -244,7 +244,6 @@ class Domain extends Model
         try {
             $all_dns_records = dns_get_record($this->domain.'.', DNS_ALL);
         } catch (Exception $e) {
-            Log::info('DNS Get All Records Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
             $all_dns_records = 'Error retrieving DNS records: '.$e->getMessage();
         }
         return [
