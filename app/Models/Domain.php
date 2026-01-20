@@ -198,15 +198,20 @@ class Domain extends Model
         }
 
         try {
-            return collect(dns_get_record($this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
-                });
+            return getVerificationRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get TXT Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
             return false;
         }
+    }
+
+    private function getVerificationRecords()
+    {
+        return collect(dns_get_record($this->domain.'.', DNS_TXT))
+                ->filter(function ($r) {
+                    return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
+                });
     }
 
     private function getMxRecords()
