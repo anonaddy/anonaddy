@@ -220,7 +220,12 @@ class Domain extends Model
                 });
     }
 
-    private function getMxRecords()
+    private function getMxValue()
+    {
+        return config('anonaddy.hostname');
+    }
+
+    private function getMxRecord()
     {
         return collect(dns_get_record($this->domain.'.', DNS_MX))
                 ->sortBy('pri')
@@ -310,7 +315,7 @@ class Domain extends Model
         }
 
         try {
-            $mx = this->getMxRecords()
+            $mx = this->getMxRecord()
         } catch (Exception $e) {
             Log::info('DNS Get MX Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
@@ -326,7 +331,7 @@ class Domain extends Model
             return false;
         }
 
-        if ($mx['target'] !== config('anonaddy.hostname')) {
+        if ($mx['target'] !== $this->getMxValue()) {
             return false;
         }
 
