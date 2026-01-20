@@ -209,6 +209,13 @@ class Domain extends Model
         }
     }
 
+    private function getMxRecords()
+    {
+        return collect(dns_get_record($this->domain.'.', DNS_MX))
+                ->sortBy('pri')
+                ->first();
+    }
+
     /**
      * Checks if the domain has the correct MX records.
      */
@@ -219,9 +226,7 @@ class Domain extends Model
         }
 
         try {
-            $mx = collect(dns_get_record($this->domain.'.', DNS_MX))
-                ->sortBy('pri')
-                ->first();
+            $mx = this->getMxRecords()
         } catch (Exception $e) {
             Log::info('DNS Get MX Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
