@@ -238,6 +238,44 @@ class Domain extends Model
                 });
     }
 
+    /**
+     Format:
+        ```ts
+        type RequiredRecordsResponse = {
+            records: RequiredRecord[];
+            all_dns_records: DnsRecord[] | string; // string in case of error retrieving DNS records
+        }
+
+        type DnsRecord = DnsRecordTxt | DnsRecordMx | DnsRecordCname;
+        type DnsRecordBase = {
+            host: string;
+            class: string;
+            ttl: number;
+        };
+        type DnsRecordTxt = DnsRecordBase & {
+            type: 'TXT';
+            txt: string;
+        };
+        type DnsRecordMx = DnsRecordBase & {
+            type: 'MX';
+            target: string;
+            pri: number;
+        };
+        type DnsRecordCname = DnsRecordBase & {
+            type: 'CNAME';
+            target: string;
+        };
+
+        type RequiredRecord = VerificationRecord;
+        type VerificationRecord = {
+            label: 'verification';
+            type: 'TXT';
+            expected: string; // expected verification value
+            got: DnsRecord[] | string;  // string in case of error retrieving DNS records
+            check: boolean; // whether the expected record was found
+        };
+        ```
+     */
     public function requiredRecords()
     {
         $all_dns_records = null;
@@ -246,10 +284,17 @@ class Domain extends Model
         } catch (Exception $e) {
             $all_dns_records = 'Error retrieving DNS records: '.$e->getMessage();
         }
+        try {
+            $v = $this->getVerificationRecords()
+            $verification = $v->asArray();
+            $hasVerification = $v->isNotEmpty();
+        } catch (Exception $e) {
+            $verification = 'Error retrieving verification records: '.$e->getMessage();
+        }
+        // Return the records and whether the verification record was found
         return [
-            'expected' => [
-            ],
-            'got' =>  [
+            'records' => [
+                ['label' => 'verification', 'type' => 'TXT', 'expected' => $this->getVerificationValue(), 'got' => $verification, 'check' => $hasVerification]]},
             ],
             'all_dns_records' => $all_dns_records,
         ];
