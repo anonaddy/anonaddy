@@ -330,8 +330,20 @@ class Domain extends Model
         // Return the records and whether the verification record was found
         return [
             'records' => [
-                ['label' => 'verification', 'type' => 'TXT', 'expected' => $this->getVerificationValue(), 'got' => $verification, 'check' => $hasVerification]]},
-                ['label' => 'mail server', 'type' => 'MX', 'expected' => $mxValue, 'got' => $mx, 'check' => $hasMX],
+                [
+                    'label' => 'verification',
+                    'type' => 'TXT',
+                    'expected' => $this->getVerificationValue(),
+                    'got' => $verification,
+                    'check' => $hasVerification,
+                ],
+                [
+                    'label' => 'mail server',
+                    'type' => 'MX',
+                    'expected' => $mxValue,
+                    'got' => $mx,
+                    'check' => $hasMX,
+                ],
             ],
             'all_dns_records' => $all_dns_records,
         ];
