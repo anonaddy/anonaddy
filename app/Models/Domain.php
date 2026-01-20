@@ -216,6 +216,17 @@ class Domain extends Model
                 ->first();
     }
 
+    private function getSpfRecords()
+    {
+        return collect(dns_get_record($this->domain.'.', DNS_TXT))
+                ->filter(function ($r) {
+                    return preg_match(
+                        "/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/',
+                        $r['txt'],
+                    );
+                });
+    }
+
     /**
      * Checks if the domain has the correct MX records.
      */
@@ -265,10 +276,7 @@ class Domain extends Model
         }
 
         try {
-            $spf = collect(dns_get_record($this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return preg_match("/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/', $r['txt']);
-                });
+            $spf = $this->getSpfRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get SPF Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
