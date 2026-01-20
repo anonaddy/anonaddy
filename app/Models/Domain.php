@@ -271,12 +271,19 @@ class Domain extends Model
             target: string;
         };
 
-        type RequiredRecord = VerificationRecord;
+        type RequiredRecord = VerificationRecord | MailServerRecord;
         type VerificationRecord = {
             label: 'verification';
             type: 'TXT';
             expected: string; // expected verification value
-            got: DnsRecord[] | string;  // string in case of error retrieving DNS records
+            got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
+            check: boolean; // whether the expected record was found
+        };
+        type MailServerRecord = {
+            label: 'mail server';
+            type: 'MX';
+            expected: string; // expected mail server value
+            got: DnsRecordMx | string;  // string in case of error retrieving DNS records
             check: boolean; // whether the expected record was found
         };
         ```
@@ -296,10 +303,18 @@ class Domain extends Model
         } catch (Exception $e) {
             $verification = 'Error retrieving verification records: '.$e->getMessage();
         }
+        try {
+            $mx = $this->getMxRecord()
+            $mxValue = $this->getMxValue()
+            $hasMX = isset($mx['target']) && $mx['target'] === ;
+        } catch (Exception $e) {
+            $verification = 'Error retrieving verification records: '.$e->getMessage();
+        }
         // Return the records and whether the verification record was found
         return [
             'records' => [
                 ['label' => 'verification', 'type' => 'TXT', 'expected' => $this->getVerificationValue(), 'got' => $verification, 'check' => $hasVerification]]},
+                ['label' => 'mail server', 'type' => 'MX', 'expected' => $mxValue, 'got' => $mx, 'check' => $hasMX],
             ],
             'all_dns_records' => $all_dns_records,
         ];
