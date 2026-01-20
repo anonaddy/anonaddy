@@ -296,20 +296,25 @@ class Domain extends Model
         } catch (Exception $e) {
             $all_dns_records = 'Error retrieving DNS records: '.$e->getMessage();
         }
+
         try {
             $v = $this->getVerificationRecords()
             $verification = $v->asArray();
             $hasVerification = $v->isNotEmpty();
         } catch (Exception $e) {
             $verification = 'Error retrieving verification records: '.$e->getMessage();
+            $hasVerification = false;
         }
+
+        $mxValue = $this->getMxValue()
         try {
             $mx = $this->getMxRecord()
-            $mxValue = $this->getMxValue()
             $hasMX = isset($mx['target']) && $mx['target'] === ;
         } catch (Exception $e) {
-            $verification = 'Error retrieving verification records: '.$e->getMessage();
+            $mx = 'Error retrieving MX records: '.$e->getMessage();
+            $hasMX = false;
         }
+
         // Return the records and whether the verification record was found
         return [
             'records' => [
