@@ -232,12 +232,24 @@ class Domain extends Model
                 ->first();
     }
 
+    private function getSpfValue()
+    {
+        return 'v=spf1 include:spf.'.config('anonaddy.domain').' mx -all';
+    }
+
+    private function getSpfRegex()
+    {
+        return "/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/'
+    }
+
+
     private function getSpfRecords()
     {
+        $spfRegex = $this->getSpfRegex();  // no need to recompute this value multiple times
         return collect(dns_get_record($this->domain.'.', DNS_TXT))
                 ->filter(function ($r) {
                     return preg_match(
-                        "/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/',
+                        $spfRegex,
                         $r['txt'],
                     );
                 });
