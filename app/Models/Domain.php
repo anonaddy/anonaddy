@@ -283,13 +283,14 @@ class Domain extends Model
             target: string;
         };
 
-        type RequiredRecord = VerificationRecord | MailServerRecord;
+        type RequiredRecord = VerificationRecord | MailServerRecord | SpfRecord;
         type VerificationRecord = {
             label: 'verification';
             type: 'TXT';
             expected: string; // expected verification value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
             check: boolean; // whether the expected record was found
+            help: undefined; // no help text for mail server record
         };
         type MailServerRecord = {
             label: 'mail server';
@@ -297,6 +298,15 @@ class Domain extends Model
             expected: string; // expected mail server value
             got: DnsRecordMx | string;  // string in case of error retrieving DNS records
             check: boolean; // whether the expected record was found
+            help: undefined; // no help text for mail server record
+        };
+        type SpfRecord = {
+            label: 'SPF';
+            type: 'TXT';
+            expected: string; // expected SPF value
+            got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
+            check: boolean; // whether the expected record was found
+            help: string; // help text for SPF record format
         };
         ```
      */
@@ -327,6 +337,14 @@ class Domain extends Model
             $hasMX = false;
         }
 
+        $spfValue = $this->getSpfValue()
+        try {
+            $spf = $this->getSpfRecords()
+            $hasSpf = $spf->isNotEmpty();
+        } catch (Exception $e) {
+            $spf = 'Error retrieving SPF records: '.$e->getMessage();
+        }
+
         // Return the records and whether the verification record was found
         return [
             'records' => [
@@ -344,6 +362,15 @@ class Domain extends Model
                     'got' => $mx,
                     'check' => $hasMX,
                 ],
+                [
+                    'label' => 'sender verification',
+                    'type' => 'TXT',
+                    'expected' => $spfValue,
+                    'got' => $spf,
+                    'check' => $hasSpf,
+                    'help' => 'Given is a possible example, the SPF record should comply to the following regex: '.$this->getSpfRegex(),
+                ],
+
             ],
             'all_dns_records' => $all_dns_records,
         ];
