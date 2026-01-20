@@ -206,11 +206,17 @@ class Domain extends Model
         }
     }
 
+    private function getVerificationValue()
+    {
+        return 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count()
+    }
+
     private function getVerificationRecords()
     {
+        $value = $this->getVerificationValue()  // no need to recompute this value multiple times
         return collect(dns_get_record($this->domain.'.', DNS_TXT))
                 ->filter(function ($r) {
-                    return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
+                    return trim($r['txt']) === $value);
                 });
     }
 
