@@ -314,31 +314,8 @@ class Domain extends Model
         // Split into labels
         $labels = explode('.', $host);
 
-        // A list of public‑suffix rules (simplified).  In production you’d use
-        // the Mozilla Public Suffix List (PSL) via a library such as
-        // jeremeamia/php-domain-parser.
-        $publicSuffixes = [
-            'com', 'org', 'net', 'edu', 'gov',
-            'co.uk', 'gov.uk', 'ac.uk',
-            'co.jp', 'ne.jp', 'or.jp',
-            // add more as needed
-        ];
-
-        // Determine the effective top‑level domain (eTLD)
-        $eTld = '';
-        for ($i = 1; $i <= count($labels); $i++) {
-            $candidate = implode('.', array_slice($labels, -$i));
-            if (in_array($candidate, $publicSuffixes, true)) {
-                $eTld = $candidate;
-            }
-        }
-
-        // If we didn't match a known suffix, fall back to the last label
-        if ($eTld === '') {
-            $eTld = $labels[count($labels) - 1];
-        }
-
         // Remove the eTLD and the immediate label before it (the registered domain)
+        $eTld = $labels[count($labels) - 1];
         $registeredDomainIdx = count($labels) - count(explode('.', $eTld)) - 1;
         $subdomainParts = array_slice($labels, 0, $registeredDomainIdx + 1);
 
