@@ -355,7 +355,7 @@ class Domain extends Model
             type: 'TXT';
             expected: string; // expected verification value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
-            check: boolean; // whether the expected record was found
+            check: boolean | null; // whether the expected record was found
             help: undefined; // no help text for mail server record
         };
         type MailServerRecord = {
@@ -363,7 +363,7 @@ class Domain extends Model
             type: 'MX';
             expected: string; // expected mail server value
             got: DnsRecordMx | string;  // string in case of error retrieving DNS records
-            check: boolean; // whether the expected record was found
+            check: boolean | null; // whether the expected record was found
             help: undefined; // no help text for mail server record
         };
         type SpfRecord = {
@@ -371,7 +371,7 @@ class Domain extends Model
             type: 'TXT';
             expected: string; // expected SPF value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
-            check: boolean; // whether the expected record was found
+            check: boolean | null; // whether the expected record was found
             help: string; // help text for SPF record format
         };
         type DmarcRecord = {
@@ -380,7 +380,7 @@ class Domain extends Model
             key: string; // DMARC record key
             expected: string; // expected DMARC value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
-            check: boolean; // whether the expected record was found
+            check: boolean | null; // whether the expected record was found
             help: string; // help text for DMARC record format
         };
         ```
@@ -409,7 +409,7 @@ class Domain extends Model
             $hasMX = isset($mx['target']) && $mx['target'] === ;
         } catch (Exception $e) {
             $mx = 'Error retrieving MX records: '.$e->getMessage();
-            $hasMX = false;
+            $hasMX = null;
         }
 
         $spfValue = $this->getSpfExample()
@@ -418,6 +418,7 @@ class Domain extends Model
             $hasSpf = $spf->isNotEmpty();
         } catch (Exception $e) {
             $spf = 'Error retrieving SPF records: '.$e->getMessage();
+            $hasSpf = null;
         }
 
         $dmarcValue = $this->getDmarcExample()
@@ -426,6 +427,7 @@ class Domain extends Model
             $hasDmarc = $dmarc->isNotEmpty();
         } catch (Exception $e) {
             $dmarc = 'Error retrieving DMARC records: '.$e->getMessage();
+            $hasSpf = null;
         }
 
         $host = getSubdomain()
