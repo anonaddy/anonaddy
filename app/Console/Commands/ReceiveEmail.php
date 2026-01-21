@@ -405,7 +405,7 @@ class ReceiveEmail extends Command
         }
 
         $recipientsToForwardTo->each(function ($aliasRecipient) use ($emailData, $ruleIds) {
-            $message = (new ForwardEmail($this->alias, $emailData, $aliasRecipient, $ruleIds));
+            $message = (new ForwardEmail($this->alias, $emailData, $aliasRecipient, false, $ruleIds));
 
             Mail::to($aliasRecipient->email)->queue($message);
         });
