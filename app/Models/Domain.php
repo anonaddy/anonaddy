@@ -264,6 +264,17 @@ class Domain extends Model
         return '/^(v=DMARC1).*(p=quarantine|reject).*/'
     }
 
+    function getDmarcRecords()
+    {
+        return collect(dns_get_record('_dmarc.'.$this->domain.'.', DNS_TXT))
+                ->filter(function ($r) {
+                    return preg_match(
+                        $this->getDmarcRegex(),
+                        $r['txt'],
+                    );
+                })
+    }
+
     /**
      Format:
         ```ts
@@ -317,6 +328,15 @@ class Domain extends Model
             check: boolean; // whether the expected record was found
             help: string; // help text for SPF record format
         };
+        type DmarcRecord = {
+            label: 'sender verification ';
+            type: 'TXT';
+            key: string; // DMARC record key
+            expected: string; // expected DMARC value
+            got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
+            check: boolean; // whether the expected record was found
+            help: string; // help text for DMARC record format
+        };
         ```
      */
     public function requiredRecords()
@@ -354,6 +374,16 @@ class Domain extends Model
             $spf = 'Error retrieving SPF records: '.$e->getMessage();
         }
 
+        $dmarcValue = $this->getDmarcExample()
+        try {
+            $dmarc = $this->getDmarcRecords()
+            $hasDmarc = $dmarc->isNotEmpty();
+        } catch (Exception $e) {
+            $dmarc = 'Error retrieving DMARC records: '.$e->getMessage();
+        }
+
+        $host = getSubdomain()
+
         // Return the records and whether the verification record was found
         return [
             'records' => [
@@ -378,6 +408,14 @@ class Domain extends Model
                     'got' => $spf,
                     'check' => $hasSpf,
                     'help' => 'Given is a possible example, the SPF record should comply to the following regex: '.$this->getSpfRegex(),
+                ],
+                [
+                    'label' => 'DMARC',
+                    'type' => 'TXT',
+                    'expected' => $dmarcValue,
+                    'got' => $dmarc,
+                    'check' => $hasDmarc,
+                    'help' => 'The DMARC record should comply to the following regex: '.$this->getDmarcRegex(),
                 ],
 
             ],
