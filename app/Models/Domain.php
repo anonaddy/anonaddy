@@ -276,6 +276,52 @@ class Domain extends Model
     }
 
     /**
+     * Returns the subdomain part of a host name.
+     *
+     * @param string $host Fully‑qualified domain name (e.g. "api.blog.example.co.uk")
+     * @return string Subdomain string, or "@" if the host is the apex domain.
+     */
+    public static function getSubdomain(string $host): string
+    {
+        // Normalise: lower‑case and trim trailing dot
+        $host = strtolower(rtrim($host, '.'));
+
+        // Split into labels
+        $labels = explode('.', $host);
+
+        // A list of public‑suffix rules (simplified).  In production you’d use
+        // the Mozilla Public Suffix List (PSL) via a library such as
+        // jeremeamia/php-domain-parser.
+        $publicSuffixes = [
+            'com', 'org', 'net', 'edu', 'gov',
+            'co.uk', 'gov.uk', 'ac.uk',
+            'co.jp', 'ne.jp', 'or.jp',
+            // add more as needed
+        ];
+
+        // Determine the effective top‑level domain (eTLD)
+        $eTld = '';
+        for ($i = 1; $i <= count($labels); $i++) {
+            $candidate = implode('.', array_slice($labels, -$i));
+            if (in_array($candidate, $publicSuffixes, true)) {
+                $eTld = $candidate;
+            }
+        }
+
+        // If we didn't match a known suffix, fall back to the last label
+        if ($eTld === '') {
+            $eTld = $labels[count($labels) - 1];
+        }
+
+        // Remove the eTLD and the immediate label before it (the registered domain)
+        $registeredDomainIdx = count($labels) - count(explode('.', $eTld)) - 1;
+        $subdomainParts = array_slice($labels, 0, $registeredDomainIdx + 1);
+
+        // No subdomain → return "@"
+        return $subdomainParts ? implode('.', $subdomainParts) : '@';
+    }
+
+    /**
      Format:
         ```ts
         type RequiredRecordsResponse = {
@@ -390,6 +436,7 @@ class Domain extends Model
                 [
                     'label' => 'verification (needed only once)',
                     'type' => 'TXT',
+                    'host' => $host,
                     'expected' => $this->getVerificationValue(),
                     'got' => $verification,
                     'check' => $hasVerification,
@@ -398,6 +445,7 @@ class Domain extends Model
                 [
                     'label' => 'mail server (addy)',
                     'type' => 'MX',
+                    'host' => $host,
                     'expected' => $mxValue,
                     'got' => $mx,
                     'check' => $hasMX,
@@ -405,6 +453,7 @@ class Domain extends Model
                 [
                     'label' => 'sender host verification (SPF)',
                     'type' => 'TXT',
+                    'host' => $host,
                     'expected' => $spfValue,
                     'got' => $spf,
                     'check' => $hasSpf,
@@ -413,6 +462,7 @@ class Domain extends Model
                 [
                     'label' => 'failed verification policy (DMARC)',
                     'type' => 'TXT',
+                    'host' => $host === '@' ? '_dmarc' : '_dmarc.'.$host,
                     'expected' => $dmarcValue,
                     'got' => $dmarc,
                     'check' => $hasDmarc,
