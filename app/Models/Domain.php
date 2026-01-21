@@ -280,6 +280,25 @@ class Domain extends Model
                 })
     }
 
+    public function getDkimExample()
+    {
+        return config('anonaddy.dkim_selector').'._domainkey.'.config('anonaddy.domain');
+    }
+
+    public function getDkimHostPrefix()
+    {
+        return config('anonaddy.dkim_selector').'._domainkey';
+    }
+
+    public function getDkimRecords()
+    {
+        $prefix = getDkimHostPrefix();
+        return collect(dns_get_record($prefix.'.'.$this->domain.'.', DNS_CNAME))
+                ->filter(function ($r) {
+                    return $r['target'] === $prefix.'.'.config('anonaddy.domain');
+                });
+    }
+
     /**
      * Returns the subdomain part of a host name.
      *
@@ -546,10 +565,7 @@ class Domain extends Model
         }
 
         try {
-            $dmarc = collect(dns_get_record('_dmarc.'.$this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return preg_match('/^(v=DMARC1).*(p=quarantine|reject).*/', $r['txt']);
-                });
+            $dmarc = $this->getDmarcRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get DMARC Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
@@ -565,10 +581,7 @@ class Domain extends Model
         }
 
         try {
-            $dkim = collect(dns_get_record(config('anonaddy.dkim_selector').'._domainkey.'.$this->domain.'.', DNS_CNAME))
-                ->contains(function ($r) {
-                    return $r['target'] === config('anonaddy.dkim_selector').'._domainkey.'.config('anonaddy.domain');
-                });
+            $dkim = $this->getDkimRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get DKIM Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
