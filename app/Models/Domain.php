@@ -254,6 +254,16 @@ class Domain extends Model
                 });
     }
 
+    private function getDmarcExample()
+    {
+        return 'v=DMARC1; p=quarantine; adkim=s'
+    }
+
+    private function getDmarcRegex()
+    {
+        return '/^(v=DMARC1).*(p=quarantine|reject).*/'
+    }
+
     /**
      Format:
         ```ts
