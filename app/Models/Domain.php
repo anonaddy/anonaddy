@@ -355,6 +355,7 @@ class Domain extends Model
         type VerificationRecord = {
             label: string;
             type: 'TXT';
+            host: string;
             expected: string; // expected verification value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
             check: boolean | null; // whether the expected record was found
@@ -363,6 +364,7 @@ class Domain extends Model
         type MailServerRecord = {
             label: string;
             type: 'MX';
+            host: string;
             expected: string; // expected mail server value
             got: DnsRecordMx | string;  // string in case of error retrieving DNS records
             check: boolean | null; // whether the expected record was found
@@ -371,6 +373,7 @@ class Domain extends Model
         type SpfRecord = {
             label: string;
             type: 'TXT';
+            host: string;
             expected: string; // expected SPF value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
             check: boolean | null; // whether the expected record was found
@@ -379,6 +382,7 @@ class Domain extends Model
         type DmarcRecord = {
             label: string;
             type: 'TXT';
+            host: string;
             key: string; // DMARC record key
             expected: string; // expected DMARC value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
@@ -388,7 +392,7 @@ class Domain extends Model
         type DkimRecord = {
             label: string;
             type: 'CNAME';
-            key: string; // DKIM record key
+            host: string;
             expected: string; // expected DKIM value
             got: DnsRecordCname[] | string;  // string in case of error retrieving DNS records
             check: boolean | null; // whether the expected record was found
