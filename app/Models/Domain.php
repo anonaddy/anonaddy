@@ -376,7 +376,7 @@ class Domain extends Model
 
         type RequiredRecord = VerificationRecord | MailServerRecord | SpfRecord;
         type VerificationRecord = {
-            label: 'verification';
+            label: string;
             type: 'TXT';
             expected: string; // expected verification value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
@@ -384,7 +384,7 @@ class Domain extends Model
             help: undefined; // no help text for mail server record
         };
         type MailServerRecord = {
-            label: 'mail server';
+            label: string;
             type: 'MX';
             expected: string; // expected mail server value
             got: DnsRecordMx | string;  // string in case of error retrieving DNS records
@@ -392,7 +392,7 @@ class Domain extends Model
             help: undefined; // no help text for mail server record
         };
         type SpfRecord = {
-            label: 'SPF';
+            label: string;
             type: 'TXT';
             expected: string; // expected SPF value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
@@ -400,13 +400,22 @@ class Domain extends Model
             help: string; // help text for SPF record format
         };
         type DmarcRecord = {
-            label: 'sender verification ';
+            label: string;
             type: 'TXT';
             key: string; // DMARC record key
             expected: string; // expected DMARC value
             got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
             check: boolean | null; // whether the expected record was found
             help: string; // help text for DMARC record format
+        };
+        type DkimRecord = {
+            label: string;
+            type: 'CNAME';
+            key: string; // DKIM record key
+            expected: string; // expected DKIM value
+            got: DnsRecordCname[] | string;  // string in case of error retrieving DNS records
+            check: boolean | null; // whether the expected record was found
+            help: string; // help text for DKIM record format
         };
         ```
      */
@@ -455,6 +464,14 @@ class Domain extends Model
             $hasSpf = null;
         }
 
+        $dkimValue = $this->getDkimValue()
+        try {
+            $dkim = $this->getDkimRecords()
+            $hasDkim = $dkim->isNotEmpty();
+        } catch (Exception $e) {
+            $dkim = 'Error retrieving DKIM records: '.$e->getMessage();
+        }
+
         $host = getSubdomain()
 
         // Return the records and whether the verification record was found
@@ -494,6 +511,14 @@ class Domain extends Model
                     'got' => $dmarc,
                     'check' => $hasDmarc,
                     'help' => 'The DMARC record should comply to the following regex: '.$this->getDmarcRegex(),
+                ],
+                [
+                    'label' => 'failed verification policy (DKIM)',
+                    'type' => 'CNAME',
+                    'host' => getDkimHostPrefix().($host === '@' ? '' : '.'.$host),
+                    'expected' => $dkimValue,
+                    'got' => $dkim,
+                    'check' => $hasDkim,
                 ],
 
             ],
