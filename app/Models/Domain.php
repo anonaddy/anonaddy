@@ -259,6 +259,11 @@ class Domain extends Model
         return 'v=DMARC1; p=quarantine; adkim=s'
     }
 
+    private function getDmarcHostPrefix()
+    {
+        return '_dmarc';
+    }
+
     private function getDmarcRegex()
     {
         return '/^(v=DMARC1).*(p=quarantine|reject).*/'
@@ -266,7 +271,7 @@ class Domain extends Model
 
     function getDmarcRecords()
     {
-        return collect(dns_get_record('_dmarc.'.$this->domain.'.', DNS_TXT))
+        return collect(dns_get_record($this->getDmarcHostPrefix().'.'.$this->domain.'.', DNS_TXT))
                 ->filter(function ($r) {
                     return preg_match(
                         $this->getDmarcRegex(),
@@ -464,7 +469,7 @@ class Domain extends Model
                 [
                     'label' => 'failed verification policy (DMARC)',
                     'type' => 'TXT',
-                    'host' => $host === '@' ? '_dmarc' : '_dmarc.'.$host,
+                    'host' => getDmarcHostPrefix().($host === '@' ? '' : '.'.$host),
                     'expected' => $dmarcValue,
                     'got' => $dmarc,
                     'check' => $hasDmarc,
