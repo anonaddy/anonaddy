@@ -388,21 +388,22 @@ class Domain extends Model
         return [
             'records' => [
                 [
-                    'label' => 'verification',
+                    'label' => 'verification (needed only once)',
                     'type' => 'TXT',
                     'expected' => $this->getVerificationValue(),
                     'got' => $verification,
                     'check' => $hasVerification,
+                    'help' => 'This value is needed only once to proof that you have authority over that domain before adding it to your account.'
                 ],
                 [
-                    'label' => 'mail server',
+                    'label' => 'mail server (addy)',
                     'type' => 'MX',
                     'expected' => $mxValue,
                     'got' => $mx,
                     'check' => $hasMX,
                 ],
                 [
-                    'label' => 'sender verification',
+                    'label' => 'sender host verification (SPF)',
                     'type' => 'TXT',
                     'expected' => $spfValue,
                     'got' => $spf,
@@ -410,7 +411,7 @@ class Domain extends Model
                     'help' => 'Given is a possible example, the SPF record should comply to the following regex: '.$this->getSpfRegex(),
                 ],
                 [
-                    'label' => 'DMARC',
+                    'label' => 'failed verification policy (DMARC)',
                     'type' => 'TXT',
                     'expected' => $dmarcValue,
                     'got' => $dmarc,
