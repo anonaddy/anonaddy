@@ -131,6 +131,7 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
         Route::get('/domains/{id}/edit', 'edit')->name('domains.edit');
     });
     Route::get('/domains/{id}/check-sending', [DomainVerificationController::class, 'checkSending']);
+    Route::get('/domains/{id}/generate-table', [DomainVerificationController::class, 'generateTable']);
 
     Route::controller(ShowUsernameController::class)->group(function () {
         Route::get('/usernames', 'index')->name('usernames.index');

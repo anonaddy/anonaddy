@@ -400,7 +400,7 @@ class Domain extends Model
         };
         ```
      */
-    public function requiredRecords()
+    public function requiredRecordsExample()
     {
         $all_dns_records = null;
         try {
