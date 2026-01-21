@@ -280,9 +280,9 @@ class Domain extends Model
                 })
     }
 
-    public function getDkimExample()
+    public function getDkimValue()
     {
-        return config('anonaddy.dkim_selector').'._domainkey.'.config('anonaddy.domain');
+        return $this->getDkimHostPrefix().'.'.config('anonaddy.domain')
     }
 
     public function getDkimHostPrefix()
@@ -293,9 +293,10 @@ class Domain extends Model
     public function getDkimRecords()
     {
         $prefix = getDkimHostPrefix();
+        $value = getDkimValue();  // no need to recompute those value multiple times
         return collect(dns_get_record($prefix.'.'.$this->domain.'.', DNS_CNAME))
                 ->filter(function ($r) {
-                    return $r['target'] === $prefix.'.'.config('anonaddy.domain');
+                    return $r['target'] === $value;
                 });
     }
 
