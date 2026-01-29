@@ -249,7 +249,7 @@
                       </div>
                       <ListboxButton
                         class="relative inline-flex items-center bg-indigo-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 focus:z-10"
-                        style="height: 39px"
+                        style="height: 42px"
                       >
                         <span class="sr-only">Change published status</span>
                         <ChevronDownIcon class="h-5 w-5 text-white" aria-hidden="true" />
