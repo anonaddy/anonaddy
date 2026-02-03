@@ -75,7 +75,6 @@ class UsernamesTest extends TestCase
             'username' => 'janedoe',
         ]);
 
-        
         $username = Username::where('username', 'janedoe')->first();
         $this->assertThat($username->can_login, $this->isTrue(), 'username can login');
     }

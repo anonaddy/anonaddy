@@ -2,17 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Recipient;
-use App\Models\User;
 use App\Models\Username;
-use App\Rules\NotDeletedUsername;
-use App\Rules\NotLocalRecipient;
-use App\Rules\RegisterUniqueRecipient;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Ramsey\Uuid\Uuid;
 
 class SetUsernameExternalId extends Command
 {
@@ -52,11 +44,11 @@ class SetUsernameExternalId extends Command
             'external_id' => $this->argument('external_id')], [
                 'username' => [
                     'required',
-                    'exists:usernames,username'
+                    'exists:usernames,username',
                 ],
                 'external_id' => [
                     'required',
-                    'unique:usernames,external_id'
+                    'unique:usernames,external_id',
                 ],
             ]);
 
@@ -78,7 +70,8 @@ class SetUsernameExternalId extends Command
         $username->user->default_username = $username;
         $username->user->save();
 
-        $this->info('Username: "'. $username->username . '" set as external with id : "'. $username->external_id .'"');
+        $this->info('Username: "'.$username->username.'" set as external with id : "'.$username->external_id.'"');
+
         return 0;
     }
 }

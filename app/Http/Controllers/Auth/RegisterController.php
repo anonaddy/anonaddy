@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
-
 class RegisterController extends Controller
 {
     /*

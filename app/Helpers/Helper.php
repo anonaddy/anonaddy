@@ -1,16 +1,14 @@
 <?php
 
 use App\Enums\LoginRedirect;
-use App\Http\Middleware\ProxyAuthentication;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
-
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
 function user()
@@ -51,23 +49,22 @@ function stripEmailExtension(string $email): string
     return $localPart.'@'.$domain;
 }
 
- /**
-     * Create a new user instance
-     *
-     * @return \App\Models\User
-     */
-function createUser(string $username, string $email, string|null $password = null, bool $emailVerified = false, string|null $externalId = null) 
+/**
+ * Create a new user instance
+ *
+ * @return \App\Models\User
+ */
+function createUser(string $username, string $email, ?string $password = null, bool $emailVerified = false, ?string $externalId = null)
 {
     $userId = Uuid::uuid4();
 
     $recipient = Recipient::create([
         'email' => $email,
-        'user_id' => $userId,    
+        'user_id' => $userId,
     ]);
 
-    if ($emailVerified)
-    {
-        $recipient->markEmailAsVerified();    
+    if ($emailVerified) {
+        $recipient->markEmailAsVerified();
     }
 
     $usernameModel = Username::create([
@@ -89,7 +86,7 @@ function createUser(string $username, string $email, string|null $password = nul
     ]);
 }
 
-function getLoginRedirectUri() : string
+function getLoginRedirectUri(): string
 {
     // Dynamic redirect setting to allow users to choose to go to /aliases page instead etc.
     return match (user()->login_redirect) {
@@ -101,11 +98,12 @@ function getLoginRedirectUri() : string
     };
 }
 
-function getLoginRedirectResponse() : RedirectResponse
+function getLoginRedirectResponse(): RedirectResponse
 {
     // If the intended path is just the dashboard then ignore and use the user's login redirect instead
     $redirectTo = getLoginRedirectUri();
     $intended = session()->pull('url.intended');
+
     return $intended === url('/') ? redirect()->to($redirectTo) : redirect()->intended($intended ?? $redirectTo);
 }
 

@@ -376,7 +376,7 @@
                       createRuleObject.actions[key].type === 'subject' ||
                       createRuleObject.actions[key].type === 'displayFrom'
                     "
-                    class="sm:ml-4 flex"
+                    class="sm:ml-4 flex flex-col w-full"
                   >
                     <div class="flex w-full">
                       <input
@@ -384,10 +384,25 @@
                         type="text"
                         class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleActions ? 'border-red-500' : ''"
-                        placeholder="Enter value"
+                        :placeholder="
+                          createRuleObject.actions[key].type === 'subject'
+                            ? 'e.g. [Fwd] {{subject}}'
+                            : 'Enter value'
+                        "
                         autofocus
                       />
                     </div>
+                    <p
+                      v-if="createRuleObject.actions[key].type === 'subject'"
+                      class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
+                    >
+                      Use
+                      <code
+                        class="px-1 py-0.5 rounded bg-grey-100 dark:bg-grey-800 font-mono text-grey-700 dark:text-grey-200"
+                        >{{ '\{\{subject\}\}' }}</code
+                      >
+                      placeholder to include the original subject (e.g. to prepend or append text).
+                    </p>
                   </span>
 
                   <multiselect
@@ -709,7 +724,7 @@
                       editRuleObject.actions[key].type === 'subject' ||
                       editRuleObject.actions[key].type === 'displayFrom'
                     "
-                    class="sm:ml-4 flex"
+                    class="sm:ml-4 flex flex-col w-full"
                   >
                     <div class="flex w-full">
                       <input
@@ -717,10 +732,25 @@
                         type="text"
                         class="w-full appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-none p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleActions ? 'border-red-500' : ''"
-                        placeholder="Enter value"
+                        :placeholder="
+                          editRuleObject.actions[key].type === 'subject'
+                            ? 'e.g. [Fwd] {{subject}}'
+                            : 'Enter value'
+                        "
                         autofocus
                       />
                     </div>
+                    <p
+                      v-if="editRuleObject.actions[key].type === 'subject'"
+                      class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
+                    >
+                      Use
+                      <code
+                        class="px-1 py-0.5 rounded bg-grey-100 dark:bg-grey-800 font-mono text-grey-700 dark:text-grey-200"
+                        >{{ '\{\{subject\}\}' }}</code
+                      >
+                      placeholder to include the original subject (e.g. to prepend or append text).
+                    </p>
                   </span>
 
                   <multiselect

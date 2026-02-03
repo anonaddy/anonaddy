@@ -25,7 +25,8 @@ trait ApplyUserRules
         switch ($action['type']) {
             case 'subject':
                 $this->replacedSubject = ' with subject "'.base64_decode($this->emailSubject).'"';
-                $this->email->subject = $action['value'];
+                $originalSubject = base64_decode($this->emailSubject);
+                $this->email->subject = str_replace('{{subject}}', $originalSubject, $action['value']);
                 break;
             case 'displayFrom':
                 $this->email->from = [];

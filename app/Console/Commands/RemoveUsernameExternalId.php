@@ -2,17 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Recipient;
-use App\Models\User;
 use App\Models\Username;
-use App\Rules\NotDeletedUsername;
-use App\Rules\NotLocalRecipient;
-use App\Rules\RegisterUniqueRecipient;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Ramsey\Uuid\Uuid;
 
 class RemoveUsernameExternalId extends Command
 {
@@ -51,7 +43,7 @@ class RemoveUsernameExternalId extends Command
             'username' => $this->argument('username')], [
                 'username' => [
                     'required',
-                    'exists:usernames,username'
+                    'exists:usernames,username',
                 ],
             ]);
 
@@ -69,7 +61,8 @@ class RemoveUsernameExternalId extends Command
         $username->external_id = null;
         $username->save();
 
-        $this->info('Externalid of username: "'. $username->username . '" is removed');
+        $this->info('Externalid of username: "'.$username->username.'" is removed');
+
         return 0;
     }
 }

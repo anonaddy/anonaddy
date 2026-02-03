@@ -232,7 +232,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | If enabled, a proxy can add a X-UserId, X-Name and X-Email (header name specified down below) to the request and auto login or register
-    | Make sure to only set this when behind a trusted proxy to prevent malicious 
+    | Make sure to only set this when behind a trusted proxy to prevent malicious
     |
     */
     'use_proxy_authentication' => env('ANONADDY_USE_PROXY_AUTHENTICATION', false),

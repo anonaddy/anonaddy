@@ -61,7 +61,7 @@ class ApiTokensTest extends TestCase
     public function user_cannot_create_api_token_without_password_when_user_is_internal()
     {
         $response = $this->post('/settings/personal-access-tokens', [
-            'name' => 'New'
+            'name' => 'New',
         ]);
 
         $response
@@ -81,7 +81,7 @@ class ApiTokensTest extends TestCase
         $this->user->defaultUsername->save();
 
         $response = $this->post('/settings/personal-access-tokens', [
-            'name' => 'New'
+            'name' => 'New',
         ]);
 
         $response->assertStatus(200);

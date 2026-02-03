@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('usernames', function (Blueprint $table) {
             $table->string('external_id')
-                  ->after('can_login')
-                  ->nullable()
-                  ->unique();
+                ->after('can_login')
+                ->nullable()
+                ->unique();
         });
     }
 
