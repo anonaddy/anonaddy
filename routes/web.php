@@ -32,6 +32,7 @@ use App\Http\Controllers\ShowFailedDeliveryController;
 use App\Http\Controllers\ShowRecipientController;
 use App\Http\Controllers\ShowRuleController;
 use App\Http\Controllers\ShowUsernameController;
+use App\Http\Controllers\SpamWarningBehaviourController;
 use App\Http\Controllers\StoreFailedDeliveryController;
 use App\Http\Controllers\TestAutoCreateRegexController;
 use App\Http\Controllers\UseReplyToController;
@@ -161,6 +162,8 @@ Route::group([
     Route::post('/email-subject', [EmailSubjectController::class, 'update'])->name('settings.email_subject');
 
     Route::post('/banner-location', [BannerLocationController::class, 'update'])->name('settings.banner_location');
+
+    Route::post('/spam-warning-behaviour', [SpamWarningBehaviourController::class, 'update'])->name('settings.spam_warning_behaviour');
 
     Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
 

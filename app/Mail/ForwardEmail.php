@@ -249,9 +249,18 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
         $displayFrom = $this->getUserDisplayFrom(base64_decode($this->displayFrom));
 
+        $spamWarningBehaviour = $this->user->spam_warning_behaviour;
+        $showSpamBanner = ($this->isSpam || $this->failedDmarc) && $spamWarningBehaviour === 'banner';
+
+        $subject = $this->user->email_subject ?? base64_decode($this->emailSubject);
+        if (($this->isSpam || $this->failedDmarc) && $spamWarningBehaviour === 'subject') {
+            $prefix = $this->failedDmarc ? '[DMARC FAIL]' : '[SPAM]';
+            $subject = $prefix.' '.$subject;
+        }
+
         $this->email = $this
             ->from($this->fromEmail, $displayFrom)
-            ->subject($this->user->email_subject ?? base64_decode($this->emailSubject))
+            ->subject($subject)
             ->withSymfonyMessage(function (Email $message) {
 
                 $message->getHeaders()
@@ -389,8 +398,8 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             ]);
         }
 
-        // No HTML content but isSpam, then force html version
-        if (! $this->emailHtml && $this->isSpam) {
+        // No HTML content but showing spam/DMARC banner, then force html version
+        if (! $this->emailHtml && $showSpamBanner) {
             // Turn off the banner for the plain text version
             $this->bannerLocationText = 'off';
 
@@ -417,6 +426,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'locationHtml' => $this->bannerLocationHtml,
             'isSpam' => $this->isSpam,
             'failedDmarc' => $this->failedDmarc,
+            'showSpamBanner' => $showSpamBanner,
             'deactivateUrl' => $this->deactivateUrl,
             'aliasEmail' => $this->alias->email,
             'aliasDomain' => $this->alias->domain,

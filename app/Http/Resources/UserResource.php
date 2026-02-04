@@ -28,6 +28,7 @@ class UserResource extends JsonResource
             'from_name' => $this->from_name,
             'email_subject' => $this->email_subject,
             'banner_location' => $this->banner_location,
+            'spam_warning_behaviour' => $this->spam_warning_behaviour,
             'bandwidth' => $this->bandwidth,
             'bandwidth_limit' => $this->getBandwidthLimit(),
             'username_count' => $this->usernames()->count(),

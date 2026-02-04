@@ -1034,6 +1034,110 @@
       <div class="py-10">
         <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Spam / DMARC Warning
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            When a forwarded email is flagged as spam or fails DMARC authentication, you can choose
+            how you are notified: show a warning banner in the email body (default), prepend a
+            warning tag to the subject line (e.g. [DMARC FAIL] or [SPAM]), or turn off the warning
+            altogether.
+          </p>
+          <p class="text-base text-grey-700 dark:text-grey-200 !mt-4">
+            <b>Please note</b> that turning the warning off completely may increase your risk of
+            falling for <b>phishing or spoofed</b> emails. If unsure, always check the
+            "X-AnonAddy-Authentication-Results" header.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              spamWarningBehaviourForm.post(route('settings.spam_warning_behaviour'), {
+                preserveScroll: true,
+              })
+            "
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label
+                  for="spam-warning-behaviour"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Warning behaviour</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="spam-warning-behaviour"
+                    v-model="spamWarningBehaviourForm.spam_warning_behaviour"
+                    name="spam_warning_behaviour"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      spamWarningBehaviourForm.errors.spam_warning_behaviour
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      spamWarningBehaviourForm.errors.spam_warning_behaviour ? 'true' : undefined
+                    "
+                    :aria-describedby="
+                      spamWarningBehaviourForm.errors.spam_warning_behaviour
+                        ? 'spam-warning-behaviour-error'
+                        : undefined
+                    "
+                  >
+                    <option
+                      value="banner"
+                      :selected="spamWarningBehaviour === 'banner' ? 'selected' : ''"
+                      class="dark:bg-grey-900"
+                    >
+                      Show warning banner in email
+                    </option>
+                    <option
+                      value="subject"
+                      :selected="spamWarningBehaviour === 'subject' ? 'selected' : ''"
+                      class="dark:bg-grey-900"
+                    >
+                      Prepend [SPAM] / [DMARC FAIL] to subject
+                    </option>
+                    <option
+                      value="off"
+                      :selected="spamWarningBehaviour === 'off' ? 'selected' : ''"
+                      class="dark:bg-grey-900"
+                    >
+                      No warning
+                    </option>
+                  </select>
+                  <div
+                    v-if="spamWarningBehaviourForm.errors.spam_warning_behaviour"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="spamWarningBehaviourForm.errors.spam_warning_behaviour"
+                  class="mt-2 text-sm text-red-600"
+                  id="spam-warning-behaviour-error"
+                >
+                  {{ spamWarningBehaviourForm.errors.spam_warning_behaviour }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="spamWarningBehaviourForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update spam / DMARC warning
+              <loader v-if="spamWarningBehaviourForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
             Replace Email Subject
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
@@ -1160,6 +1264,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  spamWarningBehaviour: {
+    type: String,
+    required: true,
+  },
   emailSubject: {
     type: String,
     required: true,
@@ -1267,6 +1375,10 @@ const fromNameForm = useForm({
 
 const bannerLocationForm = useForm({
   banner_location: props.bannerLocation,
+})
+
+const spamWarningBehaviourForm = useForm({
+  spam_warning_behaviour: props.spamWarningBehaviour,
 })
 
 const emailSubjectForm = useForm({

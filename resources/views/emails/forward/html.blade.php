@@ -1,9 +1,9 @@
-@if($locationHtml === 'off' && ! $isSpam)
+@if($locationHtml === 'off' && ! $showSpamBanner)
     {!! $html !!}
 @else
     <table style="width:100% !important;">
         <tbody>
-            @if($isSpam)
+            @if($showSpamBanner)
                 @include('emails.forward.html_spam_warning')
             @endif
             @if($locationHtml === 'top')

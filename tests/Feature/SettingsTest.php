@@ -361,6 +361,34 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
+    public function user_can_update_spam_warning_behaviour()
+    {
+        $this->assertEquals('banner', $this->user->spam_warning_behaviour);
+
+        $response = $this->post('/settings/spam-warning-behaviour', [
+            'spam_warning_behaviour' => 'subject',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertEquals('subject', $this->user->spam_warning_behaviour);
+    }
+
+    #[Test]
+    public function user_cannot_update_spam_warning_behaviour_to_incorrect_value()
+    {
+        $this->assertEquals('banner', $this->user->spam_warning_behaviour);
+
+        $response = $this->post('/settings/spam-warning-behaviour', [
+            'spam_warning_behaviour' => 'side',
+        ]);
+
+        $response->assertStatus(302);
+
+        $response->assertSessionHasErrors(['spam_warning_behaviour']);
+        $this->assertEquals('banner', $this->user->spam_warning_behaviour);
+    }
+
+    #[Test]
     public function user_can_enable_use_reply_to()
     {
         $this->assertFalse($this->user->use_reply_to);

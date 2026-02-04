@@ -29,6 +29,7 @@ class SettingController extends Controller
             'fromName' => user()->from_name ?? '',
             'emailSubject' => user()->email_subject ?? '',
             'bannerLocation' => user()->banner_location,
+            'spamWarningBehaviour' => user()->spam_warning_behaviour,
             'domainOptions' => user()->domainOptions(),
         ]);
     }

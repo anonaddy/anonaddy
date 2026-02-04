@@ -41,6 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'from_name',
         'email_subject',
         'banner_location',
+        'spam_warning_behaviour',
         'display_from_format',
         'login_redirect',
         'catch_all',

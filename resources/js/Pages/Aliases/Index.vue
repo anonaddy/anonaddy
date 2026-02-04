@@ -827,6 +827,7 @@
               v-for="formatOption in aliasFormatOptions"
               :key="formatOption.value"
               :value="formatOption.value"
+              class="dark:bg-grey-900"
             >
               {{ formatOption.label }}
             </option>
