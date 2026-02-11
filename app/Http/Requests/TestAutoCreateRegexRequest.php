@@ -33,6 +33,8 @@ class TestAutoCreateRegexRequest extends FormRequest
             ],
             'local_part' => [
                 'required',
+                'max:255',
+                'ascii',
                 new ValidAliasLocalPart,
             ],
         ];

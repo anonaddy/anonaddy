@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\SafeRegex;
 use App\Rules\ValidRegex;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -32,6 +33,7 @@ class UpdateUsernameRequest extends FormRequest
                 'string',
                 'max:100',
                 new ValidRegex,
+                new SafeRegex,
             ],
         ];
     }

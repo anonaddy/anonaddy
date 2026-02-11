@@ -369,6 +369,25 @@ class UsernamesTest extends TestCase
     }
 
     #[Test]
+    public function username_auto_create_regex_rejects_redos_prone_patterns()
+    {
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $dangerousPatterns = ['(.*)*', '(.+)+', '(a+)+', '(\w+)+'];
+
+        foreach ($dangerousPatterns as $pattern) {
+            $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
+                'auto_create_regex' => $pattern,
+            ]);
+            $response
+                ->assertStatus(422)
+                ->assertJsonValidationErrorFor('auto_create_regex');
+        }
+    }
+
+    #[Test]
     public function user_can_delete_username()
     {
         $username = Username::factory()->create([

@@ -249,6 +249,25 @@ class DomainsTest extends TestCase
     }
 
     #[Test]
+    public function domain_auto_create_regex_rejects_redos_prone_patterns()
+    {
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $dangerousPatterns = ['(.*)*', '(.+)+', '(a+)+', '(\w+)+'];
+
+        foreach ($dangerousPatterns as $pattern) {
+            $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
+                'auto_create_regex' => $pattern,
+            ]);
+            $response
+                ->assertStatus(422)
+                ->assertJsonValidationErrorFor('auto_create_regex');
+        }
+    }
+
+    #[Test]
     public function user_can_delete_domain()
     {
         $domain = Domain::factory()->create([

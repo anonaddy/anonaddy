@@ -16,6 +16,7 @@ try {
             'DB_SOCKET',
             'MYSQL_ATTR_SSL_CA',
             'ACTION_NON_ASCII',
+            'ACTION_ADDRESS_TOO_LONG',
             'ACTION_DOES_NOT_EXIST',
             'ACTION_ALIAS_DISCARD',
             'ACTION_USERNAME_DISCARD',
@@ -69,6 +70,7 @@ try {
     // Define actions, these can be overridden by adding the variables to your .env file
     // e.g. ACTION_DOES_NOT_EXIST='550 5.1.1 User not found'
     define('ACTION_NON_ASCII', $_ENV['ACTION_NON_ASCII'] ?? '553 5.6.7 Non-ASCII characters in the local-part of the recipient address are not permitted');
+    define('ACTION_ADDRESS_TOO_LONG', $_ENV['ACTION_ADDRESS_TOO_LONG'] ?? '550 5.1.1 Recipient address length exceeds maximum (RFC 5321)');
     define('ACTION_DOES_NOT_EXIST', $_ENV['ACTION_DOES_NOT_EXIST'] ?? '550 5.1.1 Address does not exist');
     define('ACTION_ALIAS_DISCARD', $_ENV['ACTION_ALIAS_DISCARD'] ?? 'DISCARD is inactive alias');
     define('ACTION_USERNAME_DISCARD', $_ENV['ACTION_USERNAME_DISCARD'] ?? 'DISCARD has inactive username');
@@ -90,6 +92,15 @@ try {
         sendAction(ACTION_DOES_NOT_EXIST);
 
         logData('No alias email or $allDomains not set.');
+        exit(0);
+    }
+
+    // RFC 5321: maximum address length is 254 octets
+    if (strlen($aliasEmail) > 254) {
+        logData('Recipient address too long: '.strlen($aliasEmail).' octets');
+
+        sendAction(ACTION_ADDRESS_TOO_LONG);
+
         exit(0);
     }
 
