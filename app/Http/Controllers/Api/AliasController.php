@@ -131,6 +131,12 @@ class AliasController extends Controller
             if ($format === 'random_words') {
                 // Random Words
                 $localPart = user()->generateRandomWordLocalPart();
+            } elseif ($format === 'random_male_name') {
+                $localPart = user()->generateRandomNameLocalPart('male');
+            } elseif ($format === 'random_female_name') {
+                $localPart = user()->generateRandomNameLocalPart('female');
+            } elseif ($format === 'random_noun') {
+                $localPart = user()->generateRandomNounLocalPart();
             } elseif ($format === 'uuid') {
                 // UUID
                 $localPart = Uuid::uuid4();

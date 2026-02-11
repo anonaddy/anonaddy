@@ -287,7 +287,7 @@ function getIdFromVerp($verpLocalPart, $verpEmail)
         return;
     }
 
-    $expectedSignature = substr(hash_hmac('sha3-224', $id, $_ENV['ANONADDY_VERP_SECRET'] ?? ''), 0, 8);
+    $expectedSignature = substr(hash_hmac('sha3-224', $id, $_ENV['ANONADDY_SECRET'] ?? ''), 0, 8);
 
     if ($signature !== $expectedSignature) {
         logData('VERP invalid signature: '.$verpEmail);

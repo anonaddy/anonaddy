@@ -37,6 +37,7 @@ class UserResource extends JsonResource
             'default_recipient_id' => $this->default_recipient_id,
             'default_alias_domain' => $this->default_alias_domain,
             'default_alias_format' => $this->default_alias_format,
+            'alias_separator' => $this->alias_separator,
             'recipient_count' => $this->recipients()->count(),
             'active_domain_count' => $this->domains()->where('active', true)->count(),
             'active_shared_domain_alias_count' => $this->activeSharedDomainAliases()->count(),

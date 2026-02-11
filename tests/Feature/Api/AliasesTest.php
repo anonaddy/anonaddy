@@ -257,8 +257,61 @@ class AliasesTest extends TestCase
 
         $response->assertStatus(201);
         $this->assertCount(1, $this->user->aliases);
-        $this->assertNotEquals($this->user->aliases[0]->id, $response->getData()->data->local_part);
+        $localPart = $response->getData()->data->local_part;
+        $this->assertNotEquals($this->user->aliases[0]->id, $localPart);
         $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+        $this->assertMatchesRegularExpression('/^[a-z]+[._-][a-z]+\d{1,3}$/', $localPart);
+    }
+
+    #[Test]
+    public function user_can_generate_new_random_male_name_alias()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'anonaddy.me',
+            'description' => 'the description',
+            'format' => 'random_male_name',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $localPart = $response->getData()->data->local_part;
+        $this->assertNotEquals($this->user->aliases[0]->id, $localPart);
+        $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+        $this->assertMatchesRegularExpression('/^[a-z]+[._-][a-z]+\d{1,3}$/', $localPart);
+    }
+
+    #[Test]
+    public function user_can_generate_new_random_female_name_alias()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'anonaddy.me',
+            'description' => 'the description',
+            'format' => 'random_female_name',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $localPart = $response->getData()->data->local_part;
+        $this->assertNotEquals($this->user->aliases[0]->id, $localPart);
+        $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+        $this->assertMatchesRegularExpression('/^[a-z]+[._-][a-z]+\d{1,3}$/', $localPart);
+    }
+
+    #[Test]
+    public function user_can_generate_new_random_noun_alias()
+    {
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => 'anonaddy.me',
+            'description' => 'the description',
+            'format' => 'random_noun',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertCount(1, $this->user->aliases);
+        $localPart = $response->getData()->data->local_part;
+        $this->assertNotEquals($this->user->aliases[0]->id, $localPart);
+        $this->assertNotEquals($this->user->aliases[0]->id, $this->user->aliases[0]->local_part);
+        $this->assertMatchesRegularExpression('/^[a-z]+[._-][a-z]+\d{1,3}$/', $localPart);
     }
 
     #[Test]

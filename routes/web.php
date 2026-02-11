@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AliasExportController;
 use App\Http\Controllers\AliasImportController;
+use App\Http\Controllers\AliasSeparatorController;
 use App\Http\Controllers\Auth\ApiAuthenticationController;
 use App\Http\Controllers\Auth\BackupCodeController;
 use App\Http\Controllers\Auth\ForgotUsernameController;
@@ -152,6 +153,8 @@ Route::group([
     Route::post('/default-alias-domain', [DefaultAliasDomainController::class, 'update'])->name('settings.default_alias_domain');
 
     Route::post('/default-alias-format', [DefaultAliasFormatController::class, 'update'])->name('settings.default_alias_format');
+
+    Route::post('/alias-separator', [AliasSeparatorController::class, 'update'])->name('settings.alias_separator');
 
     Route::post('/display-from-format', [DisplayFromFormatController::class, 'update'])->name('settings.display_from_format');
 

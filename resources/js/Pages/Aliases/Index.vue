@@ -1658,6 +1658,18 @@ const aliasFormatOptions = [
     label: 'Random Words',
   },
   {
+    value: 'random_male_name',
+    label: 'Random Male Name',
+  },
+  {
+    value: 'random_female_name',
+    label: 'Random Female Name',
+  },
+  {
+    value: 'random_noun',
+    label: 'Random Noun',
+  },
+  {
     value: 'custom',
     label: 'Custom',
   },

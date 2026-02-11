@@ -51,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'defer_new_aliases_until',
         'default_alias_domain',
         'default_alias_format',
+        'alias_separator',
         'use_reply_to',
         'store_failed_deliveries',
         'save_alias_last_used',
@@ -585,11 +586,49 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
+    /**
+     * Get the separator character to use when generating alias local parts.
+     * Resolves 'random' to one of '.', '_', '-' per generation.
+     */
+    public function aliasSeparatorForGeneration(): string
+    {
+        $setting = $this->alias_separator ?? '.';
+        if ($setting === 'random') {
+            return ['.', '_', '-'][mt_rand(0, 2)];
+        }
+
+        return $setting;
+    }
+
     public function generateRandomWordLocalPart()
     {
-        return collect(config('anonaddy.wordlist'))
-            ->random(2)
-            ->implode('.').mt_rand(0, 999);
+        $sep = $this->aliasSeparatorForGeneration();
+        $words = collect(config('anonaddy.wordlist'))->random(2)->map(fn ($w) => strtolower($w));
+
+        return $words->implode($sep).mt_rand(0, 999);
+    }
+
+    public function generateRandomNameLocalPart(string $gender): string
+    {
+        $firstNames = $gender === 'male'
+            ? config('anonaddy.male_first_names')
+            : config('anonaddy.female_first_names');
+        $first = collect($firstNames)->random();
+        $surname = collect(config('anonaddy.surnames'))->random();
+        $digits = str_pad((string) mt_rand(0, 999), 3, '0', STR_PAD_LEFT);
+        $sep = $this->aliasSeparatorForGeneration();
+
+        return strtolower($first).$sep.strtolower($surname).$digits;
+    }
+
+    public function generateRandomNounLocalPart(): string
+    {
+        $adjective = collect(config('anonaddy.adjectives'))->random();
+        $noun = collect(config('anonaddy.nouns'))->random();
+        $digits = str_pad((string) mt_rand(0, 999), 3, '0', STR_PAD_LEFT);
+        $sep = $this->aliasSeparatorForGeneration();
+
+        return strtolower($adjective).$sep.strtolower($noun).$digits;
     }
 
     public function generateRandomCharacterLocalPart(int $length): string

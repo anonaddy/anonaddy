@@ -326,7 +326,7 @@
               <div>
                 <label
                   for="default-alias-format"
-                  class="block text-sm font-medium leading-6 text-grey-600"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
                   >Select Default Format</label
                 >
                 <div class="block relative w-full mt-2">
@@ -370,6 +370,27 @@
                       Random Words
                     </option>
                     <option
+                      value="random_male_name"
+                      :selected="defaultAliasFormat === 'random_male_name' ? 'selected' : ''"
+                      class="dark:bg-grey-900"
+                    >
+                      Random Male Name
+                    </option>
+                    <option
+                      value="random_female_name"
+                      :selected="defaultAliasFormat === 'random_female_name' ? 'selected' : ''"
+                      class="dark:bg-grey-900"
+                    >
+                      Random Female Name
+                    </option>
+                    <option
+                      value="random_noun"
+                      :selected="defaultAliasFormat === 'random_noun' ? 'selected' : ''"
+                      class="dark:bg-grey-900"
+                    >
+                      Random Noun
+                    </option>
+                    <option
                       value="custom"
                       :selected="defaultAliasFormat === 'custom' ? 'selected' : ''"
                       class="dark:bg-grey-900"
@@ -401,6 +422,92 @@
             >
               Update Default Alias Format
               <loader v-if="defaultAliasFormatForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Alias Separator
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            The character used between words in aliases with the following formats: Random Words,
+            Random Male/Female Name, Random Noun and Custom Shared Domain. For example, with period:
+            <code class="rounded bg-grey-100 dark:bg-grey-800 px-1"
+              >word.word123@{{ defaultAliasDomain }}</code
+            >; with underscore:
+            <code class="rounded bg-grey-100 dark:bg-grey-800 px-1"
+              >word_word123@{{ defaultAliasDomain }}</code
+            >; with hyphen:
+            <code class="rounded bg-grey-100 dark:bg-grey-800 px-1"
+              >word-word123@{{ defaultAliasDomain }}</code
+            >.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              aliasSeparatorForm.post(route('settings.alias_separator'), {
+                preserveScroll: true,
+              })
+            "
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label
+                  for="alias-separator"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Select Separator</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="alias-separator"
+                    v-model="aliasSeparatorForm.separator"
+                    name="separator"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      aliasSeparatorForm.errors.separator
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="aliasSeparatorForm.errors.separator ? 'true' : undefined"
+                    :aria-describedby="
+                      aliasSeparatorForm.errors.separator ? 'alias-separator-error' : undefined
+                    "
+                  >
+                    <option value="." class="dark:bg-grey-900">Period (.)</option>
+                    <option value="_" class="dark:bg-grey-900">Underscore (_)</option>
+                    <option value="-" class="dark:bg-grey-900">Hyphen (-)</option>
+                    <option value="random" class="dark:bg-grey-900">
+                      Random (varies per alias)
+                    </option>
+                  </select>
+                  <div
+                    v-if="aliasSeparatorForm.errors.separator"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="aliasSeparatorForm.errors.separator"
+                  class="mt-2 text-sm text-red-600"
+                  id="alias-separator-error"
+                >
+                  {{ aliasSeparatorForm.errors.separator }}
+                </p>
+              </div>
+            </div>
+            <button
+              type="submit"
+              :disabled="aliasSeparatorForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update Alias Separator
+              <loader v-if="aliasSeparatorForm.processing" />
             </button>
           </form>
         </div>
@@ -580,9 +687,12 @@
           </p>
           <p class="text-base text-grey-700 dark:text-grey-200">
             If enabled, then the <b>From:</b> header will be set as the alias email e.g.
-            <b>alias{{ '@' + $page.props.user.username }}.anonaddy.com</b> instead of the default
+            <b>alias{{ '@' + $page.props.user.username + '.' + defaultAliasDomain }}</b> instead of
+            the default
             <b class="break-words"
-              >alias+sender=example.com{{ '@' + $page.props.user.username }}.anonaddy.com</b
+              >alias+sender=example.com{{
+                '@' + $page.props.user.username + '.' + defaultAliasDomain
+              }}</b
             >
             (this will be set as the Reply-To header instead)
           </p>
@@ -667,7 +777,7 @@
             Store Failed Deliveries
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
-            This setting allows you to choose whether or not addy.io should
+            This setting allows you to choose whether or not this instance should
             <b>temporarily store</b> failed delivery attempts, this ensures that
             <b>emails are not lost</b> if they are rejected by your recipients as they can be
             downloaded from the failed deliveries page. Failed deliveries are
@@ -760,7 +870,7 @@
             Save Alias 'Last Used At'
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
-            This setting allows you to choose whether or not addy.io should save the dates for
+            This setting allows you to choose whether or not this instance should save the dates for
             <b>last forwarded at</b>, <b>last replied at</b> and <b>last sent at</b> for your
             aliases. You can view this information by hovering over the relevant count of each of
             these on the
@@ -860,7 +970,7 @@
             <p class="text-base text-grey-700 dark:text-grey-200">
               The 'From Name' is shown when you send an email from an alias or reply anonymously to
               a forwarded email. If left blank, then the email alias itself will be used as the
-              'From Name' e.g. "example@{{ $page.props.user.username }}.anonaddy.com".
+              'From Name' e.g. "example@{{ $page.props.user.username }}.{{ defaultAliasDomain }}".
             </p>
             <div class="text-base text-grey-700 dark:text-grey-200 my-3">
               The 'From Name' that is used for an alias is determined by the following
@@ -1228,6 +1338,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  aliasSeparator: {
+    type: String,
+    required: true,
+  },
   loginRedirect: {
     type: Number,
     required: true,
@@ -1343,6 +1457,10 @@ const defaultAliasDomainForm = useForm({
 
 const defaultAliasFormatForm = useForm({
   format: props.defaultAliasFormat,
+})
+
+const aliasSeparatorForm = useForm({
+  separator: props.aliasSeparator,
 })
 
 const loginRedirectForm = useForm({

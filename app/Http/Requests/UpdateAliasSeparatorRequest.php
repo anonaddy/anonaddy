@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateDefaultAliasFormatRequest extends FormRequest
+class UpdateAliasSeparatorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,7 @@ class UpdateDefaultAliasFormatRequest extends FormRequest
     public function rules()
     {
         return [
-            'format' => [
-                'required',
-                'string',
-                'in:random_characters,uuid,random_words,random_male_name,random_female_name,random_noun,custom',
-            ],
+            'separator' => ['required', 'string', 'in:.,_,-,random'],
         ];
     }
 }

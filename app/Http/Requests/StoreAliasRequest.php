@@ -45,7 +45,7 @@ class StoreAliasRequest extends FormRequest
                 Rule::in($this->user()->domainOptions()),
             ],
             'description' => 'nullable|max:200',
-            'format' => 'nullable|in:random_characters,uuid,random_words,custom',
+            'format' => 'nullable|in:random_characters,uuid,random_words,random_male_name,random_female_name,random_noun,custom',
             'recipient_ids' => [
                 'bail',
                 'nullable',
