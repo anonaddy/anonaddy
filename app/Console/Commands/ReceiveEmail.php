@@ -139,6 +139,12 @@ class ReceiveEmail extends Command
                     }
                 }
 
+                // If a bounce that doesn't originate from this server, then we don't want to forward them (potential backscatter)
+                if ($this->option('sender') === 'MAILER-DAEMON' && Str::startsWith(strtolower($this->parser->getHeader('Content-Type')), 'multipart/report') && ! isset($outboundMessage)) {
+
+                    exit(0);
+                }
+
                 // First determine if the alias already exists in the database
                 if ($this->alias = Alias::firstWhere('email', $this->inboundAlias['local_part'].'@'.$this->inboundAlias['domain'])) {
                     $this->user = $this->alias->user;
