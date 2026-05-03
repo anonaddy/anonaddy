@@ -1,0 +1,38 @@
+variable "PHP_VERSION" {
+  default = null
+}
+variable "COMPOSER_VERSION" {
+  default = null
+}
+variable "NODE_VERSION" {
+  default = null
+}
+
+group "default" {
+  targets = ["validate"]
+}
+
+group "validate" {
+  targets = ["composer-validate", "npm-validate"]
+}
+
+target "_common" {
+  dockerfile = "dev.Dockerfile"
+  args = {
+    PHP_VERSION = PHP_VERSION
+    COMPOSER_VERSION = COMPOSER_VERSION
+    NODE_VERSION = NODE_VERSION
+  }
+}
+
+target "composer-validate" {
+  inherits = ["_common"]
+  target = "composer-validate"
+  output = ["type=cacheonly"]
+}
+
+target "npm-validate" {
+  inherits = ["_common"]
+  target = "npm-validate"
+  output = ["type=cacheonly"]
+}
