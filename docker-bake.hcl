@@ -13,7 +13,11 @@ group "default" {
 }
 
 group "validate" {
-  targets = ["composer-validate", "npm-validate"]
+  targets = ["composer-validate", "npm-validate", "phpunit"]
+}
+
+group "test" {
+  targets = ["phpunit"]
 }
 
 target "_common" {
@@ -34,5 +38,11 @@ target "composer-validate" {
 target "npm-validate" {
   inherits = ["_common"]
   target = "npm-validate"
+  output = ["type=cacheonly"]
+}
+
+target "phpunit" {
+  inherits = ["_common"]
+  target = "phpunit"
   output = ["type=cacheonly"]
 }

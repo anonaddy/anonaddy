@@ -11,6 +11,7 @@ COPY --from=composer-bin /usr/bin/composer /usr/bin/composer
 WORKDIR /src
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_CACHE_DIR=/tmp/cache/composer
+ENV COMPOSER_NO_AUDIT=1
 ENV COMPOSER_NO_INTERACTION=1
 
 FROM php-base AS composer-validate
@@ -19,6 +20,52 @@ RUN --mount=type=bind,target=.,ro \
   set -ex
   composer validate --strict --no-check-publish --check-lock
   composer --working-dir=postfix validate --no-check-publish --check-lock
+EOT
+
+FROM php-base AS php-test-base
+RUN apk add --no-cache \
+    freetype \
+    git \
+    gnupg \
+    gpgme \
+    libjpeg-turbo \
+    libpng \
+    libzip \
+    oniguruma \
+    redis \
+    sqlite-libs \
+    unzip \
+  && apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS \
+    freetype-dev \
+    gpgme-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libzip-dev \
+    oniguruma-dev \
+    sqlite-dev \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-install -j$(nproc) gd mbstring pdo_sqlite zip \
+  && pecl install gnupg mailparse redis \
+  && docker-php-ext-enable gnupg mailparse redis \
+  && echo 'memory_limit=512M' > /usr/local/etc/php/conf.d/phpunit-memory.ini \
+  && apk del .build-deps
+
+FROM php-test-base AS phpunit
+RUN --mount=type=bind,target=.,rw \
+  --mount=type=cache,target=/tmp/cache/composer \
+  --mount=type=cache,target=/src/vendor <<EOT
+  set -ex
+  export APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  export APP_ENV=testing
+  export DB_CONNECTION=sqlite
+  export DB_DATABASE=':memory:'
+  [ -f .env ] || cp .env.example .env
+  mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
+  redis-server --daemonize yes
+  composer install --prefer-dist --no-progress --no-scripts
+  php artisan package:discover --ansi
+  php artisan test
 EOT
 
 FROM node:${NODE_VERSION}-alpine AS npm-base
