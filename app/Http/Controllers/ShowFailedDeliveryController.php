@@ -12,22 +12,29 @@ class ShowFailedDeliveryController extends Controller
         // Validate search query
         $validated = $request->validate([
             'search' => 'nullable|string|max:50|min:2',
-            'filter' => 'nullable|string|in:all,inbound,outbound',
+            'filter' => 'nullable|string|in:all,inbound,outbound,inbound_quarantined',
             'page_size' => 'nullable|integer|in:25,50,100',
         ]);
 
         $query = user()
             ->failedDeliveries()
             ->with(['recipient:id,email', 'alias:id,email'])
-            ->select(['alias_id', 'email_type', 'code', 'attempted_at', 'created_at', 'id', 'user_id', 'recipient_id', 'remote_mta', 'sender', 'destination', 'is_stored', 'resent'])
+            ->select(['alias_id', 'email_type', 'code', 'attempted_at', 'created_at', 'id', 'user_id', 'recipient_id', 'remote_mta', 'sender', 'destination', 'is_stored', 'resent', 'quarantined', 'ir_dedupe_key'])
             ->latest();
 
         $filter = $validated['filter'] ?? 'all';
 
         if ($filter === 'inbound') {
-            $query->where('email_type', 'IR');
+            $query->where(function ($q) {
+                $q->where('email_type', 'IR')
+                    ->orWhereNotNull('ir_dedupe_key');
+            });
         } elseif ($filter === 'outbound') {
-            $query->where('email_type', '!=', 'IR');
+            $query->where('email_type', '!=', 'IR')
+                ->whereNull('ir_dedupe_key')
+                ->where('quarantined', false);
+        } elseif ($filter === 'inbound_quarantined') {
+            $query->where('quarantined', true);
         }
 
         if (isset($validated['search'])) {

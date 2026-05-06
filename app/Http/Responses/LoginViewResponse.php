@@ -30,7 +30,10 @@ class LoginViewResponse extends LoginViewResponseBase
         // Check if user is already authenticated with any 2FA method, if so then redirect home
         $totpAuthenticator = app(Authenticator::class)->boot($request);
 
-        if ($totpAuthenticator->isAuthenticated() || Webauthn::check()) {
+        $totpAuthenticated = $request->user()->hasTotpEnabled() && $totpAuthenticator->isAuthenticated();
+        $webauthnAuthenticated = $request->user()->hasWebauthnEnabled() && Webauthn::check();
+
+        if ($totpAuthenticated || $webauthnAuthenticated) {
             return Response::redirectTo('/');
         }
 

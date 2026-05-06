@@ -159,6 +159,35 @@ class LoginTest extends TestCase
     }
 
     #[Test]
+    public function stale_totp_session_does_not_bypass_webauthn_only_user()
+    {
+        $this->user->update([
+            'two_factor_enabled' => false,
+            'webauthn_enabled' => true,
+        ]);
+
+        $this->user->webauthnKeys()->create([
+            'name' => 'key',
+            'enabled' => true,
+            'credentialId' => 'xyz',
+            'type' => 'public-key',
+            'transports' => [],
+            'attestationType' => 'none',
+            'trustPath' => '{"type":"Webauthn\\\\TrustPath\\\\EmptyTrustPath"}',
+            'aaguid' => '00000000-0000-0000-0000-000000000000',
+            'credentialPublicKey' => 'xyz',
+            'counter' => 0,
+        ]);
+
+        $response = $this
+            ->actingAs($this->user)
+            ->withSession(['two_factor_auth' => true])
+            ->get('/recipients');
+
+        $response->assertRedirect(route('webauthn.login'));
+    }
+
+    #[Test]
     public function user_can_receive_username_reminder_email()
     {
         $this->withoutMiddleware();

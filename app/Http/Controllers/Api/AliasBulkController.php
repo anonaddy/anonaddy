@@ -135,9 +135,6 @@ class AliasBulkController extends Controller
             return response()->json(['message' => 'No aliases found'], 404);
         }
 
-        // Detach any recipients
-        DB::table('alias_recipients')->whereIn('alias_id', $aliasIds)->delete();
-
         // Use update since delete() does not trigger model event
         user()->aliases()->whereIn('id', $aliasIds)->update(['active' => false, 'deleted_at' => now()]);
 

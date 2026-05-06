@@ -35,7 +35,7 @@ class IndexFailedDeliveryRequest extends FormRequest
             'filter.email_type' => [
                 'nullable',
                 'string',
-                'in:inbound,outbound',
+                'in:inbound,outbound,inbound_quarantined',
             ],
         ];
     }

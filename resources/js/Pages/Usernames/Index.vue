@@ -27,6 +27,9 @@
       </div>
     </div>
 
+    <p v-if="rows.length" class="mb-2 text-xs text-grey-500 dark:text-grey-300 md:hidden">
+      Swipe horizontally to view username actions.
+    </p>
     <vue-good-table
       v-if="rows.length"
       v-on:sort-change="debounceToolips"

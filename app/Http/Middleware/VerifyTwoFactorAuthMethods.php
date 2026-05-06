@@ -27,7 +27,10 @@ class VerifyTwoFactorAuthMethods
         // Check if user is already authenticated with any 2FA method
         $totpAuthenticator = app(Authenticator::class)->boot($request);
 
-        if ($totpAuthenticator->isAuthenticated() || Webauthn::check()) {
+        $totpAuthenticated = $user->hasTotpEnabled() && $totpAuthenticator->isAuthenticated();
+        $webauthnAuthenticated = $user->hasWebauthnEnabled() && Webauthn::check();
+
+        if ($totpAuthenticated || $webauthnAuthenticated) {
             return $next($request);
         }
 

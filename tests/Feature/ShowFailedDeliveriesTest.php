@@ -114,6 +114,29 @@ class ShowFailedDeliveriesTest extends TestCase
     }
 
     #[Test]
+    public function user_can_filter_by_quarantined_deliveries()
+    {
+        FailedDelivery::factory()->create([
+            'user_id' => $this->user->id,
+            'email_type' => 'F',
+            'quarantined' => true,
+        ]);
+        FailedDelivery::factory()->create([
+            'user_id' => $this->user->id,
+            'email_type' => 'F',
+            'quarantined' => false,
+        ]);
+
+        $response = $this->get('/failed-deliveries?filter=inbound_quarantined');
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows.data', 1)
+            ->where('initialFilter', 'inbound_quarantined')
+        );
+    }
+
+    #[Test]
     public function user_can_paginate_failed_deliveries()
     {
         FailedDelivery::factory()->count(30)->create([

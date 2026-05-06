@@ -225,9 +225,9 @@ class CustomMailer extends Mailer
                         $notifiable = $recipient?->email_verified_at ? $recipient : $user?->defaultRecipient;
 
                         // Notify user of failed delivery
-                        if ($notifiable?->email_verified_at) {
+                        if ($notifiable?->email_verified_at && $user?->shouldReceiveFailedDeliveryNotification(false)) {
 
-                            $notifiable->notify(new FailedDeliveryNotification($alias->email ?? null, $failedDelivery->sender, $symfonyMessage->getSubject(), $failedDelivery?->is_stored, $user?->store_failed_deliveries, $recipient?->email));
+                            $notifiable->notify(new FailedDeliveryNotification($alias->email ?? null, $failedDelivery->sender, $symfonyMessage->getSubject(), $failedDelivery?->is_stored, $user?->store_failed_deliveries, $recipient?->email, false, $symfonyMessage->getHeaders()->get('X-AnonAddy-Authentication-Results')?->getBodyAsString(), $failedDelivery?->remote_mta));
                         }
                     }
                 }

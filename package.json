@@ -10,7 +10,7 @@
     "dependencies": {
         "@headlessui/vue": "^1.6.7",
         "@heroicons/vue": "^2.0.18",
-        "@inertiajs/vue3": "^2.0.0",
+        "@inertiajs/vue3": "^3.0.0",
         "@kyvg/vue3-notification": "^3.0.0",
         "@tailwindcss/forms": "^0.5.3",
         "@vueform/multiselect": "^2.3.2",
@@ -38,7 +38,7 @@
         "css-loader": "^7.0.0",
         "husky": "^9.0.0",
         "laravel-vite-plugin": "^3.0.0",
-        "lint-staged": "^16.0.0",
+        "lint-staged": "^17.0.0",
         "prettier": "^3.0.0",
         "vite": "^8.0.0"
     },

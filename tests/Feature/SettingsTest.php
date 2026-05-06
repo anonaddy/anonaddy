@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\DisplayFromFormat;
+use App\Enums\FailedDeliveryNotificationPreference;
 use App\Enums\ListUnsubscribeBehaviour;
 use App\Exports\AliasesExport;
 use App\Imports\AliasesImport;
@@ -478,6 +479,33 @@ class SettingsTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertFalse($this->user->store_failed_deliveries);
+    }
+
+    #[Test]
+    public function user_can_update_failed_delivery_notification_preference()
+    {
+        $this->assertEquals(FailedDeliveryNotificationPreference::All, $this->user->fresh()->failed_delivery_notification_preference);
+
+        $response = $this->post('/settings/failed-delivery-notification-preference', [
+            'failed_delivery_notification_preference' => FailedDeliveryNotificationPreference::QuarantinedOnly->value,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertEquals(FailedDeliveryNotificationPreference::QuarantinedOnly, $this->user->fresh()->failed_delivery_notification_preference);
+    }
+
+    #[Test]
+    public function user_cannot_update_failed_delivery_notification_preference_to_invalid_value()
+    {
+        $this->assertEquals(FailedDeliveryNotificationPreference::All, $this->user->fresh()->failed_delivery_notification_preference);
+
+        $response = $this->post('/settings/failed-delivery-notification-preference', [
+            'failed_delivery_notification_preference' => 99,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['failed_delivery_notification_preference']);
+        $this->assertEquals(FailedDeliveryNotificationPreference::All, $this->user->fresh()->failed_delivery_notification_preference);
     }
 
     #[Test]

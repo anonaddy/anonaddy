@@ -96,7 +96,7 @@ class FailedDelivery extends Model
                 'R' => 'Reply',
                 'S' => 'Send',
                 'RP' => 'Reset Password',
-                'FDN' => 'Failed Delivery',
+                'FDN' => 'Failed Delivery Notification',
                 'DMI' => 'Domain MX Invalid',
                 'DRU' => 'Default Recipient Updated',
                 'NRV' => 'New Recipient Verified',

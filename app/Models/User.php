@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DisplayFromFormat;
+use App\Enums\FailedDeliveryNotificationPreference;
 use App\Enums\ListUnsubscribeBehaviour;
 use App\Enums\LoginRedirect;
 use App\Notifications\CustomResetPassword;
@@ -57,6 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'alias_separator',
         'use_reply_to',
         'store_failed_deliveries',
+        'failed_delivery_notification_preference',
         'save_alias_last_used',
         'dark_mode',
         'default_username_id',
@@ -100,6 +102,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'webauthn_enabled' => 'boolean',
         'use_reply_to' => 'boolean',
         'store_failed_deliveries' => 'boolean',
+        'failed_delivery_notification_preference' => FailedDeliveryNotificationPreference::class,
         'save_alias_last_used' => 'boolean',
         'dark_mode' => 'boolean',
         'created_at' => 'datetime',
@@ -705,6 +708,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canCreateUsernameSubdomainAliases()
     {
         return config('anonaddy.non_admin_username_subdomains') || $this->isAdminUser();
+    }
+
+    public function shouldReceiveFailedDeliveryNotification(bool $quarantined): bool
+    {
+        $preference = $this->failed_delivery_notification_preference ?? FailedDeliveryNotificationPreference::All;
+
+        return match ($preference) {
+            FailedDeliveryNotificationPreference::All => true,
+            FailedDeliveryNotificationPreference::NormalOnly => ! $quarantined,
+            FailedDeliveryNotificationPreference::QuarantinedOnly => $quarantined,
+            FailedDeliveryNotificationPreference::None => false,
+        };
     }
 
     /**

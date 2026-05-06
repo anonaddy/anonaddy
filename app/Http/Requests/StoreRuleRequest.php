@@ -88,6 +88,7 @@ class StoreRuleRequest extends FormRequest
                         'encryption',
                         'banner',
                         'block',
+                        'quarantine',
                         'removeAttachments',
                         'forwardTo',
                         // 'webhook',

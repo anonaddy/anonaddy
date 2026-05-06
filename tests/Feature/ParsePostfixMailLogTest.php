@@ -159,7 +159,7 @@ class ParsePostfixMailLogTest extends TestCase
             'user_id' => $this->user->id,
             'alias_id' => $alias->id,
             'email_type' => 'IR',
-            'code' => 'Recipient address is inactive alias',
+            'code' => 'Email discarded because this alias is deactivated',
             'status' => '',
             'remote_mta' => 'a.b.com[52.48.1.81]',
             'bounce_type' => 'hard',
@@ -181,7 +181,7 @@ class ParsePostfixMailLogTest extends TestCase
 
         $failedDelivery = FailedDelivery::first();
         $this->assertEquals('unknown[1450:4864:20::441]', $failedDelivery->remote_mta);
-        $this->assertEquals('Recipient address is inactive alias', $failedDelivery->code);
+        $this->assertEquals('Email discarded because this alias is deactivated', $failedDelivery->code);
         $this->assertEquals('', $failedDelivery->status);
     }
 
@@ -198,5 +198,88 @@ class ParsePostfixMailLogTest extends TestCase
         $this->assertEquals('unknown[f8b0:4864:20::34f]', $failedDelivery->remote_mta);
         $this->assertEquals('554 5.1.8 <abc@example.com>: Sender address rejected: Domain not found', $failedDelivery->code);
         $this->assertEquals('554', $failedDelivery->status);
+    }
+
+    public function test_it_maps_blocklist_masked_reject_to_user_friendly_reason()
+    {
+        Alias::factory()->create(['user_id' => $this->user->id, 'email' => 'test@anonaddy.me']);
+
+        $logContent = "Mar 19 10:30:00 server postfix/smtpd[12345]: NOQUEUE: reject: RCPT from unknown[1.2.3.4]: 5.7.1 550 5.1.1 Address not found; from=<s@x.com> to=<test@anonaddy.me> proto=ESMTP helo=<1.2.3.4>\n";
+        file_put_contents($this->logPath, $logContent);
+
+        $this->artisan('anonaddy:parse-postfix-mail-log')->assertExitCode(0);
+
+        $this->assertDatabaseHas('failed_deliveries', [
+            'user_id' => $this->user->id,
+            'email_type' => 'IR',
+            'code' => 'Email blocked because the sender is on your blocklist',
+            'status' => '5.7.1',
+            'remote_mta' => 'unknown[1.2.3.4]',
+        ]);
+    }
+
+    public function test_it_maps_inactive_alias_reason_to_user_friendly_reason()
+    {
+        Alias::factory()->create(['user_id' => $this->user->id, 'email' => 'test@anonaddy.me']);
+
+        $logContent = "Mar 19 10:31:00 server postfix/smtpd[12345]: NOQUEUE: discard: RCPT from unknown[1.2.3.4]: <test@anonaddy.me>: Recipient address is inactive alias; from=<s@x.com> to=<test@anonaddy.me> proto=ESMTP helo=<1.2.3.4>\n";
+        file_put_contents($this->logPath, $logContent);
+
+        $this->artisan('anonaddy:parse-postfix-mail-log')->assertExitCode(0);
+
+        $this->assertDatabaseHas('failed_deliveries', [
+            'user_id' => $this->user->id,
+            'email_type' => 'IR',
+            'code' => 'Email discarded because this alias is deactivated',
+        ]);
+    }
+
+    public function test_it_maps_inactive_username_reason_to_user_friendly_reason()
+    {
+        Alias::factory()->create(['user_id' => $this->user->id, 'email' => 'test@anonaddy.me']);
+
+        $logContent = "Mar 19 10:32:00 server postfix/smtpd[12345]: NOQUEUE: discard: RCPT from unknown[1.2.3.4]: <test@anonaddy.me>: Recipient address has inactive username; from=<s@x.com> to=<test@anonaddy.me> proto=ESMTP helo=<1.2.3.4>\n";
+        file_put_contents($this->logPath, $logContent);
+
+        $this->artisan('anonaddy:parse-postfix-mail-log')->assertExitCode(0);
+
+        $this->assertDatabaseHas('failed_deliveries', [
+            'user_id' => $this->user->id,
+            'email_type' => 'IR',
+            'code' => 'Email discarded because this alias username is deactivated',
+        ]);
+    }
+
+    public function test_it_maps_inactive_domain_reason_to_user_friendly_reason()
+    {
+        Alias::factory()->create(['user_id' => $this->user->id, 'email' => 'test@anonaddy.me']);
+
+        $logContent = "Mar 19 10:33:00 server postfix/smtpd[12345]: NOQUEUE: discard: RCPT from unknown[1.2.3.4]: <test@anonaddy.me>: Recipient address has inactive domain; from=<s@x.com> to=<test@anonaddy.me> proto=ESMTP helo=<1.2.3.4>\n";
+        file_put_contents($this->logPath, $logContent);
+
+        $this->artisan('anonaddy:parse-postfix-mail-log')->assertExitCode(0);
+
+        $this->assertDatabaseHas('failed_deliveries', [
+            'user_id' => $this->user->id,
+            'email_type' => 'IR',
+            'code' => 'Email discarded because this alias custom domain is deactivated',
+        ]);
+    }
+
+    public function test_it_maps_deleted_alias_reason_to_user_friendly_reason()
+    {
+        Alias::factory()->create(['user_id' => $this->user->id, 'email' => 'example@alias.com']);
+
+        $logContent = "Mar 19 10:34:00 server postfix/smtpd[12345]: NOQUEUE: reject: RCPT from unknown[1.2.3.4]: 550 5.1.1 <example@alias.com>: Recipient address rejected: Address does not exist; from=<s@x.com> to=<example@alias.com> proto=ESMTP helo=<1.2.3.4>\n";
+        file_put_contents($this->logPath, $logContent);
+
+        $this->artisan('anonaddy:parse-postfix-mail-log')->assertExitCode(0);
+
+        $this->assertDatabaseHas('failed_deliveries', [
+            'user_id' => $this->user->id,
+            'email_type' => 'IR',
+            'code' => 'Email rejected because this alias was deleted',
+            'status' => '550',
+        ]);
     }
 }

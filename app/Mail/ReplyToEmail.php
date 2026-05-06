@@ -234,20 +234,20 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
         if ($this->emailText) {
             $this->email->text('emails.reply.text')->with([
-                'text' => $this->removeRealEmailAndTextBanner(base64_decode($this->emailText)),
+                'text' => $this->removeRealEmailAndTextBanner(Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailText))),
             ]);
         }
 
         if ($this->emailHtml) {
             $this->email->view('emails.reply.html')->with([
-                'html' => $this->removeRealEmailAndHtmlBanner(base64_decode($this->emailHtml)),
+                'html' => $this->removeRealEmailAndHtmlBanner(Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailHtml))),
             ]);
         }
 
         // To prevent invalid view error where no text or html is present...
         if (! $this->emailHtml && ! $this->emailText) {
             $this->email->text('emails.reply.text')->with([
-                'text' => base64_decode($this->emailText),
+                'text' => Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailText)),
             ]);
         }
 
@@ -294,8 +294,22 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
      */
     public function failed(Throwable $exception)
     {
+        $failedDelivery = $this->user->failedDeliveries()->create([
+            'recipient_id' => $this->recipient->id,
+            'alias_id' => $this->alias->id,
+            'bounce_type' => null,
+            'remote_mta' => config('mail.mailers.smtp.host'),
+            'sender' => $this->sender,
+            'email_type' => 'R',
+            'status' => null,
+            'code' => $exception->getMessage(),
+            'attempted_at' => now(),
+        ]);
+
         // Send user failed delivery notification, add to failed deliveries table
-        $this->user->defaultRecipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject)));
+        if ($this->user->shouldReceiveFailedDeliveryNotification(false)) {
+            $this->user->defaultRecipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject), false, $this->user->store_failed_deliveries, $this->recipient->email, false, null, $failedDelivery?->remote_mta));
+        }
 
         if ($this->size > 0) {
             if ($this->alias->emails_replied > 0) {
@@ -307,18 +321,6 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                 $this->user->save();
             }
         }
-
-        $this->user->failedDeliveries()->create([
-            'recipient_id' => $this->recipient->id,
-            'alias_id' => $this->alias->id,
-            'bounce_type' => null,
-            'remote_mta' => null,
-            'sender' => $this->sender,
-            'email_type' => 'R',
-            'status' => null,
-            'code' => $exception->getMessage(),
-            'attempted_at' => now(),
-        ]);
     }
 
     private function needsDkimSignature()

@@ -39,6 +39,33 @@ class ApiAuthenticationTest extends TestCase
     }
 
     #[Test]
+    public function user_can_retrieve_current_api_token_details()
+    {
+        $token = $this->user->createToken('Firefox');
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token->plainTextToken,
+        ])->json('GET', '/api/v1/api-token-details');
+
+        $response->assertSuccessful();
+        $response->assertJson([
+            'name' => 'Firefox',
+            'created_at' => $token->accessToken->created_at?->toDateTimeString(),
+            'expires_at' => null,
+        ]);
+    }
+
+    #[Test]
+    public function user_cannot_retrieve_api_token_details_with_session_authentication()
+    {
+        $response = $this->actingAs($this->user)
+            ->json('GET', '/api/v1/api-token-details');
+
+        $response->assertNotFound();
+        $response->assertSeeText('Current token could not be found');
+    }
+
+    #[Test]
     public function user_password_must_be_correct_to_get_access_token()
     {
         $this->withoutMiddleware(ThrottleRequestsWithRedis::class);

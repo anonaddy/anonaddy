@@ -19,15 +19,35 @@ class FailedDeliveryResource extends JsonResource
             'remote_mta' => $this->remote_mta,
             'sender' => $this->sender,
             'destination' => $this->destination,
+            'ir_dedupe_key' => $this->ir_dedupe_key,
+            'type' => $this->type(),
             'email_type' => $this->getRawOriginal('email_type'),
             'email_type_text' => $this->email_type,
             'status' => $this->status,
             'code' => $this->code,
             'is_stored' => $this->is_stored,
+            'quarantined' => $this->quarantined,
             'resent' => $this->resent,
             'attempted_at' => $this->attempted_at?->toDateTimeString(),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];
+    }
+
+    private function type(): string
+    {
+        if ($this->ir_dedupe_key) {
+            return 'inbound';
+        }
+
+        if ($this->quarantined) {
+            return 'inbound_quarantined';
+        }
+
+        if ($this->getRawOriginal('email_type') === 'IR') {
+            return 'inbound';
+        }
+
+        return 'outbound';
     }
 }

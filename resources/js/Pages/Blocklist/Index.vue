@@ -203,6 +203,9 @@
       </div>
     </div>
 
+    <p v-if="rows.length" class="mb-2 text-xs text-grey-500 dark:text-grey-300 md:hidden">
+      Swipe horizontally to view entry actions.
+    </p>
     <div v-if="rows.length" class="relative">
       <div
         v-if="selectedRows.length > 0"

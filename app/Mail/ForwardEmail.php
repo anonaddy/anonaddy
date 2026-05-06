@@ -118,12 +118,14 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $ruleIds;
 
+    protected ?string $smtpInboundRecipient = null;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient, $resend = false, $ruleIds = null)
+    public function __construct(Alias $alias, EmailData $emailData, Recipient $recipient, $resend = false, $ruleIds = null, ?string $smtpInboundRecipient = null)
     {
         $this->user = $alias->user;
         $this->alias = $alias;
@@ -132,6 +134,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->tos = $emailData->tos;
         $this->originalCc = $emailData->originalCc ?? null;
         $this->originalTo = $emailData->originalTo ?? null;
+        $this->smtpInboundRecipient = $smtpInboundRecipient;
 
         // Create and swap with alias reply-to addresses to allow easy reply-all
         if (count($this->ccs)) {
@@ -436,7 +439,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
         if ($this->emailText) {
             $this->email->text('emails.forward.text')->with([
-                'text' => base64_decode($this->emailText),
+                'text' => Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailText)),
             ]);
         }
 
@@ -445,7 +448,9 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             $this->bannerLocationText = 'off';
 
             $this->email->view('emails.forward.html')->with([
-                'html' => base64_decode($this->emailHtml),
+                'html' => ForwardedEmailHtmlDocument::innerHtmlForEmbedding(
+                    Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailHtml))
+                ),
             ]);
         }
 
@@ -455,14 +460,16 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             $this->bannerLocationText = 'off';
 
             $this->email->view('emails.forward.html')->with([
-                'html' => base64_decode($this->emailText),
+                'html' => ForwardedEmailHtmlDocument::innerHtmlForEmbedding(
+                    Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailText))
+                ),
             ]);
         }
 
         // To prevent invalid view error where no text or html is present...
         if (! $this->emailHtml && ! $this->emailText) {
             $this->email->text('emails.forward.text')->with([
-                'text' => base64_decode($this->emailText),
+                'text' => Utf8MojibakeRepair::unwindOutlookStyleMojibake(base64_decode($this->emailText)),
             ]);
         }
 
@@ -479,7 +486,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'failedDmarc' => $this->failedDmarc,
             'showSpamBanner' => $showSpamBanner,
             'deactivateUrl' => $this->deactivateUrl,
-            'aliasEmail' => $this->alias->email,
+            'aliasEmail' => ForwardBannerAddress::forBanner($this->smtpInboundRecipient, $this->originalTo, $this->alias),
             'aliasDomain' => $this->alias->domain,
             'aliasDescription' => $this->alias->description,
             'userId' => $this->user->id,
@@ -522,10 +529,24 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
      */
     public function failed(Throwable $exception)
     {
+        $failedDelivery = $this->user->failedDeliveries()->create([
+            'recipient_id' => $this->recipientId,
+            'alias_id' => $this->alias->id,
+            'bounce_type' => null,
+            'remote_mta' => config('mail.mailers.smtp.host'),
+            'sender' => $this->sender,
+            'email_type' => 'F',
+            'status' => null,
+            'code' => $exception->getMessage(),
+            'attempted_at' => now(),
+        ]);
+
         // Send user failed delivery notification, add to failed deliveries table
         $recipient = Recipient::find($this->recipientId);
 
-        $recipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject)));
+        if ($recipient && $this->user->shouldReceiveFailedDeliveryNotification(false)) {
+            $recipient->notify(new FailedDeliveryNotification($this->alias->email, $this->sender, base64_decode($this->emailSubject), false, $this->user->store_failed_deliveries, $recipient->email, false, $this->authenticationResults, $failedDelivery?->remote_mta));
+        }
 
         if ($this->size > 0) {
             if ($this->alias->emails_forwarded > 0) {
@@ -537,18 +558,6 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                 $this->user->save();
             }
         }
-
-        $this->user->failedDeliveries()->create([
-            'recipient_id' => $this->recipientId,
-            'alias_id' => $this->alias->id,
-            'bounce_type' => null,
-            'remote_mta' => null,
-            'sender' => $this->sender,
-            'email_type' => 'F',
-            'status' => null,
-            'code' => $exception->getMessage(),
-            'attempted_at' => now(),
-        ]);
     }
 
     /**

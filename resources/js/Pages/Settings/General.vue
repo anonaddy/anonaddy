@@ -867,6 +867,110 @@
       <div class="py-10">
         <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Failed Delivery Notifications
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            Choose which failed delivery notifications you want to receive. You can receive
+            notifications for both normal failed deliveries and inbound quarantined emails, either
+            one, or turn both off.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              failedDeliveryNotificationPreferenceForm.post(
+                route('settings.failed_delivery_notification_preference'),
+                {
+                  preserveScroll: true,
+                },
+              )
+            "
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label
+                  for="failed-delivery-notification-preference"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Notification preference</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="failed-delivery-notification-preference"
+                    v-model="
+                      failedDeliveryNotificationPreferenceForm.failed_delivery_notification_preference
+                    "
+                    name="failed_delivery_notification_preference"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      failedDeliveryNotificationPreferenceForm.errors
+                        .failed_delivery_notification_preference
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      failedDeliveryNotificationPreferenceForm.errors
+                        .failed_delivery_notification_preference
+                        ? 'true'
+                        : undefined
+                    "
+                    :aria-describedby="
+                      failedDeliveryNotificationPreferenceForm.errors
+                        .failed_delivery_notification_preference
+                        ? 'failed-delivery-notification-preference-error'
+                        : undefined
+                    "
+                  >
+                    <option
+                      v-for="option in failedDeliveryNotificationPreferenceOptions"
+                      :key="option.value"
+                      :value="option.value"
+                      class="dark:bg-grey-900"
+                    >
+                      {{ option.label }}
+                    </option>
+                  </select>
+                  <div
+                    v-if="
+                      failedDeliveryNotificationPreferenceForm.errors
+                        .failed_delivery_notification_preference
+                    "
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="
+                    failedDeliveryNotificationPreferenceForm.errors
+                      .failed_delivery_notification_preference
+                  "
+                  class="mt-2 text-sm text-red-600"
+                  id="failed-delivery-notification-preference-error"
+                >
+                  {{
+                    failedDeliveryNotificationPreferenceForm.errors
+                      .failed_delivery_notification_preference
+                  }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="failedDeliveryNotificationPreferenceForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update failed delivery notifications
+              <loader v-if="failedDeliveryNotificationPreferenceForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
             Save Alias 'Last Used At'
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
@@ -1459,6 +1563,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  failedDeliveryNotificationPreference: {
+    type: Number,
+    required: true,
+  },
   darkMode: {
     type: Boolean,
     required: true,
@@ -1567,6 +1675,25 @@ const listUnsubscribeBehaviourOptions = [
   },
 ]
 
+const failedDeliveryNotificationPreferenceOptions = [
+  {
+    value: 0,
+    label: 'All failed delivery notifications',
+  },
+  {
+    value: 1,
+    label: 'Normal failed deliveries only',
+  },
+  {
+    value: 2,
+    label: 'Quarantined emails only',
+  },
+  {
+    value: 3,
+    label: 'None',
+  },
+]
+
 const emailForm = useForm({
   email: '',
   current: '',
@@ -1598,6 +1725,10 @@ const useReplyToForm = useForm({
 
 const storeFailedDeliveriesForm = useForm({
   store_failed_deliveries: props.storeFailedDeliveries,
+})
+
+const failedDeliveryNotificationPreferenceForm = useForm({
+  failed_delivery_notification_preference: props.failedDeliveryNotificationPreference,
 })
 
 const darkModeForm = useForm({

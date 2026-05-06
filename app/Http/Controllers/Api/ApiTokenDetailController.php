@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class ApiTokenDetailController extends Controller
 {
-    public function show(Request $request)
+    public function show(Request $request): JsonResponse|Response
     {
         $token = $request->user()->currentAccessToken();
 
-        if (! $token) {
+        if (! $token instanceof PersonalAccessToken) {
             return response('Current token could not be found', 404);
         }
 

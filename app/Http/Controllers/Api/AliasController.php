@@ -157,7 +157,7 @@ class AliasController extends Controller
         // Check if domain is for username or custom domain
         $parentDomain = collect(config('anonaddy.all_domains'))
             ->filter(function ($name) use ($request) {
-                return Str::endsWith($request->domain, $name);
+                return Str::endsWith($request->domain, '.'.$name);
             })
             ->first();
 
@@ -220,8 +220,6 @@ class AliasController extends Controller
     public function destroy($id)
     {
         $alias = user()->aliases()->findOrFail($id);
-
-        $alias->detachAllRecipients();
 
         $alias->delete();
 

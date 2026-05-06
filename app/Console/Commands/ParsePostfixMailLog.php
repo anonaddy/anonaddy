@@ -135,6 +135,8 @@ class ParsePostfixMailLog extends Command
                     $bounceType = 'spam';
                 }
 
+                $displayReason = $this->normaliseUserFacingReason($reason);
+
                 $irDedupeKey = hash('sha256', $userId.'|'.($alias ? $alias->id : '').'|'.$attemptedAt->format('Y-m-d H:i:s'));
 
                 try {
@@ -146,7 +148,7 @@ class ParsePostfixMailLog extends Command
                         'sender' => $sender === '' ? '<>' : Str::limit($sender, 255),
                         'destination' => $recipientLower,
                         'remote_mta' => Str::limit($remoteMta, 255),
-                        'code' => Str::limit($reason, 255),
+                        'code' => Str::limit($displayReason, 255),
                         'status' => $smtpCode ? Str::limit($smtpCode, 10) : null,
                         'attempted_at' => $attemptedAt,
                         'created_at' => $attemptedAt,
@@ -209,5 +211,32 @@ class ParsePostfixMailLog extends Command
             'sqlite' => str_contains($e->getMessage(), 'UNIQUE constraint failed'),
             default => ($e->errorInfo[0] ?? '') === '23000',
         };
+    }
+
+    protected function normaliseUserFacingReason(string $reason): string
+    {
+        $normalisedReason = strtolower(trim($reason));
+
+        if (str_contains($normalisedReason, '550 5.1.1 address not found')) {
+            return 'Email blocked because the sender is on your blocklist';
+        }
+
+        if (str_contains($normalisedReason, 'recipient address is inactive alias')) {
+            return 'Email discarded because this alias is deactivated';
+        }
+
+        if (str_contains($normalisedReason, 'recipient address has inactive username')) {
+            return 'Email discarded because this alias username is deactivated';
+        }
+
+        if (str_contains($normalisedReason, 'recipient address has inactive domain')) {
+            return 'Email discarded because this alias custom domain is deactivated';
+        }
+
+        if (str_contains($normalisedReason, 'recipient address rejected: address does not exist')) {
+            return 'Email rejected because this alias was deleted';
+        }
+
+        return $reason;
     }
 }

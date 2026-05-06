@@ -56,6 +56,9 @@ trait ApplyUserRules
             case 'block':
                 // Do nothing, already checked.
                 break;
+            case 'quarantine':
+                // Do nothing, already checked.
+                break;
             case 'removeAttachments':
                 $this->emailAttachments = [];
                 break;

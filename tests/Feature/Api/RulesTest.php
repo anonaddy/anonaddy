@@ -104,6 +104,36 @@ class RulesTest extends TestCase
     }
 
     #[Test]
+    public function user_can_create_new_rule_with_quarantine_action()
+    {
+        $response = $this->json('POST', '/api/v1/rules', [
+            'name' => 'quarantine rule',
+            'conditions' => [
+                [
+                    'type' => 'sender',
+                    'match' => 'contains',
+                    'values' => [
+                        '@example.com',
+                    ],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'quarantine',
+                    'value' => true,
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertEquals('quarantine', $response->json('data.actions.0.type'));
+    }
+
+    #[Test]
     public function user_cannot_create_invalid_rule()
     {
         $response = $this->json('POST', '/api/v1/rules', [
@@ -285,6 +315,96 @@ class RulesTest extends TestCase
             'applied' => 1,
             'last_applied' => now(),
         ]);
+    }
+
+    #[Test]
+    public function it_can_detect_block_action_for_matching_forward_rule()
+    {
+        Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'conditions' => [
+                [
+                    'type' => 'alias',
+                    'match' => 'is exactly',
+                    'values' => [
+                        'ebay@johndoe.anonaddy.com',
+                    ],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'block',
+                    'value' => true,
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+            'applied' => 0,
+            'last_applied' => null,
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+        $emailData = new EmailData($parser, 'will@anonaddy.com', 1000);
+
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+
+        $this->assertNotEmpty($ruleIdsAndActions);
+        $this->assertTrue(UserRuleChecker::shouldBlockEmail($ruleIdsAndActions));
+        $this->assertFalse(UserRuleChecker::shouldQuarantineEmail($ruleIdsAndActions));
+    }
+
+    #[Test]
+    public function it_can_detect_quarantine_action_for_matching_forward_rule()
+    {
+        Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'conditions' => [
+                [
+                    'type' => 'alias',
+                    'match' => 'is exactly',
+                    'values' => [
+                        'ebay@johndoe.anonaddy.com',
+                    ],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'quarantine',
+                    'value' => true,
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+            'applied' => 0,
+            'last_applied' => null,
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+        $emailData = new EmailData($parser, 'will@anonaddy.com', 1000);
+
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+
+        $this->assertNotEmpty($ruleIdsAndActions);
+        $this->assertTrue(UserRuleChecker::shouldQuarantineEmail($ruleIdsAndActions));
+        $this->assertFalse(UserRuleChecker::shouldBlockEmail($ruleIdsAndActions));
     }
 
     #[Test]

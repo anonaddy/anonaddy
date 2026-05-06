@@ -197,4 +197,11 @@ class UserRuleChecker
             ->flatten(1)
             ->contains('type', 'block');
     }
+
+    public static function shouldQuarantineEmail($ruleIdsAndActions): bool
+    {
+        return collect($ruleIdsAndActions)
+            ->flatten(1)
+            ->contains('type', 'quarantine');
+    }
 }

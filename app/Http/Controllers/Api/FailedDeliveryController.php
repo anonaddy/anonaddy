@@ -15,11 +15,16 @@ class FailedDeliveryController extends Controller
             ->with(['recipient:id,email', 'alias:id,email'])
             ->when($request->input('filter.email_type'), function ($query, $value) {
                 if ($value === 'inbound') {
-                    return $query->where('email_type', 'IR');
-                }
-
-                if ($value === 'outbound') {
-                    return $query->where('email_type', '!=', 'IR');
+                    return $query->where(function ($q) {
+                        $q->where('email_type', 'IR')
+                            ->orWhereNotNull('ir_dedupe_key');
+                    });
+                } elseif ($value === 'outbound') {
+                    return $query->where('email_type', '!=', 'IR')
+                        ->whereNull('ir_dedupe_key')
+                        ->where('quarantined', false);
+                } elseif ($value === 'inbound_quarantined') {
+                    return $query->where('quarantined', true);
                 }
             })
             ->latest()

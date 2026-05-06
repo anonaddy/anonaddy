@@ -354,6 +354,9 @@
               : `${selectedRows.length} aliases`
           }}</span>
         </div>
+        <p v-if="rows.length" class="mb-2 text-xs text-grey-500 dark:text-grey-300 md:hidden">
+          Swipe horizontally to view alias actions.
+        </p>
         <vue-good-table
           v-on:sort-change="debounceToolips"
           v-on:page-change="debounceToolips"

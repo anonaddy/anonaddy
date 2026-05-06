@@ -22,6 +22,7 @@ use App\Http\Controllers\DeleteAliasController;
 use App\Http\Controllers\DisplayFromFormatController;
 use App\Http\Controllers\DomainVerificationController;
 use App\Http\Controllers\EmailSubjectController;
+use App\Http\Controllers\FailedDeliveryNotificationPreferenceController;
 use App\Http\Controllers\FromNameController;
 use App\Http\Controllers\ListUnsubscribeBehaviourController;
 use App\Http\Controllers\LoginRedirectController;
@@ -182,6 +183,8 @@ Route::group([
     Route::post('/list-unsubscribe-behaviour', [ListUnsubscribeBehaviourController::class, 'update'])->name('settings.list_unsubscribe_behaviour');
 
     Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
+
+    Route::post('/failed-delivery-notification-preference', [FailedDeliveryNotificationPreferenceController::class, 'update'])->name('settings.failed_delivery_notification_preference');
 
     Route::post('/dark-mode', [DarkModeController::class, 'update'])->name('settings.dark_mode');
 

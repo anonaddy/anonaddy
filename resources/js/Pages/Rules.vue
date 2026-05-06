@@ -29,6 +29,9 @@
       </div>
     </div>
 
+    <p v-if="rows.length" class="mb-2 text-xs text-grey-500 dark:text-grey-300 md:hidden">
+      Swipe horizontally to view rule actions.
+    </p>
     <div v-if="rows.length" class="bg-white dark:bg-grey-900 shadow">
       <div class="vgt-responsive">
         <table class="table-auto w-full">
@@ -1038,6 +1041,10 @@ const actionTypeOptions = [
     label: 'block the email',
   },
   {
+    value: 'quarantine',
+    label: 'quarantine the email',
+  },
+  {
     value: 'removeAttachments',
     label: 'remove attachments',
   },
@@ -1416,6 +1423,8 @@ const ruleActionChange = action => {
   } else if (action.type === 'banner') {
     action.value = 'top'
   } else if (action.type === 'block') {
+    action.value = true
+  } else if (action.type === 'quarantine') {
     action.value = true
   } else if (action.type === 'removeAttachments') {
     action.value = true
