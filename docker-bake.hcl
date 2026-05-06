@@ -46,3 +46,19 @@ target "phpunit" {
   target = "phpunit"
   output = ["type=cacheonly"]
 }
+
+group "update-locks" {
+  targets = ["composer-lock", "npm-lock"]
+}
+
+target "composer-lock" {
+  inherits = ["_common"]
+  target = "composer-lock"
+  output = ["type=local,dest=."]
+}
+
+target "npm-lock" {
+  inherits = ["_common"]
+  target = "npm-lock"
+  output = ["type=local,dest=."]
+}

@@ -68,6 +68,23 @@ RUN --mount=type=bind,target=.,rw \
   php artisan test
 EOT
 
+FROM php-test-base AS composer-lock-generator
+WORKDIR /work
+COPY composer.json composer.lock ./
+COPY postfix/composer.json postfix/composer.lock ./postfix/
+RUN --mount=type=cache,target=/tmp/cache/composer <<EOT
+  set -ex
+  composer update --no-install --no-scripts --no-progress --minimal-changes
+  composer --working-dir=postfix update --no-install --no-scripts --no-progress --minimal-changes
+  mkdir -p /out/postfix
+  cp composer.lock /out/composer.lock
+  cp postfix/composer.lock /out/postfix/composer.lock
+EOT
+
+FROM scratch AS composer-lock
+COPY --from=composer-lock-generator /out/composer.lock /composer.lock
+COPY --from=composer-lock-generator /out/postfix/composer.lock /postfix/composer.lock
+
 FROM node:${NODE_VERSION}-alpine AS npm-base
 WORKDIR /src
 ENV NPM_CONFIG_AUDIT=false
@@ -78,3 +95,16 @@ RUN --mount=type=bind,target=.,rw \
   --mount=type=cache,target=/root/.npm \
   --mount=type=cache,target=/src/node_modules \
   npm ci --ignore-scripts
+
+FROM npm-base AS npm-lock-generator
+WORKDIR /work
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm <<EOT
+  set -ex
+  npm install --package-lock-only --ignore-scripts
+  mkdir -p /out
+  cp package-lock.json /out/package-lock.json
+EOT
+
+FROM scratch AS npm-lock
+COPY --from=npm-lock-generator /out/package-lock.json /package-lock.json
