@@ -178,7 +178,12 @@ try {
     $noAliasExists = is_null($aliasActionQuery);
 
     if ($noAliasExists && $aliasHasSharedDomain) {
-        sendAction(ACTION_DOES_NOT_EXIST);
+        // If admin username is set then allow through with catch-all
+        if ($adminUsername) {
+            sendAction('DUNNO');
+        } else {
+            sendAction(ACTION_DOES_NOT_EXIST);
+        }
     } else {
         $aliasAction = $noAliasExists ? null : getAction($aliasActionQuery);
 
