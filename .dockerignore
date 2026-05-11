@@ -1,0 +1,13 @@
+.env
+.git
+.cursor
+.idea
+.junie
+node_modules
+vendor
+postfix/vendor
+coverage
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
