@@ -198,16 +198,314 @@ class Domain extends Model
         }
 
         try {
-            return collect(dns_get_record($this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return trim($r['txt']) === 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count());
-                });
+            return getVerificationRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get TXT Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
             return false;
         }
     }
+
+    private function getVerificationValue()
+    {
+        return 'aa-verify='.sha1(config('anonaddy.secret').user()->id.user()->domains->count()
+    }
+
+    private function getVerificationRecords()
+    {
+        $value = $this->getVerificationValue()  // no need to recompute this value multiple times
+        return collect(dns_get_record($this->domain.'.', DNS_TXT))
+                ->filter(function ($r) {
+                    return trim($r['txt']) === $value);
+                });
+    }
+
+    private function getMxValue()
+    {
+        return config('anonaddy.hostname');
+    }
+
+    private function getMxRecord()
+    {
+        return collect(dns_get_record($this->domain.'.', DNS_MX))
+                ->sortBy('pri')
+                ->first();
+    }
+
+    private function getSpfExample()
+    {
+        return 'v=spf1 include:spf.'.config('anonaddy.domain').' mx -all';
+    }
+
+    private function getSpfRegex()
+    {
+        return "/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/'
+    }
+
+    private function getSpfRecords()
+    {
+        $spfRegex = $this->getSpfRegex();  // no need to recompute this value multiple times
+        return collect(dns_get_record($this->domain.'.', DNS_TXT))
+                ->filter(function ($r) {
+                    return preg_match(
+                        $spfRegex,
+                        $r['txt'],
+                    );
+                });
+    }
+
+    private function getDmarcExample()
+    {
+        return 'v=DMARC1; p=quarantine; adkim=s'
+    }
+
+    private function getDmarcHostPrefix()
+    {
+        return '_dmarc';
+    }
+
+    private function getDmarcRegex()
+    {
+        return '/^(v=DMARC1).*(p=quarantine|reject).*/'
+    }
+
+    function getDmarcRecords()
+    {
+        return collect(dns_get_record($this->getDmarcHostPrefix().'.'.$this->domain.'.', DNS_TXT))
+                ->filter(function ($r) {
+                    return preg_match(
+                        $this->getDmarcRegex(),
+                        $r['txt'],
+                    );
+                })
+    }
+
+    public function getDkimValue()
+    {
+        return $this->getDkimHostPrefix().'.'.config('anonaddy.domain')
+    }
+
+    public function getDkimHostPrefix()
+    {
+        return config('anonaddy.dkim_selector').'._domainkey';
+    }
+
+    public function getDkimRecords()
+    {
+        $prefix = getDkimHostPrefix();
+        $value = getDkimValue();  // no need to recompute those value multiple times
+        return collect(dns_get_record($prefix.'.'.$this->domain.'.', DNS_CNAME))
+                ->filter(function ($r) {
+                    return $r['target'] === $value;
+                });
+    }
+
+    /**
+     * Returns the subdomain part of a host name.
+     *
+     * @param string $host Fully‑qualified domain name (e.g. "api.blog.example.co.uk")
+     * @return string Subdomain string, or "@" if the host is the apex domain.
+     */
+    public static function getSubdomain(string $host): string
+    {
+        // Normalise: lower‑case and trim trailing dot
+        $host = strtolower(rtrim($host, '.'));
+
+        // Split into labels
+        $labels = explode('.', $host);
+
+        // Remove the eTLD and the immediate label before it (the registered domain)
+        $eTld = $labels[count($labels) - 1];
+        $registeredDomainIdx = count($labels) - count(explode('.', $eTld)) - 1;
+        $subdomainParts = array_slice($labels, 0, $registeredDomainIdx + 1);
+
+        // No subdomain → return "@"
+        return $subdomainParts ? implode('.', $subdomainParts) : '@';
+    }
+
+    /**
+     Format:
+        ```ts
+        type RequiredRecordsResponse = {
+            records: RequiredRecord[];
+            all_dns_records: DnsRecord[] | string; // string in case of error retrieving DNS records
+        }
+
+        type DnsRecord = DnsRecordTxt | DnsRecordMx | DnsRecordCname;
+        type DnsRecordBase = {
+            host: string;
+            class: string;
+            ttl: number;
+        };
+        type DnsRecordTxt = DnsRecordBase & {
+            type: 'TXT';
+            txt: string;
+        };
+        type DnsRecordMx = DnsRecordBase & {
+            type: 'MX';
+            target: string;
+            pri: number;
+        };
+        type DnsRecordCname = DnsRecordBase & {
+            type: 'CNAME';
+            target: string;
+        };
+
+        type RequiredRecord = VerificationRecord | MailServerRecord | SpfRecord;
+        type VerificationRecord = {
+            label: string;
+            type: 'TXT';
+            host: string;
+            expected: string; // expected verification value
+            got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
+            check: boolean | null; // whether the expected record was found
+            help: undefined; // no help text for mail server record
+        };
+        type MailServerRecord = {
+            label: string;
+            type: 'MX';
+            host: string;
+            expected: string; // expected mail server value
+            got: DnsRecordMx | string;  // string in case of error retrieving DNS records
+            check: boolean | null; // whether the expected record was found
+            help: undefined; // no help text for mail server record
+        };
+        type SpfRecord = {
+            label: string;
+            type: 'TXT';
+            host: string;
+            expected: string; // expected SPF value
+            got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
+            check: boolean | null; // whether the expected record was found
+            help: string; // help text for SPF record format
+        };
+        type DmarcRecord = {
+            label: string;
+            type: 'TXT';
+            host: string;
+            key: string; // DMARC record key
+            expected: string; // expected DMARC value
+            got: DnsRecordTxt[] | string;  // string in case of error retrieving DNS records
+            check: boolean | null; // whether the expected record was found
+            help: string; // help text for DMARC record format
+        };
+        type DkimRecord = {
+            label: string;
+            type: 'CNAME';
+            host: string;
+            expected: string; // expected DKIM value
+            got: DnsRecordCname[] | string;  // string in case of error retrieving DNS records
+            check: boolean | null; // whether the expected record was found
+            help: string; // help text for DKIM record format
+        };
+        ```
+     */
+    public function requiredRecordsExample()
+    {
+        $all_dns_records = null;
+        try {
+            $all_dns_records = dns_get_record($this->domain.'.', DNS_ALL);
+        } catch (Exception $e) {
+            $all_dns_records = 'Error retrieving DNS records: '.$e->getMessage();
+        }
+
+        try {
+            $v = $this->getVerificationRecords()
+            $verification = $v->asArray();
+            $hasVerification = $v->isNotEmpty();
+        } catch (Exception $e) {
+            $verification = 'Error retrieving verification records: '.$e->getMessage();
+            $hasVerification = false;
+        }
+
+        $mxValue = $this->getMxValue()
+        try {
+            $mx = $this->getMxRecord()
+            $hasMX = isset($mx['target']) && $mx['target'] === ;
+        } catch (Exception $e) {
+            $mx = 'Error retrieving MX records: '.$e->getMessage();
+            $hasMX = null;
+        }
+
+        $spfValue = $this->getSpfExample()
+        try {
+            $spf = $this->getSpfRecords()
+            $hasSpf = $spf->isNotEmpty();
+        } catch (Exception $e) {
+            $spf = 'Error retrieving SPF records: '.$e->getMessage();
+            $hasSpf = null;
+        }
+
+        $dmarcValue = $this->getDmarcExample()
+        try {
+            $dmarc = $this->getDmarcRecords()
+            $hasDmarc = $dmarc->isNotEmpty();
+        } catch (Exception $e) {
+            $dmarc = 'Error retrieving DMARC records: '.$e->getMessage();
+            $hasSpf = null;
+        }
+
+        $dkimValue = $this->getDkimValue()
+        try {
+            $dkim = $this->getDkimRecords()
+            $hasDkim = $dkim->isNotEmpty();
+        } catch (Exception $e) {
+            $dkim = 'Error retrieving DKIM records: '.$e->getMessage();
+        }
+
+        $host = getSubdomain()
+
+        // Return the records and whether the verification record was found
+        return [
+            'records' => [
+                [
+                    'label' => 'verification (needed only once)',
+                    'type' => 'TXT',
+                    'host' => $host,
+                    'expected' => $this->getVerificationValue(),
+                    'got' => $verification,
+                    'check' => $hasVerification,
+                    'help' => 'This value is needed only once to proof that you have authority over that domain before adding it to your account.'
+                ],
+                [
+                    'label' => 'mail server (addy)',
+                    'type' => 'MX',
+                    'host' => $host,
+                    'expected' => $mxValue,
+                    'got' => $mx,
+                    'check' => $hasMX,
+                ],
+                [
+                    'label' => 'sender host verification (SPF)',
+                    'type' => 'TXT',
+                    'host' => $host,
+                    'expected' => $spfValue,
+                    'got' => $spf,
+                    'check' => $hasSpf,
+                    'help' => 'Given is a possible example, the SPF record should comply to the following regex: '.$this->getSpfRegex(),
+                ],
+                [
+                    'label' => 'failed verification policy (DMARC)',
+                    'type' => 'TXT',
+                    'host' => getDmarcHostPrefix().($host === '@' ? '' : '.'.$host),
+                    'expected' => $dmarcValue,
+                    'got' => $dmarc,
+                    'check' => $hasDmarc,
+                    'help' => 'The DMARC record should comply to the following regex: '.$this->getDmarcRegex(),
+                ],
+                [
+                    'label' => 'failed verification policy (DKIM)',
+                    'type' => 'CNAME',
+                    'host' => getDkimHostPrefix().($host === '@' ? '' : '.'.$host),
+                    'expected' => $dkimValue,
+                    'got' => $dkim,
+                    'check' => $hasDkim,
+                ],
+
+            ],
+            'all_dns_records' => $all_dns_records,
+        ];
+    }}
 
     /**
      * Checks if the domain has the correct MX records.
@@ -219,9 +517,7 @@ class Domain extends Model
         }
 
         try {
-            $mx = collect(dns_get_record($this->domain.'.', DNS_MX))
-                ->sortBy('pri')
-                ->first();
+            $mx = this->getMxRecord()
         } catch (Exception $e) {
             Log::info('DNS Get MX Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
@@ -237,7 +533,7 @@ class Domain extends Model
             return false;
         }
 
-        if ($mx['target'] !== config('anonaddy.hostname')) {
+        if ($mx['target'] !== $this->getMxValue()) {
             return false;
         }
 
@@ -260,10 +556,7 @@ class Domain extends Model
         }
 
         try {
-            $spf = collect(dns_get_record($this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return preg_match("/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/', $r['txt']);
-                });
+            $spf = $this->getSpfRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get SPF Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
@@ -279,10 +572,7 @@ class Domain extends Model
         }
 
         try {
-            $dmarc = collect(dns_get_record('_dmarc.'.$this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return preg_match('/^(v=DMARC1).*(p=quarantine|reject).*/', $r['txt']);
-                });
+            $dmarc = $this->getDmarcRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get DMARC Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 
@@ -298,10 +588,7 @@ class Domain extends Model
         }
 
         try {
-            $dkim = collect(dns_get_record(config('anonaddy.dkim_selector').'._domainkey.'.$this->domain.'.', DNS_CNAME))
-                ->contains(function ($r) {
-                    return $r['target'] === config('anonaddy.dkim_selector').'._domainkey.'.config('anonaddy.domain');
-                });
+            $dkim = $this->getDkimRecords()->isNotEmpty();
         } catch (Exception $e) {
             Log::info('DNS Get DKIM Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
 

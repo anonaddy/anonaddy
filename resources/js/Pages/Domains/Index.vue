@@ -687,6 +687,7 @@ const domainToCheck = ref(null)
 const deleteDomainLoading = ref(false)
 const deleteDomainModalOpen = ref(false)
 const checkRecordsLoading = ref(false)
+const generateTableLoading = ref(false)
 const domainDefaultRecipientModalOpen = ref(false)
 const moreInfoOpen = ref(false)
 const defaultRecipientDomainToEdit = ref({})
@@ -843,6 +844,30 @@ const editDefaultRecipient = () => {
       editDefaultRecipientLoading.value = false
       defaultRecipientId.value = null
       errorMessage()
+    })
+}
+
+const generateTable = domain => {
+  generateTableLoading.value = true
+
+  axios
+    .get(`/domains/${domain.id}/generate-table`)
+    .then(({ data }) => {
+      generateTableLoading.value = false
+
+      if (data.success === true) {
+        // TODO: show table to user
+      } else {
+        warnMessage(data.message)
+      }
+    })
+    .catch(error => {
+      generateTableLoading.value = false
+      if (error.response.status === 429) {
+        errorMessage('Please wait a little while before loading the table again')
+      } else {
+        errorMessage()
+      }
     })
 }
 
