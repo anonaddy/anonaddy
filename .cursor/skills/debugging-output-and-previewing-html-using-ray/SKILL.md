@@ -1,6 +1,6 @@
 ---
 name: debugging-output-and-previewing-html-using-ray
-description: Use when user says "send to Ray," "show in Ray," "debug in Ray," "log to Ray," "display in Ray," or wants to visualize data, debug output, or show diagrams in the Ray desktop application.
+description: "Sends variables, debug output, HTML previews, tables, and timing data to the Ray desktop application via its local HTTP API. Use when user says 'send to Ray,' 'show in Ray,' 'debug in Ray,' 'log to Ray,' 'display in Ray,' or wants to visualize data, preview HTML designs, display debug output, or render diagrams in Ray. Constructs JSON payloads for Ray payload types (log, custom, table, color, label, measure, notify) and sends them via HTTP POST to Ray's local server."
 metadata:
   author: Spatie
   tags:
@@ -16,9 +16,15 @@ metadata:
 
 Ray is Spatie's desktop debugging application for developers. Send data directly to Ray by making HTTP requests to its local server.
 
-This can be useful for debugging applications, or to preview design, logos, or other visual content. 
+This can be useful for debugging applications, or to preview design, logos, or other visual content.
 
 This is what the `ray()` PHP function does under the hood.
+
+## Workflow
+
+1. **Check availability**: `GET http://localhost:23517/_availability_check` — Ray responds with HTTP 404 when running (endpoint doesn't exist, but the server is up). A connection error means Ray is not running.
+2. **Send payload**: `POST http://localhost:23517/` with JSON body containing `uuid`, `payloads` array, and optional `meta`.
+3. **Apply modifiers**: Send `color`, `label`, and `size` payloads in the same request (same `uuid`) to style a log entry.
 
 ## Connection Details
 
@@ -66,7 +72,7 @@ This is what the `ray()` PHP function does under the hood.
 
 ### Origin Object
 
-Every payload includes origin information:
+Every payload requires an `origin` with `file`, `line_number`, and `hostname`. Shown once below — include it in every payload in actual requests:
 
 ```json
 {
@@ -85,8 +91,7 @@ Every payload includes origin information:
   "type": "log",
   "content": {
     "values": ["Hello World", 42, {"key": "value"}]
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  }
 }
 ```
 
@@ -98,8 +103,7 @@ Every payload includes origin information:
   "content": {
     "content": "<h1>HTML Content</h1><p>With formatting</p>",
     "label": "My Label"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  }
 }
 ```
 
@@ -111,70 +115,20 @@ Every payload includes origin information:
   "content": {
     "values": {"name": "John", "email": "john@example.com", "age": 30},
     "label": "User Data"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  }
 }
 ```
 
-### Color
+### Modifiers (Color, Label, Size)
 
-Set the color of the preceding log entry:
+Modifier payloads style a preceding log entry. Send them in the same request with the same `uuid`:
 
-```json
-{
-  "type": "color",
-  "content": {
-    "color": "green"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
-}
-```
-
-**Available colors:** `green`, `orange`, `red`, `purple`, `blue`, `gray`
-
-### Screen Color
-
-Set the background color of the screen:
-
-```json
-{
-  "type": "screen_color",
-  "content": {
-    "color": "green"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
-}
-```
-
-### Label
-
-Add a label to the entry:
-
-```json
-{
-  "type": "label",
-  "content": {
-    "label": "Important"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
-}
-```
-
-### Size
-
-Set the size of the entry:
-
-```json
-{
-  "type": "size",
-  "content": {
-    "size": "lg"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
-}
-```
-
-**Available sizes:** `sm`, `lg`
+| Type | Content | Values |
+|------|---------|--------|
+| `color` | `{ "color": "<value>" }` | `green`, `orange`, `red`, `purple`, `blue`, `gray` |
+| `screen_color` | `{ "color": "<value>" }` | Same colors (sets screen background) |
+| `label` | `{ "label": "<text>" }` | Any string |
+| `size` | `{ "size": "<value>" }` | `sm`, `lg` |
 
 ### Notify (Desktop Notification)
 
@@ -183,8 +137,7 @@ Set the size of the entry:
   "type": "notify",
   "content": {
     "value": "Task completed!"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  }
 }
 ```
 
@@ -195,8 +148,7 @@ Set the size of the entry:
   "type": "new_screen",
   "content": {
     "name": "Debug Session"
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  }
 }
 ```
 
@@ -212,8 +164,7 @@ Set the size of the entry:
     "time_since_last_call": 0,
     "max_memory_usage_during_total_time": 0,
     "max_memory_usage_since_last_call": 0
-  },
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  }
 }
 ```
 
@@ -226,8 +177,7 @@ These payloads only need a `type` and empty `content`:
 ```json
 {
   "type": "separator",
-  "content": {},
-  "origin": { "file": "test.php", "line_number": 1, "hostname": "localhost" }
+  "content": {}
 }
 ```
 
@@ -313,16 +263,6 @@ curl -X POST http://localhost:23517/ \
   }'
 ```
 
-## Availability Check
-
-Before sending data, you can check if Ray is running:
-
-```
-GET http://localhost:23517/_availability_check
-```
-
-Ray responds with HTTP 404 when available (the endpoint doesn't exist, but the server is running).
-
 ## Getting Ray Information
 
 ### Get Windows
@@ -350,7 +290,7 @@ Retrieve the current theme colors being used by Ray:
 GET http://localhost:23517/theme
 ```
 
-Returns the theme information including color palette:
+Returns the theme information including color palette. Use these colors when sending custom HTML content to ensure it matches Ray's current theme.
 
 ```json
 {
@@ -362,53 +302,3 @@ Returns the theme information including color palette:
   }
 }
 ```
-
-**Use Case:** When sending custom HTML content to Ray, use these theme colors to ensure your content matches Ray's current theme and looks visually integrated.
-
-**Example:** Send HTML with matching colors:
-
-```bash
-
-# First, get the theme
-
-THEME=$(curl -s http://localhost:23517/theme)
-PRIMARY_COLOR=$(echo $THEME | jq -r '.colors.primary')
-
-# Then send HTML using those colors
-
-curl -X POST http://localhost:23517/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "uuid": "theme-matched-html",
-    "payloads": [{
-      "type": "custom",
-      "content": {
-        "content": "<div style=\"background: '"$PRIMARY_COLOR"'; padding: 20px;\"><h1>Themed Content</h1></div>",
-        "label": "Themed HTML"
-      },
-      "origin": {"file": "script.sh", "line_number": 1, "hostname": "localhost"}
-    }]
-  }'
-```
-
-## Payload Type Reference
-
-| Type | Content Fields | Purpose |
-|------|----------------|---------|
-| `log` | `values` (array) | Send values to Ray |
-| `custom` | `content`, `label` | HTML or text content |
-| `table` | `values`, `label` | Display as table |
-| `color` | `color` | Set entry color |
-| `screen_color` | `color` | Set screen background |
-| `label` | `label` | Add label to entry |
-| `size` | `size` | Set entry size (sm/lg) |
-| `notify` | `value` | Desktop notification |
-| `new_screen` | `name` | Create new screen |
-| `measure` | `name`, `is_new_timer`, timing fields | Performance timing |
-| `separator` | (empty) | Visual divider |
-| `clear_all` | (empty) | Clear all entries |
-| `hide` | (empty) | Hide entry |
-| `remove` | (empty) | Remove entry |
-| `confetti` | (empty) | Confetti animation |
-| `show_app` | (empty) | Show Ray window |
-| `hide_app` | (empty) | Hide Ray window |
