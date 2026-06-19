@@ -343,6 +343,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Proxy authentication sync email
+    |--------------------------------------------------------------------------
+    |
+    | If enabled, the user's default recipient email will be synced with the proxy auth email
+    |
+    */
+    'proxy_authentication_sync_email' => env('ANONADDY_PROXY_AUTHENTICATION_SYNC_EMAIL', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Username Blacklist & Word Lists
     |--------------------------------------------------------------------------
     |
