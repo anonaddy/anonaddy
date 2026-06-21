@@ -485,7 +485,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getBandwidthLimitAPI()
     {
-        return is_infinite($this->getBandwidthLimit()) ? null : $this->getBandwidthLimit();
+        return is_infinite($this->getBandwidthLimit()) ? PHP_INT_MAX : $this->getBandwidthLimit();
     }
 
     public function getBandwidthLimitMb()
