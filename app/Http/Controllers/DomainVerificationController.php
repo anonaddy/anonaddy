@@ -26,4 +26,14 @@ class DomainVerificationController extends Controller
 
         return $domain->checkVerificationForSending();
     }
+
+    public function generateTable($id)
+    {
+        $domain = user()->domains()->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $domain->requiredRecordsExample(),
+        ]);
+    }
 }
