@@ -98,6 +98,18 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
     protected $listUnsubscribePost;
 
+    protected $listID;
+
+    protected $listHelp;
+
+    protected $listPost;
+
+    protected $listSubscribe;
+
+    protected $listOwner;
+
+    protected $listArchive;
+
     protected $inReplyTo;
 
     protected $references;
@@ -223,6 +235,12 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->messageId = $emailData->messageId;
         $this->listUnsubscribe = $emailData->listUnsubscribe;
         $this->listUnsubscribePost = $emailData->listUnsubscribePost;
+        $this->listID = $emailData->listID;
+        $this->listHelp = $emailData->listHelp;
+        $this->listPost = $emailData->listPost;
+        $this->listSubscribe = $emailData->listSubscribe;
+        $this->listOwner = $emailData->listOwner;
+        $this->listArchive = $emailData->listArchive;
         $this->inReplyTo = $emailData->inReplyTo;
         $this->references = $emailData->references;
         $this->originalEnvelopeFrom = $emailData->originalEnvelopeFrom;
@@ -338,6 +356,14 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                             ->addTextHeader('List-Unsubscribe', '<'.$this->deactivatePostUrl.'>');
                         $message->getHeaders()
                             ->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+                    }
+                }
+
+                foreach (['List-ID', 'List-Help', 'List-Post', 'List-Subscribe', 'List-Owner', 'List-Archive'] as $listHeader) {
+                    $property = lcfirst(str_replace('-', '', ucwords($listHeader, '-')));
+                    if ($this->$property) {
+                        $message->getHeaders()
+                            ->addTextHeader($listHeader, base64_decode($this->$property));
                     }
                 }
 

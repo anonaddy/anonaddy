@@ -42,6 +42,18 @@ class EmailData
 
     public $listUnsubscribePost;
 
+    public $listID;
+
+    public $listHelp;
+
+    public $listPost;
+
+    public $listSubscribe;
+
+    public $listOwner;
+
+    public $listArchive;
+
     public $inReplyTo;
 
     public $references;
@@ -131,6 +143,12 @@ class EmailData
         $this->messageId = base64_encode(Str::remove(['<', '>'], $parser->getHeader('Message-ID')));
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
         $this->listUnsubscribePost = base64_encode($parser->getHeader('List-Unsubscribe-Post'));
+        $this->listID = base64_encode($parser->getHeader('List-ID'));
+        $this->listHelp = base64_encode($parser->getHeader('List-Help'));
+        $this->listPost = base64_encode($parser->getHeader('List-Post'));
+        $this->listSubscribe = base64_encode($parser->getHeader('List-Subscribe'));
+        $this->listOwner = base64_encode($parser->getHeader('List-Owner'));
+        $this->listArchive = base64_encode($parser->getHeader('List-Archive'));
         $this->inReplyTo = base64_encode($parser->getHeader('In-Reply-To'));
         $this->references = base64_encode($parser->getHeader('References'));
 

@@ -1061,4 +1061,33 @@ class ReceiveEmailTest extends TestCase
             return $mail->hasTo($this->user->email) && $mail->hasFrom('ebay@johndoe.anonaddy.com') && $mail->hasReplyTo('ebay+will=anonaddy.com@johndoe.anonaddy.com');
         });
     }
+
+    #[Test]
+    public function it_can_forward_email_with_list_headers()
+    {
+        config(['mail.default' => 'log']);
+        Notification::fake();
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_list_id.eml'),
+                '--sender' => 'example-announce@example.org',
+                '--recipient' => ['list@johndoe.anonaddy.com'],
+                '--local_part' => ['list'],
+                '--extension' => [''],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1000',
+            ]
+        )->assertExitCode(0);
+
+        $this->assertDatabaseHas('aliases', [
+            'email' => 'list@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'list',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+            'emails_forwarded' => 1,
+        ]);
+
+        Notification::assertNothingSent();
+    }
 }
