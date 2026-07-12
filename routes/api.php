@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\UsernameDefaultRecipientController;
 use App\Http\Controllers\Auth\ApiAuthenticationController;
 use App\Http\Controllers\BlocklistCheckController;
 use App\Http\Controllers\RecipientVerificationController;
+use App\Http\Controllers\DomainVerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -237,4 +238,6 @@ Route::group([
     Route::get('api-token-details', [ApiTokenDetailController::class, 'show']);
 
     Route::get('/chart-data', [ChartDataController::class, 'index']);
+
+    Route::get('/domains/{id}/check-sending', [DomainVerificationController::class, 'checkSending']);
 });
