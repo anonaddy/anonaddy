@@ -238,4 +238,38 @@ class UserRuleChecker
             ->flatten(1)
             ->contains('type', 'quarantine');
     }
+
+    /**
+     * Add matching blocklist rule actions for the given sender to the user's blocklist.
+     *
+     * Intended for forwarded (inbound) mail where $sender is the original From address.
+     */
+    public static function applyBlocklistActionsFromRules(array $ruleIdsAndActions, User $user, ?string $sender): void
+    {
+        $sender = strtolower(trim((string) $sender));
+
+        if ($sender === '' || $sender === '<>' || ! str_contains($sender, '@')) {
+            return;
+        }
+
+        $actions = collect($ruleIdsAndActions)->flatten(1);
+
+        if ($actions->contains('type', 'blocklistSender') && filter_var($sender, FILTER_VALIDATE_EMAIL)) {
+            $user->blockedSenders()->firstOrCreate([
+                'type' => 'email',
+                'value' => $sender,
+            ]);
+        }
+
+        if ($actions->contains('type', 'blocklistDomain')) {
+            $domain = substr($sender, strrpos($sender, '@') + 1);
+
+            if ($domain !== '' && preg_match('/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i', $domain)) {
+                $user->blockedSenders()->firstOrCreate([
+                    'type' => 'domain',
+                    'value' => $domain,
+                ]);
+            }
+        }
+    }
 }

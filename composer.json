@@ -8,7 +8,7 @@
     "license": "AGPL-3.0-or-later",
     "require": {
         "php": "^8.3",
-        "asbiin/laravel-webauthn": "^5.0",
+        "asbiin/laravel-webauthn": "^6.0",
         "bacon/bacon-qr-code": "^3.0",
         "chillerlan/php-qrcode": "^6.0",
         "guzzlehttp/guzzle": "^7.2",
@@ -49,7 +49,6 @@
         "exclude-from-classmap": [
           "vendor/egulias/email-validator/src/Validation/MessageIDValidation.php",
           "vendor/asbiin/laravel-webauthn/src/Services/Webauthn/CredentialRepository.php",
-          "vendor/asbiin/laravel-webauthn/src/Services/Webauthn/CredentialAttestationValidator.php",
           "vendor/web-auth/webauthn-lib/src/CeremonyStep/CheckUserHandle.php"
         ],
         "psr-4": {

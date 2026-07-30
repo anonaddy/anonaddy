@@ -264,19 +264,33 @@ OUTPUT;
             return;
         }
 
+        // Kill any agent tied to this temp home so sockets/lock files are not
+        // removed out from under us mid-walk (common on GitHub CI).
+        Process::timeout(5)
+            ->env(['GNUPGHOME' => $directory])
+            ->run(['gpgconf', '--kill', 'gpg-agent']);
+
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($files as $file) {
+            $path = $file->getPathname();
+
             if ($file->isDir()) {
-                rmdir($file->getRealPath());
-            } else {
-                unlink($file->getRealPath());
+                @rmdir($path);
+
+                continue;
+            }
+
+            // getRealPath() is false for vanished sockets / broken links; those
+            // are common under GNUPGHOME when gpg-agent cleans up asynchronously.
+            if (file_exists($path) || is_link($path)) {
+                @unlink($path);
             }
         }
 
-        rmdir($directory);
+        @rmdir($directory);
     }
 }

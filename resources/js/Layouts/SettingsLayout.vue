@@ -8,7 +8,17 @@
     <div class="sm:flex sm:items-center mb-6">
       <div class="sm:flex-auto">
         <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Settings</h1>
-        <p class="mt-2 text-sm text-grey-700 dark:text-grey-100">Make changes to your account</p>
+        <p class="mt-2 text-sm text-grey-700 dark:text-grey-100">
+          Make changes to your account
+          <button
+            type="button"
+            @click="moreInfoOpen = !moreInfoOpen"
+            class="inline-flex items-center gap-1 ml-1 font-medium text-indigo-700 dark:text-indigo-200 hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            More info
+            <InformationCircleIcon class="h-5 w-5" aria-hidden="true" />
+          </button>
+        </p>
       </div>
     </div>
 
@@ -68,12 +78,60 @@
         </div>
       </main>
     </div>
+
+    <Modal :open="moreInfoOpen" @close="moreInfoOpen = false">
+      <template v-slot:title> More information </template>
+      <template v-slot:content>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          Settings is where you manage account-wide preferences. Use the tabs to move between
+          sections:
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>General</b> - account email, default alias domain and format, and other preferences.
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>Security</b> - password, active sessions, two-factor authentication and passkeys.
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>API Keys</b> - create and manage tokens for the browser extension, mobile apps and
+          other integrations.
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>Account Data</b> - export aliases and account data, or import aliases for a custom
+          domain.
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>Delete Account</b> - permanently delete your addy.io account and associated data.
+        </p>
+
+        <div class="mt-6 flex flex-col sm:flex-row">
+          <a
+            href="https://addy.io/help/category/accounts-and-settings/"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="inline-flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            View settings help
+            <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-2" aria-hidden="true" />
+          </a>
+          <button
+            @click="moreInfoOpen = false"
+            class="mt-3 sm:mt-0 sm:ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Close
+          </button>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script setup>
 import { Link, Head, router, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
+import Modal from '../Components/Modal.vue'
+import { InformationCircleIcon } from '@heroicons/vue/24/outline'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 
 const page = usePage()
 
@@ -113,6 +171,7 @@ const allTabs = [
 const tabs = computed(() => allTabs.filter(tab => tab.enabled))
 
 const selectedTabName = ref(_.find(allTabs, ['current', true]).name)
+const moreInfoOpen = ref(false)
 
 const visitTab = () => {
   router.visit(_.find(allTabs, ['name', selectedTabName.value]).href)

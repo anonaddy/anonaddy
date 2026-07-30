@@ -272,7 +272,7 @@ class AliasBulkController extends Controller
         }
 
         foreach ($aliases as $alias) {
-            $alias->labels()->sync($request->label_ids ?? []);
+            $alias->syncLabels($request->label_ids);
         }
 
         return response()->json([

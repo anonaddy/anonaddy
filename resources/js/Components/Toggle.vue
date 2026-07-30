@@ -7,7 +7,7 @@
     :class="[
       modelValue ? 'bg-cyan-500' : 'bg-grey-300',
       disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-      'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+      'relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
     ]"
     @update:model-value="onChange"
   >

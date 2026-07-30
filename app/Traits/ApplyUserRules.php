@@ -59,6 +59,10 @@ trait ApplyUserRules
             case 'quarantine':
                 // Do nothing, already checked.
                 break;
+            case 'blocklistSender':
+            case 'blocklistDomain':
+                // Applied in ReceiveEmail for forwards before block/quarantine exits.
+                break;
             case 'removeAttachments':
                 $this->emailAttachments = [];
                 break;

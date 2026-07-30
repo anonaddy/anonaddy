@@ -8,11 +8,13 @@
         <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Recipients</h1>
         <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           A list of all the recipients {{ search ? 'found for your search' : 'in your account' }}
-          <button @click="moreInfoOpen = !moreInfoOpen">
-            <InformationCircleIcon
-              class="h-6 w-6 inline-block cursor-pointer text-grey-500 dark:text-grey-200"
-              title="Click for more information"
-            />
+          <button
+            type="button"
+            @click="moreInfoOpen = !moreInfoOpen"
+            class="inline-flex items-center gap-1 ml-1 font-medium text-indigo-700 dark:text-indigo-200 hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            More info
+            <InformationCircleIcon class="h-5 w-5" aria-hidden="true" />
           </button>
         </p>
       </div>
@@ -20,7 +22,7 @@
         <button
           type="button"
           @click="openAddRecipientModal"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Add Recipient
         </button>
@@ -217,7 +219,7 @@
           <button
             v-else
             @click="openRecipientKeyModal(props.row)"
-            class="text-sm text-grey-500 dark:text-grey-300 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="text-sm text-grey-500 dark:text-grey-300 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add PGP key
           </button>
@@ -236,7 +238,7 @@
           <button
             v-else
             @click="resendVerification(props.row.id)"
-            class="text-sm disabled:cursor-not-allowed rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="text-sm disabled:cursor-not-allowed rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :disabled="resendVerificationLoading"
           >
             Resend email
@@ -308,7 +310,7 @@
           <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               @click="validateNewRecipient"
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="addRecipientLoading"
             >
               Add Recipient
@@ -316,7 +318,7 @@
             </button>
             <button
               @click="addRecipientModalOpen = false"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Cancel
             </button>
@@ -361,7 +363,7 @@
             <button
               type="button"
               @click="validateRecipientKey"
-              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+              class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
               :disabled="addRecipientKeyLoading"
             >
               Add Key
@@ -369,7 +371,7 @@
             </button>
             <button
               @click="closeRecipientKeyModal"
-              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Cancel
             </button>
@@ -389,7 +391,7 @@
           <button
             type="button"
             @click="deleteRecipientKey(recipientKeyToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteRecipientKeyLoading"
           >
             Remove public key
@@ -397,7 +399,7 @@
           </button>
           <button
             @click="closeDeleteRecipientKeyModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -415,7 +417,7 @@
           <button
             type="button"
             @click="deleteRecipient(recipientToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteRecipientLoading"
           >
             Delete recipient
@@ -423,7 +425,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -444,7 +446,7 @@
           <button
             type="button"
             @click="makeDefaultRecipient(recipientToMakeDefault)"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="makeDefaultLoading"
           >
             Make default recipient
@@ -452,7 +454,7 @@
           </button>
           <button
             @click="closeMakeDefaultModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -464,21 +466,30 @@
       <template v-slot:title> More information </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          This page shows all of the recipients in your account, these are your real email addresses
-          where emails can be forwarded to.
+          Recipients are your real email addresses where alias mail is forwarded.
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          You must verify each recipient before you can forwarded emails to it.
+          You must verify each recipient before emails can be forwarded to it. Click
+          <b>Make Default</b> next to a recipient to set which address new aliases use by default.
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          To update your account's default recipient email address click "Make Default" next to that
-          recipient.
+          You can also add a PGP key to encrypt forwarded mail for a recipient, and control whether
+          that recipient is allowed to reply or send from your aliases.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">
+          <a
+            href="https://addy.io/help/category/recipients/"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="inline-flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            View recipients help
+            <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-2" aria-hidden="true" />
+          </a>
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-3 sm:mt-0 sm:ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>
@@ -498,6 +509,7 @@ import tippy from 'tippy.js'
 import { VueGoodTable } from 'vue-good-table-next'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, InboxArrowDownIcon } from '@heroicons/vue/24/outline'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 import { validateCustomEmailWithErrors } from '../../utils/customEmailValidator.js'
 
 const props = defineProps({

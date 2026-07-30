@@ -9,6 +9,14 @@
         <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           Blocked senders and domains
           {{ search ? 'found for your search' : '- these entries cannot reach your aliases' }}
+          <button
+            type="button"
+            @click="moreInfoOpen = !moreInfoOpen"
+            class="inline-flex items-center gap-1 ml-1 font-medium text-indigo-700 dark:text-indigo-200 hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            More info
+            <InformationCircleIcon class="h-5 w-5" aria-hidden="true" />
+          </button>
         </p>
       </div>
     </div>
@@ -18,7 +26,7 @@
         <h2 class="text-sm font-medium text-grey-900 dark:text-white">Add to blocklist</h2>
         <button
           type="button"
-          class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           @click="bulkAddModalOpen = true"
         >
           Bulk add
@@ -68,7 +76,7 @@
           <span class="block text-sm font-medium mb-1 invisible" aria-hidden="true">Add</span>
           <button
             type="submit"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-2 px-3 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-2 px-3 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="addFormLoading"
           >
             Add to blocklist
@@ -87,7 +95,7 @@
         <Listbox as="div" v-model="showEntryType">
           <div class="relative">
             <ListboxButton
-              class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-grey-200 dark:hover:text-grey-300"
+              class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-grey-200 dark:hover:text-grey-300"
             >
               <span class="sr-only">Change display type</span>
               <ListboxLabel class="cursor-pointer">Display</ListboxLabel>
@@ -139,7 +147,7 @@
           <Listbox as="div" v-model="currentSort">
             <div class="relative">
               <ListboxButton
-                class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-grey-200 dark:hover:text-grey-300"
+                class="inline-flex items-center text-sm text-grey-700 hover:text-grey-900 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-grey-200 dark:hover:text-grey-300"
               >
                 <span class="sr-only">Change sort by</span>
                 <ListboxLabel class="cursor-pointer">Sort By</ListboxLabel>
@@ -373,6 +381,17 @@
       <p class="mt-1 text-md text-grey-500 dark:text-grey-200">
         Add an email address or domain above to block it from reaching your aliases.
       </p>
+      <p class="mt-4 text-sm text-grey-500 dark:text-grey-200">
+        <a
+          href="https://addy.io/help/category/blocklist/"
+          target="_blank"
+          rel="nofollow noreferrer noopener"
+          class="inline-flex items-center text-indigo-700 dark:text-indigo-400 font-medium hover:text-indigo-500"
+        >
+          View blocklist help
+          <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-1" aria-hidden="true" />
+        </a>
+      </p>
     </div>
 
     <Modal :open="deleteModalOpen" @close="closeDeleteModal">
@@ -385,7 +404,7 @@
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteLoading"
             @click="confirmDelete"
           >
@@ -393,7 +412,7 @@
             <Loader v-if="deleteLoading" class="inline-block ml-2 h-4 w-4" />
           </button>
           <button
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             @click="closeDeleteModal"
           >
             Cancel
@@ -412,7 +431,7 @@
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="bulkDeleteLoading"
             @click="bulkDeleteBlocklist"
           >
@@ -420,7 +439,7 @@
             <Loader v-if="bulkDeleteLoading" class="inline-block ml-2 h-4 w-4" />
           </button>
           <button
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             @click="bulkDeleteModalOpen = false"
           >
             Cancel
@@ -477,7 +496,7 @@
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="bulkAddLoading || !parsedBulkAddValues.length"
             @click="submitBulkAdd"
           >
@@ -486,10 +505,50 @@
           </button>
           <button
             type="button"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             @click="closeBulkAddModal"
           >
             Cancel
+          </button>
+        </div>
+      </template>
+    </Modal>
+
+    <Modal :open="moreInfoOpen" @close="moreInfoOpen = false">
+      <template v-slot:title> More information </template>
+      <template v-slot:content>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          The blocklist stops specific sender email addresses or entire sender domains from reaching
+          your aliases. Use it for spam or repeated unwanted mail from the same source.
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>Email</b> - best when only one address is a problem (e.g. sender@example.com).
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          <b>Domain</b> - best when many addresses at the same domain send unwanted mail (e.g.
+          example.com). Be careful blocking large providers, as this can also block legitimate
+          messages.
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          You can add entries one at a time or in bulk, from Failed Deliveries, or automatically
+          with a rule action. Blocked mail is rejected before it is forwarded.
+        </p>
+
+        <div class="mt-6 flex flex-col sm:flex-row">
+          <a
+            href="https://addy.io/help/category/blocklist/"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="inline-flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            View blocklist help
+            <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-2" aria-hidden="true" />
+          </a>
+          <button
+            @click="moreInfoOpen = false"
+            class="mt-3 sm:mt-0 sm:ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Close
           </button>
         </div>
       </template>
@@ -513,8 +572,13 @@ import {
   ListboxOption,
   ListboxOptions,
 } from '@headlessui/vue'
-import { NoSymbolIcon, BarsArrowDownIcon, BarsArrowUpIcon } from '@heroicons/vue/24/outline'
-import { ChevronDownIcon, CheckIcon } from '@heroicons/vue/20/solid'
+import {
+  NoSymbolIcon,
+  BarsArrowDownIcon,
+  BarsArrowUpIcon,
+  InformationCircleIcon,
+} from '@heroicons/vue/24/outline'
+import { ChevronDownIcon, CheckIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
 
@@ -564,6 +628,7 @@ const bulkDeleteModalOpen = ref(false)
 const bulkDeleteLoading = ref(false)
 const bulkAddModalOpen = ref(false)
 const bulkAddLoading = ref(false)
+const moreInfoOpen = ref(false)
 const bulkAddType = ref('email')
 const bulkAddText = ref('')
 const bulkAddError = ref(null)
