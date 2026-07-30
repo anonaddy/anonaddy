@@ -227,7 +227,7 @@
                           },
                         ))
                     "
-                    class="absolute inset-y-0 right-0 cursor-pointer flex items-center pr-3 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    class="absolute inset-y-0 right-0 cursor-pointer flex items-center pr-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     <XMarkIcon class="h-5 w-5 text-grey-400 dark:text-white" aria-hidden="true" />
                   </div>
@@ -248,7 +248,7 @@
                         </p>
                       </div>
                       <ListboxButton
-                        class="relative inline-flex items-center bg-indigo-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 focus:z-10"
+                        class="relative inline-flex items-center bg-indigo-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 focus:z-10"
                         style="height: 42px"
                       >
                         <span class="sr-only">Change published status</span>
@@ -317,7 +317,7 @@
               <Menu as="div" class="relative shrink-0" role="menu">
                 <div>
                   <MenuButton
-                    class="bg-white rounded-sm flex text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-grey-900"
+                    class="bg-white rounded-sm flex text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-grey-900"
                   >
                     <span class="sr-only">Open user menu</span>
                     <span id="dropdown-username" class="ml-2 md:ml-0 font-medium">{{
@@ -511,6 +511,13 @@ const sidebarNavigation = [
 ]
 
 const mobileMenuOpen = ref(false)
+
+watch(
+  () => usePage().props.user?.darkMode,
+  darkMode => {
+    document.body.classList.toggle('dark', !!darkMode)
+  },
+)
 
 const searchForm = useForm({
   search: props.search ?? '',

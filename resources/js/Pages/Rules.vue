@@ -10,11 +10,13 @@
         <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Rules</h1>
         <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           A list of all the rules {{ search ? 'found for your search' : 'in your account' }}
-          <button @click="moreInfoOpen = !moreInfoOpen">
-            <InformationCircleIcon
-              class="h-6 w-6 inline-block cursor-pointer text-grey-500 dark:text-grey-200"
-              title="Click for more information"
-            />
+          <button
+            type="button"
+            @click="moreInfoOpen = !moreInfoOpen"
+            class="inline-flex items-center gap-1 ml-1 font-medium text-indigo-700 dark:text-indigo-200 hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            More info
+            <InformationCircleIcon class="h-5 w-5" aria-hidden="true" />
           </button>
         </p>
       </div>
@@ -22,7 +24,7 @@
         <button
           type="button"
           @click="openCreateModal"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Create Rule
         </button>
@@ -171,6 +173,17 @@
           Create a Rule
         </button>
       </div>
+      <p class="mt-4 text-sm text-grey-500 dark:text-grey-200">
+        <a
+          href="https://addy.io/help/category/rules/"
+          target="_blank"
+          rel="nofollow noreferrer noopener"
+          class="inline-flex items-center text-indigo-700 dark:text-indigo-400 font-medium hover:text-indigo-500"
+        >
+          View rules help
+          <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-1" aria-hidden="true" />
+        </a>
+      </p>
     </div>
 
     <Modal
@@ -330,7 +343,7 @@
           <!-- add condition button -->
           <button
             @click="addCondition(createRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add condition
           </button>
@@ -461,7 +474,7 @@
           <!-- add action button -->
           <button
             @click="addAction(createRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add action
           </button>
@@ -514,7 +527,7 @@
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             @click="createNewRule"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="createRuleLoading"
           >
             Create Rule
@@ -522,7 +535,7 @@
           </button>
           <button
             @click="createRuleModalOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -680,7 +693,7 @@
           <!-- add condition button -->
           <button
             @click="addCondition(editRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add condition
           </button>
@@ -811,7 +824,7 @@
           <!-- add action button -->
           <button
             @click="addAction(editRuleObject)"
-            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-4 p-2 text-grey-800 bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Add action
           </button>
@@ -864,7 +877,7 @@
         <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             @click="editRule"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="editRuleLoading"
           >
             Save
@@ -872,7 +885,7 @@
           </button>
           <button
             @click="closeEditModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -890,7 +903,7 @@
           <button
             type="button"
             @click="deleteRule(ruleIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteRuleLoading"
           >
             Delete rule
@@ -898,7 +911,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -910,24 +923,31 @@
       <template v-slot:title> More information </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          Rules can be used to perform different actions if certain conditions are met.
+          Rules let you run actions automatically when an email matches conditions you set, such as
+          the sender, subject or alias.
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          For example you could create a rule that checks if the alias is for your custom domain and
-          if so then to replace the email subject.
+          Examples include changing the subject, blocking or quarantining mail, forwarding to a
+          specific recipient, or adding the sender to your blocklist.
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          You can choose to apply rules on forwards, replies and/or sends.
-        </p>
-        <p class="mt-4 text-grey-700 dark:text-grey-200">
-          Rules are applied in the order displayed on this page from top to bottom. You can re-order
-          your rules by dragging them using the icon on the left of each row.
+          You can apply rules to forwards, replies and/or sends. Rules run in the order shown on
+          this page from top to bottom. Drag a rule to change its order.
         </p>
 
-        <div class="mt-6 flex flex-col">
+        <div class="mt-6 flex flex-col sm:flex-row">
+          <a
+            href="https://addy.io/help/category/rules/"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="inline-flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            View rules help
+            <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-2" aria-hidden="true" />
+          </a>
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-3 sm:mt-0 sm:ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>
@@ -948,7 +968,7 @@ import draggable from 'vuedraggable'
 import Multiselect from '@vueform/multiselect'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, FunnelIcon } from '@heroicons/vue/24/outline'
-import { PlusIcon } from '@heroicons/vue/20/solid'
+import { PlusIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 
 const props = defineProps({
   initialRows: {
@@ -1052,6 +1072,14 @@ const actionTypeOptions = [
   {
     value: 'quarantine',
     label: 'quarantine the email',
+  },
+  {
+    value: 'blocklistSender',
+    label: 'add the sender email to the blocklist',
+  },
+  {
+    value: 'blocklistDomain',
+    label: 'add the sender domain to the blocklist',
   },
   {
     value: 'removeAttachments',
@@ -1439,6 +1467,10 @@ const ruleActionChange = action => {
   } else if (action.type === 'block') {
     action.value = true
   } else if (action.type === 'quarantine') {
+    action.value = true
+  } else if (action.type === 'blocklistSender') {
+    action.value = true
+  } else if (action.type === 'blocklistDomain') {
     action.value = true
   } else if (action.type === 'removeAttachments') {
     action.value = true

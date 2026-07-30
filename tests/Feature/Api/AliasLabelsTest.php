@@ -54,6 +54,23 @@ class AliasLabelsTest extends TestCase
     }
 
     #[Test]
+    public function syncing_the_same_labels_twice_does_not_error(): void
+    {
+        $alias = Alias::factory()->create(['user_id' => $this->user->id]);
+        $label = Label::factory()->create(['user_id' => $this->user->id]);
+
+        $payload = [
+            'alias_id' => $alias->id,
+            'label_ids' => [$label->id],
+        ];
+
+        $this->json('POST', '/api/v1/alias-labels', $payload)->assertSuccessful();
+        $this->json('POST', '/api/v1/alias-labels', $payload)->assertSuccessful();
+
+        $this->assertCount(1, $alias->fresh()->labels);
+    }
+
+    #[Test]
     public function user_cannot_attach_invalid_label_to_alias(): void
     {
         $alias = Alias::factory()->create(['user_id' => $this->user->id]);

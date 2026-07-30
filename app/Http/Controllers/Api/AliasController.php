@@ -200,7 +200,7 @@ class AliasController extends Controller
         }
 
         if ($request->has('label_ids')) {
-            $alias->labels()->sync($request->label_ids ?? []);
+            $alias->syncLabels($request->label_ids);
         }
 
         return new AliasResource($alias->refresh()->load(['recipients', 'labels']));
@@ -221,7 +221,7 @@ class AliasController extends Controller
         $alias->save();
 
         if ($request->has('label_ids')) {
-            $alias->labels()->sync($request->label_ids ?? []);
+            $alias->syncLabels($request->label_ids);
         }
 
         return new AliasResource($alias->refresh()->load(['recipients', 'labels']));

@@ -425,6 +425,8 @@ class ReceiveEmail extends Command
         $recipientsToForwardTo = $this->alias->verifiedRecipientsOrDefault();
 
         if (! empty($ruleIdsAndActions)) {
+            UserRuleChecker::applyBlocklistActionsFromRules($ruleIdsAndActions, $this->user, $emailData->sender);
+
             if (UserRuleChecker::shouldBlockEmail($ruleIdsAndActions)) {
                 // If it is a new alias that has been created on the fly, delete it.
                 if ($isNewAlias ?? false) {

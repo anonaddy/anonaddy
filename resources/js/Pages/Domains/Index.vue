@@ -8,11 +8,13 @@
         <h1 class="text-2xl font-semibold text-grey-900 dark:text-white">Domains</h1>
         <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           A list of all the domains {{ search ? 'found for your search' : 'in your account' }}
-          <button @click="moreInfoOpen = !moreInfoOpen">
-            <InformationCircleIcon
-              class="h-6 w-6 inline-block cursor-pointer text-grey-500 dark:text-grey-200"
-              title="Click for more information"
-            />
+          <button
+            type="button"
+            @click="moreInfoOpen = !moreInfoOpen"
+            class="inline-flex items-center gap-1 ml-1 font-medium text-indigo-700 dark:text-indigo-200 hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            More info
+            <InformationCircleIcon class="h-5 w-5" aria-hidden="true" />
           </button>
         </p>
       </div>
@@ -20,7 +22,7 @@
         <button
           type="button"
           @click="openAddDomainModal"
-          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
+          class="inline-flex items-center justify-center rounded-md border border-transparent bg-cyan-400 hover:bg-cyan-300 text-cyan-900 px-4 py-2 font-bold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Add Domain
         </button>
@@ -253,14 +255,14 @@
           <button
             v-if="props.row.domain_sending_verified_at || props.row.domain_mx_validated_at"
             @click="openCheckRecordsModal(rows[props.row.originalIndex])"
-            class="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-sm ml-2 text-grey-500 dark:text-grey-300 rounded-sm"
+            class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-sm ml-2 text-grey-500 dark:text-grey-300 rounded-sm"
           >
             Recheck
           </button>
           <button
             v-else
             @click="openCheckRecordsModal(rows[props.row.originalIndex])"
-            class="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-sm ml-2 text-grey-500 dark:text-grey-300 rounded-sm"
+            class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 text-sm ml-2 text-grey-500 dark:text-grey-300 rounded-sm"
           >
             Check Records
           </button>
@@ -320,6 +322,17 @@
           Add a Domain
         </button>
       </div>
+      <p class="mt-4 text-sm text-grey-500 dark:text-grey-200">
+        <a
+          href="https://addy.io/help/category/domains/"
+          target="_blank"
+          rel="nofollow noreferrer noopener"
+          class="inline-flex items-center text-indigo-700 dark:text-indigo-400 font-medium hover:text-indigo-500"
+        >
+          View custom domains help
+          <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-1" aria-hidden="true" />
+        </a>
+      </p>
     </div>
 
     <Modal :open="addDomainModalOpen" @close="closeCheckRecordsModal" max-width="md:max-w-2xl">
@@ -364,7 +377,7 @@
           />
           <button
             @click="validateNewDomain"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :class="addDomainLoading ? 'cursor-not-allowed' : ''"
             :disabled="addDomainLoading"
           >
@@ -373,7 +386,7 @@
           </button>
           <button
             @click="addDomainModalOpen = false"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -488,7 +501,7 @@
         <div class="mt-6">
           <button
             @click="checkRecords(domainToCheck)"
-            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             :class="checkRecordsLoading ? 'cursor-not-allowed' : ''"
             :disabled="checkRecordsLoading"
           >
@@ -497,7 +510,7 @@
           </button>
           <button
             @click="closeCheckRecordsModal"
-            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -543,7 +556,7 @@
           <button
             type="button"
             @click="editDefaultRecipient()"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="editDefaultRecipientLoading"
           >
             Update Default Recipient
@@ -551,7 +564,7 @@
           </button>
           <button
             @click="closeDomainDefaultRecipientModal()"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -571,7 +584,7 @@
           <button
             type="button"
             @click="deleteDomain(domainIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteDomainLoading"
           >
             Delete domain
@@ -579,7 +592,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -591,37 +604,42 @@
       <template v-slot:title> More information </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          Adding a custom domain such as <b>example.com</b> will allow you to create unlimited
-          aliases e.g. xyz@example.com. You can also add a subdomain such as
-          <b>mail.example.com</b>.
+          Custom domains let you create aliases at your own domain (e.g. hello@example.com) or a
+          subdomain (e.g. hello@mail.example.com).
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          To get started all you have to do is add a TXT record to your domain to verify ownership
-          and then add the domain here by clicking the button above.
-        </p>
-        <p class="mt-4 text-grey-700 dark:text-grey-200">
-          The TXT record needs to have the following values:
+          To get started, add a TXT record to verify ownership, then add the domain here. After
+          verification you will need MX, SPF, DKIM and DMARC records so you can receive and send
+          mail.
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
           Type: <b>TXT</b><br />
-          Host: <b>@</b><br />
+          Host: <b>@</b> (or your subdomain host)<br />
           Value:
           <b
             class="break-words cursor-pointer"
             title="Copy"
             @click="clipboard(`aa-verify=${aaVerify}`)"
             >aa-verify={{ aaVerify }}</b
-          ><br />
+          >
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          Once the DNS changes propagate and you have verified ownership of the domain you will need
-          to add a few more records to be able to receive emails at your own domain.
+          Verified domains support catch-all aliases and can have their own default recipient.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">
+          <a
+            href="https://addy.io/help/category/domains/"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="inline-flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            View custom domains help
+            <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-2" aria-hidden="true" />
+          </a>
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-3 sm:mt-0 sm:ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>
@@ -642,7 +660,7 @@ import Multiselect from '@vueform/multiselect'
 import { VueGoodTable } from 'vue-good-table-next'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, GlobeAltIcon } from '@heroicons/vue/24/outline'
-import { PlusIcon } from '@heroicons/vue/20/solid'
+import { PlusIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 
 const props = defineProps({
   initialRows: {

@@ -12,7 +12,7 @@ class AliasLabelController extends Controller
     {
         $alias = user()->aliases()->withTrashed()->findOrFail($request->alias_id);
 
-        $alias->labels()->sync($request->label_ids ?? []);
+        $alias->syncLabels($request->label_ids);
 
         return new AliasResource($alias->refresh()->load('labels'));
     }

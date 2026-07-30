@@ -92,10 +92,10 @@
           />
         </div>
         <p v-if="formError" class="mt-2 text-sm text-red-500">{{ formError }}</p>
-        <div class="mt-4 flex flex-wrap gap-2">
+        <div class="mt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
             type="button"
-            class="px-4 py-2 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 rounded disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 rounded disabled:cursor-not-allowed"
             :disabled="saving"
             @click="editingLabel ? updateLabel() : createLabel()"
           >
@@ -105,14 +105,14 @@
           <button
             v-if="editingLabel"
             type="button"
-            class="px-4 py-2 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded dark:bg-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:border-grey-700"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded dark:bg-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:border-grey-700"
             @click="cancelEdit"
           >
             Cancel edit
           </button>
           <button
             type="button"
-            class="px-4 py-2 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded dark:bg-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:border-grey-700"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 border border-grey-100 rounded dark:bg-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:border-grey-700"
             @click="$emit('close')"
           >
             Close

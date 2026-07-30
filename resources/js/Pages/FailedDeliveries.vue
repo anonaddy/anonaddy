@@ -11,11 +11,13 @@
         <p class="mt-2 text-sm text-grey-700 dark:text-grey-200">
           A list of all the failed deliveries
           {{ search ? 'found for your search' : 'in your account' }}
-          <button @click="moreInfoOpen = !moreInfoOpen">
-            <InformationCircleIcon
-              class="h-6 w-6 inline-block cursor-pointer text-grey-500 dark:text-grey-200"
-              title="Click for more information"
-            />
+          <button
+            type="button"
+            @click="moreInfoOpen = !moreInfoOpen"
+            class="inline-flex items-center gap-1 ml-1 font-medium text-indigo-700 dark:text-indigo-200 hover:text-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            More info
+            <InformationCircleIcon class="h-5 w-5" aria-hidden="true" />
           </button>
         </p>
       </div>
@@ -290,7 +292,7 @@
           <button
             type="button"
             @click="resendFailedDelivery(failedDeliveryToResend)"
-            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="resendFailedDeliveryLoading"
           >
             Resend failed delivery
@@ -298,7 +300,7 @@
           </button>
           <button
             @click="closeResendModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -321,7 +323,7 @@
           <button
             type="button"
             @click="deleteFailedDelivery(failedDeliveryIdToDelete)"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="deleteFailedDeliveryLoading"
           >
             Delete failed delivery
@@ -329,7 +331,7 @@
           </button>
           <button
             @click="closeDeleteModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -353,14 +355,14 @@
           <button
             type="button"
             @click="confirmQuarantinedDownload"
-            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="!failedDeliveryToDownloadId"
           >
             Download anyway
           </button>
           <button
             @click="closeQuarantinedDownloadModal"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -372,41 +374,42 @@
       <template v-slot:title> More information </template>
       <template v-slot:content>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          There are 3 different types of failed deliveries on addy.io.
+          This page shows emails that could not be delivered normally, and the reason why.
         </p>
         <ol class="mt-4 text-grey-700 dark:text-grey-200 list-decimal list-inside space-y-2">
           <li>
-            <b>Outbound bounces</b> - these occur when addy.io attempts to forward an email but the
-            destination mail server rejects it (e.g. User inbox full).
+            <b>Outbound bounces</b> - addy.io tried to forward an email but the destination mail
+            server rejected it (e.g. mailbox full).
           </li>
           <li>
-            <b>Inbound rejections</b> - these occur when the addy.io mail servers reject inbound
-            emails from senders that fail basic security checks (e.g. the sender's email provider
-            could not prove the message was genuine).
+            <b>Inbound rejections</b> - the addy.io mail servers rejected the message before
+            accepting it, usually because basic sender security checks failed.
           </li>
           <li>
-            <b>Inbound quarantined</b> - these are emails that were detected as spam by the spam
-            filtering software on the addy.io mail servers (e.g. blacklisted sending IP address,
-            high spam score).
+            <b>Inbound quarantined</b> - the message was accepted but filtered as spam (e.g. listed
+            sending IP or high spam score).
           </li>
         </ol>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
-          This page allows you to see all three types of failed deliveries and the reasons why they
-          failed.
-        </p>
-        <p class="mt-4 text-grey-700 dark:text-grey-200">
-          Outbound bounces and inbound quarantines are temporarily stored if you have this setting
-          enabled in your account.
-        </p>
-        <p class="mt-4 text-grey-700 dark:text-grey-200">
-          Inbound rejections are not stored as they are never even accepted by the addy.io mail
-          servers.
+          Outbound bounces and quarantined messages can be temporarily stored if that setting is
+          enabled, so you can view or download them. Outbound bounces can be resent after you fix
+          the issue. Quarantined messages cannot be released or marked as safe. Inbound rejections
+          are not stored because they are never accepted.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">
+          <a
+            href="https://addy.io/help/category/failed-deliveries/"
+            target="_blank"
+            rel="nofollow noreferrer noopener"
+            class="inline-flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            View failed deliveries help
+            <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-2" aria-hidden="true" />
+          </a>
           <button
             @click="moreInfoOpen = false"
-            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="mt-3 sm:mt-0 sm:ml-4 px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Close
           </button>
@@ -430,7 +433,7 @@
           <button
             type="button"
             @click="blockSender('email')"
-            class="w-full px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="w-full px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="blockSenderLoading"
           >
             Block email
@@ -440,7 +443,7 @@
             v-if="senderDomain"
             type="button"
             @click="blockSender('domain')"
-            class="w-full px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            class="w-full px-4 py-3 text-cyan-900 font-semibold bg-cyan-400 hover:bg-cyan-300 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             :disabled="blockSenderLoading"
           >
             Block domain
@@ -448,7 +451,7 @@
           </button>
           <button
             @click="closeBlockSenderModal"
-            class="w-full px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="w-full px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Cancel
           </button>
@@ -469,6 +472,7 @@ import { notify } from '@kyvg/vue3-notification'
 import { VueGoodTable } from 'vue-good-table-next'
 import Multiselect from '@vueform/multiselect'
 import { InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 
 const props = defineProps({
   initialRows: {

@@ -92,6 +92,8 @@ class StoreRuleRequest extends FormRequest
                         'quarantine',
                         'removeAttachments',
                         'forwardTo',
+                        'blocklistSender',
+                        'blocklistDomain',
                         // 'webhook',
                     ]),
                 ];

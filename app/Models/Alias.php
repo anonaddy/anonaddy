@@ -138,6 +138,28 @@ class Alias extends Model
     }
 
     /**
+     * Sync labels for this alias, serialising concurrent updates with a row lock.
+     *
+     * Laravel's sync() can race when two requests both see the pivot as empty and
+     * both insert the same (alias_id, label_id) primary key.
+     *
+     * @param  array<int, string>|null  $labelIds
+     */
+    public function syncLabels(?array $labelIds): void
+    {
+        $labelIds = array_values(array_unique($labelIds ?? []));
+
+        DB::transaction(function () use ($labelIds) {
+            static::withTrashed()
+                ->whereKey($this->id)
+                ->lockForUpdate()
+                ->first();
+
+            $this->labels()->sync($labelIds);
+        });
+    }
+
+    /**
      * Detach all recipients from this alias.
      *
      * @return int
