@@ -4,6 +4,7 @@ namespace App\CustomMailDriver;
 
 use App\CustomMailDriver\Mime\Crypto\AlreadyEncrypted;
 use App\CustomMailDriver\Mime\Crypto\OpenPGPEncrypter;
+use App\Mail\MailboxHeader;
 use App\Models\Alias;
 use App\Models\OutboundMessage;
 use App\Models\Recipient;
@@ -282,12 +283,20 @@ class CustomMailer extends Mailer
 
             // Add in original Tos that have been updated
             if ($tos = $this->data['tos'] ?? null) {
-                foreach ($tos as $key => $to) {
-                    if ($key === 0) {
-                        // This allows us to have the To: header set as the alias whilst still delivering to the correct RCPT TO for forwards.
-                        $message->to($to); // In order to override recipient email for forwards
-                    } else {
-                        $message->addTo($to);
+                $index = 0;
+                foreach ($tos as $to) {
+                    if (! is_string($to)) {
+                        continue;
+                    }
+
+                    foreach (MailboxHeader::forSymfony($to) as $address) {
+                        if ($index === 0) {
+                            // This allows us to have the To: header set as the alias whilst still delivering to the correct RCPT TO for forwards.
+                            $message->to($address);
+                        } else {
+                            $message->addTo($address);
+                        }
+                        $index++;
                     }
                 }
             }
@@ -295,14 +304,23 @@ class CustomMailer extends Mailer
             // Add in original CCs that have been updated
             if ($ccs = $this->data['ccs'] ?? null) {
                 foreach ($ccs as $cc) {
-                    $message->addCc($cc);
+                    if (! is_string($cc)) {
+                        continue;
+                    }
+
+                    foreach (MailboxHeader::forSymfony($cc) as $address) {
+                        $message->addCc($address);
+                    }
                 }
             }
 
-            // Add the original sender header here to prevent it altering the envelope from address
             if ($originalSenderHeader = $message->getHeaders()->get('Original-Sender')) {
-                $message->getHeaders()->addMailboxHeader('Sender', $originalSenderHeader->getValue());
+                $senderAddresses = MailboxHeader::forSymfony((string) $originalSenderHeader->getValue());
                 $message->getHeaders()->remove('Original-Sender');
+
+                if ($senderAddresses !== []) {
+                    $message->getHeaders()->addMailboxHeader('Sender', $senderAddresses[0]);
+                }
             }
 
             return $this->transport->send($message, Envelope::create($envelopeMessage));

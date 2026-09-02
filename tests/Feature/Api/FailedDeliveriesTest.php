@@ -176,4 +176,65 @@ class FailedDeliveriesTest extends TestCase
         $response->assertStatus(204);
         $this->assertEmpty($this->user->failedDeliveries);
     }
+
+    #[Test]
+    public function user_can_bulk_delete_failed_deliveries()
+    {
+        $failedDeliveries = FailedDelivery::factory()->count(3)->create([
+            'user_id' => $this->user->id,
+        ]);
+        $ids = $failedDeliveries->pluck('id')->all();
+
+        $response = $this->postJson('/api/v1/failed-deliveries/delete/bulk', ['ids' => $ids]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', '3 failed deliveries deleted successfully');
+        $this->assertEqualsCanonicalizing($ids, $response->json('ids'));
+        foreach ($ids as $id) {
+            $this->assertDatabaseMissing('failed_deliveries', ['id' => $id]);
+        }
+    }
+
+    #[Test]
+    public function bulk_delete_only_removes_authenticated_users_failed_deliveries()
+    {
+        $ownFailedDeliveries = FailedDelivery::factory()->count(2)->create([
+            'user_id' => $this->user->id,
+        ]);
+        $otherUser = $this->createUser();
+        $otherFailedDelivery = FailedDelivery::factory()->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        $ids = [...$ownFailedDeliveries->pluck('id')->all(), $otherFailedDelivery->id];
+
+        $response = $this->postJson('/api/v1/failed-deliveries/delete/bulk', ['ids' => $ids]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', '2 failed deliveries deleted successfully');
+        foreach ($ownFailedDeliveries as $failedDelivery) {
+            $this->assertModelMissing($failedDelivery);
+        }
+        $this->assertModelExists($otherFailedDelivery);
+    }
+
+    #[Test]
+    public function bulk_delete_validates_ids_required()
+    {
+        $response = $this->postJson('/api/v1/failed-deliveries/delete/bulk', []);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('ids');
+    }
+
+    #[Test]
+    public function bulk_delete_returns_not_found_when_no_matching_failed_deliveries()
+    {
+        $response = $this->postJson('/api/v1/failed-deliveries/delete/bulk', [
+            'ids' => ['46eebc50-f7f8-46d7-beb9-c37f04c29a84'],
+        ]);
+
+        $response->assertStatus(404);
+        $response->assertJsonPath('message', 'No failed deliveries found');
+    }
 }

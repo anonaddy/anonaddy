@@ -4,7 +4,10 @@ namespace Tests\Feature\Api;
 
 use App\Models\Domain;
 use App\Models\Recipient;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -144,6 +147,31 @@ class DomainsTest extends TestCase
     }
 
     #[Test]
+    public function user_is_rate_limited_when_activating_domains_too_often()
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(1)->by($request->user()?->id ?: $request->ip());
+        });
+
+        $domain = Domain::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+        ]);
+
+        $this->json('POST', '/api/v1/active-domains/', [
+            'id' => $domain->id,
+        ])->assertStatus(200);
+
+        $response = $this->json('POST', '/api/v1/active-domains/', [
+            'id' => $domain->id,
+        ]);
+
+        $response->assertStatus(429);
+        $this->assertIsString($response->json('message'));
+        $this->assertNotEmpty($response->json('message'));
+    }
+
+    #[Test]
     public function user_can_deactivate_domain()
     {
         $domain = Domain::factory()->create([
@@ -240,7 +268,7 @@ class DomainsTest extends TestCase
         ]);
 
         $response = $this->json('PATCH', '/api/v1/domains/'.$domain->id, [
-            'auto_create_regex' => '///',
+            'auto_create_regex' => '(unclosed',
         ]);
 
         $response

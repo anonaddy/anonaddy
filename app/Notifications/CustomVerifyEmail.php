@@ -20,6 +20,28 @@ class CustomVerifyEmail extends VerifyEmail implements ShouldBeEncrypted, Should
     use Queueable;
 
     /**
+     * Delete the notification if the notifiable no longer exists.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = true;
+
+    /**
+     * Determine if the notification should be sent.
+     *
+     * Queued verification emails can outlive the default recipient when an
+     * account is cleaned up before the worker processes the job.
+     */
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        if ($notifiable instanceof User) {
+            return filled($notifiable->defaultRecipient?->email);
+        }
+
+        return filled($notifiable->email);
+    }
+
+    /**
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable

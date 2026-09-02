@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Models\Alias;
 use App\Models\EmailData;
+use App\Models\Label;
 use App\Models\Rule;
 use App\Models\User;
+use App\Rules\ValidRegex;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
 class UserRuleChecker
@@ -20,13 +23,16 @@ class UserRuleChecker
 
     protected $subject;
 
-    public function __construct(User $user, EmailData $emailData, Alias $alias)
+    protected bool $isNewAlias;
+
+    public function __construct(User $user, EmailData $emailData, Alias $alias, bool $isNewAlias = false)
     {
         $this->user = $user;
         $this->emailData = $emailData;
         $this->alias = $alias;
         $this->sender = $emailData->sender;
         $this->subject = $emailData->subject;
+        $this->isNewAlias = $isNewAlias;
     }
 
     /**
@@ -93,6 +99,30 @@ class UserRuleChecker
                 return $this->conditionSatisfied($this->alias->description, $condition);
             case 'alias_label':
                 return $this->aliasLabelConditionSatisfied($condition);
+            case 'display_from':
+                return $this->conditionSatisfied(base64_decode((string) $this->emailData->display_from), $condition);
+            case 'header':
+                return $this->headerConditionSatisfied($condition);
+            case 'alias_created_by_catch_all':
+                return $this->isNewAlias;
+            case 'alias_not_created_by_catch_all':
+                return ! $this->isNewAlias;
+            case 'has_attachments':
+                return ! empty($this->emailData->attachments);
+            case 'has_no_attachments':
+                return empty($this->emailData->attachments);
+            case 'email_is_spam':
+                return (bool) $this->emailData->isSpam;
+            case 'email_is_not_spam':
+                return ! $this->emailData->isSpam;
+            case 'dmarc_failed':
+                return (bool) $this->emailData->failedDmarc;
+            case 'dmarc_did_not_fail':
+                return ! $this->emailData->failedDmarc;
+            case 'email_size':
+                return $this->numericConditionSatisfied((int) $this->emailData->size, $condition);
+            case 'alias_emails_forwarded':
+                return $this->numericConditionSatisfied((int) $this->alias->emails_forwarded, $condition);
             default:
                 return false;
         }
@@ -107,7 +137,7 @@ class UserRuleChecker
         $labelNames = $this->alias->labels->pluck('name');
 
         if ($labelNames->isEmpty()) {
-            return $this->emptyAliasLabelConditionSatisfied($condition);
+            return $this->emptyCollectionConditionSatisfied($condition);
         }
 
         $condition = array_merge($condition, [
@@ -119,7 +149,35 @@ class UserRuleChecker
         });
     }
 
-    protected function emptyAliasLabelConditionSatisfied(array $condition): bool
+    protected function headerConditionSatisfied(array $condition): bool
+    {
+        $presentHeaderNames = collect($this->emailData->headers ?? [])
+            ->map(fn ($header) => strtolower(Str::before($header, ':')))
+            ->filter()
+            ->unique()
+            ->values();
+
+        $wantedHeaderNames = collect($condition['values'] ?? [])
+            ->map(fn ($value) => strtolower(trim((string) $value)))
+            ->filter()
+            ->values();
+
+        if ($wantedHeaderNames->isEmpty()) {
+            return false;
+        }
+
+        return match ($condition['match']) {
+            'exists' => $wantedHeaderNames->contains(
+                fn ($name) => $presentHeaderNames->contains($name)
+            ),
+            'does not exist' => $wantedHeaderNames->every(
+                fn ($name) => ! $presentHeaderNames->contains($name)
+            ),
+            default => false,
+        };
+    }
+
+    protected function emptyCollectionConditionSatisfied(array $condition): bool
     {
         return in_array($condition['match'], [
             'is not',
@@ -128,6 +186,24 @@ class UserRuleChecker
             'does not end with',
             'does not match regex',
         ], true);
+    }
+
+    protected function numericConditionSatisfied(int $variable, array $condition): bool
+    {
+        $values = collect($condition['values'])->map(fn ($value) => (int) $value);
+
+        switch ($condition['match']) {
+            case 'is exactly':
+                return $values->contains(fn ($value) => $variable === $value);
+            case 'is not':
+                return ! $values->contains(fn ($value) => $variable === $value);
+            case 'is greater than':
+                return $values->contains(fn ($value) => $variable > $value);
+            case 'is less than':
+                return $values->contains(fn ($value) => $variable < $value);
+            default:
+                return false;
+        }
     }
 
     /**
@@ -172,11 +248,11 @@ class UserRuleChecker
                 });
             case 'matches regex':
                 return $values->contains(function ($value) use ($variable) {
-                    return Str::isMatch("/{$value}/", $variable);
+                    return ValidRegex::matches((string) $value, (string) $variable);
                 });
             case 'does not match regex':
                 return ! $values->contains(function ($value) use ($variable) {
-                    return Str::isMatch("/{$value}/", $variable);
+                    return ValidRegex::matches((string) $value, (string) $variable);
                 });
             default:
                 return false;
@@ -186,9 +262,9 @@ class UserRuleChecker
     /**
      * Static method to get rule IDs for forwards (convenience method)
      */
-    public static function getRuleIdsAndActionsForForwards(User $user, EmailData $emailData, Alias $alias): array
+    public static function getRuleIdsAndActionsForForwards(User $user, EmailData $emailData, Alias $alias, bool $isNewAlias = false): array
     {
-        $checker = new self($user, $emailData, $alias);
+        $checker = new self($user, $emailData, $alias, $isNewAlias);
 
         return $checker->getRuleIdsAndActions('Forwards');
     }
@@ -206,9 +282,9 @@ class UserRuleChecker
     /**
      * Static method to get rule IDs for sends (convenience method)
      */
-    public static function getRuleIdsAndActionsForSends(User $user, EmailData $emailData, Alias $alias): array
+    public static function getRuleIdsAndActionsForSends(User $user, EmailData $emailData, Alias $alias, bool $isNewAlias = false): array
     {
-        $checker = new self($user, $emailData, $alias);
+        $checker = new self($user, $emailData, $alias, $isNewAlias);
 
         return $checker->getRuleIdsAndActions('Sends');
     }
@@ -271,5 +347,138 @@ class UserRuleChecker
                 ]);
             }
         }
+    }
+
+    /**
+     * Apply alias side-effect actions from matching rules (labels, description, deactivate, delete).
+     *
+     * Skip when a new catch-all alias is about to be force-deleted on block. Safe to run
+     * before quarantine/block exits for existing aliases, and before queueing mail.
+     * Pass $includeDelete = false when you still need to update the alias row afterwards.
+     */
+    public static function applyAliasActionsFromRules(array $ruleIdsAndActions, User $user, Alias $alias, bool $includeDelete = true): void
+    {
+        $actions = collect($ruleIdsAndActions)->flatten(1);
+
+        $descriptionAction = $actions->firstWhere('type', 'setAliasDescription');
+
+        if ($descriptionAction !== null) {
+            $description = trim((string) ($descriptionAction['value'] ?? ''));
+
+            $alias->update([
+                'description' => $description === '' ? null : $description,
+            ]);
+        }
+
+        self::applyAddLabelActions($actions, $user, $alias);
+        self::applyRemoveLabelActions($actions, $user, $alias);
+
+        if ($actions->contains('type', 'deactivateAlias')) {
+            $alias->deactivate();
+        }
+
+        if ($includeDelete) {
+            self::applyDeleteAliasActionFromRules($ruleIdsAndActions, $user, $alias);
+        }
+    }
+
+    public static function applyDeleteAliasActionFromRules(array $ruleIdsAndActions, User $user, Alias $alias): void
+    {
+        $shouldDelete = collect($ruleIdsAndActions)
+            ->flatten(1)
+            ->contains('type', 'deleteAlias');
+
+        if (! $shouldDelete || $alias->trashed()) {
+            return;
+        }
+
+        $alias->delete();
+    }
+
+    public static function applyLabelActionsFromRules(array $ruleIdsAndActions, User $user, Alias $alias): void
+    {
+        self::applyAliasActionsFromRules($ruleIdsAndActions, $user, $alias);
+    }
+
+    protected static function applyAddLabelActions($actions, User $user, Alias $alias): void
+    {
+        $labelNames = $actions
+            ->where('type', 'addLabel')
+            ->pluck('value')
+            ->map(fn ($name) => strtolower(trim((string) $name)))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($labelNames->isEmpty()) {
+            return;
+        }
+
+        $attachedIds = $alias->labels()->pluck('labels.id')->all();
+        $attachedCount = count($attachedIds);
+
+        foreach ($labelNames as $name) {
+            $label = $user->labels()->where('name', $name)->first();
+
+            if (! $label) {
+                if ($user->hasReachedLabelLimit()) {
+                    continue;
+                }
+
+                try {
+                    $label = $user->labels()->create([
+                        'name' => $name,
+                        'colour' => Label::COLOURS[0],
+                    ]);
+                } catch (QueryException $e) {
+                    if ((int) $e->getCode() !== 23000) {
+                        throw $e;
+                    }
+
+                    $label = $user->labels()->where('name', $name)->first();
+
+                    if (! $label) {
+                        continue;
+                    }
+                }
+            }
+
+            if (in_array($label->id, $attachedIds, true)) {
+                continue;
+            }
+
+            if ($attachedCount >= Label::LABELS_PER_ALIAS_LIMIT) {
+                break;
+            }
+
+            $alias->labels()->syncWithoutDetaching([$label->id]);
+            $attachedIds[] = $label->id;
+            $attachedCount++;
+        }
+    }
+
+    protected static function applyRemoveLabelActions($actions, User $user, Alias $alias): void
+    {
+        $labelNames = $actions
+            ->where('type', 'removeLabel')
+            ->pluck('value')
+            ->map(fn ($name) => strtolower(trim((string) $name)))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($labelNames->isEmpty()) {
+            return;
+        }
+
+        $labelIds = $user->labels()
+            ->whereIn('name', $labelNames->all())
+            ->pluck('id');
+
+        if ($labelIds->isEmpty()) {
+            return;
+        }
+
+        $alias->labels()->detach($labelIds->all());
     }
 }

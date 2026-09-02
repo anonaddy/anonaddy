@@ -39,6 +39,33 @@
       Swipe horizontally to view failed delivery actions.
     </p>
     <div v-if="rows.length" class="relative">
+      <div
+        v-if="selectedRows.length > 0"
+        id="bulk-actions"
+        class="horizontal-scroll absolute px-0.5 top-0 left-12 flex flex-nowrap w-full h-12 items-center space-x-3 bg-gradient-to-r from-white dark:from-grey-900 z-10 overflow-x-auto"
+        style="width: calc(100% - 3rem)"
+      >
+        <button
+          type="button"
+          class="ml-1 inline-flex items-center rounded border border-grey-300 bg-white px-2.5 py-1.5 text-xs font-medium text-grey-700 shadow-sm hover:bg-grey-50 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30 dark:border-grey-600 dark:bg-grey-800 dark:text-grey-200 dark:hover:bg-grey-700"
+          :disabled="bulkDeleteLoading"
+          @click="
+            selectedRows.length === 1
+              ? openDeleteModal(selectedRows[0].id)
+              : (bulkDeleteModalOpen = true)
+          "
+        >
+          Delete
+          <loader v-if="bulkDeleteLoading" />
+        </button>
+        <span class="font-semibold text-indigo-800 hidden md:inline-block dark:text-indigo-400">
+          {{
+            selectedRows.length === 1
+              ? '1 failed delivery'
+              : `${selectedRows.length} failed deliveries`
+          }}
+        </span>
+      </div>
       <vue-good-table
         :columns="columns"
         :rows="rows"
@@ -46,10 +73,27 @@
           enabled: false,
         }"
         styleClass="vgt-table"
+        :row-style-class="rowStyleClassFn"
       >
         <template #table-column="props">
+          <span v-if="props.column.field === 'select'">
+            <input
+              v-if="rows.length <= 100"
+              type="checkbox"
+              class="h-4 w-4 rounded border-grey-300 text-indigo-600 focus:ring-indigo-500 dark:text-indigo-400 dark:bg-grey-950"
+              :checked="indeterminate || selectedRowIds.length === rows.length"
+              :indeterminate="indeterminate"
+              @change="selectedRowIds = $event.target.checked ? rows.map(r => r.id) : []"
+            />
+            <div
+              v-else
+              type="checkbox"
+              class="h-4 w-4 rounded border-grey-300 bg-grey-100 border text-indigo-600 focus:ring-indigo-500 tooltip cursor-not-allowed dark:bg-grey-800"
+              data-tippy-content="'Select All' is only available when the page size is 100 or less"
+            ></div>
+          </span>
           <div
-            v-if="props.column.field === 'actions'"
+            v-else-if="props.column.field === 'actions'"
             class="relative flex w-full h-full min-h-full self-stretch items-center justify-start outline-hidden bg-white px-3 dark:bg-grey-900"
           >
             <span
@@ -59,7 +103,8 @@
           </div>
           <span
             v-else-if="props.column.field === 'email_type'"
-            class="inline-flex items-center gap-1"
+            class="inline-flex items-center gap-1 whitespace-nowrap"
+            :class="selectedRows.length > 0 ? 'blur-sm' : ''"
           >
             <span>{{ props.column.label }}</span>
             <span
@@ -69,13 +114,32 @@
               <icon name="info" class="inline-block w-4 h-4 text-grey-300 fill-current" />
             </span>
           </span>
-          <span v-else>
+          <span v-else class="whitespace-nowrap" :class="selectedRows.length > 0 ? 'blur-sm' : ''">
             {{ props.column.label }}
           </span>
         </template>
         <template #table-row="props">
+          <span v-if="props.column.field === 'select'" class="flex items-center">
+            <div
+              v-if="selectedRowIds.includes(props.row.id)"
+              class="absolute inset-y-0 left-0 w-0.5 bg-indigo-600"
+            ></div>
+            <div
+              v-if="selectedRowIds.length >= 100 && !selectedRowIds.includes(props.row.id)"
+              type="checkbox"
+              class="h-4 w-4 rounded border-grey-300 bg-grey-100 text-indigo-600 focus:ring-indigo-500 cursor-not-allowed dark:bg-grey-800"
+              title="You cannot select more than 100 failed deliveries"
+            ></div>
+            <input
+              v-else
+              type="checkbox"
+              class="h-4 w-4 rounded border-grey-300 text-indigo-600 focus:ring-indigo-500 dark:text-indigo-400 dark:bg-grey-950"
+              :value="props.row.id"
+              v-model="selectedRowIds"
+            />
+          </span>
           <span
-            v-if="props.column.field == 'created_at'"
+            v-else-if="props.column.field == 'created_at'"
             class="tooltip outline-hidden cursor-default text-sm text-grey-500 dark:text-grey-300"
             :data-tippy-content="$filters.formatDate(rows[props.row.originalIndex].created_at)"
             >{{ $filters.timeAgo(props.row.created_at) }}
@@ -182,11 +246,16 @@
           </span>
           <div
             v-else
-            class="flex w-full h-full min-h-full self-stretch items-center justify-center outline-hidden bg-white px-3 dark:bg-grey-900"
+            class="flex w-full h-full min-h-full self-stretch items-center justify-center outline-hidden px-3"
             tabindex="-1"
           >
             <span
-              class="pointer-events-none absolute inset-y-0 -left-6 hidden lg:block w-6 bg-gradient-to-r from-transparent to-white dark:to-grey-900"
+              class="pointer-events-none absolute inset-y-0 -left-6 hidden lg:block w-6 bg-gradient-to-r from-transparent"
+              :class="
+                selectedRowIds.includes(props.row.id)
+                  ? 'to-grey-50 dark:to-grey-950'
+                  : 'to-white dark:to-grey-900'
+              "
             ></span>
             <button
               v-if="props.row.is_stored"
@@ -339,6 +408,37 @@
       </template>
     </Modal>
 
+    <Modal :open="bulkDeleteModalOpen" @close="bulkDeleteModalOpen = false">
+      <template v-slot:title> Delete Failed Deliveries </template>
+      <template v-slot:content>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          Are you sure you want to delete these <b>{{ selectedRows.length }}</b> failed deliveries?
+        </p>
+        <p class="mt-4 text-grey-700 dark:text-grey-200">
+          Failed deliveries are <b>automatically removed</b> when they are more than
+          <b>7 days old</b>. Deleting a failed delivery also deletes the email if it has been
+          stored.
+        </p>
+        <div class="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+          <button
+            type="button"
+            @click="bulkDeleteFailedDeliveries"
+            class="px-4 py-3 text-white font-semibold bg-red-500 hover:bg-red-600 border border-transparent rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            :disabled="bulkDeleteLoading"
+          >
+            Delete failed deliveries
+            <loader v-if="bulkDeleteLoading" />
+          </button>
+          <button
+            @click="bulkDeleteModalOpen = false"
+            class="px-4 py-3 text-grey-800 font-semibold bg-white hover:bg-grey-50 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700 border border-grey-100 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Cancel
+          </button>
+        </div>
+      </template>
+    </Modal>
+
     <Modal
       :open="downloadQuarantinedFailedDeliveryModalOpen"
       @close="closeQuarantinedDownloadModal"
@@ -462,7 +562,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import Modal from '../Components/Modal.vue'
 import PaginationControls from '../Components/PaginationControls.vue'
@@ -473,6 +573,7 @@ import { VueGoodTable } from 'vue-good-table-next'
 import Multiselect from '@vueform/multiselect'
 import { InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
+import { getRequestErrorText } from '../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -506,11 +607,18 @@ const filterType = ref(props.initialFilter)
 const pageSize = ref(props.initialPageSize)
 const updatePageSizeLoading = ref(false)
 const pageSizeOptions = [25, 50, 100]
+const selectedRowIds = ref([])
+const selectedRows = computed(() => rows.value.filter(row => selectedRowIds.value.includes(row.id)))
+const indeterminate = computed(
+  () => selectedRowIds.value.length > 0 && selectedRowIds.value.length < rows.value.length,
+)
 
 const resendFailedDeliveryLoading = ref(false)
 const resendFailedDeliveryModalOpen = ref(false)
 const deleteFailedDeliveryLoading = ref(false)
 const deleteFailedDeliveryModalOpen = ref(false)
+const bulkDeleteModalOpen = ref(false)
+const bulkDeleteLoading = ref(false)
 const downloadQuarantinedFailedDeliveryModalOpen = ref(false)
 const blockSenderModalOpen = ref(false)
 const blockSenderLoading = ref(false)
@@ -529,11 +637,18 @@ watch(
   () => props.initialRows,
   newVal => {
     rows.value = newVal.data
+    selectedRowIds.value = []
     debounceToolips()
   },
 )
 
 const columns = [
+  {
+    label: '',
+    field: 'select',
+    sortable: false,
+    globalSearchDisabled: true,
+  },
   {
     label: 'Created',
     field: 'created_at',
@@ -627,7 +742,7 @@ const resendFailedDelivery = failedDelivery => {
       resendFailedDeliveryLoading.value = false
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       resendFailedDeliveryLoading.value = false
       resendFailedDeliveryModalOpen.value = false
     })
@@ -639,6 +754,8 @@ const deleteFailedDelivery = id => {
   axios
     .delete(`/api/v1/failed-deliveries/${id}`)
     .then(() => {
+      selectedRowIds.value = selectedRowIds.value.filter(selectedId => selectedId !== id)
+
       router.reload({
         only: ['initialRows', 'search', 'initialFilter', 'initialPageSize'],
         preserveState: true,
@@ -660,11 +777,61 @@ const deleteFailedDelivery = id => {
       })
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteFailedDeliveryLoading.value = false
       deleteFailedDeliveryModalOpen.value = false
     })
 }
+
+const bulkDeleteFailedDeliveries = () => {
+  bulkDeleteLoading.value = true
+
+  axios
+    .post('/api/v1/failed-deliveries/delete/bulk', JSON.stringify({ ids: selectedRowIds.value }), {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    })
+    .then(response => {
+      selectedRowIds.value = []
+      bulkDeleteModalOpen.value = false
+      successMessage(response.data.message)
+
+      router.reload({
+        only: ['initialRows', 'search', 'initialFilter', 'initialPageSize'],
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: page => {
+          const newRows = page.props.initialRows.data
+          const currentPage = page.props.initialRows.current_page ?? 1
+
+          if (!newRows.length && currentPage > 1) {
+            bulkDeleteLoading.value = false
+            visitWithParams({ page: currentPage - 1 }, [])
+            return
+          }
+
+          rows.value = newRows
+          bulkDeleteLoading.value = false
+        },
+      })
+    })
+    .catch(error => {
+      bulkDeleteLoading.value = false
+      if (error.response?.status === 404) {
+        errorMessage(error.response.data?.message ?? 'No failed deliveries found')
+      } else if (error.response?.status === 422) {
+        errorMessage(
+          error.response?.data?.errors
+            ? Object.values(error.response.data.errors).flat().join(' ')
+            : 'Validation failed',
+        )
+      } else {
+        errorMessage(getRequestErrorText(error))
+      }
+    })
+}
+
+const rowStyleClassFn = row => (selectedRowIds.value.includes(row.id) ? 'vgt-row-selected' : '')
 
 const openResendModal = failedDelivery => {
   resendFailedDeliveryModalOpen.value = true
@@ -755,10 +922,8 @@ const blockSender = type => {
     .catch(error => {
       if (error.response?.status === 422 && error.response?.data?.errors?.value) {
         errorMessage(error.response.data.errors.value[0])
-      } else if (error.response?.data?.message) {
-        errorMessage(error.response.data.message)
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
     .finally(() => {
@@ -817,6 +982,12 @@ const errorMessage = (text = 'An error has occurred, please try again later') =>
 </script>
 
 <style scoped>
+/* Keep header labels on one line so the bulk-actions bar (h-12) matches thead height. */
+:deep(.vgt-table thead th) {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 @media (min-width: 1024px) {
   :deep(.vgt-table thead th:last-child) {
     position: sticky;
@@ -830,6 +1001,14 @@ const errorMessage = (text = 'An error has occurred, please try again later') =>
     right: 0;
     z-index: 1;
     border-left: 0 !important;
+  }
+
+  :deep(.vgt-table tbody tr.vgt-row-selected td:last-child) {
+    background-color: #f5f7fa;
+  }
+
+  :global(.dark) :deep(.vgt-table tbody tr.vgt-row-selected td:last-child) {
+    background-color: #111827;
   }
 
   :deep(.vgt-table thead th:last-child::before),

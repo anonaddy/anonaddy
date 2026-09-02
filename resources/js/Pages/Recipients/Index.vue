@@ -511,6 +511,7 @@ import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, InboxArrowDownIcon } from '@heroicons/vue/24/outline'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 import { validateCustomEmailWithErrors } from '../../utils/customEmailValidator.js'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -658,10 +659,10 @@ const editRecipient = recipient => {
       recipientDescriptionToEdit.value = ''
       successMessage('Recipient description updated')
     })
-    .catch(() => {
+    .catch(error => {
       recipientIdToEdit.value = ''
       recipientDescriptionToEdit.value = ''
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -688,14 +689,10 @@ const addNewRecipient = () => {
     })
     .catch(error => {
       addRecipientLoading.value = false
-      if (error.response.status === 403) {
-        errorMessage(error.response.data)
-      } else if (error.response.status === 422) {
+      if (error.response.status === 422) {
         errorMessage(error.response.data.errors.email[0])
-      } else if (error.response.status === 429) {
-        errorMessage('You are making too many requests')
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error, 'You are making too many requests'))
       }
     })
 }
@@ -723,11 +720,7 @@ const makeDefaultRecipient = recipient => {
     .catch(error => {
       closeMakeDefaultModal()
       makeDefaultLoading.value = false
-      if (error.response.data.message) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -745,7 +738,7 @@ const deleteRecipient = recipient => {
       deleteRecipientLoading.value = false
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteRecipientLoading.value = false
       deleteRecipientModalOpen.value = false
     })
@@ -780,11 +773,7 @@ const addRecipientKey = () => {
     })
     .catch(error => {
       addRecipientKeyLoading.value = false
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -801,11 +790,7 @@ const deleteRecipientKey = recipient => {
       deleteRecipientKeyLoading.value = false
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
       deleteRecipientKeyLoading.value = false
       deleteRecipientKeyModalOpen.value = false
     })
@@ -826,7 +811,7 @@ const turnOnEncryption = id => {
       //
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -837,7 +822,7 @@ const turnOffEncryption = id => {
       //
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -856,11 +841,7 @@ const activateRecipient = id => {
       //
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -871,11 +852,7 @@ const deactivateRecipient = id => {
       //
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -898,11 +875,7 @@ const resendVerification = id => {
     })
     .catch(error => {
       resendVerificationLoading.value = false
-      if (error.response.status === 429) {
-        errorMessage('You can only resend the email once per minute')
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, 'You can only resend the email once per minute'))
     })
 }
 

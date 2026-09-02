@@ -327,6 +327,7 @@ import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
 import { ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/20/solid'
 import Toggle from '../../Components/Toggle.vue'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialUsername: {
@@ -387,7 +388,7 @@ const editFromName = () => {
     })
     .catch(error => {
       username.value.fromNameLoading = false
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -406,7 +407,7 @@ const allowLogin = () => {
       successMessage('Username allowed to login')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -417,7 +418,7 @@ const disallowLogin = () => {
       successMessage('Username disallowed to login')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -447,12 +448,9 @@ const editAutoCreateRegex = () => {
     })
     .catch(error => {
       username.value.autoCreateRegexLoading = false
-
-      if (error.response.data.message !== undefined) {
+      errorMessage(getRequestErrorText(error))
+      if (error.response?.data?.message !== undefined) {
         errors.value.auto_create_regex = error.response.data.message
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
       }
     })
 }
@@ -500,11 +498,9 @@ const testAutoCreateRegex = () => {
     })
     .catch(error => {
       username.value.testAutoCreateRegexLoading = false
-      if (error.response.data.message !== undefined) {
+      errorMessage(getRequestErrorText(error))
+      if (error.response?.data?.message !== undefined) {
         errors.value.test_auto_create_regex_local_part = error.response.data.message
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
       }
     })
 }

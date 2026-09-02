@@ -239,16 +239,15 @@
 
             <div class="p-2 w-full bg-grey-100 dark:bg-grey-800">
               <div class="flex">
-                <div
-                  class="w-full flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0"
-                >
+                <div class="w-full flex flex-col lg:flex-row lg:items-center gap-2">
                   <span class="text-nowrap dark:text-grey-200">If the</span>
-                  <span class="sm:ml-2">
+                  <span class="lg:shrink-0">
                     <div class="relative">
                       <select
                         v-model="createRuleObject.conditions[key].type"
+                        @change="ruleConditionTypeChange(createRuleObject.conditions[key])"
                         :id="`create_rule_condition_types_${key}`"
-                        class="block appearance-none w-full sm:w-32 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="block appearance-none w-full lg:w-56 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
@@ -265,9 +264,9 @@
 
                   <span
                     v-if="conditionMatchOptions(createRuleObject, key).length"
-                    class="sm:ml-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0"
+                    class="flex flex-col sm:flex-row gap-2 min-w-0 flex-1"
                   >
-                    <div class="relative sm:mr-4">
+                    <div class="relative shrink-0">
                       <select
                         v-model="createRuleObject.conditions[key].match"
                         @change="ruleConditionMatchChange(createRuleObject.conditions[key])"
@@ -286,19 +285,48 @@
                       </select>
                     </div>
 
-                    <div class="flex">
+                    <div
+                      v-if="isNumericConditionType(createRuleObject.conditions[key].type)"
+                      class="flex min-w-0 flex-1"
+                    >
+                      <input
+                        :value="createRuleObject.conditions[key].values[0] ?? ''"
+                        @input="
+                          setNumericConditionValue(
+                            createRuleObject.conditions[key],
+                            $event.target.value,
+                          )
+                        "
+                        type="number"
+                        min="0"
+                        class="w-full min-w-0 appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-hidden p-2 dark:text-white dark:bg-white/5"
+                        :class="errors.ruleConditions ? 'border-red-500' : ''"
+                        :placeholder="
+                          createRuleObject.conditions[key].type === 'email_size'
+                            ? 'Size in bytes'
+                            : 'e.g. 0'
+                        "
+                        autofocus
+                      />
+                    </div>
+
+                    <div v-else class="flex min-w-0 flex-1">
                       <input
                         v-model="createRuleObject.conditions[key].currentConditionValue"
-                        @keyup.enter="addValueToCondition(createRuleObect, key)"
+                        @keyup.enter="addValueToCondition(createRuleObject, key)"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-hidden p-2 dark:text-white dark:bg-white/5"
+                        class="w-full min-w-0 appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-hidden p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleConditions ? 'border-red-500' : ''"
-                        placeholder="Enter value"
+                        :placeholder="
+                          createRuleObject.conditions[key].type === 'header'
+                            ? 'e.g. List-Unsubscribe'
+                            : 'Enter value'
+                        "
                         autofocus
                       />
                       <button
                         @click="addValueToCondition(createRuleObject, key)"
-                        class="p-2 bg-grey-200 rounded-r text-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700"
+                        class="shrink-0 p-2 bg-grey-200 rounded-r text-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700"
                       >
                         Insert
                       </button>
@@ -315,7 +343,13 @@
                   />
                 </div>
               </div>
-              <div class="mt-2 max-w-full text-left">
+              <div
+                v-if="
+                  isStringConditionType(createRuleObject.conditions[key].type) &&
+                  !isNumericConditionType(createRuleObject.conditions[key].type)
+                "
+                class="mt-2 max-w-full text-left"
+              >
                 <span
                   v-for="(value, index) in createRuleObject.conditions[key].values"
                   :key="index"
@@ -393,7 +427,10 @@
                   <span
                     v-if="
                       createRuleObject.actions[key].type === 'subject' ||
-                      createRuleObject.actions[key].type === 'displayFrom'
+                      createRuleObject.actions[key].type === 'displayFrom' ||
+                      createRuleObject.actions[key].type === 'addLabel' ||
+                      createRuleObject.actions[key].type === 'removeLabel' ||
+                      createRuleObject.actions[key].type === 'setAliasDescription'
                     "
                     class="sm:ml-4 flex flex-col w-full"
                   >
@@ -406,11 +443,22 @@
                         :placeholder="
                           createRuleObject.actions[key].type === 'subject'
                             ? 'e.g. [Fwd] {{subject}}'
-                            : 'Enter value'
+                            : createRuleObject.actions[key].type === 'addLabel' ||
+                                createRuleObject.actions[key].type === 'removeLabel'
+                              ? 'e.g. shopping'
+                              : createRuleObject.actions[key].type === 'setAliasDescription'
+                                ? 'e.g. Newsletter signup (leave empty to clear)'
+                                : 'Enter value'
                         "
                         autofocus
                       />
                     </div>
+                    <p
+                      v-if="createRuleObject.actions[key].type === 'setAliasDescription'"
+                      class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
+                    >
+                      Leave empty to clear the alias description.
+                    </p>
                     <p
                       v-if="createRuleObject.actions[key].type === 'subject'"
                       class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
@@ -592,16 +640,15 @@
 
             <div class="p-2 w-full bg-grey-100 dark:bg-grey-800">
               <div class="flex">
-                <div
-                  class="w-full flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0"
-                >
-                  <span class="dark:text-grey-200">If the</span>
-                  <span class="sm:ml-2">
+                <div class="w-full flex flex-col lg:flex-row lg:items-center gap-2">
+                  <span class="text-nowrap dark:text-grey-200">If the</span>
+                  <span class="lg:shrink-0">
                     <div class="relative">
                       <select
                         v-model="editRuleObject.conditions[key].type"
+                        @change="ruleConditionTypeChange(editRuleObject.conditions[key])"
                         :id="`edit_rule_condition_types_${key}`"
-                        class="block appearance-none w-full sm:w-32 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
+                        class="block appearance-none w-full lg:w-56 text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring"
                         required
                       >
                         <option
@@ -618,9 +665,9 @@
 
                   <span
                     v-if="conditionMatchOptions(editRuleObject, key).length"
-                    class="sm:ml-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0"
+                    class="flex flex-col sm:flex-row gap-2 min-w-0 flex-1"
                   >
-                    <div class="relative sm:mr-4">
+                    <div class="relative shrink-0">
                       <select
                         v-model="editRuleObject.conditions[key].match"
                         @change="ruleConditionMatchChange(editRuleObject.conditions[key])"
@@ -639,19 +686,48 @@
                       </select>
                     </div>
 
-                    <div class="flex">
+                    <div
+                      v-if="isNumericConditionType(editRuleObject.conditions[key].type)"
+                      class="flex min-w-0 flex-1"
+                    >
+                      <input
+                        :value="editRuleObject.conditions[key].values[0] ?? ''"
+                        @input="
+                          setNumericConditionValue(
+                            editRuleObject.conditions[key],
+                            $event.target.value,
+                          )
+                        "
+                        type="number"
+                        min="0"
+                        class="w-full min-w-0 appearance-none bg-white border border-transparent rounded text-grey-700 focus:outline-hidden p-2 dark:text-white dark:bg-white/5"
+                        :class="errors.ruleConditions ? 'border-red-500' : ''"
+                        :placeholder="
+                          editRuleObject.conditions[key].type === 'email_size'
+                            ? 'Size in bytes'
+                            : 'e.g. 0'
+                        "
+                        autofocus
+                      />
+                    </div>
+
+                    <div v-else class="flex min-w-0 flex-1">
                       <input
                         v-model="editRuleObject.conditions[key].currentConditionValue"
-                        @keyup.enter="addValueToCondition(editRuleObect, key)"
+                        @keyup.enter="addValueToCondition(editRuleObject, key)"
                         type="text"
-                        class="w-full appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-hidden p-2 dark:text-white dark:bg-white/5"
+                        class="w-full min-w-0 appearance-none bg-white border border-transparent rounded-l text-grey-700 focus:outline-hidden p-2 dark:text-white dark:bg-white/5"
                         :class="errors.ruleConditions ? 'border-red-500' : ''"
-                        placeholder="Enter value"
+                        :placeholder="
+                          editRuleObject.conditions[key].type === 'header'
+                            ? 'e.g. List-Unsubscribe'
+                            : 'Enter value'
+                        "
                         autofocus
                       />
                       <button
                         @click="addValueToCondition(editRuleObject, key)"
-                        class="p-2 bg-grey-200 rounded-r text-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700"
+                        class="shrink-0 p-2 bg-grey-200 rounded-r text-grey-600 dark:text-grey-100 dark:hover:bg-grey-700 dark:bg-grey-600 dark:border-grey-700"
                       >
                         Insert
                       </button>
@@ -668,7 +744,13 @@
                   />
                 </div>
               </div>
-              <div class="mt-2 max-w-full text-left">
+              <div
+                v-if="
+                  isStringConditionType(editRuleObject.conditions[key].type) &&
+                  !isNumericConditionType(editRuleObject.conditions[key].type)
+                "
+                class="mt-2 max-w-full text-left"
+              >
                 <span v-for="(value, index) in editRuleObject.conditions[key].values" :key="index">
                   <span
                     class="inline-flex max-w-full min-w-0 items-center bg-green-200 text-sm font-semibold rounded-sm pl-1"
@@ -743,7 +825,10 @@
                   <span
                     v-if="
                       editRuleObject.actions[key].type === 'subject' ||
-                      editRuleObject.actions[key].type === 'displayFrom'
+                      editRuleObject.actions[key].type === 'displayFrom' ||
+                      editRuleObject.actions[key].type === 'addLabel' ||
+                      editRuleObject.actions[key].type === 'removeLabel' ||
+                      editRuleObject.actions[key].type === 'setAliasDescription'
                     "
                     class="sm:ml-4 flex flex-col w-full"
                   >
@@ -756,11 +841,22 @@
                         :placeholder="
                           editRuleObject.actions[key].type === 'subject'
                             ? 'e.g. [Fwd] {{subject}}'
-                            : 'Enter value'
+                            : editRuleObject.actions[key].type === 'addLabel' ||
+                                editRuleObject.actions[key].type === 'removeLabel'
+                              ? 'e.g. shopping'
+                              : editRuleObject.actions[key].type === 'setAliasDescription'
+                                ? 'e.g. Newsletter signup (leave empty to clear)'
+                                : 'Enter value'
                         "
                         autofocus
                       />
                     </div>
+                    <p
+                      v-if="editRuleObject.actions[key].type === 'setAliasDescription'"
+                      class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
+                    >
+                      Leave empty to clear the alias description.
+                    </p>
                     <p
                       v-if="editRuleObject.actions[key].type === 'subject'"
                       class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
@@ -969,6 +1065,7 @@ import Multiselect from '@vueform/multiselect'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, FunnelIcon } from '@heroicons/vue/24/outline'
 import { PlusIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
+import { getRequestErrorText } from '../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -1032,6 +1129,10 @@ const conditionTypeOptions = [
     label: 'subject',
   },
   {
+    value: 'display_from',
+    label: 'from name',
+  },
+  {
     value: 'alias',
     label: 'alias email',
   },
@@ -1043,7 +1144,81 @@ const conditionTypeOptions = [
     value: 'alias_label',
     label: 'alias label',
   },
+  {
+    value: 'header',
+    label: 'header',
+  },
+  {
+    value: 'email_size',
+    label: 'email size',
+  },
+  {
+    value: 'alias_emails_forwarded',
+    label: 'alias emails forwarded count',
+  },
+  {
+    value: 'alias_created_by_catch_all',
+    label: 'alias was created by catch-all',
+  },
+  {
+    value: 'alias_not_created_by_catch_all',
+    label: 'alias was not created by catch-all',
+  },
+  {
+    value: 'has_attachments',
+    label: 'email has attachments',
+  },
+  {
+    value: 'has_no_attachments',
+    label: 'email has no attachments',
+  },
+  {
+    value: 'email_is_spam',
+    label: 'email is spam',
+  },
+  {
+    value: 'email_is_not_spam',
+    label: 'email is not spam',
+  },
+  {
+    value: 'dmarc_failed',
+    label: 'email failed DMARC',
+  },
+  {
+    value: 'dmarc_did_not_fail',
+    label: 'email did not fail DMARC',
+  },
 ]
+
+const booleanConditionTypes = [
+  'alias_created_by_catch_all',
+  'alias_not_created_by_catch_all',
+  'has_attachments',
+  'has_no_attachments',
+  'email_is_spam',
+  'email_is_not_spam',
+  'dmarc_failed',
+  'dmarc_did_not_fail',
+]
+
+const numericConditionTypes = ['email_size', 'alias_emails_forwarded']
+
+const stringConditionTypes = [
+  'sender',
+  'subject',
+  'alias',
+  'alias_description',
+  'alias_label',
+  'display_from',
+  'header',
+]
+
+const isBooleanConditionType = type => booleanConditionTypes.includes(type)
+const isNumericConditionType = type => numericConditionTypes.includes(type)
+const isStringConditionType = type => stringConditionTypes.includes(type)
+// Keep old name as alias used elsewhere during transition
+const isCatchAllConditionType = isBooleanConditionType
+
 const actionTypeOptions = [
   {
     value: 'select',
@@ -1088,6 +1263,26 @@ const actionTypeOptions = [
   {
     value: 'forwardTo',
     label: 'forward to',
+  },
+  {
+    value: 'addLabel',
+    label: 'add the label',
+  },
+  {
+    value: 'removeLabel',
+    label: 'remove the label',
+  },
+  {
+    value: 'setAliasDescription',
+    label: 'set the alias description to',
+  },
+  {
+    value: 'deactivateAlias',
+    label: 'deactivate the alias',
+  },
+  {
+    value: 'deleteAlias',
+    label: 'delete the alias',
   },
 ]
 
@@ -1138,6 +1333,21 @@ const createNewRule = () => {
   }
 
   Object.entries(createRuleObject.value.conditions).forEach(([key, condition]) => {
+    if (isBooleanConditionType(condition.type)) {
+      return
+    }
+
+    if (isNumericConditionType(condition.type)) {
+      if (
+        condition.values[0] === undefined ||
+        condition.values[0] === '' ||
+        Number.isNaN(Number(condition.values[0]))
+      ) {
+        return (errors.value.ruleConditions = `You must enter a number for the ${indexToHuman[key]} condition`)
+      }
+      return
+    }
+
     if (!condition.values.length) {
       return (errors.value.ruleConditions = `You must add some values for the ${indexToHuman[key]} condition, make sure to click "Insert"`)
     }
@@ -1148,6 +1358,10 @@ const createNewRule = () => {
   }
 
   Object.entries(createRuleObject.value.actions).forEach(([key, action]) => {
+    if (action.type === 'setAliasDescription') {
+      return
+    }
+
     if (!action.value && action.value !== false) {
       return (errors.value.ruleActions = `You must add a value for the ${indexToHuman[key]} action`)
     }
@@ -1164,7 +1378,7 @@ const createNewRule = () => {
       '/api/v1/rules',
       JSON.stringify({
         name: createRuleObject.value.name,
-        conditions: createRuleObject.value.conditions,
+        conditions: createRuleObject.value.conditions.map(normaliseConditionForSubmit),
         actions: createRuleObject.value.actions,
         operator: createRuleObject.value.operator,
         forwards: createRuleObject.value.forwards,
@@ -1186,12 +1400,10 @@ const createNewRule = () => {
     })
     .catch(error => {
       createRuleLoading.value = false
-      if (error.response.status === 403) {
-        errorMessage(error.response.data)
-      } else if (error.response.data) {
+      if (error.response?.status === 422 && error.response.data?.errors) {
         errorMessage(Object.entries(error.response.data.errors)[0][1][0])
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -1208,6 +1420,21 @@ const editRule = () => {
   }
 
   Object.entries(editRuleObject.value.conditions).forEach(([key, condition]) => {
+    if (isBooleanConditionType(condition.type)) {
+      return
+    }
+
+    if (isNumericConditionType(condition.type)) {
+      if (
+        condition.values[0] === undefined ||
+        condition.values[0] === '' ||
+        Number.isNaN(Number(condition.values[0]))
+      ) {
+        return (errors.value.ruleConditions = `You must enter a number for the ${indexToHuman[key]} condition`)
+      }
+      return
+    }
+
     if (!condition.values.length) {
       return (errors.value.ruleConditions = `You must add some values for the ${indexToHuman[key]} condition, make sure to click "Insert"`)
     }
@@ -1218,6 +1445,10 @@ const editRule = () => {
   }
 
   Object.entries(editRuleObject.value.actions).forEach(([key, action]) => {
+    if (action.type === 'setAliasDescription') {
+      return
+    }
+
     if (!action.value && action.value !== false) {
       return (errors.value.ruleActions = `You must add a value for the ${indexToHuman[key]} action`)
     }
@@ -1234,7 +1465,7 @@ const editRule = () => {
       `/api/v1/rules/${editRuleObject.value.id}`,
       JSON.stringify({
         name: editRuleObject.value.name,
-        conditions: editRuleObject.value.conditions,
+        conditions: editRuleObject.value.conditions.map(normaliseConditionForSubmit),
         actions: editRuleObject.value.actions,
         operator: editRuleObject.value.operator,
         forwards: editRuleObject.value.forwards,
@@ -1261,10 +1492,10 @@ const editRule = () => {
     })
     .catch(error => {
       editRuleLoading.value = false
-      if (error.response.data) {
+      if (error.response?.status === 422 && error.response.data?.errors) {
         errorMessage(Object.entries(error.response.data.errors)[0][1][0])
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -1280,7 +1511,7 @@ const deleteRule = id => {
       deleteRuleLoading.value = false
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteRuleModalOpen.value = false
       deleteRuleLoading.value = false
     })
@@ -1302,11 +1533,7 @@ const activateRule = rule => {
     })
     .catch(error => {
       rule.active = false
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -1318,11 +1545,7 @@ const deactivateRule = rule => {
     })
     .catch(error => {
       rule.active = true
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -1343,21 +1566,26 @@ const reorderRules = (displaySuccess = true) => {
       }
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
 const conditionMatchOptions = (object, key) => {
-  if (
-    _.includes(
-      ['sender', 'subject', 'alias', 'alias_description', 'alias_label'],
-      object.conditions[key].type,
-    )
-  ) {
+  const type = object.conditions[key].type
+
+  if (isBooleanConditionType(type)) {
+    return []
+  }
+
+  if (isNumericConditionType(type)) {
+    return ['is exactly', 'is not', 'is greater than', 'is less than']
+  }
+
+  if (type === 'header') {
+    return ['exists', 'does not exist']
+  }
+
+  if (isStringConditionType(type)) {
     return [
       'contains',
       'does not contain',
@@ -1373,6 +1601,31 @@ const conditionMatchOptions = (object, key) => {
   }
 
   return []
+}
+
+const setNumericConditionValue = (condition, value) => {
+  if (value === '' || value === null || value === undefined) {
+    condition.values = []
+    return
+  }
+
+  condition.values = [Number(value)]
+}
+
+const normaliseConditionForSubmit = condition => {
+  if (isBooleanConditionType(condition.type)) {
+    return { type: condition.type, match: 'is exactly', values: ['true'] }
+  }
+
+  if (isNumericConditionType(condition.type)) {
+    return {
+      type: condition.type,
+      match: condition.match,
+      values: [Number(condition.values[0])],
+    }
+  }
+
+  return condition
 }
 
 const addCondition = object => {
@@ -1457,22 +1710,58 @@ const ruleConditionMatchChange = condition => {
   errors.value.ruleConditions = ''
 }
 
+const ruleConditionTypeChange = condition => {
+  errors.value.ruleConditions = ''
+
+  if (isBooleanConditionType(condition.type)) {
+    condition.match = 'is exactly'
+    condition.values = ['true']
+    condition.currentConditionValue = ''
+    return
+  }
+
+  if (isNumericConditionType(condition.type)) {
+    condition.match = 'is greater than'
+    condition.values = []
+    condition.currentConditionValue = ''
+    return
+  }
+
+  if (condition.type === 'header') {
+    condition.match = 'exists'
+    condition.values = []
+    condition.currentConditionValue = ''
+    return
+  }
+
+  condition.match = 'contains'
+  condition.values = []
+  condition.currentConditionValue = ''
+}
+
 const ruleActionChange = action => {
-  if (action.type === 'subject' || action.type === 'displayFrom' || action.type === 'select') {
+  if (
+    action.type === 'subject' ||
+    action.type === 'displayFrom' ||
+    action.type === 'addLabel' ||
+    action.type === 'removeLabel' ||
+    action.type === 'setAliasDescription' ||
+    action.type === 'select'
+  ) {
     action.value = ''
   } else if (action.type === 'encryption') {
     action.value = false
   } else if (action.type === 'banner') {
     action.value = 'top'
-  } else if (action.type === 'block') {
-    action.value = true
-  } else if (action.type === 'quarantine') {
-    action.value = true
-  } else if (action.type === 'blocklistSender') {
-    action.value = true
-  } else if (action.type === 'blocklistDomain') {
-    action.value = true
-  } else if (action.type === 'removeAttachments') {
+  } else if (
+    action.type === 'block' ||
+    action.type === 'quarantine' ||
+    action.type === 'blocklistSender' ||
+    action.type === 'blocklistDomain' ||
+    action.type === 'removeAttachments' ||
+    action.type === 'deactivateAlias' ||
+    action.type === 'deleteAlias'
+  ) {
     action.value = true
   } else if (action.type === 'forwardTo') {
     action.value = ''

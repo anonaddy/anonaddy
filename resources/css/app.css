@@ -407,6 +407,11 @@
   table.vgt-table tbody tr {
     @apply h-20;
   }
+  /* Paint selection on cells so taller multi-line rows stay fully highlighted.
+    Important beats sticky column utilities like bg-white / dark:bg-grey-900. */
+  table.vgt-table tbody tr.vgt-row-selected > td {
+    @apply bg-grey-50! dark:bg-grey-950!;
+  }
   table.vgt-table tr.clickable {
     @apply cursor-pointer;
   }

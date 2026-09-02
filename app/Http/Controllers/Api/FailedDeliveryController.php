@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DestroyFailedDeliveryBulkRequest;
 use App\Http\Requests\IndexFailedDeliveryRequest;
 use App\Http\Resources\FailedDeliveryResource;
 
@@ -47,5 +48,31 @@ class FailedDeliveryController extends Controller
         $failedDelivery->delete();
 
         return response('', 204);
+    }
+
+    public function destroyBulk(DestroyFailedDeliveryBulkRequest $request)
+    {
+        $failedDeliveries = user()
+            ->failedDeliveries()
+            ->whereIn('id', $request->ids)
+            ->get();
+
+        if ($failedDeliveries->isEmpty()) {
+            return response()->json(['message' => 'No failed deliveries found'], 404);
+        }
+
+        $ids = $failedDeliveries->pluck('id');
+
+        // Delete each model so the deleting event can remove stored emails from S3.
+        $failedDeliveries->each->delete();
+
+        $count = $ids->count();
+
+        return response()->json([
+            'message' => $count === 1
+                ? '1 failed delivery deleted successfully'
+                : "{$count} failed deliveries deleted successfully",
+            'ids' => $ids,
+        ], 200);
     }
 }

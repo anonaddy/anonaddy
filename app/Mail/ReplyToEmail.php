@@ -96,14 +96,7 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                     ];
                 })
                 ->filter(fn ($cc) => filter_var($cc['address'], FILTER_VALIDATE_EMAIL))
-                ->map(function ($cc) {
-                    // Only add in display if it exists
-                    if ($cc['display']) {
-                        return $cc['display'].' <'.$cc['address'].'>';
-                    }
-
-                    return '<'.$cc['address'].'>';
-                })
+                ->map(fn ($cc) => MailboxHeader::format($cc['display'] ?? null, $cc['address']))
                 ->toArray();
         }
 
@@ -117,14 +110,7 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                     ];
                 })
                 ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
-                ->map(function ($to) {
-                    // Only add in display if it exists
-                    if ($to['display']) {
-                        return $to['display'].' <'.$to['address'].'>';
-                    }
-
-                    return '<'.$to['address'].'>';
-                })
+                ->map(fn ($to) => MailboxHeader::format($to['display'] ?? null, $to['address']))
                 ->toArray();
         }
 

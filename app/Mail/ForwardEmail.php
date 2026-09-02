@@ -18,6 +18,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Throwable;
 
 class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
@@ -154,14 +155,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                     ];
                 })
                 ->filter(fn ($cc) => filter_var($cc['address'], FILTER_VALIDATE_EMAIL))
-                ->map(function ($cc) {
-                    // Only add in display if it exists
-                    if ($cc['display']) {
-                        return $cc['display'].' <'.$cc['address'].'>';
-                    }
-
-                    return '<'.$cc['address'].'>';
-                })
+                ->map(fn ($cc) => MailboxHeader::format($cc['display'] ?? null, $cc['address']))
                 ->toArray();
         }
 
@@ -188,14 +182,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                 ];
             })
             ->filter(fn ($to) => filter_var($to['address'], FILTER_VALIDATE_EMAIL))
-            ->map(function ($to) {
-                // Only add in display if it exists
-                if ($to['display']) {
-                    return $to['display'].' <'.$to['address'].'>';
-                }
-
-                return '<'.$to['address'].'>';
-            })
+            ->map(fn ($to) => MailboxHeader::format($to['display'] ?? null, $to['address']))
             ->toArray();
 
         $this->displayFrom = $emailData->display_from;
@@ -291,15 +278,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                 $message->getHeaders()
                     ->addTextHeader('Feedback-ID', 'F:'.$this->alias->id.':anonaddy');
 
-                $message->getHeaders()->remove('Message-ID');
-
-                if ($this->messageId) {
-                    $message->getHeaders()
-                        ->addIdHeader('Message-ID', base64_decode($this->messageId));
-                } else {
-                    $message->getHeaders()
-                        ->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$this->alias->domain);
-                }
+                $this->addMessageIdHeader($message);
 
                 $behaviour = $this->user->list_unsubscribe_behaviour;
 
@@ -566,6 +545,29 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                 $this->user->bandwidth -= $this->size;
                 $this->user->save();
             }
+        }
+    }
+
+    /**
+     * Original Message-IDs from some clients (for example Outlook) are not RFC 2822 addr-spec.
+     * Symfony IdentificationHeader rejects those, so fall back to a generated id.
+     */
+    private function addMessageIdHeader(Email $message): void
+    {
+        $message->getHeaders()->remove('Message-ID');
+
+        $originalMessageId = $this->messageId ? base64_decode($this->messageId) : null;
+
+        try {
+            $message->getHeaders()->addIdHeader(
+                'Message-ID',
+                $originalMessageId ?: bin2hex(random_bytes(16)).'@'.$this->alias->domain
+            );
+        } catch (RfcComplianceException) {
+            $message->getHeaders()->addIdHeader(
+                'Message-ID',
+                bin2hex(random_bytes(16)).'@'.$this->alias->domain
+            );
         }
     }
 

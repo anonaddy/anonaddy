@@ -183,6 +183,7 @@ import tippy from 'tippy.js'
 import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 import Multiselect from '@vueform/multiselect'
 import Toggle from '../../Components/Toggle.vue'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialAlias: {
@@ -237,7 +238,7 @@ const editFromName = () => {
     })
     .catch(error => {
       alias.value.fromNameLoading = false
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -255,12 +256,10 @@ const updateAliasLabels = () => {
     })
     .catch(error => {
       labelsLoading.value = false
-      if ([403, 429].includes(error.response?.status)) {
-        errorMessage(error.response.data)
-      } else if (error.response?.status === 422) {
+      if (error.response?.status === 422) {
         errorMessage(error.response.data.message)
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -280,7 +279,7 @@ const enableAttachedRecipientsOnly = () => {
       successMessage('Attached recipients only enabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -291,7 +290,7 @@ const disableAttachedRecipientsOnly = () => {
       successMessage('Attached recipients only disabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 

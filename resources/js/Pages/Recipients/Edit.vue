@@ -213,6 +213,7 @@ import Toggle from '../../Components/Toggle.vue'
 import { notify } from '@kyvg/vue3-notification'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRecipient: {
@@ -245,7 +246,7 @@ const allowRepliesSends = () => {
       successMessage('Can reply/send enabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -256,7 +257,7 @@ const disallowRepliesSends = () => {
       successMessage('Can reply/send disabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -275,11 +276,7 @@ const turnOnInlineEncryption = () => {
       successMessage('Use PGP/Inline enabled')
     })
     .catch(error => {
-      if (error.response.status === 422) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -290,7 +287,7 @@ const turnOffInlineEncryption = () => {
       successMessage('Use PGP/Inline disabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -309,11 +306,7 @@ const turnOnProtectedHeaders = () => {
       successMessage('Hide email subject enabled')
     })
     .catch(error => {
-      if (error.response.status === 422) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -324,7 +317,7 @@ const turnOffProtectedHeaders = () => {
       successMessage('Hide email subject disabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -344,11 +337,7 @@ const turnOnRemovePgpKeys = () => {
       successMessage('Remove PGP keys enabled')
     })
     .catch(error => {
-      if (error.response.status === 422) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -360,7 +349,7 @@ const turnOffRemovePgpKeys = () => {
       successMessage('Remove PGP keys disabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -380,11 +369,7 @@ const turnOnRemovePgpSignatures = () => {
       successMessage('Remove PGP signatures enabled')
     })
     .catch(error => {
-      if (error.response.status === 422) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -396,7 +381,7 @@ const turnOffRemovePgpSignatures = () => {
       successMessage('Remove PGP signatures disabled')
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 

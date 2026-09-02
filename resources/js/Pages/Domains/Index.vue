@@ -661,6 +661,7 @@ import { VueGoodTable } from 'vue-good-table-next'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, GlobeAltIcon } from '@heroicons/vue/24/outline'
 import { PlusIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -791,18 +792,19 @@ const addNewDomain = () => {
     })
     .catch(error => {
       addDomainLoading.value = false
-      if (error.response.status === 403) {
-        errorMessage(error.response.data)
-      } else if (error.response.status === 422) {
+      if (error.response.status === 422) {
         errorMessage(error.response.data.errors.domain[0])
-      } else if (error.response.status === 429) {
-        errorMessage('You are making too many requests, please try again in a couple of minutes')
       } else if (error.response.status === 404) {
         warnMessage(
           'Verification TXT record not found, this could be due to DNS caching, please try again shortly.',
         )
       } else {
-        errorMessage()
+        errorMessage(
+          getRequestErrorText(
+            error,
+            'You are making too many requests, please try again in a couple of minutes',
+          ),
+        )
       }
     })
 }
@@ -831,7 +833,7 @@ const editDomain = domain => {
     .catch(error => {
       domainIdToEdit.value = null
       domainDescriptionToEdit.value = ''
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 const editDefaultRecipient = () => {
@@ -862,7 +864,7 @@ const editDefaultRecipient = () => {
       domainDefaultRecipientModalOpen.value = false
       editDefaultRecipientLoading.value = false
       defaultRecipientId.value = null
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -885,11 +887,9 @@ const checkRecords = domain => {
     })
     .catch(error => {
       checkRecordsLoading.value = false
-      if (error.response.status === 429) {
-        errorMessage('Please wait a little while before checking the records again')
-      } else {
-        errorMessage()
-      }
+      errorMessage(
+        getRequestErrorText(error, 'Please wait a little while before checking the records again'),
+      )
     })
 }
 
@@ -908,7 +908,7 @@ const activateDomain = id => {
       //
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -919,7 +919,7 @@ const deactivateDomain = id => {
       //
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -938,11 +938,7 @@ const enableCatchAll = id => {
       //
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -953,11 +949,7 @@ const disableCatchAll = id => {
       //
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -979,7 +971,7 @@ const deleteDomain = id => {
       })
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteDomainLoading.value = false
       deleteDomainModalOpen.value = false
     })
