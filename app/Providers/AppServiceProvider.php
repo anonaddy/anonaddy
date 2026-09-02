@@ -7,6 +7,10 @@ use App\Http\Responses\LoginViewResponse;
 use App\Http\Responses\RegisterSuccessResponse;
 use App\Http\Responses\RegisterViewResponse;
 use App\Models\PersonalAccessToken;
+use Cose\Algorithm\ManagerFactory as CoseAlgorithmManagerFactory;
+use Cose\Algorithm\Signature\ECDSA;
+use Cose\Algorithm\Signature\EdDSA;
+use Cose\Algorithm\Signature\RSA;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
         Webauthn::loginViewResponseUsing(LoginViewResponse::class);
 
         $this->app->bind(AuthenticateController::class, WebauthnAuthenticateController::class);
+
+        $this->bindCoseAlgorithmManagerFactory();
     }
 
     /**
@@ -110,5 +116,40 @@ class AppServiceProvider extends ServiceProvider
                 ]
             );
         });
+    }
+
+    /**
+     * laravel-webauthn constructs RS1 without acknowledging that SHA-1 is insecure.
+     * cose-lib 4.7+ emits E_USER_WARNING, which Laravel converts to an exception.
+     */
+    private function bindCoseAlgorithmManagerFactory(): void
+    {
+        $this->app->bind(
+            CoseAlgorithmManagerFactory::class,
+            fn () => tap(new CoseAlgorithmManagerFactory, function (CoseAlgorithmManagerFactory $factory): void {
+                $algorithms = [
+                    RSA\RS256::class,
+                    RSA\RS384::class,
+                    RSA\RS512::class,
+                    RSA\PS256::class,
+                    RSA\PS384::class,
+                    RSA\PS512::class,
+                    ECDSA\ES256::class,
+                    ECDSA\ES256K::class,
+                    ECDSA\ES384::class,
+                    ECDSA\ES512::class,
+                    EdDSA\Ed256::class,
+                    EdDSA\Ed512::class,
+                    EdDSA\Ed25519::class,
+                    EdDSA\EdDSA::class,
+                ];
+
+                $factory->add((string) RSA\RS1::identifier(), RSA\RS1::create(acknowledgeInsecureAlgorithm: true));
+
+                foreach ($algorithms as $algorithm) {
+                    $factory->add((string) $algorithm::identifier(), new $algorithm);
+                }
+            })
+        );
     }
 }

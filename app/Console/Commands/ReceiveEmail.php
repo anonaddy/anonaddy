@@ -289,22 +289,25 @@ class ReceiveEmail extends Command
 
         if (! empty($ruleIdsAndActions)) {
             if (UserRuleChecker::shouldBlockEmail($ruleIdsAndActions)) {
+                UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias, false);
                 $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
-
+                UserRuleChecker::applyDeleteAliasActionFromRules($ruleIdsAndActions, $this->user, $this->alias);
                 $this->storeRuleFailedDelivery(false, 'Email blocked because one of your rules was applied', 'R');
 
                 exit(0);
             }
 
             if (UserRuleChecker::shouldQuarantineEmail($ruleIdsAndActions)) {
+                UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias, false);
                 $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
-
+                UserRuleChecker::applyDeleteAliasActionFromRules($ruleIdsAndActions, $this->user, $this->alias);
                 $this->storeRuleFailedDelivery(true, 'Email quarantined because one of your rules was applied', 'R');
 
                 exit(0);
             }
 
             $ruleIds = array_keys($ruleIdsAndActions);
+            UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias);
         }
 
         $message = new ReplyToEmail($this->user, $this->alias, $verifiedRecipient, $emailData, $ruleIds, [$destination]);
@@ -332,7 +335,7 @@ class ReceiveEmail extends Command
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size, 'S');
 
         // Check user rules and get rule IDs that have satisfied conditions
-        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForSends($this->user, $emailData, $this->alias);
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForSends($this->user, $emailData, $this->alias, $isNewAlias ?? false);
         $ruleIds = null;
 
         if (! empty($ruleIdsAndActions)) {
@@ -341,7 +344,9 @@ class ReceiveEmail extends Command
                 if ($isNewAlias ?? false) {
                     $this->alias->forceDelete();
                 } else {
+                    UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias, false);
                     $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
+                    UserRuleChecker::applyDeleteAliasActionFromRules($ruleIdsAndActions, $this->user, $this->alias);
                 }
 
                 $this->storeRuleFailedDelivery(false, 'Email blocked because one of your rules was applied', 'S');
@@ -350,9 +355,11 @@ class ReceiveEmail extends Command
             }
 
             if (UserRuleChecker::shouldQuarantineEmail($ruleIdsAndActions)) {
+                UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias, false);
                 if (! ($isNewAlias ?? false)) {
                     $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
                 }
+                UserRuleChecker::applyDeleteAliasActionFromRules($ruleIdsAndActions, $this->user, $this->alias);
 
                 $this->storeRuleFailedDelivery(true, 'Email quarantined because one of your rules was applied', 'S');
 
@@ -360,6 +367,7 @@ class ReceiveEmail extends Command
             }
 
             $ruleIds = array_keys($ruleIdsAndActions);
+            UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias);
         }
 
         $message = new SendFromEmail($this->user, $this->alias, $verifiedRecipient, $emailData, $ruleIds, [$destination]);
@@ -419,7 +427,7 @@ class ReceiveEmail extends Command
         $emailData = new EmailData($this->parser, $this->option('sender'), $this->size);
 
         // Check user rules and get rule IDs that have satisfied conditions
-        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $this->alias);
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $this->alias, $isNewAlias ?? false);
         $ruleIds = null;
 
         $recipientsToForwardTo = $this->alias->verifiedRecipientsOrDefault();
@@ -432,7 +440,9 @@ class ReceiveEmail extends Command
                 if ($isNewAlias ?? false) {
                     $this->alias->forceDelete();
                 } else {
+                    UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias, false);
                     $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
+                    UserRuleChecker::applyDeleteAliasActionFromRules($ruleIdsAndActions, $this->user, $this->alias);
                 }
 
                 $this->storeRuleFailedDelivery(false, 'Email blocked because one of your rules was applied', 'F');
@@ -441,9 +451,11 @@ class ReceiveEmail extends Command
             }
 
             if (UserRuleChecker::shouldQuarantineEmail($ruleIdsAndActions)) {
+                UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias, false);
                 if (! ($isNewAlias ?? false)) {
                     $this->alias->increment('emails_blocked', 1, ['last_blocked' => now()]);
                 }
+                UserRuleChecker::applyDeleteAliasActionFromRules($ruleIdsAndActions, $this->user, $this->alias);
 
                 $this->storeRuleFailedDelivery(true, 'Email quarantined because one of your rules was applied', 'F');
 
@@ -451,6 +463,7 @@ class ReceiveEmail extends Command
             }
 
             $ruleIds = array_keys($ruleIdsAndActions);
+            UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias);
 
             $forwardToRecipientIds = UserRuleChecker::getRecipientIdsToForwardToFromRuleIdsAndActions($ruleIdsAndActions);
 

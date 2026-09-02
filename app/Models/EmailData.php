@@ -34,6 +34,8 @@ class EmailData
 
     public $inlineAttachments;
 
+    public $headers;
+
     public $size;
 
     public $messageId;
@@ -135,6 +137,7 @@ class EmailData
         $this->html = base64_encode($parser->getMessageBody('html'));
         $this->attachments = [];
         $this->inlineAttachments = [];
+        $this->headers = [];
         $this->size = $size;
         $this->messageId = base64_encode(Str::remove(['<', '>'], $parser->getHeader('Message-ID')));
         $this->listUnsubscribe = base64_encode($parser->getHeader('List-Unsubscribe'));
@@ -159,6 +162,22 @@ class EmailData
 
         $this->isSpam = $parser->getHeader('X-AnonAddy-Spam') === 'Yes';
         $this->failedDmarc = Str::contains($this->authenticationResults, 'dmarc=fail');
+
+        try {
+            foreach ($parser->getHeaders() as $name => $value) {
+                $headerValues = is_array($value) ? $value : [$value];
+
+                foreach ($headerValues as $headerValue) {
+                    if (! is_string($headerValue) || trim($headerValue) === '') {
+                        continue;
+                    }
+
+                    $this->headers[] = strtolower((string) $name).': '.$headerValue;
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->headers = [];
+        }
 
         $isReplyOrSend = in_array($emailType, ['R', 'S']);
 

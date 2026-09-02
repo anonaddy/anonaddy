@@ -54,10 +54,7 @@ class AliasesImport implements ShouldQueue, SkipsEmptyRows, SkipsOnError, SkipsO
             });
     }
 
-    /**
-     * @return Alias|null
-     */
-    public function model(array $row)
+    public function model(array $row): ?Alias
     {
         $aliasable = $this->domains->firstWhere('domain', $row['domain']);
 

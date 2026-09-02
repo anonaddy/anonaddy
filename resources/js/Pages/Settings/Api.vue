@@ -273,6 +273,7 @@ import { ref } from 'vue'
 import SettingsLayout from './../../Layouts/SettingsLayout.vue'
 import { notify } from '@kyvg/vue3-notification'
 import Modal from '../../Components/Modal.vue'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 import { usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -336,10 +337,10 @@ const store = () => {
     })
     .catch(error => {
       loading.value = false
-      if (isObject(error.response.data)) {
+      if (error.response?.data?.errors && error.response.status !== 429) {
         form.value.errors = error.response.data.errors
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -363,7 +364,7 @@ const revoke = () => {
     .catch(error => {
       revokeTokenLoading.value = false
       revokeTokenModalOpen.value = false
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 

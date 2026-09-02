@@ -311,6 +311,7 @@
           </Listbox>
 
           <button
+            type="button"
             class="ml-3 disabled:cursor-not-allowed tooltip"
             :disabled="changeSortDirLoading"
             @click="changeSortDir()"
@@ -318,8 +319,15 @@
               $page.props.sortDirection === 'desc' ? 'Change to ascending' : 'Change to descending'
             "
           >
-            <BarsArrowDownIcon v-if="$page.props.sortDirection === 'desc'" class="h-5 w-5" />
-            <BarsArrowUpIcon type="button" v-else class="h-5 w-5" />
+            <span class="sr-only">{{
+              $page.props.sortDirection === 'desc' ? 'Change to ascending' : 'Change to descending'
+            }}</span>
+            <BarsArrowDownIcon
+              v-if="$page.props.sortDirection === 'desc'"
+              class="h-5 w-5"
+              aria-hidden="true"
+            />
+            <BarsArrowUpIcon v-else class="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -375,7 +383,7 @@
                 : openBulkAliasRecipientsModal()
             "
           >
-            Edit Recipients <loader v-if="bulkEditAliasRecipientsLoading" />
+            Update Recipients <loader v-if="bulkEditAliasRecipientsLoading" />
           </button>
           <button
             type="button"
@@ -387,7 +395,7 @@
                 : openBulkAliasLabelsModal()
             "
           >
-            Edit Labels <loader v-if="bulkEditAliasLabelsLoading" />
+            Update Labels <loader v-if="bulkEditAliasLabelsLoading" />
           </button>
           <button
             type="button"
@@ -1099,7 +1107,7 @@
     </Modal>
 
     <Modal :open="editAliasLabelsModalOpen" @close="closeAliasLabelsModal">
-      <template v-slot:title> Update Alias Labels </template>
+      <template v-slot:title> Update Labels for this Alias </template>
       <template v-slot:content>
         <p class="mt-4 mb-3 text-grey-700 dark:text-grey-200">
           Select labels for this alias. You can choose up to 10 labels.
@@ -1109,7 +1117,7 @@
           class="mb-2 text-sm text-indigo-500 hover:text-indigo-800 dark:text-indigo-200 dark:hover:text-indigo-300"
           @click="openManageLabelsModal('single')"
         >
-          Click here to manage labels
+          Click here to manage all labels for this account
         </button>
         <multiselect
           v-model="aliasLabelsToEdit"
@@ -1146,7 +1154,7 @@
     </Modal>
 
     <Modal :open="bulkEditAliasLabelsModalOpen" @close="closeBulkAliasLabelsModal()">
-      <template v-slot:title> Update Labels for Aliases </template>
+      <template v-slot:title> Update Labels for Selected Aliases </template>
       <template v-slot:content>
         <p class="my-4 text-grey-700 dark:text-grey-200">
           Select labels for these <b>{{ selectedRowIds.length }}</b> aliases. You can choose up to
@@ -1154,10 +1162,10 @@
         </p>
         <button
           type="button"
-          class="mb-2 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400"
+          class="mb-2 text-sm text-indigo-500 hover:text-indigo-800 dark:text-indigo-200 dark:hover:text-indigo-300"
           @click="openManageLabelsModal('bulk')"
         >
-          Click here to manage labels
+          Click here to manage all labels for this account
         </button>
         <multiselect
           v-model="aliasLabelsToEdit"
@@ -1614,6 +1622,7 @@ import {
   ArrowTopRightOnSquareIcon,
 } from '@heroicons/vue/20/solid'
 import { validateCustomEmailWithErrors } from '../../utils/customEmailValidator.js'
+import { BULK_RATE_LIMIT_MESSAGE, getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -2146,12 +2155,10 @@ const createNewAlias = () => {
     })
     .catch(error => {
       createAliasLoading.value = false
-      if ([429, 403].includes(error.response.status)) {
-        errorMessage(error.response.data)
-      } else if (error.response.status === 422) {
+      if (error.response.status === 422) {
         errorMessage(error.response.data.message)
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -2180,7 +2187,7 @@ const editAliasDescription = alias => {
     .catch(error => {
       aliasIdToEdit.value = ''
       aliasDescriptionToEdit.value = ''
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -2217,7 +2224,7 @@ const editAliasRecipients = () => {
     .catch(error => {
       editAliasRecipientsLoading.value = false
       closeAliasRecipientsModal()
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -2256,7 +2263,7 @@ const bulkEditAliasRecipients = () => {
     .catch(error => {
       bulkEditAliasRecipientsLoading.value = false
       closeBulkAliasRecipientsModal()
-      errorMessage()
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2277,11 +2284,7 @@ const activateAlias = alias => {
     })
     .catch(error => {
       alias.active = false
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -2312,13 +2315,7 @@ const bulkActivateAlias = () => {
     })
     .catch(error => {
       bulkActivateAliasLoading.value = false
-      if (error.response.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response.data.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2331,11 +2328,7 @@ const deactivateAlias = alias => {
     .catch(error => {
       alias.active = true
       debounceToolips()
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -2366,13 +2359,7 @@ const bulkDeactivateAlias = () => {
     })
     .catch(error => {
       bulkDeactivateAliasLoading.value = false
-      if (error.response.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response.data.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2404,11 +2391,7 @@ const pinAlias = alias => {
     })
     .catch(error => {
       bulkPinAliasLoading.value = false
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -2443,13 +2426,7 @@ const bulkPinAlias = () => {
     })
     .catch(error => {
       bulkPinAliasLoading.value = false
-      if (error.response?.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response?.data?.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2478,11 +2455,7 @@ const unpinAlias = alias => {
     })
     .catch(error => {
       bulkUnpinAliasLoading.value = false
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -2516,13 +2489,7 @@ const bulkUnpinAlias = () => {
     })
     .catch(error => {
       bulkUnpinAliasLoading.value = false
-      if (error.response?.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response?.data?.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2596,7 +2563,7 @@ const deleteAlias = id => {
       }
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteAliasModalOpen.value = false
       deleteAliasLoading.value = false
     })
@@ -2681,13 +2648,7 @@ const bulkDeleteAlias = () => {
     .catch(error => {
       bulkDeleteAliasLoading.value = false
       bulkDeleteAliasModalOpen.value = false
-      if (error.response.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response.data.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2746,7 +2707,7 @@ const forgetAlias = id => {
       })
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       forgetAliasModalOpen.value = false
       forgetAliasLoading.value = false
     })
@@ -2819,13 +2780,7 @@ const bulkForgetAlias = () => {
     .catch(error => {
       bulkForgetAliasLoading.value = false
       bulkForgetAliasModalOpen.value = false
-      if (error.response.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response.data.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -2868,7 +2823,7 @@ const restoreAlias = id => {
       }
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       restoreAliasModalOpen.value = false
       restoreAliasLoading.value = false
     })
@@ -2921,13 +2876,7 @@ const bulkRestoreAlias = () => {
     .catch(error => {
       bulkRestoreAliasLoading.value = false
       bulkRestoreAliasModalOpen.value = false
-      if (error.response.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response.data.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -3116,12 +3065,10 @@ const editAliasLabels = () => {
     })
     .catch(error => {
       editAliasLabelsLoading.value = false
-      if ([429, 403].includes(error.response?.status)) {
-        errorMessage(error.response.data)
-      } else if (error.response?.status === 422) {
+      if (error.response?.status === 422) {
         errorMessage(error.response.data.message)
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -3160,13 +3107,7 @@ const bulkEditAliasLabels = () => {
     .catch(error => {
       bulkEditAliasLabelsLoading.value = false
       bulkEditAliasLabelsModalOpen.value = false
-      if (error.response?.status === 429) {
-        errorMessage('Too many bulk requests, please wait a little while before trying again')
-      } else if (error.response?.data?.message !== undefined) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error, BULK_RATE_LIMIT_MESSAGE))
     })
 }
 
@@ -3279,7 +3220,7 @@ const disabledBulkRestore = () => {
 }
 
 const rowStyleClassFn = row => {
-  return selectedRowIds.value.includes(row.id) ? 'bg-grey-50 dark:bg-grey-950' : ''
+  return selectedRowIds.value.includes(row.id) ? 'vgt-row-selected' : ''
 }
 
 const clipboard = (str, success, error) => {

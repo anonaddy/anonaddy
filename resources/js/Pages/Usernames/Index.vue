@@ -430,6 +430,7 @@ import { VueGoodTable } from 'vue-good-table-next'
 import { notify } from '@kyvg/vue3-notification'
 import { InformationCircleIcon, UsersIcon } from '@heroicons/vue/24/outline'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -542,12 +543,10 @@ const addNewUsername = () => {
     .catch(error => {
       addUsernameLoading.value = false
 
-      if (error.response.status === 403) {
-        errorMessage(error.response.data)
-      } else if (error.response.status == 422) {
+      if (error.response.status == 422) {
         errorMessage(error.response.data.errors.username[0])
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -576,7 +575,7 @@ const editUsername = username => {
     .catch(error => {
       usernameIdToEdit.value = ''
       usernameDescriptionToEdit.value = ''
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -607,7 +606,7 @@ const editDefaultRecipient = () => {
       usernameDefaultRecipientModalOpen.value = false
       editDefaultRecipientLoading.value = false
       defaultRecipientId.value = null
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -635,11 +634,7 @@ const makeDefaultUsername = username => {
     .catch(error => {
       closeMakeDefaultModal()
       makeDefaultLoading.value = false
-      if (error.response.data.message) {
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -654,7 +649,7 @@ const deleteUsername = id => {
       deleteUsernameLoading.value = false
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteUsernameLoading.value = false
       deleteUsernameModalOpen.value = false
     })
@@ -675,7 +670,7 @@ const activateUsername = id => {
       //
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -686,7 +681,7 @@ const deactivateUsername = id => {
       //
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -705,11 +700,7 @@ const enableCatchAll = id => {
       //
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -720,11 +711,7 @@ const disableCatchAll = id => {
       //
     })
     .catch(error => {
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 

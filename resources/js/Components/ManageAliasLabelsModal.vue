@@ -127,6 +127,7 @@
 import axios from 'axios'
 import { notify } from '@kyvg/vue3-notification'
 import { ref, watch } from 'vue'
+import { getRequestErrorText } from '../utils/getRequestErrorText.js'
 import Modal from './Modal.vue'
 
 const colourPalette = [
@@ -271,10 +272,8 @@ function deleteLabel(label) {
 function handleError(error) {
   if (error.response?.status === 422) {
     formError.value = error.response.data.message || 'Validation failed'
-  } else if ([403, 429].includes(error.response?.status)) {
-    formError.value = error.response.data
   } else {
-    formError.value = 'Something went wrong'
+    formError.value = getRequestErrorText(error) ?? 'Something went wrong'
   }
 }
 </script>

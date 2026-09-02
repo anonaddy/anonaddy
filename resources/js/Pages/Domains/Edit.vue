@@ -201,7 +201,7 @@
             You can use
             <a
               href="https://regex101.com/"
-              class="text-indigo-800"
+              class="text-indigo-500 hover:text-indigo-800 dark:text-indigo-200 dark:hover:text-indigo-300"
               target="_blank"
               rel="nofollow noreferrer noopener"
               >regex101.com</a
@@ -365,6 +365,7 @@ import { notify } from '@kyvg/vue3-notification'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
 import { ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/20/solid'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialDomain: {
@@ -424,7 +425,7 @@ const editFromName = () => {
     })
     .catch(error => {
       domain.value.fromNameLoading = false
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -454,12 +455,9 @@ const editAutoCreateRegex = () => {
     })
     .catch(error => {
       domain.value.autoCreateRegexLoading = false
-
-      if (error.response.data.message !== undefined) {
+      errorMessage(getRequestErrorText(error))
+      if (error.response?.data?.message !== undefined) {
         errors.value.auto_create_regex = error.response.data.message
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
       }
     })
 }
@@ -507,11 +505,9 @@ const testAutoCreateRegex = () => {
     })
     .catch(error => {
       domain.value.testAutoCreateRegexLoading = false
-      if (error.response.data.message !== undefined) {
+      errorMessage(getRequestErrorText(error))
+      if (error.response?.data?.message !== undefined) {
         errors.value.test_auto_create_regex_local_part = error.response.data.message
-        errorMessage(error.response.data.message)
-      } else {
-        errorMessage()
       }
     })
 }

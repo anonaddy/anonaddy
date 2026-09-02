@@ -6,7 +6,10 @@ use App\Models\DeletedUsername;
 use App\Models\Recipient;
 use App\Models\User;
 use App\Models\Username;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -205,6 +208,31 @@ class UsernamesTest extends TestCase
     }
 
     #[Test]
+    public function user_is_rate_limited_when_activating_usernames_too_often()
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(1)->by($request->user()?->id ?: $request->ip());
+        });
+
+        $username = Username::factory()->create([
+            'user_id' => $this->user->id,
+            'active' => false,
+        ]);
+
+        $this->json('POST', '/api/v1/active-usernames/', [
+            'id' => $username->id,
+        ])->assertStatus(200);
+
+        $response = $this->json('POST', '/api/v1/active-usernames/', [
+            'id' => $username->id,
+        ]);
+
+        $response->assertStatus(429);
+        $this->assertIsString($response->json('message'));
+        $this->assertNotEmpty($response->json('message'));
+    }
+
+    #[Test]
     public function user_can_deactivate_username()
     {
         $username = Username::factory()->create([
@@ -360,7 +388,7 @@ class UsernamesTest extends TestCase
         ]);
 
         $response = $this->json('PATCH', '/api/v1/usernames/'.$username->id, [
-            'auto_create_regex' => '///',
+            'auto_create_regex' => '(unclosed',
         ]);
 
         $response

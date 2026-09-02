@@ -36,7 +36,7 @@ class DestroyBlocklistBulkRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ids' => 'required|array|max:500|min:1',
+            'ids' => 'required|array|max:100|min:1',
             'ids.*' => 'required|uuid|distinct',
         ];
     }

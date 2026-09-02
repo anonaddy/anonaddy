@@ -63,6 +63,13 @@ trait ApplyUserRules
             case 'blocklistDomain':
                 // Applied in ReceiveEmail for forwards before block/quarantine exits.
                 break;
+            case 'addLabel':
+            case 'removeLabel':
+            case 'setAliasDescription':
+            case 'deactivateAlias':
+            case 'deleteAlias':
+                // Applied in ReceiveEmail via UserRuleChecker::applyAliasActionsFromRules().
+                break;
             case 'removeAttachments':
                 $this->emailAttachments = [];
                 break;

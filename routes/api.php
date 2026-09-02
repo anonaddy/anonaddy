@@ -235,6 +235,7 @@ Route::group([
     Route::controller(FailedDeliveryController::class)->group(function () {
         Route::get('/failed-deliveries', 'index');
         Route::get('/failed-deliveries/{id}', 'show');
+        Route::post('/failed-deliveries/delete/bulk', 'destroyBulk');
         Route::delete('/failed-deliveries/{id}', 'destroy');
     });
 

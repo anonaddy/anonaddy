@@ -828,6 +828,7 @@ import SettingsLayout from './../../Layouts/SettingsLayout.vue'
 import { notify } from '@kyvg/vue3-notification'
 import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 import Modal from '../../Components/Modal.vue'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialTwoFactorEnabled: {
@@ -954,10 +955,8 @@ const deleteKey = () => {
       deleteKeyLoading.value = false
       if (error.response.status == 422) {
         errors.value.deleteKey = 'The password is incorrect.'
-      } else if (error.response !== undefined) {
-        errorMessage(error.response.data)
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }
@@ -982,11 +981,7 @@ const enableKey = key => {
     })
     .catch(error => {
       key.enableKeyLoading = false
-      if (error.response !== undefined) {
-        errorMessage(error.response.data)
-      } else {
-        errorMessage()
-      }
+      errorMessage(getRequestErrorText(error))
     })
 }
 
@@ -1023,10 +1018,8 @@ const disableKey = () => {
       disableKeyLoading.value = false
       if (error.response.status == 422) {
         errors.value.disableKey = 'The password is incorrect.'
-      } else if (error.response !== undefined) {
-        errorMessage(error.response.data)
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
 }

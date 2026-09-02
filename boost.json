@@ -14,7 +14,9 @@
     ],
     "sail": false,
     "skills": [
+        "infer-conventions",
         "laravel-best-practices",
+        "testing-best-practices",
         "inertia-vue-development",
         "tailwindcss-development",
         "debugging-output-and-previewing-html-using-ray"

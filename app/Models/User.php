@@ -122,7 +122,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function email(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->defaultRecipient->email,
+            get: fn () => $this->defaultRecipient?->email,
         );
     }
 
@@ -132,7 +132,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function emailVerifiedAt(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->defaultRecipient->email_verified_at,
+            get: fn () => $this->defaultRecipient?->email_verified_at,
         );
     }
 

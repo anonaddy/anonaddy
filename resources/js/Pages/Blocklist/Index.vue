@@ -197,6 +197,7 @@
           </Listbox>
 
           <button
+            type="button"
             class="ml-3 disabled:cursor-not-allowed tooltip"
             :disabled="changeSortDirLoading"
             @click="changeSortDir()"
@@ -204,8 +205,11 @@
               sortDirection === 'desc' ? 'Change to ascending' : 'Change to descending'
             "
           >
-            <BarsArrowDownIcon v-if="sortDirection === 'desc'" class="h-5 w-5" />
-            <BarsArrowUpIcon type="button" v-else class="h-5 w-5" />
+            <span class="sr-only">{{
+              sortDirection === 'desc' ? 'Change to ascending' : 'Change to descending'
+            }}</span>
+            <BarsArrowDownIcon v-if="sortDirection === 'desc'" class="h-5 w-5" aria-hidden="true" />
+            <BarsArrowUpIcon v-else class="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -251,7 +255,7 @@
         <template #table-column="props">
           <span v-if="props.column.field === 'select'">
             <input
-              v-if="rows.length <= 50"
+              v-if="rows.length <= 100"
               type="checkbox"
               class="h-4 w-4 rounded border-grey-300 text-indigo-600 focus:ring-indigo-500 dark:text-indigo-400 dark:bg-grey-950"
               :checked="indeterminate || selectedRowIds.length === rows.length"
@@ -262,7 +266,7 @@
               v-else
               type="checkbox"
               class="h-4 w-4 rounded border-grey-300 bg-grey-100 border text-indigo-600 focus:ring-indigo-500 tooltip cursor-not-allowed dark:bg-grey-800"
-              data-tippy-content="'Select All' is only available when the page size is 50"
+              data-tippy-content="'Select All' is only available when the page size is 100 or less"
             ></div>
           </span>
           <span
@@ -288,10 +292,10 @@
               class="absolute inset-y-0 left-0 w-0.5 bg-indigo-600"
             ></div>
             <div
-              v-if="selectedRowIds.length >= 50 && !selectedRowIds.includes(props.row.id)"
+              v-if="selectedRowIds.length >= 100 && !selectedRowIds.includes(props.row.id)"
               type="checkbox"
               class="h-4 w-4 rounded border-grey-300 bg-grey-100 text-indigo-600 focus:ring-indigo-500 cursor-not-allowed dark:bg-grey-800"
-              title="You cannot select more than 50 blocklist entries"
+              title="You cannot select more than 100 blocklist entries"
             ></div>
             <input
               v-else
@@ -581,6 +585,7 @@ import {
 import { ChevronDownIcon, CheckIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
+import { getRequestErrorText } from '../../utils/getRequestErrorText.js'
 
 const props = defineProps({
   initialRows: {
@@ -761,8 +766,7 @@ const changeSortDir = () => {
   changeSortDirLoading.value = false
 }
 
-const rowStyleClassFn = row =>
-  selectedRowIds.value.includes(row.id) ? 'bg-grey-50 dark:bg-grey-950' : ''
+const rowStyleClassFn = row => (selectedRowIds.value.includes(row.id) ? 'vgt-row-selected' : '')
 
 const addForm = useForm({
   type: 'email',
@@ -807,6 +811,8 @@ const submitAddForm = () => {
         for (const [key, messages] of Object.entries(err.response.data.errors)) {
           addForm.setError(key, Array.isArray(messages) ? messages[0] : messages)
         }
+      } else {
+        errorMessage(getRequestErrorText(err))
       }
 
       addFormLoading.value = false
@@ -905,7 +911,7 @@ const confirmDelete = () => {
       })
     })
     .catch(error => {
-      errorMessage()
+      errorMessage(getRequestErrorText(error))
       deleteLoading.value = false
       deleteModalOpen.value = false
     })
@@ -968,7 +974,7 @@ const bulkDeleteBlocklist = () => {
             : 'Validation failed',
         )
       } else {
-        errorMessage()
+        errorMessage(getRequestErrorText(error))
       }
     })
     .finally(() => {
@@ -1031,7 +1037,7 @@ const submitBulkAdd = () => {
         const errors = error.response.data.errors
         bulkAddError.value = Object.values(errors).flat().filter(Boolean)[0] ?? 'Validation failed.'
       } else {
-        bulkAddError.value = 'An error occurred. Please try again.'
+        bulkAddError.value = getRequestErrorText(error) ?? 'An error occurred. Please try again.'
       }
 
       bulkAddLoading.value = false
