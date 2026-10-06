@@ -136,9 +136,7 @@
 
       <div class="py-10">
         <div class="space-y-1">
-          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
-            Dark Mode Theme
-          </h3>
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">Theme</h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
             Choose your preferred theme for the web application.
           </p>
@@ -146,7 +144,7 @@
         <div class="mt-4">
           <form
             @submit.prevent="
-              darkModeForm.post(route('settings.dark_mode'), {
+              themeForm.post(route('settings.dark_mode'), {
                 preserveScroll: true,
               })
             "
@@ -154,66 +152,49 @@
             <div class="grid grid-cols-1 mb-6">
               <div>
                 <label
-                  for="dark-mode"
+                  for="theme"
                   class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
-                  >Dark Mode</label
+                  >Theme</label
                 >
                 <div class="block relative w-full mt-2">
                   <select
-                    id="dark-mode"
-                    v-model="darkModeForm.dark_mode"
-                    name="format"
+                    id="theme"
+                    v-model="themeForm.theme"
+                    name="theme"
                     required
                     class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
                     :class="
-                      darkModeForm.errors.dark_mode
+                      themeForm.errors.theme
                         ? 'ring-red-300 focus:ring-red-500'
                         : 'ring-grey-300 focus:ring-indigo-600'
                     "
-                    :aria-invalid="darkModeForm.errors.dark_mode ? 'true' : undefined"
-                    :aria-describedby="
-                      darkModeForm.errors.dark_mode ? 'dark-mode-error' : undefined
-                    "
+                    :aria-invalid="themeForm.errors.theme ? 'true' : undefined"
+                    :aria-describedby="themeForm.errors.theme ? 'theme-error' : undefined"
                   >
-                    <option
-                      :value="false"
-                      :selected="!darkModeForm ? 'selected' : ''"
-                      class="dark:bg-grey-900"
-                    >
-                      Disabled
-                    </option>
-                    <option
-                      :value="true"
-                      :selected="darkModeForm ? 'selected' : ''"
-                      class="dark:bg-grey-900"
-                    >
-                      Enabled
-                    </option>
+                    <option value="system" class="dark:bg-grey-900">System</option>
+                    <option value="light" class="dark:bg-grey-900">Light</option>
+                    <option value="dark" class="dark:bg-grey-900">Dark</option>
                   </select>
                   <div
-                    v-if="darkModeForm.errors.dark_mode"
+                    v-if="themeForm.errors.theme"
                     class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
                   >
                     <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
                   </div>
                 </div>
-                <p
-                  v-if="darkModeForm.errors.dark_mode"
-                  class="mt-2 text-sm text-red-600"
-                  id="dark-mode-error"
-                >
-                  {{ darkModeForm.errors.dark_mode }}
+                <p v-if="themeForm.errors.theme" class="mt-2 text-sm text-red-600" id="theme-error">
+                  {{ themeForm.errors.theme }}
                 </p>
               </div>
             </div>
 
             <button
               type="submit"
-              :disabled="darkModeForm.processing"
+              :disabled="themeForm.processing"
               class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
             >
-              {{ $page.props.darkMode ? 'Disable' : 'Enable' }} Dark Mode
-              <loader v-if="darkModeForm.processing" />
+              Update Theme
+              <loader v-if="themeForm.processing" />
             </button>
           </form>
         </div>
@@ -297,6 +278,165 @@
             >
               Update Default Alias Domain
               <loader v-if="defaultAliasDomainForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Alias Domain Picker
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            Choose the domains that appear when you create an alias. The website, the browser
+            extension, and the mobile apps use this list. A hidden domain stays on your account, and
+            you can still receive email for aliases on that domain. It just makes your list of
+            domains shorter and easier to manage.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              hiddenAliasDomainsForm.post(route('settings.hidden_alias_domains'), {
+                preserveScroll: true,
+              })
+            "
+          >
+            <p
+              v-if="aliasDomainPickerError"
+              class="mb-4 text-sm text-red-600"
+              id="hidden-alias-domains-error"
+            >
+              {{ aliasDomainPickerError }}
+            </p>
+            <div
+              class="mb-6 divide-y divide-grey-200 border-y border-grey-200 dark:divide-white/10 dark:border-white/10"
+            >
+              <div v-for="group in aliasDomainPickerGroups" :key="group.key" class="py-3">
+                <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                  <button
+                    type="button"
+                    class="flex items-center gap-2 text-left"
+                    :aria-expanded="aliasDomainGroupIsOpen(group.key)"
+                    :aria-controls="`alias-domain-group-${group.key}`"
+                    @click="toggleAliasDomainGroup(group.key)"
+                  >
+                    <ChevronDownIcon
+                      class="h-4 w-4 text-grey-500 transition dark:text-grey-300"
+                      :class="aliasDomainGroupIsOpen(group.key) ? '' : '-rotate-90'"
+                      aria-hidden="true"
+                    />
+                    <span class="text-sm font-medium leading-6 text-grey-900 dark:text-white">
+                      {{ group.label }}
+                    </span>
+                    <span class="text-sm text-grey-500 dark:text-grey-300">
+                      {{ shownAliasDomainCount(group.domains) }} of {{ group.domains.length }} shown
+                    </span>
+                  </button>
+                  <div class="flex gap-3 text-sm">
+                    <button
+                      type="button"
+                      class="font-medium text-indigo-700 hover:text-indigo-500 dark:text-indigo-200"
+                      @click="showAliasDomainGroup(group.domains)"
+                    >
+                      Show all
+                    </button>
+                    <button
+                      type="button"
+                      class="font-medium text-indigo-700 hover:text-indigo-500 dark:text-indigo-200"
+                      @click="hideAliasDomainGroup(group.domains)"
+                    >
+                      Hide all
+                    </button>
+                  </div>
+                </div>
+                <div
+                  v-if="aliasDomainGroupIsOpen(group.key)"
+                  :id="`alias-domain-group-${group.key}`"
+                  class="mt-2 max-h-48 overflow-y-auto pl-6"
+                >
+                  <template v-if="group.key === 'username'">
+                    <div
+                      v-for="section in usernameAliasDomainSections(group.domains)"
+                      :key="section.username"
+                      class="mb-3"
+                    >
+                      <label
+                        class="flex items-center gap-3 text-sm font-medium text-grey-900 dark:text-white"
+                      >
+                        <input
+                          type="checkbox"
+                          class="h-4 w-4 rounded border-grey-300 text-indigo-600 focus:ring-indigo-500 dark:bg-grey-950 dark:text-indigo-400"
+                          :checked="
+                            shownAliasDomainCount(section.domains) === section.domains.length
+                          "
+                          :ref="element => setAliasDomainSectionCheckbox(element, section.domains)"
+                          @change="setAliasDomainSectionShown(section.domains, $event)"
+                        />
+                        {{ section.username }}
+                      </label>
+                      <ul class="mt-2 space-y-2 pl-7">
+                        <li v-for="domain in section.domains" :key="domain">
+                          <label
+                            class="flex items-start gap-3 text-sm text-grey-700 dark:text-grey-200"
+                          >
+                            <input
+                              type="checkbox"
+                              class="mt-0.5 h-4 w-4 rounded border-grey-300 text-indigo-600 focus:ring-indigo-500 dark:bg-grey-950 dark:text-indigo-400 disabled:opacity-60"
+                              :checked="aliasDomainIsShown(domain)"
+                              :disabled="domain === defaultAliasDomain"
+                              @change="setAliasDomainShown(domain, $event)"
+                            />
+                            <span>
+                              {{ domain }}
+                              <span
+                                v-if="domain === defaultAliasDomain"
+                                class="block text-grey-500 dark:text-grey-300"
+                              >
+                                Default alias domain. This domain stays in the picker.
+                              </span>
+                            </span>
+                          </label>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                  <ul v-else class="space-y-2">
+                    <li v-for="domain in group.domains" :key="domain">
+                      <label
+                        class="flex items-start gap-3 text-sm text-grey-700 dark:text-grey-200"
+                      >
+                        <input
+                          type="checkbox"
+                          class="mt-0.5 h-4 w-4 rounded border-grey-300 text-indigo-600 focus:ring-indigo-500 dark:bg-grey-950 dark:text-indigo-400 disabled:opacity-60"
+                          :checked="aliasDomainIsShown(domain)"
+                          :disabled="domain === defaultAliasDomain"
+                          @change="setAliasDomainShown(domain, $event)"
+                        />
+                        <span>
+                          {{ domain }}
+                          <span
+                            v-if="domain === defaultAliasDomain"
+                            class="block text-grey-500 dark:text-grey-300"
+                          >
+                            Default alias domain. This domain stays in the picker.
+                          </span>
+                        </span>
+                      </label>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="hiddenAliasDomainsForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update Alias Domain Picker
+              <loader v-if="hiddenAliasDomainsForm.processing" />
             </button>
           </form>
         </div>
@@ -866,6 +1006,97 @@
       <div class="py-10">
         <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Show Intentional Failed Deliveries
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            Choose whether failed deliveries appear when you have already stopped the email. This
+            includes a deactivated alias, username, or custom domain, a deleted alias, and a sender
+            on your blocklist. This instance still rejects these emails. This setting only changes
+            the Failed Deliveries page, the API list, and the dashboard chart.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              showIntentionalFailedDeliveriesForm.post(
+                route('settings.show_intentional_failed_deliveries'),
+                {
+                  preserveScroll: true,
+                },
+              )
+            "
+          >
+            <div class="grid grid-cols-1 mb-6">
+              <div>
+                <label
+                  for="show-intentional-failed-deliveries"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Show Intentional Failed Deliveries</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="show-intentional-failed-deliveries"
+                    v-model="showIntentionalFailedDeliveriesForm.show_intentional_failed_deliveries"
+                    name="show_intentional_failed_deliveries"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      showIntentionalFailedDeliveriesForm.errors.show_intentional_failed_deliveries
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      showIntentionalFailedDeliveriesForm.errors.show_intentional_failed_deliveries
+                        ? 'true'
+                        : undefined
+                    "
+                    :aria-describedby="
+                      showIntentionalFailedDeliveriesForm.errors.show_intentional_failed_deliveries
+                        ? 'show-intentional-failed-deliveries-error'
+                        : undefined
+                    "
+                  >
+                    <option :value="true" class="dark:bg-grey-900">Shown</option>
+                    <option :value="false" class="dark:bg-grey-900">Hidden</option>
+                  </select>
+                  <div
+                    v-if="
+                      showIntentionalFailedDeliveriesForm.errors.show_intentional_failed_deliveries
+                    "
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-8"
+                  >
+                    <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+                  </div>
+                </div>
+                <p
+                  v-if="
+                    showIntentionalFailedDeliveriesForm.errors.show_intentional_failed_deliveries
+                  "
+                  class="mt-2 text-sm text-red-600"
+                  id="show-intentional-failed-deliveries-error"
+                >
+                  {{
+                    showIntentionalFailedDeliveriesForm.errors.show_intentional_failed_deliveries
+                  }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="showIntentionalFailedDeliveriesForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update Show Intentional Failed Deliveries
+              <loader v-if="showIntentionalFailedDeliveriesForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
             Failed Delivery Notifications
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
@@ -1360,8 +1591,13 @@
           </p>
           <p class="text-base text-grey-700 dark:text-grey-200 mt-4!">
             Where an original List-Unsubscribe header is present and contains a mailto: email
-            address, addy.io will rewrite it so that the email is sent from your alias and not your
-            real email address.
+            address, this instance will rewrite it so that the email is sent from your alias and not
+            your real email address.
+          </p>
+          <p class="text-base text-grey-700 dark:text-grey-200 mt-4!">
+            If you use only the original List-Unsubscribe header, this instance does not add a
+            header when the original email has none. The email client then shows no unsubscribe
+            button.
           </p>
           <p class="text-base text-grey-700 dark:text-grey-200 mt-4!">
             One-click deactivate, delete, block sender email and block sender domain links in
@@ -1525,9 +1761,10 @@
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'
 import { useForm, Link } from '@inertiajs/vue3'
 import SettingsLayout from './../../Layouts/SettingsLayout.vue'
-import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon, ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 
 const props = defineProps({
   defaultAliasDomain: {
@@ -1554,6 +1791,14 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  aliasDomainPickerGroups: {
+    type: Array,
+    required: true,
+  },
+  hiddenAliasDomains: {
+    type: Array,
+    required: true,
+  },
   useReplyTo: {
     type: Boolean,
     required: true,
@@ -1562,12 +1807,16 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  showIntentionalFailedDeliveries: {
+    type: Boolean,
+    required: true,
+  },
   failedDeliveryNotificationPreference: {
     type: Number,
     required: true,
   },
-  darkMode: {
-    type: Boolean,
+  theme: {
+    type: String,
     required: true,
   },
   saveAliasLastUsed: {
@@ -1660,6 +1909,10 @@ const listUnsubscribeBehaviourOptions = [
     label: 'Use original List-Unsubscribe, fallback to one-click deactivate if none is present',
   },
   {
+    value: 5,
+    label: 'Use original List-Unsubscribe, do not add a header if none is present',
+  },
+  {
     value: 1,
     label: 'Always use one-click deactivate',
   },
@@ -1702,6 +1955,139 @@ const defaultAliasDomainForm = useForm({
   domain: props.defaultAliasDomain,
 })
 
+const aliasPickerDomains = props.aliasDomainPickerGroups.flatMap(group => group.domains)
+
+const hiddenAliasDomainsForm = useForm({
+  hidden_domains: props.hiddenAliasDomains.filter(domain => domain !== props.defaultAliasDomain),
+})
+
+const localAliasDomainPickerError = ref('')
+
+const openAliasDomainGroups = ref({})
+
+const aliasDomainGroupIsOpen = key => Boolean(openAliasDomainGroups.value[key])
+
+const toggleAliasDomainGroup = key => {
+  openAliasDomainGroups.value[key] = !openAliasDomainGroups.value[key]
+}
+
+const usernameAliasDomainSections = domains => {
+  const sections = new Map()
+
+  domains.forEach(domain => {
+    const username = domain.slice(0, domain.indexOf('.'))
+
+    if (!sections.has(username)) {
+      sections.set(username, [])
+    }
+
+    sections.get(username).push(domain)
+  })
+
+  return [...sections.entries()].map(([username, sectionDomains]) => ({
+    username,
+    domains: sectionDomains,
+  }))
+}
+
+const aliasDomainPickerError = computed(
+  () =>
+    hiddenAliasDomainsForm.errors.hidden_domains ||
+    Object.entries(hiddenAliasDomainsForm.errors).find(([key]) =>
+      key.startsWith('hidden_domains'),
+    )?.[1] ||
+    localAliasDomainPickerError.value,
+)
+
+const visibleAliasDomainCount = hiddenDomains =>
+  aliasPickerDomains.filter(
+    domain => domain === props.defaultAliasDomain || !hiddenDomains.includes(domain),
+  ).length
+
+const aliasDomainIsShown = domain => {
+  if (domain === props.defaultAliasDomain) {
+    return true
+  }
+
+  return !hiddenAliasDomainsForm.hidden_domains.includes(domain)
+}
+
+const shownAliasDomainCount = domains => domains.filter(domain => aliasDomainIsShown(domain)).length
+
+const setAliasDomainSectionCheckbox = (element, domains) => {
+  if (!element) {
+    return
+  }
+
+  const shown = shownAliasDomainCount(domains)
+  element.indeterminate = shown > 0 && shown < domains.length
+}
+
+const setAliasDomainSectionShown = (domains, event) => {
+  if (event.target.checked) {
+    showAliasDomainGroup(domains)
+    return
+  }
+
+  hideAliasDomainGroup(domains)
+  event.target.checked = shownAliasDomainCount(domains) === domains.length
+  setAliasDomainSectionCheckbox(event.target, domains)
+}
+
+const setAliasDomainShown = (domain, event) => {
+  if (domain === props.defaultAliasDomain) {
+    event.target.checked = true
+    return
+  }
+
+  localAliasDomainPickerError.value = ''
+  const hiddenDomains = hiddenAliasDomainsForm.hidden_domains.filter(item => item !== domain)
+
+  if (!event.target.checked) {
+    const nextHiddenDomains = [...hiddenDomains, domain]
+
+    if (visibleAliasDomainCount(nextHiddenDomains) === 0) {
+      event.target.checked = true
+      localAliasDomainPickerError.value = 'Leave at least one domain visible in the alias picker.'
+      return
+    }
+
+    hiddenAliasDomainsForm.hidden_domains = nextHiddenDomains
+    return
+  }
+
+  hiddenAliasDomainsForm.hidden_domains = hiddenDomains
+}
+
+const showAliasDomainGroup = domains => {
+  localAliasDomainPickerError.value = ''
+  const shownDomains = new Set(domains)
+  hiddenAliasDomainsForm.hidden_domains = hiddenAliasDomainsForm.hidden_domains.filter(
+    domain => !shownDomains.has(domain),
+  )
+}
+
+const hideAliasDomainGroup = domains => {
+  localAliasDomainPickerError.value = ''
+  const nextHiddenDomains = [
+    ...new Set([
+      ...hiddenAliasDomainsForm.hidden_domains,
+      ...domains.filter(domain => domain !== props.defaultAliasDomain),
+    ]),
+  ]
+
+  if (visibleAliasDomainCount(nextHiddenDomains) === 0) {
+    const keepVisible = aliasPickerDomains.find(domain => domain !== props.defaultAliasDomain)
+    hiddenAliasDomainsForm.hidden_domains = nextHiddenDomains.filter(
+      domain => domain !== keepVisible,
+    )
+    localAliasDomainPickerError.value = 'Leave at least one domain visible in the alias picker.'
+    return
+  }
+
+  hiddenAliasDomainsForm.hidden_domains = nextHiddenDomains
+}
+
 const defaultAliasFormatForm = useForm({
   format: props.defaultAliasFormat,
 })
@@ -1726,12 +2112,16 @@ const storeFailedDeliveriesForm = useForm({
   store_failed_deliveries: props.storeFailedDeliveries,
 })
 
+const showIntentionalFailedDeliveriesForm = useForm({
+  show_intentional_failed_deliveries: props.showIntentionalFailedDeliveries,
+})
+
 const failedDeliveryNotificationPreferenceForm = useForm({
   failed_delivery_notification_preference: props.failedDeliveryNotificationPreference,
 })
 
-const darkModeForm = useForm({
-  dark_mode: props.darkMode,
+const themeForm = useForm({
+  theme: props.theme,
 })
 
 const saveAliasLastUsedForm = useForm({

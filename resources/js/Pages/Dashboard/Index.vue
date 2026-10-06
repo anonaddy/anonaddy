@@ -200,6 +200,37 @@
         <outbound-messages-pie v-else :totals="outboundMessageTotals" />
       </div>
     </div>
+
+    <div class="mt-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <h3 class="text-base font-semibold leading-6 text-grey-600 dark:text-grey-200">
+        Failed Deliveries Last 7 Days
+        <span v-if="!chartsLoading" class="ml-2 font-semibold text-indigo-800 dark:text-indigo-400">
+          {{ failedDeliveriesTotal.toLocaleString() }}
+        </span>
+        <loader v-if="chartsLoading" />
+      </h3>
+      <Link
+        :href="route('failed_deliveries.index')"
+        class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+      >
+        View all<span class="sr-only"> failed deliveries</span>
+      </Link>
+    </div>
+    <div
+      class="mt-5 bg-white overflow-hidden shadow sm:rounded-lg p-4 flex justify-center items-center max-h-80 min-h-64 dark:bg-grey-900"
+    >
+      <div v-if="chartsLoading" />
+      <div v-else-if="failedDeliveriesTotal === 0" class="flex items-center justify-center">
+        No data to display
+      </div>
+      <failed-deliveries-graph
+        v-else
+        :inbound-rejections-data="inboundRejectionsData"
+        :inbound-quarantined-data="inboundQuarantinedData"
+        :outbound-bounces-data="outboundBouncesData"
+        :labels="labels"
+      />
+    </div>
   </div>
 </template>
 
@@ -218,6 +249,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import OutboundMessagesGraph from './OutboundMessagesGraph.vue'
 import OutboundMessagesPie from './OutboundMessagesPie.vue'
+import FailedDeliveriesGraph from './FailedDeliveriesGraph.vue'
 
 const props = defineProps({
   totals: {
@@ -264,6 +296,10 @@ const repliesData = ref([])
 const sendsData = ref([])
 const labels = ref([])
 const outboundMessageTotals = ref(null)
+const inboundRejectionsData = ref([])
+const inboundQuarantinedData = ref([])
+const outboundBouncesData = ref([])
+const failedDeliveriesTotal = ref(0)
 
 onMounted(() => {
   axios.get('/api/v1/chart-data').then(response => {
@@ -272,6 +308,10 @@ onMounted(() => {
     sendsData.value = response.data.sendsData
     labels.value = response.data.labels
     outboundMessageTotals.value = response.data.outboundMessageTotals
+    inboundRejectionsData.value = response.data.inboundRejectionsData
+    inboundQuarantinedData.value = response.data.inboundQuarantinedData
+    outboundBouncesData.value = response.data.outboundBouncesData
+    failedDeliveriesTotal.value = response.data.failedDeliveriesTotal
 
     if (_.isEqual(outboundMessageTotals.value, [0, 0, 0])) {
       outboundMessageTotals.value = null

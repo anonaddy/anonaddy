@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Alias;
 use App\Models\FailedDelivery;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -50,6 +51,29 @@ class FailedDeliveriesTest extends TestCase
         $response->assertSuccessful();
         $this->assertCount(1, $response->json());
         $this->assertEquals($failedDelivery->code, $response->json()['data']['code']);
+    }
+
+    #[Test]
+    public function failed_deliveries_include_alias_description(): void
+    {
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'description' => 'Newsletter signup',
+        ]);
+        $failedDelivery = FailedDelivery::factory()->create([
+            'user_id' => $this->user->id,
+            'alias_id' => $alias->id,
+        ]);
+
+        $this->json('GET', '/api/v1/failed-deliveries')
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.alias_description', 'Newsletter signup')
+            ->assertJsonPath('data.0.alias_email', $alias->email);
+
+        $this->json('GET', '/api/v1/failed-deliveries/'.$failedDelivery->id)
+            ->assertSuccessful()
+            ->assertJsonPath('data.alias_description', 'Newsletter signup')
+            ->assertJsonPath('data.alias_email', $alias->email);
     }
 
     #[Test]
@@ -236,5 +260,31 @@ class FailedDeliveriesTest extends TestCase
 
         $response->assertStatus(404);
         $response->assertJsonPath('message', 'No failed deliveries found');
+    }
+
+    #[Test]
+    public function api_list_hides_intentional_failed_deliveries_when_the_user_turns_the_setting_off(): void
+    {
+        $hidden = FailedDelivery::factory()->create([
+            'user_id' => $this->user->id,
+            'email_type' => 'IR',
+            'code' => FailedDelivery::CODE_ALIAS_DEACTIVATED,
+        ]);
+        $bounce = FailedDelivery::factory()->create([
+            'user_id' => $this->user->id,
+            'email_type' => 'F',
+            'code' => '550 5.1.1 User unknown',
+        ]);
+
+        $this->user->update(['show_intentional_failed_deliveries' => false]);
+
+        $response = $this->json('GET', '/api/v1/failed-deliveries');
+
+        $response->assertSuccessful();
+        $ids = collect($response->json('data'))->pluck('id');
+        $this->assertTrue($ids->contains($bounce->id));
+        $this->assertFalse($ids->contains($hidden->id));
+
+        $this->json('GET', '/api/v1/failed-deliveries/'.$hidden->id)->assertSuccessful();
     }
 }

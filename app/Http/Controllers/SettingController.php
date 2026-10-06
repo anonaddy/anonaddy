@@ -25,8 +25,9 @@ class SettingController extends Controller
             'displayFromFormat' => user()->display_from_format->value,
             'useReplyTo' => user()->use_reply_to,
             'storeFailedDeliveries' => user()->store_failed_deliveries,
+            'showIntentionalFailedDeliveries' => user()->show_intentional_failed_deliveries,
             'failedDeliveryNotificationPreference' => user()->failed_delivery_notification_preference->value,
-            'darkMode' => user()->dark_mode,
+            'theme' => user()->theme->value,
             'saveAliasLastUsed' => user()->save_alias_last_used,
             'fromName' => user()->from_name ?? '',
             'emailSubject' => user()->email_subject ?? '',
@@ -34,6 +35,8 @@ class SettingController extends Controller
             'spamWarningBehaviour' => user()->spam_warning_behaviour,
             'listUnsubscribeBehaviour' => user()->list_unsubscribe_behaviour->value,
             'domainOptions' => user()->domainOptions(),
+            'aliasDomainPickerGroups' => user()->aliasDomainPickerGroups(),
+            'hiddenAliasDomains' => user()->hidden_alias_domains ?? [],
         ]);
     }
 

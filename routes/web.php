@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AliasBannerActionsController;
 use App\Http\Controllers\AliasExportController;
 use App\Http\Controllers\AliasImportController;
 use App\Http\Controllers\AliasSeparatorController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\DisplayFromFormatController;
 use App\Http\Controllers\EmailSubjectController;
 use App\Http\Controllers\FailedDeliveryNotificationPreferenceController;
 use App\Http\Controllers\FromNameController;
+use App\Http\Controllers\HiddenAliasDomainsController;
 use App\Http\Controllers\ListUnsubscribeBehaviourController;
 use App\Http\Controllers\LoginRedirectController;
 use App\Http\Controllers\PasswordController;
@@ -33,6 +35,7 @@ use App\Http\Controllers\ShowBlocklistController;
 use App\Http\Controllers\ShowDashboardController;
 use App\Http\Controllers\ShowDomainController;
 use App\Http\Controllers\ShowFailedDeliveryController;
+use App\Http\Controllers\ShowIntentionalFailedDeliveriesController;
 use App\Http\Controllers\ShowRecipientController;
 use App\Http\Controllers\ShowRuleController;
 use App\Http\Controllers\ShowUsernameController;
@@ -132,6 +135,13 @@ Route::middleware(['auth', 'verified', '2fa'])->group(function () {
 
     Route::get('/deactivate/{alias}', [DeactivateAliasController::class, 'deactivate'])->name('deactivate');
 
+    Route::controller(AliasBannerActionsController::class)->group(function () {
+        Route::get('/aliases/{alias}/actions', 'show')->name('aliases.banner_actions.show');
+        Route::post('/aliases/{alias}/actions/deactivate', 'deactivate')->name('aliases.banner_actions.deactivate');
+        Route::post('/aliases/{alias}/actions/block-email', 'blockEmail')->name('aliases.banner_actions.block_email');
+        Route::post('/aliases/{alias}/actions/block-domain', 'blockDomain')->name('aliases.banner_actions.block_domain');
+    });
+
     Route::get('/rules', [ShowRuleController::class, 'index'])->name('rules.index');
 
     Route::get('/failed-deliveries', [ShowFailedDeliveryController::class, 'index'])->name('failed_deliveries.index');
@@ -165,6 +175,8 @@ Route::group([
 
     Route::post('/default-alias-domain', [DefaultAliasDomainController::class, 'update'])->name('settings.default_alias_domain');
 
+    Route::post('/hidden-alias-domains', [HiddenAliasDomainsController::class, 'update'])->name('settings.hidden_alias_domains');
+
     Route::post('/default-alias-format', [DefaultAliasFormatController::class, 'update'])->name('settings.default_alias_format');
 
     Route::post('/alias-separator', [AliasSeparatorController::class, 'update'])->name('settings.alias_separator');
@@ -184,6 +196,8 @@ Route::group([
     Route::post('/list-unsubscribe-behaviour', [ListUnsubscribeBehaviourController::class, 'update'])->name('settings.list_unsubscribe_behaviour');
 
     Route::post('/store-failed-deliveries', [StoreFailedDeliveryController::class, 'update'])->name('settings.store_failed_deliveries');
+
+    Route::post('/show-intentional-failed-deliveries', [ShowIntentionalFailedDeliveriesController::class, 'update'])->name('settings.show_intentional_failed_deliveries');
 
     Route::post('/failed-delivery-notification-preference', [FailedDeliveryNotificationPreferenceController::class, 'update'])->name('settings.failed_delivery_notification_preference');
 

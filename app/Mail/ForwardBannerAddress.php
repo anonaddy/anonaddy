@@ -9,7 +9,7 @@ use Throwable;
 final class ForwardBannerAddress
 {
     /**
-     * Address to show on forward banners (“This email was sent to …”).
+     * Address to show on forward banners ("To:").
      *
      * Prefers the real SMTP envelope recipient (includes +detail extensions), then tries the inbound
      * To header value, falling back to the stored alias mailbox.

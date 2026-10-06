@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
+import { CHART_CYAN, CHART_PERIWINKLE, useChartTheme } from './chartTheme'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -16,17 +17,15 @@ const props = defineProps({
   },
 })
 
+const { textColor, navy } = useChartTheme()
+
 const chartData = computed(() => {
   return {
     labels: ['Forwards', 'Replies', 'Sends'],
     datasets: [
       {
         label: 'Total',
-        backgroundColor: [
-          'rgba(28, 212, 212, 1)',
-          'rgba(25, 33, 108, 1)',
-          'rgba(123, 147, 219, 1)',
-        ],
+        backgroundColor: [CHART_CYAN, navy.value, CHART_PERIWINKLE],
         hoverOffset: 4,
         data: props.totals,
       },
@@ -34,8 +33,16 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: true,
-}
+  color: textColor.value,
+  plugins: {
+    legend: {
+      labels: {
+        color: textColor.value,
+      },
+    },
+  },
+}))
 </script>

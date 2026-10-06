@@ -12,6 +12,8 @@ class BlockedSender extends Model
     use HasFactory;
     use HasUuid;
 
+    public const ALREADY_ON_BLOCKLIST_MESSAGE = 'This email or domain is already on your blocklist.';
+
     public $incrementing = false;
 
     protected $keyType = 'string';
@@ -57,5 +59,31 @@ class BlockedSender extends Model
     public function isDomain(): bool
     {
         return $this->type === 'domain';
+    }
+
+    /**
+     * Shared alias domains that must not be blocked from a banner link.
+     */
+    public static function isProtectedAliasDomain(string $domain): bool
+    {
+        $domain = strtolower(trim($domain));
+
+        if ($domain === '') {
+            return false;
+        }
+
+        foreach (config('anonaddy.all_domains', []) as $aliasDomain) {
+            $aliasDomain = strtolower((string) $aliasDomain);
+
+            if ($aliasDomain === '') {
+                continue;
+            }
+
+            if ($domain === $aliasDomain || str_ends_with($domain, '.'.$aliasDomain)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

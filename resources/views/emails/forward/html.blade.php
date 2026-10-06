@@ -17,6 +17,9 @@
             @if($locationHtml === 'bottom')
                 @include('emails.forward.html_banner')
             @endif
+            @if($locationHtml !== 'off')
+                @include('emails.forward.html_banner_reset')
+            @endif
         </tbody>
     </table>
 @endif

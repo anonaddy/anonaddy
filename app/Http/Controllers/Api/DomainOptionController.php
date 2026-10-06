@@ -9,7 +9,7 @@ class DomainOptionController extends Controller
     public function index()
     {
         return response()->json([
-            'data' => user()->domainOptions(),
+            'data' => user()->visibleDomainOptions(),
             'sharedDomains' => user()->sharedDomainOptions(),
             'defaultAliasDomain' => user()->default_alias_domain,
             'defaultAliasFormat' => user()->default_alias_format,

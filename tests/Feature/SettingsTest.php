@@ -411,6 +411,11 @@ class SettingsTest extends TestCase
             'list_unsubscribe_behaviour' => ListUnsubscribeBehaviour::Deactivate->value,
         ]);
         $this->assertEquals(ListUnsubscribeBehaviour::Deactivate, $this->user->fresh()->list_unsubscribe_behaviour);
+
+        $this->post('/settings/list-unsubscribe-behaviour', [
+            'list_unsubscribe_behaviour' => ListUnsubscribeBehaviour::OriginalWithNoFallback->value,
+        ]);
+        $this->assertEquals(ListUnsubscribeBehaviour::OriginalWithNoFallback, $this->user->fresh()->list_unsubscribe_behaviour);
     }
 
     #[Test]
@@ -479,6 +484,46 @@ class SettingsTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertFalse($this->user->store_failed_deliveries);
+    }
+
+    #[Test]
+    public function user_can_show_intentional_failed_deliveries()
+    {
+        $this->user->update(['show_intentional_failed_deliveries' => false]);
+
+        $this->assertFalse($this->user->show_intentional_failed_deliveries);
+
+        $response = $this->post('/settings/show-intentional-failed-deliveries/', [
+            'show_intentional_failed_deliveries' => true,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertTrue($this->user->fresh()->show_intentional_failed_deliveries);
+    }
+
+    #[Test]
+    public function user_can_hide_intentional_failed_deliveries()
+    {
+        $this->assertTrue($this->user->show_intentional_failed_deliveries);
+
+        $response = $this->post('/settings/show-intentional-failed-deliveries/', [
+            'show_intentional_failed_deliveries' => false,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertFalse($this->user->fresh()->show_intentional_failed_deliveries);
+    }
+
+    #[Test]
+    public function user_cannot_update_show_intentional_failed_deliveries_to_invalid_value()
+    {
+        $response = $this->post('/settings/show-intentional-failed-deliveries/', [
+            'show_intentional_failed_deliveries' => 'hidden',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['show_intentional_failed_deliveries']);
+        $this->assertTrue($this->user->fresh()->show_intentional_failed_deliveries);
     }
 
     #[Test]

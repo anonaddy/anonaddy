@@ -237,7 +237,7 @@ class ShowAliasController extends Controller
             'recipientOptions' => fn () => user()->verifiedRecipients()->select(['id', 'email'])->get(),
             'domain' => fn () => user()->canCreateSharedDomainAliases() ? config('anonaddy.domain') : null,
             'subdomain' => fn () => user()->canCreateUsernameSubdomainAliases() ? user()->username.'.'.config('anonaddy.domain') : null,
-            'domainOptions' => fn () => user()->domainOptions(),
+            'domainOptions' => fn () => user()->visibleDomainOptions(),
             'defaultAliasDomain' => fn () => user()->default_alias_domain,
             'defaultAliasFormat' => fn () => user()->default_alias_format,
             'search' => $validated['search'] ?? null,

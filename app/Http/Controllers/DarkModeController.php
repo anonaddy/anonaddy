@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Theme;
 use App\Http\Requests\UpdateDarkModeRequest;
 
 class DarkModeController extends Controller
 {
     public function update(UpdateDarkModeRequest $request)
     {
-        if ($request->dark_mode) {
-            user()->update(['dark_mode' => true]);
-        } else {
-            user()->update(['dark_mode' => false]);
-        }
+        $theme = $request->enum('theme', Theme::class);
 
-        return back()->with(['flash' => $request->dark_mode ? 'Dark Mode Enabled Successfully' : 'Dark Mode Disabled Successfully']);
+        user()->update(['theme' => $theme]);
+
+        $message = match ($theme) {
+            Theme::System => 'System theme enabled successfully',
+            Theme::Light => 'Light theme enabled successfully',
+            Theme::Dark => 'Dark theme enabled successfully',
+        };
+
+        return back()->with(['flash' => $message]);
     }
 }

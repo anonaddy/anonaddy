@@ -15,6 +15,7 @@ class FailedDeliveryResource extends JsonResource
             'recipient_email' => $this->recipient->email ?? null,
             'alias_id' => $this->alias_id,
             'alias_email' => $this->alias->email ?? null,
+            'alias_description' => $this->alias->description ?? null,
             'bounce_type' => $this->bounce_type,
             'remote_mta' => $this->remote_mta,
             'sender' => $this->sender,

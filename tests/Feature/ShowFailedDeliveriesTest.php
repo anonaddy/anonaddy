@@ -161,6 +161,50 @@ class ShowFailedDeliveriesTest extends TestCase
     }
 
     #[Test]
+    public function intentional_failed_deliveries_stay_in_the_list_until_the_user_hides_them(): void
+    {
+        $intentionalCodes = [
+            FailedDelivery::CODE_SENDER_ON_YOUR_BLOCKLIST,
+            FailedDelivery::CODE_ALIAS_DEACTIVATED,
+            FailedDelivery::CODE_ALIAS_USERNAME_DEACTIVATED,
+            FailedDelivery::CODE_ALIAS_DOMAIN_DEACTIVATED,
+            FailedDelivery::CODE_ALIAS_DELETED,
+        ];
+
+        foreach ($intentionalCodes as $code) {
+            FailedDelivery::factory()->create([
+                'user_id' => $this->user->id,
+                'email_type' => 'IR',
+                'code' => $code,
+            ]);
+        }
+
+        $bounce = FailedDelivery::factory()->create([
+            'user_id' => $this->user->id,
+            'email_type' => 'F',
+            'code' => '550 5.1.1 User unknown',
+        ]);
+
+        $this->get('/failed-deliveries')
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page->has('initialRows.data', 6));
+
+        $this->user->update(['show_intentional_failed_deliveries' => false]);
+
+        $response = $this->get('/failed-deliveries');
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('initialRows.data', 1)
+            ->where('initialRows.data.0.id', $bounce->id)
+        );
+
+        $this->get('/failed-deliveries?search=deactivated')
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page->has('initialRows.data', 0));
+    }
+
+    #[Test]
     public function user_can_paginate_failed_deliveries()
     {
         FailedDelivery::factory()->count(30)->create([

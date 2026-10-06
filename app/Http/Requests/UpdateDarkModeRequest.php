@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Theme;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDarkModeRequest extends FormRequest
 {
@@ -23,7 +25,7 @@ class UpdateDarkModeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'dark_mode' => 'required|boolean',
+            'theme' => ['required', Rule::enum(Theme::class)],
         ];
     }
 }

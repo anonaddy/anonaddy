@@ -123,6 +123,40 @@ class CustomDataPartTest extends TestCase
     }
 
     #[Test]
+    public function it_sanitises_content_id_with_more_than_one_at_sign(): void
+    {
+        $part = new CustomDataPart('hello', 'file.txt', 'text/plain');
+
+        $part->setContentId('img1@info.support.Xq0@clippers.skillsclips.com');
+
+        $headers = $part->getPreparedHeaders();
+
+        $this->assertSame(['img1.info.support.Xq0@clippers.skillsclips.com'], $headers->getHeaderBody('Content-ID'));
+    }
+
+    #[Test]
+    public function it_renders_email_without_exception_when_content_id_has_two_at_signs(): void
+    {
+        $part = new CustomDataPart('hello', 'file.txt', 'text/plain');
+        $part->asInline();
+        $part->setContentId('img1@info.support.Xq0@clippers.skillsclips.com');
+
+        $html = $part->rewriteHtmlCidReferences('<img src="cid:img1@info.support.Xq0@clippers.skillsclips.com">');
+
+        $email = (new Email)
+            ->from('sender@example.com')
+            ->to('to@example.com')
+            ->subject('cid test')
+            ->html($html);
+        $email->addPart($part);
+
+        $raw = $email->toString();
+
+        $this->assertStringContainsString('Content-ID: <img1.info.support.Xq0@clippers.skillsclips.com>', $raw);
+        $this->assertStringContainsString('cid:img1.info.support.Xq0@clippers.skillsclips.com', $raw);
+    }
+
+    #[Test]
     public function it_falls_back_to_a_generated_content_id_when_invalid(): void
     {
         $part = new CustomDataPart('hello', 'file.txt', 'text/plain');

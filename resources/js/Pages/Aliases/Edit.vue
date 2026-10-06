@@ -42,6 +42,35 @@
             {{ alias.description }}
           </div>
         </div>
+        <div>
+          <label
+            for="active"
+            class="block font-medium text-grey-700 text-lg pointer-events-none cursor-default dark:text-grey-200"
+            >Active</label
+          >
+          <p class="mt-1 text-base text-grey-700 dark:text-grey-200">
+            When an alias is deactivated, any messages sent to it will be silently discarded. The
+            sender will not be notified of the unsuccessful delivery.
+          </p>
+          <Toggle
+            v-if="alias.deleted_at"
+            id="active"
+            label="Active"
+            class="mt-4 !cursor-not-allowed"
+            title="You cannot activate a deleted alias"
+            v-model="alias.active"
+            :disabled="true"
+          />
+          <Toggle
+            v-else
+            id="active"
+            label="Active"
+            class="mt-4"
+            v-model="alias.active"
+            @on="activateAlias"
+            @off="deactivateAlias"
+          />
+        </div>
         <div class="pt-8">
           <div class="block text-lg font-medium text-grey-700 dark:text-grey-200">
             Alias 'From Name'
@@ -290,6 +319,42 @@ const disableAttachedRecipientsOnly = () => {
       successMessage('Attached recipients only disabled')
     })
     .catch(error => {
+      errorMessage(getRequestErrorText(error))
+    })
+}
+
+const activateAlias = () => {
+  axios
+    .post(
+      `/api/v1/active-aliases`,
+      JSON.stringify({
+        id: alias.value.id,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+    .then(() => {
+      alias.value.active = true
+      addTooltips()
+      successMessage('Alias activated')
+    })
+    .catch(error => {
+      alias.value.active = false
+      errorMessage(getRequestErrorText(error))
+    })
+}
+
+const deactivateAlias = () => {
+  axios
+    .delete(`/api/v1/active-aliases/${alias.value.id}`)
+    .then(() => {
+      alias.value.active = false
+      addTooltips()
+      successMessage('Alias deactivated')
+    })
+    .catch(error => {
+      alias.value.active = true
       errorMessage(getRequestErrorText(error))
     })
 }

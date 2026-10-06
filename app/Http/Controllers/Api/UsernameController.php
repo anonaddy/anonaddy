@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUsernameRequest;
 use App\Http\Requests\UpdateUsernameRequest;
 use App\Http\Resources\UsernameResource;
+use App\Models\Username;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Validation\ValidationException;
 
 class UsernameController extends Controller
 {
@@ -27,9 +30,19 @@ class UsernameController extends Controller
             return response('', 403);
         }
 
-        $username = user()->usernames()->create(['username' => $request->username, 'can_login' => ! usesExternalAuthentication()]);
+        try {
+            $username = user()->usernames()->create(['username' => $request->username, 'can_login' => ! usesExternalAuthentication()]);
 
-        user()->increment('username_count');
+            user()->increment('username_count');
+        } catch (UniqueConstraintViolationException $exception) {
+            if (! Username::isDuplicateUsernameViolation($exception)) {
+                throw $exception;
+            }
+
+            throw ValidationException::withMessages([
+                'username' => __('validation.unique', ['attribute' => 'username']),
+            ]);
+        }
 
         return new UsernameResource($username->refresh()->load('defaultRecipient')->loadCount('aliases'));
     }

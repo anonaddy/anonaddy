@@ -104,36 +104,36 @@
           class="relative inline-flex items-center rounded-l-md border border-grey-300 bg-white px-2 py-2 text-sm font-medium text-grey-500 hover:bg-grey-50 focus:z-20 dark:bg-grey-900 dark:hover:bg-grey-950 dark:border-grey-500 dark:text-grey-200"
         >
           <span class="sr-only">Previous</span>
-          <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
+          <ChevronLeftIcon class="pointer-events-none h-5 w-5" aria-hidden="true" />
         </Link>
         <span
           v-else
           class="disabled cursor-not-allowed relative inline-flex items-center rounded-l-md border border-grey-300 bg-white px-2 py-2 text-sm font-medium text-grey-500 focus:z-20 dark:bg-grey-800 dark:border-grey-500 dark:text-grey-200"
         >
           <span class="sr-only">Previous</span>
-          <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
+          <ChevronLeftIcon class="pointer-events-none h-5 w-5" aria-hidden="true" />
         </span>
 
-        <div v-for="link in pageLinks" :key="link.label">
+        <template v-for="(link, index) in pageLinks" :key="`${index}-${link.label}`">
           <Link
             v-if="link.url"
             :href="link.url"
-            aria-current="page"
-            class="relative inline-flex items-center border z-10 px-4 py-2 text-sm font-medium focus:z-20"
+            :aria-current="link.active ? 'page' : undefined"
+            class="relative inline-flex items-center border px-4 py-2 text-sm font-medium focus:z-20"
             :class="
               link.active
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-600 dark:bg-grey-950 dark:text-grey-100 dark:border-grey-500'
+                ? 'z-10 border-indigo-500 bg-indigo-50 text-indigo-600 dark:bg-grey-950 dark:text-grey-100 dark:border-grey-500'
                 : 'border-grey-300 bg-white text-grey-500 hover:bg-grey-50 dark:bg-grey-900 dark:hover:bg-grey-950 dark:text-grey-200 dark:border-grey-500'
             "
           >
-            {{ link.label }}
+            <span class="pointer-events-none">{{ link.label }}</span>
           </Link>
           <span
             v-else
             class="relative inline-flex items-center border border-grey-300 bg-white px-4 py-2 text-sm font-medium text-grey-700 dark:bg-grey-900 dark:text-grey-200 dark:border-grey-500"
             >...</span
           >
-        </div>
+        </template>
 
         <Link
           v-if="pagination.next_page_url"
@@ -141,14 +141,14 @@
           class="relative inline-flex items-center rounded-r-md border border-grey-300 bg-white p-2 text-sm font-medium text-grey-500 hover:bg-grey-50 focus:z-20 dark:bg-grey-900 dark:hover:bg-grey-950 dark:text-grey-200 dark:border-grey-500"
         >
           <span class="sr-only">Next</span>
-          <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
+          <ChevronRightIcon class="pointer-events-none h-5 w-5" aria-hidden="true" />
         </Link>
         <span
           v-else
           class="disabled cursor-not-allowed relative inline-flex items-center rounded-r-md border border-grey-300 bg-white px-2 py-2 text-sm font-medium text-grey-500 focus:z-20 dark:bg-grey-800 dark:text-grey-200 dark:border-grey-500"
         >
           <span class="sr-only">Next</span>
-          <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
+          <ChevronRightIcon class="pointer-events-none h-5 w-5" aria-hidden="true" />
         </span>
       </nav>
     </div>

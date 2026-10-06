@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\BlockedSender;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -48,7 +49,7 @@ class StoreBlockedSenderRequest extends FormRequest
                         }
                     }
                     if (user()->blockedSenders()->where('type', $type)->where('value', $normalised)->exists()) {
-                        $fail('This email or domain is already on your blocklist.');
+                        $fail(BlockedSender::ALREADY_ON_BLOCKLIST_MESSAGE);
                     }
                 },
             ],

@@ -218,23 +218,23 @@ class ParsePostfixMailLog extends Command
         $normalisedReason = strtolower(trim($reason));
 
         if (str_contains($normalisedReason, '550 5.1.1 address not found')) {
-            return 'Email blocked because the sender is on your blocklist';
+            return FailedDelivery::CODE_SENDER_ON_YOUR_BLOCKLIST;
         }
 
         if (str_contains($normalisedReason, 'recipient address is inactive alias')) {
-            return 'Email discarded because this alias is deactivated';
+            return FailedDelivery::CODE_ALIAS_DEACTIVATED;
         }
 
         if (str_contains($normalisedReason, 'recipient address has inactive username')) {
-            return 'Email discarded because this alias username is deactivated';
+            return FailedDelivery::CODE_ALIAS_USERNAME_DEACTIVATED;
         }
 
         if (str_contains($normalisedReason, 'recipient address has inactive domain')) {
-            return 'Email discarded because this alias custom domain is deactivated';
+            return FailedDelivery::CODE_ALIAS_DOMAIN_DEACTIVATED;
         }
 
         if (str_contains($normalisedReason, 'recipient address rejected: address does not exist')) {
-            return 'Email rejected because this alias was deleted';
+            return FailedDelivery::CODE_ALIAS_DELETED;
         }
 
         return $reason;

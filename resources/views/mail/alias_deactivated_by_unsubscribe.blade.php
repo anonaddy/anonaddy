@@ -19,10 +19,10 @@ Your alias **{{ $aliasEmail }}** has been deactivated because a one-click unsubs
 @endif
 @endif
 
-If you did not intend to deactivate this alias, you can click the button below, search for it and reactivate it.
+If you did not intend to deactivate this alias, you can click the button below and reactivate it.
 
-@component('mail::button', ['url' => config('app.url').'/aliases'])
-View Your Aliases
+@component('mail::button', ['url' => config('app.url').'/aliases/'.$aliasId.'/edit'])
+View Alias
 @endcomponent
 
 @endcomponent

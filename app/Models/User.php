@@ -6,6 +6,7 @@ use App\Enums\DisplayFromFormat;
 use App\Enums\FailedDeliveryNotificationPreference;
 use App\Enums\ListUnsubscribeBehaviour;
 use App\Enums\LoginRedirect;
+use App\Enums\Theme;
 use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
 use App\Traits\HasEncryptedAttributes;
@@ -55,12 +56,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'defer_new_aliases_until',
         'default_alias_domain',
         'default_alias_format',
+        'hidden_alias_domains',
         'alias_separator',
         'use_reply_to',
         'store_failed_deliveries',
+        'show_intentional_failed_deliveries',
         'failed_delivery_notification_preference',
         'save_alias_last_used',
-        'dark_mode',
+        'theme',
         'default_username_id',
         'default_recipient_id',
         'password',
@@ -102,12 +105,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'webauthn_enabled' => 'boolean',
         'use_reply_to' => 'boolean',
         'store_failed_deliveries' => 'boolean',
+        'show_intentional_failed_deliveries' => 'boolean',
         'failed_delivery_notification_preference' => FailedDeliveryNotificationPreference::class,
         'save_alias_last_used' => 'boolean',
-        'dark_mode' => 'boolean',
+        'theme' => Theme::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'email_verified_at' => 'datetime',
+        'hidden_alias_domains' => 'array',
         'reject_until' => 'datetime',
         'defer_until' => 'datetime',
         'defer_new_aliases_until' => 'datetime',
@@ -722,6 +727,77 @@ class User extends Authenticatable implements MustVerifyEmail
             })
             ->reverse()
             ->values();
+    }
+
+    /**
+     * Domain options for the alias creation picker.
+     *
+     * Hidden domains stay out of this list. The default alias domain stays in the list.
+     */
+    public function visibleDomainOptions(): Collection
+    {
+        $hiddenDomains = collect($this->hidden_alias_domains ?? [])
+            ->filter(fn ($domain) => is_string($domain));
+        $defaultAliasDomain = $this->default_alias_domain;
+
+        $visibleDomains = $this->domainOptions()
+            ->reject(function (string $domain) use ($hiddenDomains, $defaultAliasDomain) {
+                if ($defaultAliasDomain !== null && $domain === $defaultAliasDomain) {
+                    return false;
+                }
+
+                return $hiddenDomains->contains($domain);
+            })
+            ->values();
+
+        if ($visibleDomains->isEmpty()) {
+            return $this->domainOptions()->take(1)->values();
+        }
+
+        return $visibleDomains;
+    }
+
+    /**
+     * Alias picker domains grouped for the settings page.
+     *
+     * @return array<int, array{key: string, label: string, domains: array<int, string>}>
+     */
+    public function aliasDomainPickerGroups(): array
+    {
+        $groups = [
+            'custom' => [],
+            'shared' => [],
+            'username' => [],
+        ];
+
+        $customDomains = $this->verifiedDomains()->pluck('domain')->flip();
+        $sharedDomains = collect($this->sharedDomainOptions())->flip();
+
+        foreach ($this->domainOptions() as $domain) {
+            if ($customDomains->has($domain)) {
+                $groups['custom'][] = $domain;
+            } elseif ($sharedDomains->has($domain)) {
+                $groups['shared'][] = $domain;
+            } else {
+                $groups['username'][] = $domain;
+            }
+        }
+
+        $labels = [
+            'custom' => 'Custom domains',
+            'shared' => 'Shared domains',
+            'username' => 'Username domains',
+        ];
+
+        return collect($groups)
+            ->filter(fn (array $domains) => $domains !== [])
+            ->map(fn (array $domains, string $key) => [
+                'key' => $key,
+                'label' => $labels[$key],
+                'domains' => $domains,
+            ])
+            ->values()
+            ->all();
     }
 
     public function sharedDomainOptions()

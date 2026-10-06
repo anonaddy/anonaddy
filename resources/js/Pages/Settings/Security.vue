@@ -263,12 +263,11 @@
             Generate New Backup Code
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
-            The backup code can be used in a situation where you have lost your 2FA device to allow
-            you to access your account. If you've forgotten or lost your backup code then you can
-            generate a new one by clicking the button below.
-            <b>This code will only be displayed once</b> so make sure you store it in a
-            <b>secure place</b>. If you have an old backup code saved
-            <b>you must update it with this one</b>.
+            If you lose your authentication app or security key,
+            <b>this backup code lets you turn off 2FA and recover your account</b>. Use this only if
+            you do not have your backup code saved. A new code replaces the old one immediately. The
+            old code stops working. <b>Copy the new code and store it</b> before you leave this
+            page.
           </p>
         </div>
         <div

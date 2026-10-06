@@ -144,9 +144,15 @@ class UserRuleChecker
             'values' => collect($condition['values'])->map(fn ($value) => strtolower($value))->all(),
         ]);
 
-        return $labelNames->contains(function ($labelName) use ($condition) {
-            return $this->conditionSatisfied($labelName, $condition);
-        });
+        $labelSatisfiesCondition = fn ($labelName) => $this->conditionSatisfied($labelName, $condition);
+
+        // A negated match is true only when no label matches.
+        // "does not contain norule" is false when any label contains norule.
+        if ($this->isNegatedStringMatch($condition['match'])) {
+            return $labelNames->every($labelSatisfiesCondition);
+        }
+
+        return $labelNames->contains($labelSatisfiesCondition);
     }
 
     protected function headerConditionSatisfied(array $condition): bool
@@ -179,7 +185,12 @@ class UserRuleChecker
 
     protected function emptyCollectionConditionSatisfied(array $condition): bool
     {
-        return in_array($condition['match'], [
+        return $this->isNegatedStringMatch($condition['match']);
+    }
+
+    protected function isNegatedStringMatch(string $match): bool
+    {
+        return in_array($match, [
             'is not',
             'does not contain',
             'does not start with',
