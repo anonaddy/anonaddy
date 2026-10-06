@@ -9,7 +9,9 @@ use App\Models\Username;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -151,6 +153,37 @@ class UsernamesTest extends TestCase
         $response
             ->assertStatus(422)
             ->assertJsonValidationErrors('username');
+    }
+
+    #[Test]
+    public function store_returns_422_when_the_username_is_taken_during_create(): void
+    {
+        Username::creating(function (Username $username): void {
+            if ($username->username !== 'janedoe') {
+                return;
+            }
+
+            if (DB::table('usernames')->where('username', 'janedoe')->exists()) {
+                return;
+            }
+
+            DB::table('usernames')->insert([
+                'id' => (string) Str::uuid(),
+                'user_id' => $this->user->id,
+                'username' => 'janedoe',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        $response = $this->json('POST', '/api/v1/usernames', [
+            'username' => 'janedoe',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.username.0', 'The username has already been taken.');
+        $this->assertSame(0, $this->user->fresh()->username_count);
+        $this->assertSame(2, Username::count());
     }
 
     #[Test]

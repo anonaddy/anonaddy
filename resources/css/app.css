@@ -21,6 +21,14 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
 }
 
 /* Add custom utilities here... */

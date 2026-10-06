@@ -2,6 +2,7 @@
 
 namespace App\CustomMailDriver\Mime\Part;
 
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
@@ -14,6 +15,8 @@ class CustomDataPart extends DataPart
     private const MAX_LINE_LENGTH = 998;
 
     private ?string $cid;
+
+    private ?string $requestedCid = null;
 
     private ?string $filename;
 
@@ -73,14 +76,28 @@ class CustomDataPart extends DataPart
         $cid = preg_replace('/[\x00-\x1F\x7F]/', '', $cid) ?? '';
 
         if ($cid === '') {
+            $this->requestedCid = null;
             $this->cid = $this->generateContentId();
 
             return $this;
         }
 
-        $this->cid = $cid;
+        $this->requestedCid = $cid;
+        $this->cid = $this->sanitiseContentId($cid);
 
         return $this;
+    }
+
+    public function rewriteHtmlCidReferences(string $html): string
+    {
+        $from = $this->requestedCid;
+        $to = $this->cid ?? null;
+
+        if ($from === null || $from === '' || $to === null || $from === $to) {
+            return $html;
+        }
+
+        return str_ireplace('cid:'.$from, 'cid:'.$to, $html);
     }
 
     public function getContentId(): string
@@ -99,6 +116,27 @@ class CustomDataPart extends DataPart
         }
 
         return $this->cid !== null;
+    }
+
+    /**
+     * Symfony IdentificationHeader treats Content-ID as an addr-spec and rejects
+     * more than one unquoted @ (for example img1@host@domain).
+     */
+    private function sanitiseContentId(string $cid): string
+    {
+        if (substr_count($cid, '@') < 2) {
+            return $cid;
+        }
+
+        $lastAt = strrpos($cid, '@');
+        $local = str_replace('@', '.', substr($cid, 0, $lastAt));
+        $domain = substr($cid, $lastAt + 1);
+
+        if ($local === '' || $domain === '') {
+            return $this->generateContentId();
+        }
+
+        return $local.'@'.$domain;
     }
 
     private function generateContentId(): string
@@ -123,7 +161,12 @@ class CustomDataPart extends DataPart
         $headers = parent::getPreparedHeaders();
 
         if (isset($this->cid) && $this->cid !== null) {
-            $headers->setHeaderBody('Id', 'Content-ID', $this->cid);
+            try {
+                $headers->setHeaderBody('Id', 'Content-ID', $this->cid);
+            } catch (RfcComplianceException) {
+                $this->cid = $this->generateContentId();
+                $headers->setHeaderBody('Id', 'Content-ID', $this->cid);
+            }
         }
 
         if (isset($this->filename) && $this->filename !== null) {

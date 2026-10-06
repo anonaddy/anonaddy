@@ -428,8 +428,6 @@
                     v-if="
                       createRuleObject.actions[key].type === 'subject' ||
                       createRuleObject.actions[key].type === 'displayFrom' ||
-                      createRuleObject.actions[key].type === 'addLabel' ||
-                      createRuleObject.actions[key].type === 'removeLabel' ||
                       createRuleObject.actions[key].type === 'setAliasDescription'
                     "
                     class="sm:ml-4 flex flex-col w-full"
@@ -443,12 +441,9 @@
                         :placeholder="
                           createRuleObject.actions[key].type === 'subject'
                             ? 'e.g. [Fwd] {{subject}}'
-                            : createRuleObject.actions[key].type === 'addLabel' ||
-                                createRuleObject.actions[key].type === 'removeLabel'
-                              ? 'e.g. shopping'
-                              : createRuleObject.actions[key].type === 'setAliasDescription'
-                                ? 'e.g. Newsletter signup (leave empty to clear)'
-                                : 'Enter value'
+                            : createRuleObject.actions[key].type === 'setAliasDescription'
+                              ? 'e.g. Newsletter signup (leave empty to clear)'
+                              : 'Enter value'
                         "
                         autofocus
                       />
@@ -469,6 +464,45 @@
                         >{{ '\{\{subject\}\}' }}</code
                       >
                       placeholder to include the original subject (e.g. to prepend or append text).
+                    </p>
+                  </span>
+
+                  <span
+                    v-if="
+                      createRuleObject.actions[key].type === 'addLabel' ||
+                      createRuleObject.actions[key].type === 'removeLabel'
+                    "
+                    class="sm:ml-4 flex flex-col w-full"
+                  >
+                    <div class="relative w-full">
+                      <select
+                        v-model="createRuleObject.actions[key].value"
+                        :id="`create_rule_action_label_${key}`"
+                        class="w-full block appearance-none text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring-3"
+                        required
+                      >
+                        <option value="" disabled class="dark:bg-grey-900">Select a label</option>
+                        <option
+                          v-for="label in labelOptionsFor(createRuleObject.actions[key].value)"
+                          :key="label.id"
+                          :value="label.name"
+                          class="dark:bg-grey-900"
+                        >
+                          {{ label.name }}
+                        </option>
+                      </select>
+                    </div>
+                    <p
+                      v-if="!labelOptions.length"
+                      class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
+                    >
+                      You have no labels yet.
+                      <Link
+                        :href="route('aliases.index')"
+                        class="font-medium text-indigo-700 dark:text-indigo-200"
+                      >
+                        Create one on the aliases page.
+                      </Link>
                     </p>
                   </span>
 
@@ -826,8 +860,6 @@
                     v-if="
                       editRuleObject.actions[key].type === 'subject' ||
                       editRuleObject.actions[key].type === 'displayFrom' ||
-                      editRuleObject.actions[key].type === 'addLabel' ||
-                      editRuleObject.actions[key].type === 'removeLabel' ||
                       editRuleObject.actions[key].type === 'setAliasDescription'
                     "
                     class="sm:ml-4 flex flex-col w-full"
@@ -841,12 +873,9 @@
                         :placeholder="
                           editRuleObject.actions[key].type === 'subject'
                             ? 'e.g. [Fwd] {{subject}}'
-                            : editRuleObject.actions[key].type === 'addLabel' ||
-                                editRuleObject.actions[key].type === 'removeLabel'
-                              ? 'e.g. shopping'
-                              : editRuleObject.actions[key].type === 'setAliasDescription'
-                                ? 'e.g. Newsletter signup (leave empty to clear)'
-                                : 'Enter value'
+                            : editRuleObject.actions[key].type === 'setAliasDescription'
+                              ? 'e.g. Newsletter signup (leave empty to clear)'
+                              : 'Enter value'
                         "
                         autofocus
                       />
@@ -867,6 +896,45 @@
                         >{{ '\{\{subject\}\}' }}</code
                       >
                       placeholder to include the original subject (e.g. to prepend or append text).
+                    </p>
+                  </span>
+
+                  <span
+                    v-if="
+                      editRuleObject.actions[key].type === 'addLabel' ||
+                      editRuleObject.actions[key].type === 'removeLabel'
+                    "
+                    class="sm:ml-4 flex flex-col w-full"
+                  >
+                    <div class="relative w-full">
+                      <select
+                        v-model="editRuleObject.actions[key].value"
+                        :id="`edit_rule_action_label_${key}`"
+                        class="w-full block appearance-none text-grey-700 dark:text-white dark:bg-white/5 bg-white p-2 pr-8 rounded shadow focus:ring-3"
+                        required
+                      >
+                        <option value="" disabled class="dark:bg-grey-900">Select a label</option>
+                        <option
+                          v-for="label in labelOptionsFor(editRuleObject.actions[key].value)"
+                          :key="label.id"
+                          :value="label.name"
+                          class="dark:bg-grey-900"
+                        >
+                          {{ label.name }}
+                        </option>
+                      </select>
+                    </div>
+                    <p
+                      v-if="!labelOptions.length"
+                      class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
+                    >
+                      You have no labels yet.
+                      <Link
+                        :href="route('aliases.index')"
+                        class="font-medium text-indigo-700 dark:text-indigo-200"
+                      >
+                        Create one on the aliases page.
+                      </Link>
                     </p>
                   </span>
 
@@ -1079,7 +1147,25 @@ const props = defineProps({
   search: {
     type: String,
   },
+  labelOptions: {
+    type: Array,
+    required: true,
+  },
 })
+
+const labelOptionsFor = currentValue => {
+  const options = [...props.labelOptions]
+
+  if (
+    typeof currentValue === 'string' &&
+    currentValue !== '' &&
+    !options.some(label => label.name === currentValue)
+  ) {
+    options.push({ id: `saved-${currentValue}`, name: currentValue })
+  }
+
+  return options
+}
 
 const rows = ref(props.initialRows)
 

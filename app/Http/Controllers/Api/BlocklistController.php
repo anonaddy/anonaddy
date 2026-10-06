@@ -8,8 +8,10 @@ use App\Http\Requests\StoreBlockedSenderRequest;
 use App\Http\Requests\StoreBlocklistBulkRequest;
 use App\Http\Resources\BlocklistResource;
 use App\Models\BlockedSender;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class BlocklistController extends Controller
 {
@@ -52,7 +54,13 @@ class BlocklistController extends Controller
 
     public function store(StoreBlockedSenderRequest $request)
     {
-        $blockedSender = $request->user()->blockedSenders()->create($request->validated());
+        try {
+            $blockedSender = $request->user()->blockedSenders()->create($request->validated());
+        } catch (UniqueConstraintViolationException) {
+            throw ValidationException::withMessages([
+                'value' => BlockedSender::ALREADY_ON_BLOCKLIST_MESSAGE,
+            ]);
+        }
 
         return new BlocklistResource($blockedSender->refresh());
     }
@@ -70,19 +78,24 @@ class BlocklistController extends Controller
             ->all();
 
         $toCreate = array_values(array_diff($values, $existing));
+        $skipped = count($values) - count($toCreate);
 
-        $rows = array_map(fn (string $value) => [
-            'user_id' => $request->user()->id,
-            'type' => $type,
-            'value' => $value,
-        ], $toCreate);
+        $createdModels = collect();
 
-        $createdModels = $request->user()->blockedSenders()->createMany($rows);
-        // Refresh attributes to get the latest data
+        foreach ($toCreate as $value) {
+            try {
+                $createdModels->push($request->user()->blockedSenders()->create([
+                    'type' => $type,
+                    'value' => $value,
+                ]));
+            } catch (UniqueConstraintViolationException) {
+                $skipped++;
+            }
+        }
+
         $createdModels = BlockedSender::whereIn('id', $createdModels->pluck('id'))->get();
 
         $count = count($createdModels);
-        $skipped = count($values) - count($toCreate);
 
         $data = BlocklistResource::collection($createdModels)->resolve();
 

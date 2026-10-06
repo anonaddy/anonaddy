@@ -23,6 +23,7 @@ class ShowRuleController extends Controller
                 ->orderBy('order')
                 ->get(),
             'recipientOptions' => user()->verifiedRecipients()->select(['id', 'email'])->get(),
+            'labelOptions' => user()->labels()->orderBy('name')->get(['id', 'name']),
             'search' => $validated['search'] ?? null,
         ]);
     }

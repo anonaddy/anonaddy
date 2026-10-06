@@ -2,6 +2,16 @@
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
+    <script>
+        (function () {
+            var theme = @json(data_get($page ?? [], 'props.user.theme', 'system'));
+            var dark = theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            if (dark) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
@@ -19,7 +29,7 @@
     @routes
     @inertiaHead
 </head>
-<body class="{{ $page['props']['user']['darkMode'] ? 'dark' : '' }}">
+<body>
     @inertia
 </body>
 </html>

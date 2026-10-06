@@ -6,6 +6,7 @@ use App\Mail\ForwardEmail;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,16 @@ class FailedDelivery extends Model
     use HasEncryptedAttributes;
     use HasFactory;
     use HasUuid;
+
+    public const CODE_SENDER_ON_YOUR_BLOCKLIST = 'Email blocked because the sender is on your blocklist';
+
+    public const CODE_ALIAS_DEACTIVATED = 'Email discarded because this alias is deactivated';
+
+    public const CODE_ALIAS_USERNAME_DEACTIVATED = 'Email discarded because this alias username is deactivated';
+
+    public const CODE_ALIAS_DOMAIN_DEACTIVATED = 'Email discarded because this alias custom domain is deactivated';
+
+    public const CODE_ALIAS_DELETED = 'Email rejected because this alias was deleted';
 
     public $incrementing = false;
 
@@ -120,6 +131,41 @@ class FailedDelivery extends Model
                 default => 'Forward',
             },
         );
+    }
+
+    /**
+     * Inbound rejections the user already chose to stop.
+     *
+     * @return list<string>
+     */
+    public static function intentionalRejectionCodes(): array
+    {
+        return [
+            self::CODE_SENDER_ON_YOUR_BLOCKLIST,
+            self::CODE_ALIAS_DEACTIVATED,
+            self::CODE_ALIAS_USERNAME_DEACTIVATED,
+            self::CODE_ALIAS_DOMAIN_DEACTIVATED,
+            self::CODE_ALIAS_DELETED,
+        ];
+    }
+
+    /**
+     * Hide intentional rejections when the account setting is off.
+     *
+     * A null setting still shows the rows, matching the column default.
+     *
+     * @param  Builder<FailedDelivery>  $query
+     */
+    public function scopeVisibleFor(Builder $query, User $user): void
+    {
+        if ($user->show_intentional_failed_deliveries !== false) {
+            return;
+        }
+
+        $query->where(function (Builder $query) {
+            $query->whereNotIn('code', self::intentionalRejectionCodes())
+                ->orWhereNull('code');
+        });
     }
 
     protected function type(): Attribute

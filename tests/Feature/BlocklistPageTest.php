@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\BlockedSender;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -296,7 +298,42 @@ class BlocklistPageTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('value');
-        $this->assertEquals(1, BlockedSender::where('user_id', $this->user->id)->where('value', 'duplicate@example.com')->count());
+        $response->assertJsonPath('errors.value.0', BlockedSender::ALREADY_ON_BLOCKLIST_MESSAGE);
+        $this->assertSame(1, BlockedSender::where('user_id', $this->user->id)->where('value', 'duplicate@example.com')->count());
+    }
+
+    #[Test]
+    public function store_returns_422_when_unique_constraint_is_violated(): void
+    {
+        BlockedSender::creating(function (BlockedSender $sender): void {
+            if ($sender->type !== 'domain' || $sender->value !== 'example.com') {
+                return;
+            }
+
+            if (DB::table('blocked_senders')->where('user_id', $sender->user_id)->where('type', 'domain')->where('value', 'example.com')->exists()) {
+                return;
+            }
+
+            DB::table('blocked_senders')->insert([
+                'id' => (string) Str::uuid(),
+                'user_id' => $sender->user_id,
+                'type' => 'domain',
+                'value' => 'example.com',
+                'blocked' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        $response = $this->postJson('/api/v1/blocklist', [
+            'type' => 'domain',
+            'value' => 'example.com',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('value');
+        $response->assertJsonPath('errors.value.0', BlockedSender::ALREADY_ON_BLOCKLIST_MESSAGE);
+        $this->assertSame(1, BlockedSender::where('user_id', $this->user->id)->where('value', 'example.com')->count());
     }
 
     #[Test]

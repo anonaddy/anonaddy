@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $user->email,
                     'default_recipient_id' => $user->default_recipient_id,
                     'default_username_id' => $user->default_username_id,
-                    'darkMode' => $user->dark_mode,
+                    'theme' => $user->theme->value,
                 ];
             },
             'errorBags' => function () {

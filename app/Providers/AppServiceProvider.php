@@ -121,6 +121,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * laravel-webauthn constructs RS1 without acknowledging that SHA-1 is insecure.
      * cose-lib 4.7+ emits E_USER_WARNING, which Laravel converts to an exception.
+     * Ed256 and Ed512 also warn unless the caller acknowledges that they are non-standard.
      */
     private function bindCoseAlgorithmManagerFactory(): void
     {
@@ -138,13 +139,13 @@ class AppServiceProvider extends ServiceProvider
                     ECDSA\ES256K::class,
                     ECDSA\ES384::class,
                     ECDSA\ES512::class,
-                    EdDSA\Ed256::class,
-                    EdDSA\Ed512::class,
-                    EdDSA\Ed25519::class,
+                    // Ed25519 uses the same identifier as EdDSA. Registering both warns.
                     EdDSA\EdDSA::class,
                 ];
 
                 $factory->add((string) RSA\RS1::identifier(), RSA\RS1::create(acknowledgeInsecureAlgorithm: true));
+                $factory->add((string) EdDSA\Ed256::identifier(), EdDSA\Ed256::create(acknowledgeNonStandardAlgorithm: true));
+                $factory->add((string) EdDSA\Ed512::identifier(), EdDSA\Ed512::create(acknowledgeNonStandardAlgorithm: true));
 
                 foreach ($algorithms as $algorithm) {
                     $factory->add((string) $algorithm::identifier(), new $algorithm);

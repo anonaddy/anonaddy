@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Username;
 use App\Rules\NotBlacklisted;
 use App\Rules\NotDeletedUsername;
 use App\Rules\NotLocalRecipient;
 use App\Rules\RegisterUniqueRecipient;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
 {
@@ -97,11 +100,19 @@ class RegisterController extends Controller
 
     /**
      * Create a new user instance after a valid registration.
-     *
-     * @return User
      */
-    protected function create(array $data)
+    protected function create(array $data): User
     {
-        return createUser($data['username'], $data['email'], $data['password']);
+        try {
+            return createUser($data['username'], $data['email'], $data['password']);
+        } catch (UniqueConstraintViolationException $exception) {
+            if (! Username::isDuplicateUsernameViolation($exception)) {
+                throw $exception;
+            }
+
+            throw ValidationException::withMessages([
+                'username' => __('validation.unique', ['attribute' => 'username']),
+            ]);
+        }
     }
 }

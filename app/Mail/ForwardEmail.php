@@ -6,6 +6,7 @@ use App\CustomMailDriver\Mime\Part\CustomDataPart;
 use App\Enums\DisplayFromFormat;
 use App\Enums\ListUnsubscribeBehaviour;
 use App\Models\Alias;
+use App\Models\BlockedSender;
 use App\Models\EmailData;
 use App\Models\Recipient;
 use App\Notifications\FailedDeliveryNotification;
@@ -60,6 +61,10 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
     protected $emailInlineAttachments;
 
     protected $deactivateUrl;
+
+    protected $blockEmailUrl;
+
+    protected $blockDomainUrl;
 
     protected $deactivatePostUrl;
 
@@ -193,6 +198,27 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $this->emailAttachments = $emailData->attachments;
         $this->emailInlineAttachments = $emailData->inlineAttachments;
         $this->deactivateUrl = URL::signedRoute('deactivate', ['alias' => $alias->id]);
+        $this->blockEmailUrl = null;
+        $this->blockDomainUrl = null;
+        $senderEmail = is_string($this->sender) && filter_var($this->sender, FILTER_VALIDATE_EMAIL)
+            ? Str::lower($this->sender)
+            : null;
+        if ($senderEmail !== null) {
+            $this->blockEmailUrl = URL::signedRoute('aliases.banner_actions.show', [
+                'alias' => $alias->id,
+                'email' => $senderEmail,
+                'action' => 'block_email',
+            ]);
+
+            $senderDomain = Str::afterLast($senderEmail, '@');
+            if ($senderDomain !== '' && ! BlockedSender::isProtectedAliasDomain($senderDomain)) {
+                $this->blockDomainUrl = URL::signedRoute('aliases.banner_actions.show', [
+                    'alias' => $alias->id,
+                    'email' => $senderEmail,
+                    'action' => 'block_domain',
+                ]);
+            }
+        }
         $this->deactivatePostUrl = URL::temporarySignedRoute('deactivate_post', now()->addDays(30), ['alias' => $alias->id]);
         $this->deletePostUrl = URL::temporarySignedRoute('delete_post', now()->addDays(30), ['alias' => $alias->id]);
         $this->blockEmailPostUrl = null;
@@ -302,16 +328,14 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                         ->addTextHeader('List-Unsubscribe', '<'.$this->blockDomainPostUrl.'>');
                     $message->getHeaders()
                         ->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+                } elseif ($behaviour === ListUnsubscribeBehaviour::OriginalWithNoFallback) {
+                    if ($this->listUnsubscribe) {
+                        $this->addOriginalListUnsubscribeHeaders($message);
+                    }
                 } else {
                     // ListUnsubscribeBehaviour::OriginalWithFallback
                     if ($this->listUnsubscribe) {
-                        $listUnsubscribeValue = $this->rewriteListUnsubscribeMailtoAddresses(base64_decode($this->listUnsubscribe));
-                        $message->getHeaders()
-                            ->addTextHeader('List-Unsubscribe', $listUnsubscribeValue);
-                        if ($this->listUnsubscribePost) {
-                            $message->getHeaders()
-                                ->addTextHeader('List-Unsubscribe-Post', base64_decode($this->listUnsubscribePost));
-                        }
+                        $this->addOriginalListUnsubscribeHeaders($message);
                     } else {
                         $message->getHeaders()
                             ->addTextHeader('List-Unsubscribe', '<'.$this->deactivatePostUrl.'>');
@@ -385,6 +409,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
                         $part->setContentId(base64_decode($attachment['contentId']));
                         $part->setFileName(base64_decode($attachment['file_name']));
+                        $this->rewriteHtmlContentId($message, $part);
 
                         $message->addPart($part);
                     }
@@ -397,6 +422,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                         // Only set content-id if present
                         if ($attachment['contentId']) {
                             $part->setContentId(base64_decode($attachment['contentId']));
+                            $this->rewriteHtmlContentId($message, $part);
                         }
                         $part->setFileName(base64_decode($attachment['file_name']));
 
@@ -461,7 +487,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             ]);
         }
 
-        $this->replacedSubject = $this->user->email_subject ? ' with subject "'.base64_decode($this->emailSubject).'"' : null;
+        $this->replacedSubject = $this->user->email_subject ? base64_decode($this->emailSubject) : null;
 
         if ($this->ruleIds) {
             $this->applyRulesByIds($this->ruleIds);
@@ -474,6 +500,8 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             'failedDmarc' => $this->failedDmarc,
             'showSpamBanner' => $showSpamBanner,
             'deactivateUrl' => $this->deactivateUrl,
+            'blockEmailUrl' => $this->blockEmailUrl,
+            'blockDomainUrl' => $this->blockDomainUrl,
             'aliasEmail' => ForwardBannerAddress::forBanner($this->smtpInboundRecipient, $this->originalTo, $this->alias),
             'aliasDomain' => $this->alias->domain,
             'aliasDescription' => $this->alias->description,
@@ -572,6 +600,20 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
     }
 
     /**
+     * Forward the sender List-Unsubscribe header after mailto addresses are rewritten to the alias.
+     */
+    private function addOriginalListUnsubscribeHeaders(Email $message): void
+    {
+        $listUnsubscribeValue = $this->rewriteListUnsubscribeMailtoAddresses(base64_decode($this->listUnsubscribe));
+        $message->getHeaders()
+            ->addTextHeader('List-Unsubscribe', $listUnsubscribeValue);
+        if ($this->listUnsubscribePost) {
+            $message->getHeaders()
+                ->addTextHeader('List-Unsubscribe-Post', base64_decode($this->listUnsubscribePost));
+        }
+    }
+
+    /**
      * Rewrite mailto: addresses in List-Unsubscribe so replies go to the alias and do not expose the user's real email.
      */
     private function rewriteListUnsubscribeMailtoAddresses(string $headerValue): string
@@ -594,6 +636,19 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             },
             $normalisedHeaderValue
         );
+    }
+
+    private function rewriteHtmlContentId(Email $message, CustomDataPart $part): void
+    {
+        $html = $message->getHtmlBody();
+
+        if (is_string($html) && $html !== '') {
+            $message->html($part->rewriteHtmlCidReferences($html));
+        }
+
+        if ($this->emailHtml) {
+            $this->emailHtml = base64_encode($part->rewriteHtmlCidReferences(base64_decode($this->emailHtml)));
+        }
     }
 
     private function getUserDisplayFrom($displayFrom)

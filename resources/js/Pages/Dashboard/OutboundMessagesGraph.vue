@@ -14,6 +14,7 @@ import {
   Legend,
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
+import { CHART_CYAN, CHART_PERIWINKLE, useChartTheme } from './chartTheme'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend)
 
@@ -36,62 +37,64 @@ const props = defineProps({
   },
 })
 
+const { textColor, navy } = useChartTheme()
+
 const chartData = computed(() => {
   return {
     labels: props.labels,
     datasets: [
       {
         label: 'Forwards',
-        backgroundColor: 'rgba(28, 212, 212, 1)',
-        borderColor: 'rgba(28, 212, 212, 1)',
+        backgroundColor: CHART_CYAN,
+        borderColor: CHART_CYAN,
         borderWidth: 4,
-        pointBackgroundColor: 'rgba(28, 212, 212, 1)',
+        pointBackgroundColor: CHART_CYAN,
         pointBorderColor: '#fff',
         lineTension: 0.4,
         pointRadius: 5,
         pointBorderWidth: 2,
         pointHitRadius: 100,
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(28, 212, 212, 1)',
+        pointHoverBorderColor: CHART_CYAN,
         data: props.forwardsData,
       },
       {
         label: 'Replies',
-        backgroundColor: 'rgba(25, 33, 108, 1)',
-        borderColor: 'rgba(25, 33, 108, 1)',
+        backgroundColor: navy.value,
+        borderColor: navy.value,
         borderWidth: 4,
-        pointBackgroundColor: 'rgba(25, 33, 108, 1)',
+        pointBackgroundColor: navy.value,
         pointBorderColor: '#fff',
         lineTension: 0.4,
         pointRadius: 5,
         pointBorderWidth: 2,
         pointHitRadius: 100,
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(25, 33, 108, 1)',
+        pointHoverBorderColor: navy.value,
         data: props.repliesData,
       },
       {
         label: 'Sends',
-        backgroundColor: 'rgba(123, 147, 219, 1)',
-        borderColor: 'rgba(123, 147, 219, 1)',
+        backgroundColor: CHART_PERIWINKLE,
+        borderColor: CHART_PERIWINKLE,
         borderWidth: 4,
-        pointBackgroundColor: 'rgba(123, 147, 219, 1)',
+        pointBackgroundColor: CHART_PERIWINKLE,
         pointBorderColor: '#fff',
         lineTension: 0.4,
         pointRadius: 5,
         pointBorderWidth: 2,
         pointHitRadius: 100,
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(123, 147, 219, 1)',
+        pointHoverBorderColor: CHART_PERIWINKLE,
         data: props.sendsData,
       },
     ],
   }
 })
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
-  //maintainAspectRatio: true,
+  color: textColor.value,
   elements: {
     point: {
       radius: 6,
@@ -99,35 +102,28 @@ const chartOptions = {
       hoverRadius: 6,
     },
   },
-  legend: {
-    display: false,
+  plugins: {
+    legend: {
+      labels: {
+        color: textColor.value,
+      },
+    },
   },
   interaction: {
     intersect: false,
     mode: 'index',
   },
-  tooltips: {
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    titleSpacing: 4,
-    titleMarginBottom: 8,
-    titleFontSize: 15,
-    bodySpacing: 4,
-    bodyFontSize: 14,
-    xPadding: 10,
-    yPadding: 10,
-    displayColors: true,
-  },
   hover: {
     mode: 'nearest',
     intersect: true,
-  },
-  legend: {
-    display: false,
   },
   scales: {
     x: {
       grid: {
         display: false,
+      },
+      ticks: {
+        color: textColor.value,
       },
     },
     y: {
@@ -137,8 +133,9 @@ const chartOptions = {
       },
       ticks: {
         stepSize: 1,
+        color: textColor.value,
       },
     },
   },
-}
+}))
 </script>

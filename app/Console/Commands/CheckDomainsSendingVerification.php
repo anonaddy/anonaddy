@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Domain;
 use App\Notifications\DomainUnverifiedForSending;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class CheckDomainsSendingVerification extends Command
 {
@@ -44,10 +45,17 @@ class CheckDomainsSendingVerification extends Command
             ->each(function ($domain) {
                 try {
                     $result = $domain->checkVerificationForSending();
+                    $data = $result->getData();
 
-                    if ($result->getData()->success === false) {
+                    if (! empty($data->dns_error)) {
+                        Log::info('Domain sending verification skipped due to DNS error: '.$domain->domain);
+
+                        return;
+                    }
+
+                    if ($data->success === false) {
                         // Notify user via email, give reason
-                        $domain->user->notify(new DomainUnverifiedForSending($domain->domain, $result->getData()->message));
+                        $domain->user->notify(new DomainUnverifiedForSending($domain->domain, $data->message));
 
                         $domain->domain_sending_verified_at = null;
                         $domain->save();

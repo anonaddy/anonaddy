@@ -327,7 +327,7 @@
           href="https://addy.io/help/category/domains/"
           target="_blank"
           rel="nofollow noreferrer noopener"
-          class="inline-flex items-center text-indigo-700 dark:text-indigo-400 font-medium hover:text-indigo-500"
+          class="inline-flex items-center text-indigo-700 dark:text-indigo-200 font-medium hover:text-indigo-500 hover:dark:text-indigo-300"
         >
           View custom domains help
           <ArrowTopRightOnSquareIcon class="h-4 w-4 ml-1" aria-hidden="true" />

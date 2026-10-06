@@ -487,6 +487,7 @@ import {
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid'
 import { CheckIcon, ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/20/solid'
 import FlashNotification from './../Components/FlashNotification.vue'
+import { applyDocumentTheme, prefersDark } from '../utils/theme.js'
 
 const props = defineProps({
   search: {
@@ -511,12 +512,14 @@ const sidebarNavigation = [
 ]
 
 const mobileMenuOpen = ref(false)
+const page = usePage()
 
 watch(
-  () => usePage().props.user?.darkMode,
-  darkMode => {
-    document.body.classList.toggle('dark', !!darkMode)
+  [() => page.props.user?.theme, prefersDark],
+  () => {
+    applyDocumentTheme(page.props.user?.theme ?? 'system')
   },
+  { immediate: true },
 )
 
 const searchForm = useForm({

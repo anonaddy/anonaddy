@@ -7,6 +7,7 @@ use App\Models\Username;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
@@ -56,34 +57,36 @@ function stripEmailExtension(string $email): string
  */
 function createUser(string $username, string $email, ?string $password = null, bool $emailVerified = false, ?string $externalId = null)
 {
-    $userId = Uuid::uuid4();
+    return DB::transaction(function () use ($username, $email, $password, $emailVerified, $externalId) {
+        $userId = Uuid::uuid4();
 
-    $recipient = Recipient::create([
-        'email' => $email,
-        'user_id' => $userId,
-    ]);
+        $recipient = Recipient::create([
+            'email' => $email,
+            'user_id' => $userId,
+        ]);
 
-    if ($emailVerified) {
-        $recipient->markEmailAsVerified();
-    }
+        if ($emailVerified) {
+            $recipient->markEmailAsVerified();
+        }
 
-    $usernameModel = Username::create([
-        'username' => $username,
-        'user_id' => $userId,
-        'external_id' => $externalId,
-    ]);
+        $usernameModel = Username::create([
+            'username' => $username,
+            'user_id' => $userId,
+            'external_id' => $externalId,
+        ]);
 
-    $twoFactor = app('pragmarx.google2fa');
+        $twoFactor = app('pragmarx.google2fa');
 
-    $passwordHash = $password === null ? '' : Hash::make($password);
+        $passwordHash = $password === null ? '' : Hash::make($password);
 
-    return User::create([
-        'id' => $userId,
-        'default_username_id' => $usernameModel->id,
-        'default_recipient_id' => $recipient->id,
-        'password' => $passwordHash,
-        'two_factor_secret' => $twoFactor->generateSecretKey(),
-    ]);
+        return User::create([
+            'id' => $userId,
+            'default_username_id' => $usernameModel->id,
+            'default_recipient_id' => $recipient->id,
+            'password' => $passwordHash,
+            'two_factor_secret' => $twoFactor->generateSecretKey(),
+        ]);
+    });
 }
 
 function getLoginRedirectUri(): string

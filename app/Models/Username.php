@@ -6,6 +6,7 @@ use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class Username extends Model
 {
@@ -61,6 +62,19 @@ class Username extends Model
     public function setUsernameAttribute($value)
     {
         $this->attributes['username'] = strtolower($value);
+    }
+
+    /**
+     * Report whether a unique-constraint error is the username index.
+     *
+     * MySQL names the index. SQLite names the column.
+     */
+    public static function isDuplicateUsernameViolation(UniqueConstraintViolationException $exception): bool
+    {
+        $message = $exception->getMessage();
+
+        return str_contains($message, 'usernames_username_unique')
+            || str_contains($message, 'usernames.username');
     }
 
     /**

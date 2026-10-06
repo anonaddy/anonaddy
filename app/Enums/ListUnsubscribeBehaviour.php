@@ -9,4 +9,5 @@ enum ListUnsubscribeBehaviour: int
     case Delete = 2;
     case BlockEmail = 3;
     case BlockDomain = 4;
+    case OriginalWithNoFallback = 5;
 }

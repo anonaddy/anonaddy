@@ -29,7 +29,7 @@ class DeactivateAliasController extends Controller
 
         Log::info('Email banner link deactivated alias: '.$alias->email.' ID: '.$id);
 
-        return redirect()->route('aliases.index')
+        return redirect()->route('aliases.edit', $alias->id)
             ->with(['flash' => 'Alias '.$alias->email.' deactivated successfully!']);
     }
 

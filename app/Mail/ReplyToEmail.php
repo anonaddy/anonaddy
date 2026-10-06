@@ -175,6 +175,7 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
 
                         $part->setContentId(base64_decode($attachment['contentId']));
                         $part->setFileName(base64_decode($attachment['file_name']));
+                        $this->rewriteHtmlContentId($message, $part);
 
                         $message->addPart($part);
                     }
@@ -218,6 +219,7 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
                         // Only set content-id if present
                         if ($attachment['contentId']) {
                             $part->setContentId(base64_decode($attachment['contentId']));
+                            $this->rewriteHtmlContentId($message, $part);
                         }
                         $part->setFileName($fileName);
 
@@ -322,15 +324,28 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         return $this->alias->isCustomDomain() ? $this->alias->aliasable->isVerifiedForSending() : false;
     }
 
+    private function rewriteHtmlContentId(Email $message, CustomDataPart $part): void
+    {
+        $html = $message->getHtmlBody();
+
+        if (is_string($html) && $html !== '') {
+            $message->html($part->rewriteHtmlCidReferences($html));
+        }
+
+        if ($this->emailHtml) {
+            $this->emailHtml = base64_encode($part->rewriteHtmlCidReferences(base64_decode($this->emailHtml)));
+        }
+    }
+
     private function removeRealEmailAndTextBanner($text)
     {
         // Replace <alias+hello=example.com@johndoe.anonaddy.com> with <hello@example.com>
         $recipients = ReplyQuotedReverseAliasRewriter::collectRecipientAddresses($this, $this->replyDestinations, $this->tos ?? [], $this->ccs ?? []);
 
         // Reply may be HTML but email client added HTML banner plain text version
-        return Str::of(ReplyQuotedReverseAliasRewriter::rewrite(str_ireplace($this->sender, '', $text), $this->alias, $recipients))
-            ->replaceMatches('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '')
-            ->replaceMatches('/(This email was sent to).*?(to deactivate this alias)/mis', '');
+        return ForwardBannerStripper::stripText(
+            ReplyQuotedReverseAliasRewriter::rewrite(str_ireplace($this->sender, '', $text), $this->alias, $recipients)
+        );
     }
 
     private function removeRealEmailAndHtmlBanner($html)
@@ -339,19 +354,11 @@ class ReplyToEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         $recipients = ReplyQuotedReverseAliasRewriter::collectRecipientAddresses($this, $this->replyDestinations, $this->tos ?? [], $this->ccs ?? []);
 
         // Reply may be HTML but have a plain text banner
-        $html = ReplyQuotedReverseAliasRewriter::rewrite(str_ireplace($this->sender, '', $html), $this->alias, $recipients);
+        $result = ForwardBannerStripper::stripHtml(
+            ReplyQuotedReverseAliasRewriter::rewrite(str_ireplace($this->sender, '', $html), $this->alias, $recipients)
+        );
 
-        $html = preg_replace('/(?s)((<|&lt;)!--banner-info--(&gt;|>)).*?((<|&lt;)!--banner-info--(&gt;|>))/mi', '', $html) ?? $html;
-
-        $host = preg_quote(Str::of(config('app.url'))->after('://')->rtrim('/'), '/');
-
-        $html = preg_replace(
-            '/(?s)<tr\b(?:(?!<tr\b)(?!'.$host.').)*+'.$host.'(?:\/|%2F)deactivate(?:\/|%2F)(?:(?!<\/tr>).)*+<\/tr>/i',
-            '',
-            $html
-        ) ?? $html;
-
-        return Str::of($html);
+        return $result;
     }
 
     /**

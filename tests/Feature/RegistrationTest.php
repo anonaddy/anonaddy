@@ -10,9 +10,11 @@ use App\Notifications\CustomVerifyEmail;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -173,6 +175,45 @@ class RegistrationTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors(['username']);
+    }
+
+    #[Test]
+    public function user_sees_a_validation_error_when_the_username_is_taken_during_create(): void
+    {
+        Username::creating(function (Username $username): void {
+            if ($username->username !== 'johndoe') {
+                return;
+            }
+
+            if (DB::table('usernames')->where('username', 'johndoe')->exists()) {
+                return;
+            }
+
+            DB::table('usernames')->insert([
+                'id' => (string) Str::uuid(),
+                'user_id' => (string) Str::uuid(),
+                'username' => 'johndoe',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        $response = $this->post('/register', [
+            'username' => 'johndoe',
+            'email' => 'johndoe@example.com',
+            'email_confirmation' => 'johndoe@example.com',
+            'password' => 'mypassword',
+            'terms' => true,
+        ]);
+
+        $response->assertSessionHasErrors([
+            'username' => 'The username has already been taken.',
+        ]);
+
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('recipients', 0);
+        $this->assertDatabaseCount('usernames', 0);
     }
 
     #[Test]

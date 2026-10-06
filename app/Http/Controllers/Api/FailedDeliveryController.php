@@ -13,7 +13,8 @@ class FailedDeliveryController extends Controller
     {
         $failedDeliveries = user()
             ->failedDeliveries()
-            ->with(['recipient:id,email', 'alias:id,email'])
+            ->visibleFor(user())
+            ->with(['recipient:id,email', 'alias:id,email,description'])
             ->when($request->input('filter.email_type'), function ($query, $value) {
                 if ($value === 'inbound') {
                     return $query->where(function ($q) {
@@ -38,7 +39,7 @@ class FailedDeliveryController extends Controller
     {
         $failedDelivery = user()->failedDeliveries()->findOrFail($id);
 
-        return new FailedDeliveryResource($failedDelivery->load(['recipient:id,email', 'alias:id,email']));
+        return new FailedDeliveryResource($failedDelivery->load(['recipient:id,email', 'alias:id,email,description']));
     }
 
     public function destroy($id)

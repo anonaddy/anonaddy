@@ -720,6 +720,166 @@ class RulesTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_apply_rule_when_one_alias_label_contains_the_excluded_value(): void
+    {
+        $norule = Label::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'norule',
+        ]);
+        $fitness = Label::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'fitness',
+        ]);
+
+        Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'conditions' => [
+                [
+                    'type' => 'alias',
+                    'match' => 'contains',
+                    'values' => [
+                        '.xoxy',
+                    ],
+                ],
+                [
+                    'type' => 'alias_label',
+                    'match' => 'does not contain',
+                    'values' => [
+                        'norule',
+                    ],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'subject',
+                    'value' => 'Forward to both',
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'rei.xoxy@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'rei.xoxy',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+        $alias->labels()->attach([$norule->id, $fitness->id]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+        $emailData = new EmailData($parser, 'will@anonaddy.com', 1000);
+
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+
+        $this->assertEmpty($ruleIdsAndActions);
+    }
+
+    #[Test]
+    public function it_applies_rule_when_no_alias_label_contains_the_excluded_value(): void
+    {
+        $fitness = Label::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'fitness',
+        ]);
+        $shopping = Label::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'shopping',
+        ]);
+
+        $rule = Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'conditions' => [
+                [
+                    'type' => 'alias_label',
+                    'match' => 'does not contain',
+                    'values' => [
+                        'norule',
+                    ],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'subject',
+                    'value' => 'Forward to both',
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'rei.xoxy@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'rei.xoxy',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+        $alias->labels()->attach([$fitness->id, $shopping->id]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+        $emailData = new EmailData($parser, 'will@anonaddy.com', 1000);
+
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+
+        $this->assertArrayHasKey($rule->id, $ruleIdsAndActions);
+    }
+
+    #[Test]
+    public function it_applies_rule_when_one_of_several_alias_labels_contains_the_value(): void
+    {
+        $norule = Label::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'norule',
+        ]);
+        $fitness = Label::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'fitness',
+        ]);
+
+        $rule = Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'conditions' => [
+                [
+                    'type' => 'alias_label',
+                    'match' => 'contains',
+                    'values' => [
+                        'norule',
+                    ],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'subject',
+                    'value' => 'Forward to both',
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'rei.xoxy@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'rei.xoxy',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+        $alias->labels()->attach([$norule->id, $fitness->id]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+        $emailData = new EmailData($parser, 'will@anonaddy.com', 1000);
+
+        $ruleIdsAndActions = UserRuleChecker::getRuleIdsAndActionsForForwards($this->user, $emailData, $alias);
+
+        $this->assertArrayHasKey($rule->id, $ruleIdsAndActions);
+    }
+
+    #[Test]
     public function it_can_detect_block_action_for_matching_forward_rule()
     {
         Rule::factory()->create([

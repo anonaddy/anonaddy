@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Dns\DomainDnsLookup;
+use App\Enums\DnsLookupStatus;
 use App\Http\Resources\DomainResource;
 use App\Traits\HasEncryptedAttributes;
 use App\Traits\HasUuid;
@@ -251,7 +253,7 @@ class Domain extends Model
      */
     public function checkVerificationForSending()
     {
-        if (App::environment('testing')) {
+        if ($this->shouldBypassSendingDnsChecks()) {
             $this->markDomainAsVerifiedForSending();
 
             return response()->json([
@@ -261,61 +263,46 @@ class Domain extends Model
             ]);
         }
 
-        try {
-            $spf = collect(dns_get_record($this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return preg_match("/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/', $r['txt']);
-                });
-        } catch (Exception $e) {
-            Log::info('DNS Get SPF Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
+        $selector = config('anonaddy.dkim_selector');
 
-            $spf = null;
-        }
+        $checks = [
+            [
+                'label' => 'SPF',
+                'name' => $this->domain.'.',
+                'type' => DNS_TXT,
+                'missing' => 'SPF record not found. This could be due to DNS caching, please try again later.',
+                'matcher' => fn (array $record) => preg_match("/^(v=spf1).*(include:spf\.".config('anonaddy.domain').'|mx).*(-|~)all$/', $record['txt'] ?? ''),
+            ],
+            [
+                'label' => 'DMARC',
+                'name' => '_dmarc.'.$this->domain.'.',
+                'type' => DNS_TXT,
+                'missing' => 'DMARC record not found. This could be due to DNS caching, please try again later.',
+                'matcher' => fn (array $record) => preg_match('/^(v=DMARC1).*(p=quarantine|reject).*/', $record['txt'] ?? ''),
+            ],
+            [
+                'label' => 'DKIM',
+                'name' => $selector.'._domainkey.'.$this->domain.'.',
+                'type' => DNS_CNAME,
+                'missing' => 'CNAME '.$selector.'._domainkey record not found. This could be due to DNS caching, please try again later.',
+                'matcher' => fn (array $record) => ($record['target'] ?? null) === $selector.'._domainkey.'.config('anonaddy.domain'),
+            ],
+        ];
 
-        if (! $spf) {
-            return response()->json([
-                'success' => false,
-                'message' => 'SPF record not found. This could be due to DNS caching, please try again later.',
-                'data' => new DomainResource($this->fresh()),
-            ]);
-        }
+        foreach ($checks as $check) {
+            $status = $this->lookupSendingDnsRecord($check['name'], $check['type'], $check['matcher'], $check['label']);
 
-        try {
-            $dmarc = collect(dns_get_record('_dmarc.'.$this->domain.'.', DNS_TXT))
-                ->contains(function ($r) {
-                    return preg_match('/^(v=DMARC1).*(p=quarantine|reject).*/', $r['txt']);
-                });
-        } catch (Exception $e) {
-            Log::info('DNS Get DMARC Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
+            if ($status === DnsLookupStatus::Failed) {
+                return $this->sendingDnsLookupFailedResponse();
+            }
 
-            $dmarc = null;
-        }
-
-        if (! $dmarc) {
-            return response()->json([
-                'success' => false,
-                'message' => 'DMARC record not found. This could be due to DNS caching, please try again later.',
-                'data' => new DomainResource($this->fresh()),
-            ]);
-        }
-
-        try {
-            $dkim = collect(dns_get_record(config('anonaddy.dkim_selector').'._domainkey.'.$this->domain.'.', DNS_CNAME))
-                ->contains(function ($r) {
-                    return $r['target'] === config('anonaddy.dkim_selector').'._domainkey.'.config('anonaddy.domain');
-                });
-        } catch (Exception $e) {
-            Log::info('DNS Get DKIM Error:', ['domain' => $this->domain, 'user' => $this->user?->username, 'error' => $e->getMessage()]);
-
-            $dkim = null;
-        }
-
-        if (! $dkim) {
-            return response()->json([
-                'success' => false,
-                'message' => 'CNAME '.config('anonaddy.dkim_selector').'._domainkey record not found. This could be due to DNS caching, please try again later.',
-                'data' => new DomainResource($this->fresh()),
-            ]);
+            if ($status === DnsLookupStatus::Missing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $check['missing'],
+                    'data' => new DomainResource($this->fresh()),
+                ]);
+            }
         }
 
         $this->markDomainAsVerifiedForSending();
@@ -323,6 +310,67 @@ class Domain extends Model
         return response()->json([
             'success' => true,
             'message' => 'Records successfully verified.',
+            'data' => new DomainResource($this->fresh()),
+        ]);
+    }
+
+    /**
+     * Skip live DNS lookups in tests unless a test opts in.
+     */
+    protected function shouldBypassSendingDnsChecks(): bool
+    {
+        return App::environment('testing') && ! config('anonaddy.run_dns_checks');
+    }
+
+    /**
+     * @param  callable(array<string, mixed>): bool  $matcher
+     */
+    protected function lookupSendingDnsRecord(string $name, int $type, callable $matcher, string $logLabel): DnsLookupStatus
+    {
+        try {
+            $records = app(DomainDnsLookup::class)->getRecords($name, $type);
+        } catch (Exception $e) {
+            Log::info("DNS Get {$logLabel} Error:", [
+                'domain' => $this->domain,
+                'user' => $this->user?->username,
+                'error' => $e->getMessage(),
+            ]);
+
+            return DnsLookupStatus::Failed;
+        }
+
+        if ($records === false) {
+            Log::info("DNS Get {$logLabel} Error:", [
+                'domain' => $this->domain,
+                'user' => $this->user?->username,
+                'error' => 'dns_get_record returned false',
+            ]);
+
+            return DnsLookupStatus::Failed;
+        }
+
+        if (collect($records)->contains($matcher)) {
+            return DnsLookupStatus::Found;
+        }
+
+        return DnsLookupStatus::Missing;
+    }
+
+    protected function sendingDnsLookupFailedResponse()
+    {
+        if ($this->isVerifiedForSending()) {
+            return response()->json([
+                'success' => true,
+                'dns_error' => true,
+                'message' => 'DNS lookup failed. Domain left verified for sending.',
+                'data' => new DomainResource($this->fresh()),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'dns_error' => true,
+            'message' => 'DNS lookup failed. This could be due to DNS caching, please try again later.',
             'data' => new DomainResource($this->fresh()),
         ]);
     }

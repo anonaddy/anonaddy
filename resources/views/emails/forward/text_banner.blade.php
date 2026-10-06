@@ -1,6 +1,21 @@
 <!--banner-info-->
-This email was sent to {{ $aliasEmail }}{{ $aliasDescription ? ' (' . $aliasDescription . ')' : '' }} from {{ $fromEmail }}{!! $replacedSubject !!}.
-To deactivate this alias copy and paste the url below into your web browser.
-
-{{ $deactivateUrl }}
+--------------------
+To: {{ $aliasEmail }}{{ filled($aliasDescription) ? ' ('.$aliasDescription.')' : '' }}
+From: {{ $fromEmail }}
+@if($replacedSubject)
+Original subject: {!! $replacedSubject !!}
+@endif
+@if(! empty($deactivateUrl))
+Deactivate:
+{!! $deactivateUrl !!}
+@endif
+@if(! empty($blockEmailUrl))
+{{ "\n" }}Block email:
+{!! $blockEmailUrl !!}
+@endif
+@if(! empty($blockDomainUrl))
+{{ "\n" }}Block domain:
+{!! $blockDomainUrl !!}
+@endif
+--------------------
 <!--banner-info-->
