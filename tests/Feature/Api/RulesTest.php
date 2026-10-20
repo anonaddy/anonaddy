@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\DisplayFromFormat;
 use App\Mail\ForwardEmail;
 use App\Models\Alias;
 use App\Models\EmailData;
@@ -377,6 +378,55 @@ class RulesTest extends TestCase
             'applied' => 1,
             'last_applied' => now(),
         ]);
+    }
+
+    #[Test]
+    public function display_from_action_can_include_the_original_formatted_from_name(): void
+    {
+        $email = $this->buildEmailWithDisplayFromAction(
+            '{{from}} [External: {{from}}] ✓ {{from}}',
+            DisplayFromFormat::LEGACY,
+            'Päypål, Inc.',
+        );
+
+        $this->assertSame("Päypål, Inc. 'will@anonaddy.com' [External: Päypål, Inc. 'will@anonaddy.com'] ✓ Päypål, Inc. 'will@anonaddy.com'", $email->from[0]['name']);
+        $this->assertSame('ebay+will=anonaddy.com@johndoe.'.config('anonaddy.domain'), $email->from[0]['address']);
+        $this->assertSame('Test Email', $email->subject);
+    }
+
+    #[Test]
+    public function display_from_action_without_placeholder_remains_a_static_replacement(): void
+    {
+        $email = $this->buildEmailWithDisplayFromAction('[MASKED]', DisplayFromFormat::LEGACY);
+
+        $this->assertSame('[MASKED]', $email->from[0]['name']);
+    }
+
+    #[Test]
+    public function display_from_placeholder_uses_existing_fallback_when_sender_has_no_display_name(): void
+    {
+        $email = $this->buildEmailWithDisplayFromAction(
+            '[External: {{from}}]',
+            DisplayFromFormat::DEFAULT,
+            'will@anonaddy.com',
+        );
+
+        $this->assertSame('[External: will at anonaddy.com]', $email->from[0]['name']);
+    }
+
+    #[Test]
+    public function display_from_placeholder_preserves_reply_to_routing(): void
+    {
+        $email = $this->buildEmailWithDisplayFromAction(
+            '[External] {{from}}',
+            DisplayFromFormat::DOMAIN,
+            'Will',
+            true,
+        );
+
+        $this->assertSame('[External] Will - anonaddy.com', $email->from[0]['name']);
+        $this->assertSame('ebay@johndoe.'.config('anonaddy.domain'), $email->from[0]['address']);
+        $this->assertSame('ebay+will=anonaddy.com@johndoe.'.config('anonaddy.domain'), $email->replyTo[0]['address']);
     }
 
     #[Test]
@@ -1898,6 +1948,46 @@ class RulesTest extends TestCase
                 ->assertStatus(422)
                 ->assertJsonValidationErrorFor('actions.0.value');
         }
+    }
+
+    private function buildEmailWithDisplayFromAction(
+        string $template,
+        DisplayFromFormat $displayFromFormat,
+        string $displayFrom = 'Will',
+        bool $useReplyTo = false,
+    ): ForwardEmail {
+        $this->user->display_from_format = $displayFromFormat;
+        $this->user->use_reply_to = $useReplyTo;
+        $this->user->save();
+
+        $rule = Rule::factory()->create([
+            'user_id' => $this->user->id,
+            'actions' => [
+                [
+                    'type' => 'displayFrom',
+                    'value' => $template,
+                ],
+            ],
+        ]);
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $parser = $this->getParser(base_path('tests/emails/email.eml'));
+        $emailData = new EmailData($parser, 'will@anonaddy.com', 1500);
+        $emailData->display_from = base64_encode($displayFrom);
+
+        return (new ForwardEmail(
+            $alias,
+            $emailData,
+            $this->user->defaultRecipient,
+            false,
+            [$rule->id],
+        ))->build();
     }
 
     protected function getParser($file)
