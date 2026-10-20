@@ -285,7 +285,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
             }
         }
 
-        $displayFrom = $this->getUserDisplayFrom(base64_decode($this->displayFrom));
+        $this->displayFrom = $this->getUserDisplayFrom(base64_decode($this->displayFrom));
 
         $spamWarningBehaviour = $this->user->spam_warning_behaviour;
         $showSpamBanner = ($this->isSpam || $this->failedDmarc) && $spamWarningBehaviour === 'banner';
@@ -297,7 +297,7 @@ class ForwardEmail extends Mailable implements ShouldBeEncrypted, ShouldQueue
         }
 
         $this->email = $this
-            ->from($this->fromEmail, $displayFrom)
+            ->from($this->fromEmail, $this->displayFrom)
             ->subject($subject)
             ->withSymfonyMessage(function (Email $message) {
 

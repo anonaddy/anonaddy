@@ -6,11 +6,15 @@ trait ApplyUserRules
 {
     protected $emailType;
 
+    protected $originalDisplayFrom;
+
     public function applyRulesByIds(array $ruleIds)
     {
         if (empty($ruleIds)) {
             return;
         }
+
+        $this->originalDisplayFrom = $this->displayFrom;
 
         $this->user->rules()->whereIn('id', $ruleIds)->each(function ($rule) {
             // Apply actions for that rule
@@ -29,9 +33,10 @@ trait ApplyUserRules
                 $this->email->subject = str_replace('{{subject}}', $originalSubject, $action['value']);
                 break;
             case 'displayFrom':
+                $displayFrom = str_replace('{{from}}', $this->originalDisplayFrom ?? '', $action['value']);
                 $this->email->from = [];
-                $this->displayFrom = $action['value'];
-                $this->email->from($this->fromEmail, $action['value']);
+                $this->displayFrom = $displayFrom;
+                $this->email->from($this->fromEmail, $displayFrom);
                 break;
             case 'encryption':
                 if ($action['value'] == false) {

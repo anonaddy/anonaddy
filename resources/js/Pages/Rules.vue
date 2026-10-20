@@ -441,9 +441,11 @@
                         :placeholder="
                           createRuleObject.actions[key].type === 'subject'
                             ? 'e.g. [Fwd] {{subject}}'
-                            : createRuleObject.actions[key].type === 'setAliasDescription'
-                              ? 'e.g. Newsletter signup (leave empty to clear)'
-                              : 'Enter value'
+                            : createRuleObject.actions[key].type === 'displayFrom'
+                              ? 'e.g. [External] {{from}}'
+                              : createRuleObject.actions[key].type === 'setAliasDescription'
+                                ? 'e.g. Newsletter signup (leave empty to clear)'
+                                : 'Enter value'
                         "
                         autofocus
                       />
@@ -455,15 +457,26 @@
                       Leave empty to clear the alias description.
                     </p>
                     <p
-                      v-if="createRuleObject.actions[key].type === 'subject'"
+                      v-if="
+                        createRuleObject.actions[key].type === 'subject' ||
+                        createRuleObject.actions[key].type === 'displayFrom'
+                      "
                       class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
                     >
                       Use
                       <code
                         class="px-1 py-0.5 rounded bg-grey-100 dark:bg-grey-800 font-mono text-grey-700 dark:text-grey-200"
-                        >{{ '\{\{subject\}\}' }}</code
+                        >{{
+                          createRuleObject.actions[key].type === 'subject'
+                            ? '\{\{subject\}\}'
+                            : '\{\{from\}\}'
+                        }}</code
                       >
-                      placeholder to include the original subject (e.g. to prepend or append text).
+                      placeholder to include the original
+                      {{
+                        createRuleObject.actions[key].type === 'subject' ? 'subject' : 'from name'
+                      }}
+                      (e.g. to prepend or append text).
                     </p>
                   </span>
 
@@ -873,9 +886,11 @@
                         :placeholder="
                           editRuleObject.actions[key].type === 'subject'
                             ? 'e.g. [Fwd] {{subject}}'
-                            : editRuleObject.actions[key].type === 'setAliasDescription'
-                              ? 'e.g. Newsletter signup (leave empty to clear)'
-                              : 'Enter value'
+                            : editRuleObject.actions[key].type === 'displayFrom'
+                              ? 'e.g. [External] {{from}}'
+                              : editRuleObject.actions[key].type === 'setAliasDescription'
+                                ? 'e.g. Newsletter signup (leave empty to clear)'
+                                : 'Enter value'
                         "
                         autofocus
                       />
@@ -887,15 +902,24 @@
                       Leave empty to clear the alias description.
                     </p>
                     <p
-                      v-if="editRuleObject.actions[key].type === 'subject'"
+                      v-if="
+                        editRuleObject.actions[key].type === 'subject' ||
+                        editRuleObject.actions[key].type === 'displayFrom'
+                      "
                       class="mt-1.5 text-xs text-grey-500 dark:text-grey-300"
                     >
                       Use
                       <code
                         class="px-1 py-0.5 rounded bg-grey-100 dark:bg-grey-800 font-mono text-grey-700 dark:text-grey-200"
-                        >{{ '\{\{subject\}\}' }}</code
+                        >{{
+                          editRuleObject.actions[key].type === 'subject'
+                            ? '\{\{subject\}\}'
+                            : '\{\{from\}\}'
+                        }}</code
                       >
-                      placeholder to include the original subject (e.g. to prepend or append text).
+                      placeholder to include the original
+                      {{ editRuleObject.actions[key].type === 'subject' ? 'subject' : 'from name' }}
+                      (e.g. to prepend or append text).
                     </p>
                   </span>
 
