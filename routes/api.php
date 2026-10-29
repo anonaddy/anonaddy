@@ -69,7 +69,7 @@ Route::controller(ApiAuthenticationController::class)->prefix('auth')->group(fun
 });
 
 Route::group([
-    'middleware' => ['auth:sanctum', 'verified'],
+    'middleware' => ['auth:sanctum', 'verified', '2fa'], // 2fa stops a session that has not passed 2FA using the API
     'prefix' => 'v1',
 ], function () {
     Route::controller(AliasController::class)->group(function () {

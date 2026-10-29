@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Rules\SafeRegex;
 use App\Rules\ValidRegex;
+use App\Rules\WebhookAction;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -252,7 +253,7 @@ class StoreRuleRequest extends FormRequest
                         'setAliasDescription',
                         'deactivateAlias',
                         'deleteAlias',
-                        // 'webhook',
+                        'webhook',
                     ]),
                 ];
 
@@ -277,6 +278,14 @@ class StoreRuleRequest extends FormRequest
                         'string',
                         'max:50',
                         'distinct',
+                    ];
+                }
+
+                if ($action['type'] === 'webhook') {
+                    return [
+                        'required',
+                        'array',
+                        new WebhookAction,
                     ];
                 }
 

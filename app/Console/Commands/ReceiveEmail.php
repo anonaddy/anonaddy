@@ -15,6 +15,7 @@ use App\Notifications\DisallowedReplySendAttempt;
 use App\Notifications\FailedDeliveryNotification;
 use App\Notifications\NearBandwidthLimit;
 use App\Notifications\SpamReplySendAttempt;
+use App\Services\InboundEmailWebhookDispatcher;
 use App\Services\UserRuleChecker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -50,9 +51,16 @@ class ReceiveEmail extends Command
      */
     protected $description = 'Receive email from postfix pipe';
 
+    /**
+     * Postfix pipe status for a temporary failure. Any other non-zero status bounces.
+     */
+    public const POSTFIX_TEMPFAIL = 75;
+
     protected $parser;
 
     protected $senderFrom;
+
+    protected bool $hasMultipleFromAddresses = false;
 
     protected $size;
 
@@ -205,7 +213,7 @@ class ReceiveEmail extends Command
                     $validEmailDestination = $destination;
                 }
 
-                if ($validEmailDestination) {
+                if ($validEmailDestination && ! $this->hasMultipleFromAddresses) {
                     $verifiedRecipient = $this->user->getVerifiedRecipientByEmail($this->senderFrom);
                 } else {
                     $verifiedRecipient = null;
@@ -266,7 +274,9 @@ class ReceiveEmail extends Command
 
             report($e);
 
-            exit(1);
+            Log::channel('single')->info('ERROR RECEIVE EMAIL', ['inboundAlias' => $this->inboundAlias ?? null]);
+
+            return self::POSTFIX_TEMPFAIL;
         }
     }
 
@@ -308,6 +318,7 @@ class ReceiveEmail extends Command
 
             $ruleIds = array_keys($ruleIdsAndActions);
             UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias);
+            $this->queueInboundEmailWebhooks($ruleIdsAndActions, $emailData, 'R');
         }
 
         $message = new ReplyToEmail($this->user, $this->alias, $verifiedRecipient, $emailData, $ruleIds, [$destination]);
@@ -368,6 +379,7 @@ class ReceiveEmail extends Command
 
             $ruleIds = array_keys($ruleIdsAndActions);
             UserRuleChecker::applyAliasActionsFromRules($ruleIdsAndActions, $this->user, $this->alias);
+            $this->queueInboundEmailWebhooks($ruleIdsAndActions, $emailData, 'S');
         }
 
         $message = new SendFromEmail($this->user, $this->alias, $verifiedRecipient, $emailData, $ruleIds, [$destination]);
@@ -473,6 +485,8 @@ class ReceiveEmail extends Command
                     $recipientsToForwardTo = $ruleRecipients;
                 }
             }
+
+            $this->queueInboundEmailWebhooks($ruleIdsAndActions, $emailData, 'F');
         }
 
         $recipientsToForwardTo->each(function ($aliasRecipient) use ($emailData, $ruleIds) {
@@ -480,6 +494,25 @@ class ReceiveEmail extends Command
 
             Mail::to($aliasRecipient->email)->queue($message);
         });
+    }
+
+    /**
+     * Queue one webhook per distinct URL after the message is accepted.
+     * Block and quarantine exits return before this runs. The dispatcher also skips those actions.
+     */
+    protected function queueInboundEmailWebhooks(array $ruleIdsAndActions, EmailData $emailData, string $emailType): void
+    {
+        if ($this->alias === null || $this->user === null) {
+            return;
+        }
+
+        app(InboundEmailWebhookDispatcher::class)->queue(
+            $this->user,
+            $this->alias,
+            $emailData,
+            $ruleIdsAndActions,
+            $emailType,
+        );
     }
 
     protected function handleQuarantine($emailType)
@@ -609,6 +642,13 @@ class ReceiveEmail extends Command
 
         // Is not a bounce, may be an auto-reply so return
         if (! $deliveryReport) {
+            return;
+        }
+
+        // Replies and sends expose the VERP address to the third party, so only trust a DSN with a null envelope sender
+        if (in_array($outboundMessage->email_type, ['R', 'S'], true) && $this->option('sender') !== 'MAILER-DAEMON') {
+            Log::info('Delivery Report from non-null sender', ['outboundMessage' => $outboundMessage->id, 'sender' => $this->option('sender')]);
+
             return;
         }
 
@@ -786,11 +826,32 @@ class ReceiveEmail extends Command
             if (isset($part['headers']['from'])) {
                 $value = $part['headers']['from'];
                 $value = (is_array($value)) ? $value[0] : $value;
+                $originalFromAddresses = collect();
 
                 try {
-                    mailparse_rfc822_parse_addresses($value);
+                    $from = collect(mailparse_rfc822_parse_addresses($value));
+
+                    $originalFromAddresses = $from->pluck('address')
+                        ->filter(fn ($address) => filter_var($address, FILTER_VALIDATE_EMAIL))
+                        ->map(fn ($address) => strtolower($address))
+                        ->values();
+
+                    // A reply or send must come from a single, unambiguous sender.
+                    if ($originalFromAddresses->count() > 1) {
+                        $this->hasMultipleFromAddresses = true;
+                    }
                 } catch (\Exception $e) {
-                    $part['headers']['from'] = str_replace('\\', '', $part['headers']['from']);
+                    // From: "Example" <Example <hi@example.com>>
+                    // From: Jane Doe > jane@example.com
+                    if (is_string($part['headers']['from'])) {
+                        $part['headers']['from'] = $this->repairNonCompliantFromHeader(
+                            $part['headers']['from'],
+                            $originalFromAddresses->all(),
+                        );
+                    } else {
+                        Log::channel('single')->info('getParser from header array error', ['from' => $part['headers']['from']]);
+                    }
+
                     $mimePart->setPart($part);
                 }
             }
@@ -861,6 +922,104 @@ class ReceiveEmail extends Command
         }
 
         return 'soft';
+    }
+
+    /**
+     * Rewrite a From header that mailparse rejected.
+     *
+     * Only addresses written in the original header are kept. MIME-decoding a
+     * display name must not introduce a different address, for example
+     * "=?UTF-8?B?PHZpY3RpbUBleGFtcGxlLmNvbT4=?=" (<victim@example.com>).
+     *
+     * @param  array<int, string>  $originalFromAddresses
+     */
+    protected function repairNonCompliantFromHeader(string $header, array $originalFromAddresses = []): string
+    {
+        $allowedAddresses = collect($originalFromAddresses)
+            ->merge($this->emailAddressesInHeader($header))
+            ->map(fn ($address) => strtolower((string) $address))
+            ->filter(fn (string $address) => filter_var($address, FILTER_VALIDATE_EMAIL))
+            ->unique()
+            ->values()
+            ->all();
+
+        $repaired = preg_replace('/<(?=.*?<)/', '', $header) ?? $header;
+        $repaired = preg_replace('/>(?=.*?>)/', '', $repaired) ?? $repaired;
+
+        try {
+            if (Str::contains(strtolower($repaired), '=?utf-8?')) {
+                $repaired = mb_decode_mimeheader($repaired);
+            }
+        } catch (\Throwable $e) {
+            // A bad encoded-word must not abort receipt. The text above is still repaired below.
+        }
+
+        $repaired = str_replace([
+            '\\"',
+            '\\',
+            '"',
+            '(',
+            ')',
+        ], '', $repaired);
+
+        $parsedAddresses = $this->mailboxAddresses($repaired);
+        $safeAddresses = array_values(array_filter(
+            $parsedAddresses,
+            fn (string $address): bool => in_array($address, $allowedAddresses, true),
+        ));
+
+        if (count($allowedAddresses) > 1) {
+            $this->hasMultipleFromAddresses = true;
+        }
+
+        if ($safeAddresses !== [] && $parsedAddresses === $safeAddresses && count($safeAddresses) === 1) {
+            return $repaired;
+        }
+
+        if ($allowedAddresses !== []) {
+            return $allowedAddresses[0];
+        }
+
+        return '';
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function emailAddressesInHeader(string $header): array
+    {
+        preg_match_all('/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i', $header, $matches);
+
+        $addresses = [];
+
+        foreach ($matches[0] as $candidate) {
+            $candidate = strtolower(trim($candidate, '.,;'));
+
+            if (filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
+                $addresses[] = $candidate;
+            }
+        }
+
+        return array_values(array_unique($addresses));
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function mailboxAddresses(string $header): array
+    {
+        try {
+            $addresses = mailparse_rfc822_parse_addresses($header);
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        return collect($addresses ?: [])
+            ->pluck('address')
+            ->filter(fn ($address) => is_string($address) && filter_var($address, FILTER_VALIDATE_EMAIL))
+            ->map(fn (string $address) => strtolower($address))
+            ->values()
+            ->all();
     }
 
     protected function getSenderFrom()

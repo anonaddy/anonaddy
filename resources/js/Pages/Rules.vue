@@ -523,10 +523,15 @@
                   >
                   </multiselect>
 
-                  <span
-                    v-else-if="createRuleObject.actions[key].type === 'banner'"
-                    class="sm:ml-4 flex"
-                  >
+                  <RuleWebhookAction
+                    v-if="createRuleObject.actions[key].type === 'webhook'"
+                    :value="createRuleObject.actions[key].value"
+                    :url-input-id="`create_rule_webhook_url_${key}`"
+                    :body-input-id="`create_rule_webhook_body_${key}`"
+                    :headers-input-id="`create_rule_webhook_headers_${key}`"
+                  />
+
+                  <span v-if="createRuleObject.actions[key].type === 'banner'" class="sm:ml-4 flex">
                     <div class="relative sm:mr-4 w-full">
                       <select
                         v-model="createRuleObject.actions[key].value"
@@ -955,10 +960,15 @@
                   >
                   </multiselect>
 
-                  <span
-                    v-else-if="editRuleObject.actions[key].type === 'banner'"
-                    class="sm:ml-4 flex"
-                  >
+                  <RuleWebhookAction
+                    v-if="editRuleObject.actions[key].type === 'webhook'"
+                    :value="editRuleObject.actions[key].value"
+                    :url-input-id="`edit_rule_webhook_url_${key}`"
+                    :body-input-id="`edit_rule_webhook_body_${key}`"
+                    :headers-input-id="`edit_rule_webhook_headers_${key}`"
+                  />
+
+                  <span v-if="editRuleObject.actions[key].type === 'banner'" class="sm:ml-4 flex">
                     <div class="relative sm:mr-4 w-full">
                       <select
                         v-model="editRuleObject.actions[key].value"
@@ -1092,11 +1102,22 @@
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
           Examples include changing the subject, blocking or quarantining mail, forwarding to a
-          specific recipient, or adding the sender to your blocklist.
+          specific recipient, adding the sender to your blocklist, or sending a webhook.
         </p>
         <p class="mt-4 text-grey-700 dark:text-grey-200">
           You can apply rules to forwards, replies and/or sends. Rules run in the order shown on
           this page from top to bottom. Drag a rule to change its order.
+        </p>
+        <p v-if="signingSecret" class="mt-4 text-grey-700 dark:text-grey-200">
+          Webhook signing secret:
+          <code
+            class="px-1 py-0.5 rounded bg-grey-100 dark:bg-grey-800 font-mono text-grey-700 dark:text-grey-200 break-all"
+            >{{ signingSecret }}</code
+          >
+        </p>
+        <p v-if="signingSecret" class="mt-2 text-grey-700 dark:text-grey-200">
+          addy signs each JSON body with HMAC-SHA256. Compare the hex digest with the
+          X-Addy-Signature header. Use the raw request body and this secret as the key.
         </p>
 
         <div class="mt-6 flex flex-col sm:flex-row">
@@ -1125,6 +1146,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Modal from '../Components/Modal.vue'
+import RuleWebhookAction from '../Components/RuleWebhookAction.vue'
 import Toggle from '../Components/Toggle.vue'
 import { roundArrow } from 'tippy.js'
 import tippy from 'tippy.js'
@@ -1151,7 +1173,13 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  webhookSecret: {
+    type: String,
+    default: null,
+  },
 })
+
+const signingSecret = ref(props.webhookSecret)
 
 const labelOptionsFor = currentValue => {
   const options = [...props.labelOptions]
@@ -1370,6 +1398,10 @@ const actionTypeOptions = [
     value: 'deleteAlias',
     label: 'delete the alias',
   },
+  {
+    value: 'webhook',
+    label: 'send a webhook to',
+  },
 ]
 
 const indexToHuman = {
@@ -1444,12 +1476,10 @@ const createNewRule = () => {
   }
 
   Object.entries(createRuleObject.value.actions).forEach(([key, action]) => {
-    if (action.type === 'setAliasDescription') {
-      return
-    }
+    const message = actionValueError(action, key)
 
-    if (!action.value && action.value !== false) {
-      return (errors.value.ruleActions = `You must add a value for the ${indexToHuman[key]} action`)
+    if (message) {
+      errors.value.ruleActions = message
     }
   })
 
@@ -1477,6 +1507,7 @@ const createNewRule = () => {
     )
     .then(({ data }) => {
       createRuleLoading.value = false
+      rememberWebhookSecret(data)
       resetCreateRuleObject()
       rows.value.push(data.data)
       createRuleModalOpen.value = false
@@ -1531,12 +1562,10 @@ const editRule = () => {
   }
 
   Object.entries(editRuleObject.value.actions).forEach(([key, action]) => {
-    if (action.type === 'setAliasDescription') {
-      return
-    }
+    const message = actionValueError(action, key)
 
-    if (!action.value && action.value !== false) {
-      return (errors.value.ruleActions = `You must add a value for the ${indexToHuman[key]} action`)
+    if (message) {
+      errors.value.ruleActions = message
     }
   })
 
@@ -1566,6 +1595,7 @@ const editRule = () => {
       let rule = _.find(rows.value, ['id', editRuleObject.value.id])
 
       editRuleLoading.value = false
+      rememberWebhookSecret(response.data)
       rule.name = editRuleObject.value.name
       rule.conditions = editRuleObject.value.conditions
       rule.actions = editRuleObject.value.actions
@@ -1851,6 +1881,44 @@ const ruleActionChange = action => {
     action.value = true
   } else if (action.type === 'forwardTo') {
     action.value = ''
+  } else if (action.type === 'webhook') {
+    action.value = {
+      url: '',
+      include_body: false,
+      include_headers: false,
+    }
+  }
+}
+
+const actionNeedsValue = action => {
+  if (action.type === 'setAliasDescription') {
+    return false
+  }
+
+  if (action.type === 'webhook') {
+    const url = typeof action.value?.url === 'string' ? action.value.url.trim() : ''
+
+    return !url.startsWith('https://')
+  }
+
+  return !action.value && action.value !== false
+}
+
+const actionValueError = (action, key) => {
+  if (!actionNeedsValue(action)) {
+    return null
+  }
+
+  if (action.type === 'webhook') {
+    return `Enter a valid URL including https:// for the ${indexToHuman[key]} action`
+  }
+
+  return `You must add a value for the ${indexToHuman[key]} action`
+}
+
+const rememberWebhookSecret = data => {
+  if (typeof data?.meta?.webhook_secret === 'string' && data.meta.webhook_secret !== '') {
+    signingSecret.value = data.meta.webhook_secret
   }
 }
 
@@ -1873,6 +1941,15 @@ const openEditModal = rule => {
   errors.value = {}
   editRuleModalOpen.value = true
   editRuleObject.value = _.cloneDeep(rule)
+  editRuleObject.value.actions?.forEach(action => {
+    if (action.type !== 'webhook' || !action.value || typeof action.value !== 'object') {
+      return
+    }
+
+    if (typeof action.value.include_headers !== 'boolean') {
+      action.value.include_headers = false
+    }
+  })
 }
 
 const closeEditModal = () => {

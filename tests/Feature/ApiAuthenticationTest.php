@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Username;
 use App\Notifications\IncorrectOtpNotification;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
@@ -21,6 +22,26 @@ class ApiAuthenticationTest extends TestCase
         parent::setUp();
 
         $this->user = $this->createUser('johndoe', null, ['password' => Hash::make('mypassword')]);
+    }
+
+    #[Test]
+    public function user_cannot_retrieve_access_token_with_a_username_that_has_login_disabled()
+    {
+        $this->withoutMiddleware(ThrottleRequestsWithRedis::class);
+
+        Username::factory()->create([
+            'user_id' => $this->user->id,
+            'username' => 'janedoe',
+            'can_login' => false,
+        ]);
+
+        $this->json('POST', '/api/auth/login', [
+            'username' => 'janedoe',
+            'password' => 'mypassword',
+            'device_name' => 'Firefox',
+        ])->assertUnauthorized();
+
+        $this->assertSame(0, $this->user->tokens()->count());
     }
 
     #[Test]

@@ -237,6 +237,48 @@ class SettingsTest extends TestCase
     }
 
     #[Test]
+    public function user_can_update_custom_alias_random_characters()
+    {
+        $response = $this->post('/settings/custom-alias-random-characters', [
+            'enabled' => true,
+            'length' => 4,
+            'charset' => 'letters',
+        ]);
+
+        $response->assertStatus(302);
+        $user = $this->user->fresh();
+        $this->assertTrue($user->custom_alias_random_characters);
+        $this->assertSame(4, $user->custom_alias_random_length);
+        $this->assertSame('letters', $user->custom_alias_random_charset->value);
+
+        $response = $this->post('/settings/custom-alias-random-characters', [
+            'enabled' => false,
+            'length' => 4,
+            'charset' => 'letters',
+        ]);
+
+        $response->assertStatus(302);
+        $user = $this->user->fresh();
+        $this->assertFalse($user->custom_alias_random_characters);
+        $this->assertSame(4, $user->custom_alias_random_length);
+        $this->assertSame('letters', $user->custom_alias_random_charset->value);
+    }
+
+    #[Test]
+    public function user_cannot_update_custom_alias_random_characters_if_invalid()
+    {
+        $response = $this->post('/settings/custom-alias-random-characters', [
+            'enabled' => true,
+            'length' => 11,
+            'charset' => 'symbols',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['length', 'charset']);
+        $this->assertFalse($this->user->fresh()->custom_alias_random_characters);
+    }
+
+    #[Test]
     public function user_cannot_update_default_alias_format_if_invalid()
     {
         $response = $this->post('/settings/default-alias-format', [

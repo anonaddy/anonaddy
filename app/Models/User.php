@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CustomAliasRandomCharset;
 use App\Enums\DisplayFromFormat;
 use App\Enums\FailedDeliveryNotificationPreference;
 use App\Enums\ListUnsubscribeBehaviour;
@@ -19,6 +20,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -58,6 +60,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'default_alias_format',
         'hidden_alias_domains',
         'alias_separator',
+        'custom_alias_random_characters',
+        'custom_alias_random_length',
+        'custom_alias_random_charset',
         'use_reply_to',
         'store_failed_deliveries',
         'show_intentional_failed_deliveries',
@@ -77,6 +82,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'from_name',
         'email_subject',
         'two_factor_secret',
+        'webhook_secret',
     ];
 
     /**
@@ -89,6 +95,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'two_factor_secret',
         'two_factor_backup_code',
+        'webhook_secret',
     ];
 
     /**
@@ -113,6 +120,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'updated_at' => 'datetime',
         'email_verified_at' => 'datetime',
         'hidden_alias_domains' => 'array',
+        'custom_alias_random_characters' => 'boolean',
+        'custom_alias_random_length' => 'integer',
+        'custom_alias_random_charset' => CustomAliasRandomCharset::class,
         'reject_until' => 'datetime',
         'defer_until' => 'datetime',
         'defer_new_aliases_until' => 'datetime',
@@ -656,6 +666,140 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $setting;
+    }
+
+    public function ensureWebhookSecret(): string
+    {
+        if (is_string($this->webhook_secret) && $this->webhook_secret !== '') {
+            return $this->webhook_secret;
+        }
+
+        $secret = bin2hex(random_bytes(32));
+        $this->webhook_secret = $secret;
+        $encrypted = $this->getAttributes()['webhook_secret'];
+
+        $updated = static::query()->whereKey($this->id)->whereNull('webhook_secret')->update([
+            'webhook_secret' => $encrypted,
+        ]);
+
+        if ($updated === 0) {
+            $stored = static::query()->whereKey($this->id)->value('webhook_secret');
+
+            if (is_string($stored) && $stored !== '') {
+                $attributes = $this->getAttributes();
+                $attributes['webhook_secret'] = $stored;
+                $this->setRawAttributes($attributes);
+                $this->syncOriginalAttribute('webhook_secret');
+
+                return Crypt::decrypt($stored);
+            }
+        }
+
+        $this->syncOriginalAttribute('webhook_secret');
+
+        return $secret;
+    }
+
+    /**
+     * Whether custom aliases should get a random suffix.
+     */
+    public function appendsRandomCharactersToCustomAliases(): bool
+    {
+        return (bool) $this->custom_alias_random_characters;
+    }
+
+    /**
+     * Local part for a custom alias, with the account's random suffix.
+     */
+    public function localPartWithCustomRandomCharacters(string $prefix, string $domain): string
+    {
+        $separator = $this->aliasSeparatorForGeneration();
+        $prefixWithSeparator = $prefix.$separator;
+        $length = max(1, min(10, (int) ($this->custom_alias_random_length ?? 5)));
+        $alphabet = ($this->custom_alias_random_charset ?? CustomAliasRandomCharset::Alphanumeric)->alphabet();
+        $keyspace = strlen($alphabet) ** $length;
+
+        if ($keyspace <= 1296) {
+            $available = $this->availableCustomAliasSuffixes($prefixWithSeparator, $domain, $alphabet, $length);
+
+            if ($available !== []) {
+                return $prefixWithSeparator.$available[random_int(0, count($available) - 1)];
+            }
+        } else {
+            for ($attempt = 0; $attempt < 8; $attempt++) {
+                $candidate = $prefixWithSeparator.$this->randomCustomAliasCharacters($alphabet, $length);
+                $taken = Alias::withTrashed()
+                    ->where('email', strtolower($candidate.'@'.$domain))
+                    ->exists();
+
+                if (! $taken) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $prefixWithSeparator.$this->randomCustomAliasCharacters($alphabet, $length);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function availableCustomAliasSuffixes(string $prefixWithSeparator, string $domain, string $alphabet, int $length): array
+    {
+        $suffixes = $this->customAliasSuffixes($alphabet, $length);
+        $taken = [];
+
+        foreach (array_chunk($suffixes, 500) as $suffixChunk) {
+            $emails = array_map(
+                fn (string $suffix) => strtolower($prefixWithSeparator.$suffix.'@'.$domain),
+                $suffixChunk
+            );
+
+            foreach (Alias::withTrashed()->whereIn('email', $emails)->pluck('email') as $email) {
+                $taken[strtolower($email)] = true;
+            }
+        }
+
+        return array_values(array_filter(
+            $suffixes,
+            fn (string $suffix) => ! isset($taken[strtolower($prefixWithSeparator.$suffix.'@'.$domain)])
+        ));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function customAliasSuffixes(string $alphabet, int $length): array
+    {
+        $suffixes = [];
+        $alphabetLength = strlen($alphabet);
+        $total = $alphabetLength ** $length;
+
+        for ($i = 0; $i < $total; $i++) {
+            $suffix = '';
+            $value = $i;
+
+            for ($position = 0; $position < $length; $position++) {
+                $suffix = $alphabet[$value % $alphabetLength].$suffix;
+                $value = intdiv($value, $alphabetLength);
+            }
+
+            $suffixes[] = $suffix;
+        }
+
+        return $suffixes;
+    }
+
+    protected function randomCustomAliasCharacters(string $alphabet, int $length): string
+    {
+        $characters = '';
+        $lastIndex = strlen($alphabet) - 1;
+
+        for ($i = 0; $i < $length; $i++) {
+            $characters .= $alphabet[random_int(0, $lastIndex)];
+        }
+
+        return $characters;
     }
 
     public function generateRandomWordLocalPart()

@@ -30,9 +30,18 @@ class Webauthn extends ServicesWebauthn
      */
     public static function canRegister(User $user): bool
     {
-        $totpAuthenticator = app(Authenticator::class)->boot(request());
+        if (! static::webauthnEnabled()) {
+            return false;
+        }
 
-        // check() sees if the user is authenticated for the session via webauthn, but if the user is authenticated using TOTP they need to be able to add a key too
-        return static::webauthnEnabled() && (! static::enabled($user) || ($totpAuthenticator->isAuthenticated() || static::check()));
+        // A user with no 2FA method yet can add their first key
+        if (! $user->hasAnyTwoFactorEnabled() && ! static::enabled($user)) {
+            return true;
+        }
+
+        // Otherwise 2FA must already have been passed for this session, via TOTP or webauthn
+        $totpAuthenticated = $user->hasTotpEnabled() && app(Authenticator::class)->boot(request())->isAuthenticated();
+
+        return $totpAuthenticated || static::check();
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Label;
 use App\Models\Rule;
 use App\Rules\ValidRegex;
 use App\Services\UserRuleChecker;
+use App\Services\WebhookUrlGuard;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Str;
 use PhpMimeMailParser\Parser;
@@ -1898,6 +1899,95 @@ class RulesTest extends TestCase
                 ->assertStatus(422)
                 ->assertJsonValidationErrorFor('actions.0.value');
         }
+    }
+
+    #[Test]
+    public function user_can_create_a_webhook_rule_and_receives_a_signing_secret(): void
+    {
+        $this->mock(WebhookUrlGuard::class, function ($mock) {
+            $mock->shouldReceive('failureReason')->andReturn(null);
+        });
+
+        $payload = [
+            'name' => 'webhook rule',
+            'conditions' => [
+                [
+                    'type' => 'sender',
+                    'match' => 'is exactly',
+                    'values' => ['will@anonaddy.com'],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'webhook',
+                    'value' => [
+                        'url' => 'https://example.com/hooks/addy',
+                        'include_body' => true,
+                    ],
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+            'replies' => false,
+            'sends' => false,
+        ];
+
+        $response = $this->json('POST', '/api/v1/rules', $payload);
+
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.actions.0.type', 'webhook');
+        $response->assertJsonPath('data.actions.0.value.url', 'https://example.com/hooks/addy');
+        $response->assertJsonPath('data.actions.0.value.include_body', true);
+
+        $secret = $response->json('meta.webhook_secret');
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $secret);
+
+        $payload['name'] = 'second webhook rule';
+        $payload['actions'][0]['value']['include_body'] = false;
+
+        $second = $this->json('POST', '/api/v1/rules', $payload);
+
+        $second->assertStatus(201);
+        $second->assertJsonPath('data.actions.0.value.include_body', false);
+        $this->assertSame($secret, $second->json('meta.webhook_secret'));
+
+        $this->actingAs($this->user->fresh(), 'sanctum');
+
+        $this->json('GET', '/api/v1/account-details')
+            ->assertSuccessful()
+            ->assertJsonPath('data.webhook_secret', $secret);
+    }
+
+    #[Test]
+    public function webhook_rule_returns_422_for_a_private_url(): void
+    {
+        $response = $this->json('POST', '/api/v1/rules', [
+            'name' => 'webhook rule',
+            'conditions' => [
+                [
+                    'type' => 'sender',
+                    'match' => 'is exactly',
+                    'values' => ['will@anonaddy.com'],
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'webhook',
+                    'value' => [
+                        'url' => 'https://127.0.0.1/hook',
+                        'include_body' => false,
+                    ],
+                ],
+            ],
+            'operator' => 'AND',
+            'forwards' => true,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertSame(
+            'The webhook URL must be a public https address.',
+            $response->json('errors')['actions.0.value'][0]
+        );
     }
 
     protected function getParser($file)

@@ -271,6 +271,7 @@
           </span>
           <span
             v-else-if="props.column.field === 'blocked'"
+            class="inline-flex items-center gap-1 whitespace-nowrap"
             :class="selectedRows.length > 0 ? 'blur-sm' : ''"
           >
             {{ props.column.label }}
@@ -845,6 +846,7 @@ const columns = [
     field: 'blocked',
     type: 'number',
     sortable: false,
+    thClass: 'whitespace-nowrap',
   },
   {
     label: 'Created',
@@ -1085,3 +1087,11 @@ const errorMessage = (text = 'An error has occurred, please try again later') =>
   })
 }
 </script>
+
+<style scoped>
+/* Keep header labels on one line so the bulk-actions bar (h-12) matches thead height. */
+:deep(.vgt-table thead th) {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+</style>

@@ -77,7 +77,7 @@ trait ApplyUserRules
                 // Do nothing, already checked.
                 break;
             case 'webhook':
-                // http payload to url
+                // Queued from ReceiveEmail after the message is accepted. This trait runs once per recipient.
                 break;
         }
     }

@@ -13,7 +13,9 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionObject;
 use Tests\TestCase;
 
 class ReceiveEmailTest extends TestCase
@@ -1060,5 +1062,90 @@ class ReceiveEmailTest extends TestCase
 
             return $mail->hasTo($this->user->email) && $mail->hasFrom('ebay@johndoe.anonaddy.com') && $mail->hasReplyTo('ebay+will=anonaddy.com@johndoe.anonaddy.com');
         });
+    }
+
+    #[Test]
+    public function unexpected_receive_error_exits_with_postfix_tempfail(): void
+    {
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email.eml'),
+                '--sender' => 'will@anonaddy.com',
+                '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                '--local_part' => [],
+                '--extension' => [''],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1000',
+            ]
+        )->expectsOutputToContain('4.3.0 An error has occurred, please try again later.')
+            ->assertExitCode(75);
+    }
+
+    #[Test]
+    #[DataProvider('nonCompliantFromHeaders')]
+    public function it_forwards_email_when_the_from_header_is_not_rfc822_compliant(string $from, string $expectedSender): void
+    {
+        Mail::fake();
+
+        $path = $this->writeEmailWithFrom($from);
+
+        try {
+            $this->artisan(
+                'anonaddy:receive-email',
+                [
+                    'file' => $path,
+                    '--sender' => 'envelope@example.com',
+                    '--recipient' => ['ebay@johndoe.anonaddy.com'],
+                    '--local_part' => ['ebay'],
+                    '--extension' => [''],
+                    '--domain' => ['johndoe.anonaddy.com'],
+                    '--size' => '1000',
+                ]
+            )->assertExitCode(0);
+        } finally {
+            @unlink($path);
+        }
+
+        Mail::assertQueued(ForwardEmail::class, function (ForwardEmail $mail) use ($expectedSender): bool {
+            $sender = (new ReflectionObject($mail))->getProperty('sender');
+            $sender->setAccessible(true);
+
+            return $sender->getValue($mail) === $expectedSender;
+        });
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function nonCompliantFromHeaders(): array
+    {
+        return [
+            'stray greater-than before a bare address' => ['Jane Doe > jane@example.com', 'jane@example.com'],
+            'trailing greater-than' => ['jane@example.com>', 'jane@example.com'],
+            'greater-than inside an unquoted display name' => ['Sales > Team jane@example.com', 'jane@example.com'],
+            'nested angle brackets' => ['"Example" <Example <jane@example.com>>', 'jane@example.com'],
+            'split encoded display name' => ['=?UTF-8?B?RXhhbXBsZSA8?=jane@example.com>', 'jane@example.com'],
+            'encoded address with no literal mailbox' => ['=?UTF-8?B?PHZpY3RpbUBleGFtcGxlLmNvbT4=?=>', 'envelope@example.com'],
+            'encoded display name beside a literal mailbox' => ['"=?UTF-8?B?PHZpY3RpbUBleGFtcGxlLmNvbT4=?=" <real@example.com>>', 'real@example.com'],
+            'header with no address' => ['some text > only', 'envelope@example.com'],
+        ];
+    }
+
+    protected function writeEmailWithFrom(string $from): string
+    {
+        $content = "Date: Wed, 20 Feb 2019 15:00:00 +0100 (CET)\r\n"
+            ."From: {$from}\r\n"
+            ."To: <ebay@johndoe.anonaddy.com>\r\n"
+            ."Subject: Test Email\r\n"
+            ."Message-ID: <from-header-repair@example.com>\r\n"
+            ."Content-Type: text/plain; charset=UTF-8\r\n"
+            ."\r\n"
+            ."This is a test email.\r\n";
+
+        $path = tempnam(sys_get_temp_dir(), 'from-header-');
+        file_put_contents($path, $content);
+
+        return $path;
     }
 }

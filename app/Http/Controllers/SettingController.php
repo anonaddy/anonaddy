@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Webauthn;
 use App\Http\Requests\DestroyAccountRequest;
 use App\Http\Resources\PersonalAccessTokenResource;
 use App\Jobs\DeleteAccount;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use PragmaRX\Google2FALaravel\Support\Authenticator;
 
 class SettingController extends Controller
 {
@@ -21,6 +23,9 @@ class SettingController extends Controller
             'defaultAliasDomain' => user()->default_alias_domain,
             'defaultAliasFormat' => user()->default_alias_format,
             'aliasSeparator' => user()->alias_separator,
+            'customAliasRandomCharacters' => user()->custom_alias_random_characters,
+            'customAliasRandomLength' => user()->custom_alias_random_length ?? 5,
+            'customAliasRandomCharset' => user()->custom_alias_random_charset?->value ?? 'alphanumeric',
             'loginRedirect' => user()->login_redirect->value,
             'displayFromFormat' => user()->display_from_format->value,
             'useReplyTo' => user()->use_reply_to,
@@ -53,6 +58,8 @@ class SettingController extends Controller
         // User has TOTP 2FA enabled
         $alreadyHasTotpEnabled = user()->two_factor_enabled;
 
+        $totpAuthenticator = app(Authenticator::class)->boot($request);
+
         return Inertia::render('Settings/Security', [
             'authSecret' => $alreadyHasTotpEnabled ? null : user()->two_factor_secret,
             'qrCode' => $alreadyHasTotpEnabled ? null : $qrCode,
@@ -60,6 +67,8 @@ class SettingController extends Controller
             'backupCode' => $request->session()->get('backupCode', null),
             'initialTwoFactorEnabled' => user()->two_factor_enabled,
             'initialWebauthnEnabled' => user()->webauthn_enabled,
+            'sessionPassedTotp' => user()->hasTotpEnabled() && $totpAuthenticator->isAuthenticated(),
+            'sessionPassedWebauthn' => user()->hasWebauthnEnabled() && Webauthn::check(),
             'initialKeys' => user()->webauthnKeys()->latest()->select(['id', 'name', 'enabled', 'created_at'])->get()->values(),
         ]);
     }

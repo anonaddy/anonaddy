@@ -25,6 +25,7 @@ class ShowRuleController extends Controller
             'recipientOptions' => user()->verifiedRecipients()->select(['id', 'email'])->get(),
             'labelOptions' => user()->labels()->orderBy('name')->get(['id', 'name']),
             'search' => $validated['search'] ?? null,
+            'webhookSecret' => user()->webhook_secret,
         ]);
     }
 }

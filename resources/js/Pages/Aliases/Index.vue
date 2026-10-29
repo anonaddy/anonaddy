@@ -333,6 +333,9 @@
       </div>
     </div>
 
+    <p v-if="rows.length" class="mb-2 text-xs text-grey-500 dark:text-grey-300 md:hidden">
+      Swipe horizontally to view alias actions.
+    </p>
     <div v-if="rows.length">
       <div class="relative">
         <div
@@ -438,9 +441,6 @@
               : `${selectedRows.length} aliases`
           }}</span>
         </div>
-        <p v-if="rows.length" class="mb-2 text-xs text-grey-500 dark:text-grey-300 md:hidden">
-          Swipe horizontally to view alias actions.
-        </p>
         <vue-good-table
           v-on:sort-change="debounceToolips"
           v-on:page-change="debounceToolips"
@@ -470,7 +470,10 @@
                 data-tippy-content="'Select All' is only available when the page size is 25"
               ></div>
             </span>
-            <span v-else-if="props.column.label == 'Active'">
+            <span
+              v-else-if="props.column.label == 'Active'"
+              class="inline-flex items-center gap-1 whitespace-nowrap"
+            >
               {{ props.column.label }}
               <span
                 class="tooltip outline-hidden"
@@ -906,7 +909,14 @@
               :value="formatOption.value"
               class="dark:bg-grey-900"
             >
-              {{ formatOption.label }}
+              {{ formatOption.label
+              }}{{
+                !sharedDomains.includes(createAliasDomain) &&
+                customAliasRandomCharacters &&
+                formatOption.value === 'custom'
+                  ? ` (${customAliasRandomSuffixLabel})`
+                  : ''
+              }}
             </option>
           </select>
         </div>
@@ -1530,7 +1540,9 @@
             <span class="font-semibold text-indigo-800 dark:text-indigo-400">{{
               newAliasExtension ? `${newAliasLocalPart}+${newAliasExtension}` : newAliasLocalPart
             }}</span
-            ><span class="font-semibold text-grey-500">@{{ newAliasDomain }}</span>
+            ><span class="font-semibold text-grey-500 dark:text-grey-200"
+              >@{{ newAliasDomain }}</span
+            >
           </button>
         </p>
 
@@ -1653,6 +1665,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  customAliasRandomCharacters: {
+    type: Boolean,
+    default: false,
+  },
+  customAliasRandomLength: {
+    type: Number,
+    default: 5,
+  },
+  customAliasRandomCharset: {
+    type: String,
+    default: 'alphanumeric',
+  },
   search: {
     type: String,
   },
@@ -1753,6 +1777,23 @@ const newAliasDomain = ref('')
 const newAliasModalOpen = ref(false)
 const createAliasLoading = ref(false)
 const createAliasDomain = ref(props.defaultAliasDomain)
+
+const customAliasRandomSuffixLabel = computed(() => {
+  const count = props.customAliasRandomLength
+  const charset = props.customAliasRandomCharset
+
+  if (charset === 'letters') {
+    return `${count} random ${count === 1 ? 'letter' : 'letters'} will be added`
+  }
+
+  if (charset === 'numbers') {
+    return `${count} random ${count === 1 ? 'number' : 'numbers'} will be added`
+  }
+
+  return count === 1
+    ? '1 random letter or number will be added'
+    : `${count} random letters and numbers will be added`
+})
 const createAliasLocalPart = ref('')
 const createAliasDescription = ref('')
 const createAliasRecipientIds = ref([])
@@ -1969,6 +2010,7 @@ const columns = [
     label: 'Active',
     field: 'active',
     type: 'boolean',
+    thClass: 'whitespace-nowrap',
   },
   {
     label: '',
@@ -3251,3 +3293,11 @@ const errorMessage = (text = 'An error has occurred, please try again later') =>
   })
 }
 </script>
+
+<style scoped>
+/* Keep header labels on one line so the bulk-actions bar (h-12) matches thead height. */
+:deep(.vgt-table thead th) {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+</style>

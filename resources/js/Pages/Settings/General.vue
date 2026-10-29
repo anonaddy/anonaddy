@@ -655,6 +655,180 @@
       <div class="py-10">
         <div class="space-y-1">
           <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
+            Custom Alias Random Characters
+          </h3>
+          <p class="text-base text-grey-700 dark:text-grey-200">
+            When you create a
+            <a
+              href="https://addy.io/help/creating-your-first-alias/"
+              class="text-indigo-700 dark:text-indigo-400 font-bold"
+              target="_blank"
+              rel="nofollow noreferrer noopener"
+              >custom alias</a
+            >, random characters can be added after your alias separator. Typing
+            <code class="rounded bg-grey-100 dark:bg-grey-800 px-1">shop</code>
+            can create
+            <code class="rounded bg-grey-100 dark:bg-grey-800 px-1">shop.k3mxp</code>. Leave this
+            disabled to keep the local part exactly as you type it.
+          </p>
+        </div>
+        <div class="mt-4">
+          <form
+            @submit.prevent="
+              customAliasRandomCharactersForm.post(
+                route('settings.custom_alias_random_characters'),
+                {
+                  preserveScroll: true,
+                },
+              )
+            "
+          >
+            <div class="grid grid-cols-1 gap-6 mb-6">
+              <div>
+                <label
+                  for="custom-alias-random-characters"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Random characters</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="custom-alias-random-characters"
+                    v-model="customAliasRandomCharactersForm.enabled"
+                    name="enabled"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      customAliasRandomCharactersForm.errors.enabled
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      customAliasRandomCharactersForm.errors.enabled ? 'true' : undefined
+                    "
+                    :aria-describedby="
+                      customAliasRandomCharactersForm.errors.enabled
+                        ? 'custom-alias-random-characters-error'
+                        : undefined
+                    "
+                  >
+                    <option :value="false" class="dark:bg-grey-900">Disabled</option>
+                    <option :value="true" class="dark:bg-grey-900">Enabled</option>
+                  </select>
+                </div>
+                <p
+                  v-if="customAliasRandomCharactersForm.errors.enabled"
+                  class="mt-2 text-sm text-red-600"
+                  id="custom-alias-random-characters-error"
+                >
+                  {{ customAliasRandomCharactersForm.errors.enabled }}
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="custom-alias-random-length"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Number of characters</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="custom-alias-random-length"
+                    v-model="customAliasRandomCharactersForm.length"
+                    name="length"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      customAliasRandomCharactersForm.errors.length
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      customAliasRandomCharactersForm.errors.length ? 'true' : undefined
+                    "
+                    :aria-describedby="
+                      customAliasRandomCharactersForm.errors.length
+                        ? 'custom-alias-random-length-error'
+                        : undefined
+                    "
+                  >
+                    <option
+                      v-for="length in 10"
+                      :key="length"
+                      :value="length"
+                      class="dark:bg-grey-900"
+                    >
+                      {{ length }}
+                    </option>
+                  </select>
+                </div>
+                <p
+                  v-if="customAliasRandomCharactersForm.errors.length"
+                  class="mt-2 text-sm text-red-600"
+                  id="custom-alias-random-length-error"
+                >
+                  {{ customAliasRandomCharactersForm.errors.length }}
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="custom-alias-random-charset"
+                  class="block text-sm font-medium leading-6 text-grey-600 dark:text-white"
+                  >Characters</label
+                >
+                <div class="block relative w-full mt-2">
+                  <select
+                    id="custom-alias-random-charset"
+                    v-model="customAliasRandomCharactersForm.charset"
+                    name="charset"
+                    required
+                    class="relative block w-full rounded border-0 bg-transparent py-2 text-grey-900 dark:text-white dark:bg-white/5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-base sm:leading-6"
+                    :class="
+                      customAliasRandomCharactersForm.errors.charset
+                        ? 'ring-red-300 focus:ring-red-500'
+                        : 'ring-grey-300 focus:ring-indigo-600'
+                    "
+                    :aria-invalid="
+                      customAliasRandomCharactersForm.errors.charset ? 'true' : undefined
+                    "
+                    :aria-describedby="
+                      customAliasRandomCharactersForm.errors.charset
+                        ? 'custom-alias-random-charset-error'
+                        : undefined
+                    "
+                  >
+                    <option value="alphanumeric" class="dark:bg-grey-900">
+                      Letters and numbers
+                    </option>
+                    <option value="letters" class="dark:bg-grey-900">Letters</option>
+                    <option value="numbers" class="dark:bg-grey-900">Numbers</option>
+                  </select>
+                </div>
+                <p
+                  v-if="customAliasRandomCharactersForm.errors.charset"
+                  class="mt-2 text-sm text-red-600"
+                  id="custom-alias-random-charset-error"
+                >
+                  {{ customAliasRandomCharactersForm.errors.charset }}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              :disabled="customAliasRandomCharactersForm.processing"
+              class="bg-cyan-400 w-full hover:bg-cyan-300 text-cyan-900 font-bold py-3 px-4 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed"
+            >
+              Update Random Characters
+              <loader v-if="customAliasRandomCharactersForm.processing" />
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="py-10">
+        <div class="space-y-1">
+          <h3 class="text-lg font-medium leading-6 text-grey-900 dark:text-white">
             Update Page to Display After Login
           </h3>
           <p class="text-base text-grey-700 dark:text-grey-200">
@@ -1779,6 +1953,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  customAliasRandomCharacters: {
+    type: Boolean,
+    default: false,
+  },
+  customAliasRandomLength: {
+    type: Number,
+    default: 5,
+  },
+  customAliasRandomCharset: {
+    type: String,
+    default: 'alphanumeric',
+  },
   loginRedirect: {
     type: Number,
     required: true,
@@ -2094,6 +2280,12 @@ const defaultAliasFormatForm = useForm({
 
 const aliasSeparatorForm = useForm({
   separator: props.aliasSeparator,
+})
+
+const customAliasRandomCharactersForm = useForm({
+  enabled: props.customAliasRandomCharacters,
+  length: props.customAliasRandomLength,
+  charset: props.customAliasRandomCharset,
 })
 
 const loginRedirectForm = useForm({
