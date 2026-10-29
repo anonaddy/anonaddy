@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ForwardEmail;
 use App\Mail\ReplyToEmail;
 use App\Models\Alias;
+use App\Models\OutboundMessage;
 use App\Models\Recipient;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use ParagonIE\ConstantTime\Base32;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -147,5 +151,47 @@ class ReplyToEmailTest extends TestCase
         Mail::assertQueued(ReplyToEmail::class, function ($mail) {
             return $mail->hasTo('support@ebay.com');
         });
+    }
+
+    #[Test]
+    public function delivery_report_for_a_reply_from_a_non_null_sender_is_not_treated_as_a_bounce()
+    {
+        Mail::fake();
+
+        $alias = Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $outboundMessage = OutboundMessage::query()->create([
+            'id' => 'abcd1234wxyz',
+            'user_id' => $this->user->id,
+            'alias_id' => $alias->id,
+            'recipient_id' => $this->user->default_recipient_id,
+            'email_type' => 'R',
+            'encrypted' => false,
+        ]);
+
+        $signature = substr(hash_hmac('sha3-224', $outboundMessage->id, config('anonaddy.secret')), 0, 8);
+        $verp = 'b_'.Base32::encodeUnpadded($outboundMessage->id).'_'.Base32::encodeUnpadded($signature).'@johndoe.'.config('anonaddy.domain');
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => base_path('tests/emails/email_bounce.eml'),
+                '--sender' => 'contact@ebay.com',
+                '--recipient' => [$verp],
+                '--local_part' => [Str::before($verp, '@')],
+                '--extension' => [''],
+                '--domain' => ['johndoe.'.config('anonaddy.domain')],
+                '--size' => '1000',
+            ]
+        )->assertExitCode(0);
+
+        $this->assertFalse($outboundMessage->refresh()->bounced);
+        $this->assertSame(0, $this->user->failedDeliveries()->count());
+        Mail::assertQueued(ForwardEmail::class);
     }
 }

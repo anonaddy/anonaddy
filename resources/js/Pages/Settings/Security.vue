@@ -364,6 +364,25 @@
             To disable TOTP authentication enter your password below. You can always enable it again
             later if you wish.
           </p>
+          <div
+            v-if="disablingTotpRequiresSecurityKey"
+            class="text-base border-t-8 rounded text-yellow-800 border-yellow-600 bg-yellow-100 px-3 py-4 mt-4"
+            role="alert"
+          >
+            <div class="flex items-center mb-2">
+              <span class="rounded-full bg-yellow-400 uppercase px-2 py-1 text-xs font-bold mr-2"
+                >Important</span
+              >
+              <div>You will need a security key to continue.</div>
+            </div>
+            <p>
+              You signed in with your authenticator app. After you turn it off, you must sign in
+              with a security key or passkey before you can continue. If you have lost that key,
+              delete it first. You can do that now, while this authenticator app is still on. If you
+              have also lost your backup code, leave the authenticator app on. The backup code on
+              the next page turns both methods off.
+            </p>
+          </div>
         </div>
         <div class="mt-4">
           <form
@@ -726,6 +745,25 @@
           Once this key is disabled, <b>Two-Factor Authentication</b> will still be enabled as you
           have {{ twoFactorEnabled ? 'TOTP 2FA' : 'other enabled keys' }} on your account.
         </p>
+        <div
+          v-if="lastEnabledKeyRequiresAuthenticator(keyToDisable)"
+          class="text-base border-t-8 rounded text-yellow-800 border-yellow-600 bg-yellow-100 px-3 py-4"
+          role="alert"
+        >
+          <div class="flex items-center mb-2">
+            <span class="rounded-full bg-yellow-400 uppercase px-2 py-1 text-xs font-bold mr-2"
+              >Important</span
+            >
+            <div>You will need your authenticator app to continue.</div>
+          </div>
+          <p>
+            You signed in with a security key. After you turn off the last one, you must enter a
+            code from your authenticator app before you can continue. If you have lost that app,
+            turn it off first. You can do that now, while this key is still on. If you have also
+            lost your backup code, leave this key on. The backup code on the next page turns both
+            methods off.
+          </p>
+        </div>
         <div class="mt-6">
           <label
             for="disable-key-current-password"
@@ -779,6 +817,24 @@
           Once this key is removed, <b>Two-Factor Authentication</b> will still be enabled as you
           have {{ twoFactorEnabled ? 'TOTP 2FA' : 'other enabled keys' }} on your account.
         </p>
+        <div
+          v-if="lastEnabledKeyRequiresAuthenticator(keyToDelete)"
+          class="text-base border-t-8 rounded text-yellow-800 border-yellow-600 bg-yellow-100 px-3 py-4"
+          role="alert"
+        >
+          <div class="flex items-center mb-2">
+            <span class="rounded-full bg-yellow-400 uppercase px-2 py-1 text-xs font-bold mr-2"
+              >Important</span
+            >
+            <div>You will need your authenticator app to continue.</div>
+          </div>
+          <p>
+            You signed in with a security key. After you remove the last one, you must enter a code
+            from your authenticator app before you can continue. If you have lost that app, turn it
+            off first. You can do that now, while this key is still on. If you have also lost your
+            backup code, leave this key on. The backup code on the next page turns both methods off.
+          </p>
+        </div>
         <div class="mt-6">
           <label
             for="delete-key-current-password"
@@ -838,6 +894,14 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  sessionPassedTotp: {
+    type: Boolean,
+    required: true,
+  },
+  sessionPassedWebauthn: {
+    type: Boolean,
+    required: true,
+  },
   backupCode: {
     type: String,
   },
@@ -860,6 +924,17 @@ const twoFactorEnabled = ref(props.initialTwoFactorEnabled)
 const webauthnEnabled = ref(props.initialWebauthnEnabled)
 
 const enabledKeys = computed(() => _.filter(keys.value, key => key.enabled))
+
+const disablingTotpRequiresSecurityKey = computed(
+  () => enabledKeys.value.length > 0 && props.sessionPassedTotp && !props.sessionPassedWebauthn,
+)
+
+const lastEnabledKeyRequiresAuthenticator = key =>
+  Boolean(key?.enabled) &&
+  enabledKeys.value.length <= 1 &&
+  twoFactorEnabled.value &&
+  props.sessionPassedWebauthn &&
+  !props.sessionPassedTotp
 
 const disableKeyModalOpen = ref(false)
 const deleteKeyModalOpen = ref(false)
@@ -993,9 +1068,12 @@ const disableKey = () => {
 
   disableKeyLoading.value = true
 
+  const disabledKeyId = keyToDisable.value.id
+  const requiresAuthenticator = lastEnabledKeyRequiresAuthenticator(keyToDisable.value)
+
   axios
     .post(
-      `/webauthn/enabled-keys/${keyToDisable.value.id}`,
+      `/webauthn/enabled-keys/${disabledKeyId}`,
       JSON.stringify({
         current: disableKeyCurrentPassword.value,
       }),
@@ -1004,7 +1082,7 @@ const disableKey = () => {
       },
     )
     .then(response => {
-      let key = _.find(keys.value, ['id', keyToDisable.value.id])
+      let key = _.find(keys.value, ['id', disabledKeyId])
       key.enabled = false
 
       successMessage('Key Successfully Disabled')
@@ -1012,6 +1090,10 @@ const disableKey = () => {
       disableKeyModalOpen.value = false
       keyToDisable.value = null
       disableKeyCurrentPassword.value = ''
+
+      if (requiresAuthenticator) {
+        router.reload()
+      }
     })
     .catch(error => {
       disableKeyLoading.value = false

@@ -300,6 +300,39 @@ class UserRuleChecker
         return $checker->getRuleIdsAndActions('Sends');
     }
 
+    /**
+     * Distinct webhook URLs from matching rules.
+     *
+     * When more than one rule uses the same URL, include the body or the headers if any of them asks for it.
+     *
+     * @return array<string, array{include_body: bool, include_headers: bool}>
+     */
+    public static function webhookTargets(array $ruleIdsAndActions): array
+    {
+        $targets = [];
+
+        foreach (collect($ruleIdsAndActions)->flatten(1) as $action) {
+            if (($action['type'] ?? null) !== 'webhook' || ! is_array($action['value'] ?? null)) {
+                continue;
+            }
+
+            $url = $action['value']['url'] ?? null;
+
+            if (! is_string($url) || $url === '') {
+                continue;
+            }
+
+            $includeBody = ($action['value']['include_body'] ?? false) === true;
+            $includeHeaders = ($action['value']['include_headers'] ?? false) === true;
+            $targets[$url] = [
+                'include_body' => ($targets[$url]['include_body'] ?? false) || $includeBody,
+                'include_headers' => ($targets[$url]['include_headers'] ?? false) || $includeHeaders,
+            ];
+        }
+
+        return $targets;
+    }
+
     public static function getRecipientIdsToForwardToFromRuleIdsAndActions($ruleIdsAndActions): array
     {
         // Limit to a total of 10 forwardTo recipients.

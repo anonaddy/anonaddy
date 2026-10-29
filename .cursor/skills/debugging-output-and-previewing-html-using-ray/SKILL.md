@@ -368,14 +368,11 @@ Returns the theme information including color palette:
 **Example:** Send HTML with matching colors:
 
 ```bash
-
 # First, get the theme
-
 THEME=$(curl -s http://localhost:23517/theme)
 PRIMARY_COLOR=$(echo $THEME | jq -r '.colors.primary')
 
 # Then send HTML using those colors
-
 curl -X POST http://localhost:23517/ \
   -H "Content-Type: application/json" \
   -d '{

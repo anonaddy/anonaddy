@@ -129,6 +129,10 @@ class AliasController extends Controller
                 $localPart = Str::before($localPart, '+');
             }
 
+            if ($request->user()->appendsRandomCharactersToCustomAliases()) {
+                $localPart = $request->validated()['local_part_without_extension'];
+            }
+
             $data = [
                 'email' => $localPart.'@'.$request->domain,
                 'local_part' => $localPart,

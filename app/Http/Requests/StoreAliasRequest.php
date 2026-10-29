@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Alias;
 use App\Models\Label;
 use App\Rules\UserLabelId;
 use App\Rules\ValidAliasLocalPart;
 use App\Rules\VerifiedRecipientId;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -27,9 +29,17 @@ class StoreAliasRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        $prefix = Str::before($this->local_part ?? '', '+');
+        $domain = strtolower((string) $this->domain);
+        $localPartWithoutExtension = $prefix;
+
+        if ($this->input('format') === 'custom' && $this->user()->appendsRandomCharactersToCustomAliases()) {
+            $localPartWithoutExtension = $this->user()->localPartWithCustomRandomCharacters($prefix, $domain);
+        }
+
         $this->merge([
-            'domain' => strtolower($this->domain),
-            'local_part_without_extension' => Str::before($this->local_part, '+'), // Remove extension so that we can check alias uniqueness properly
+            'domain' => $domain,
+            'local_part_without_extension' => $localPartWithoutExtension,
         ]);
     }
 
@@ -71,22 +81,19 @@ class StoreAliasRequest extends FormRequest
         $validator->sometimes('local_part_without_extension', [
             'bail',
             'required',
-            'max:50',
-            Rule::unique('aliases', 'local_part')->where(function ($query) {
-                return $query->where('domain', $this->validationData()['domain']);
-            }),
+            'max:64',
+            function (string $attribute, mixed $value, Closure $fail): void {
+                $email = strtolower($value.'@'.$this->validationData()['domain']);
+
+                if (Alias::withTrashed()->where('email', $email)->exists()) {
+                    $fail('That alias already exists.');
+                }
+            },
             new ValidAliasLocalPart,
         ], function () {
             $format = $this->validationData()['format'] ?? 'random_characters';
 
             return $format === 'custom';
         });
-    }
-
-    public function messages()
-    {
-        return [
-            'local_part_without_extension.unique' => 'That alias already exists.',
-        ];
     }
 }

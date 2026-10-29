@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alias;
+use App\Models\BlockedSender;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class BlocklistOneClickController extends Controller
 {
@@ -18,9 +20,10 @@ class BlocklistOneClickController extends Controller
     {
         $alias = Alias::findOrFail($alias);
 
-        $validated = $request->validate([
+        // Only the signed query string can be trusted, a POST body field would override it in validate()
+        $validated = Validator::make($request->query(), [
             'email' => ['required', 'string', 'email', 'max:253'],
-        ]);
+        ])->validate();
 
         $value = strtolower(trim($validated['email']));
 
@@ -37,11 +40,16 @@ class BlocklistOneClickController extends Controller
     {
         $alias = Alias::findOrFail($alias);
 
-        $validated = $request->validate([
+        // Only the signed query string can be trusted, a POST body field would override it in validate()
+        $validated = Validator::make($request->query(), [
             'domain' => ['required', 'string', 'max:253', 'regex:/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i'],
-        ]);
+        ])->validate();
 
         $value = strtolower(trim($validated['domain']));
+
+        if (BlockedSender::isProtectedAliasDomain($value)) {
+            return response('', 422);
+        }
 
         $alias->user->blockedSenders()->firstOrCreate(
             ['type' => 'domain', 'value' => $value]

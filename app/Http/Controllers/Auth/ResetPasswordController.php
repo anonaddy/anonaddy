@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -96,6 +97,29 @@ class ResetPasswordController extends Controller
             'password_confirmation',
             'token'
         );
+    }
+
+    /**
+     * Get the response for a successful password reset.
+     *
+     * @param  string  $response
+     * @return RedirectResponse|JsonResponse
+     */
+    protected function sendResetResponse(Request $request, $response)
+    {
+        Auth::logoutOtherDevices($request->password);
+
+        // A reset may follow a compromised account, so API keys must stop working too
+        $request->user()?->tokens()->delete();
+
+        if ($request->wantsJson()) {
+            return new JsonResponse(['message' => trans($response)], 200);
+        }
+
+        // The dashboard shows flash messages as a toast, it does not show status
+        return redirect($this->redirectPath())
+            ->with('status', trans($response))
+            ->with('flash', trans($response));
     }
 
     /**

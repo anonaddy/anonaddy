@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRuleRequest;
 use App\Http\Resources\RuleResource;
+use Illuminate\Support\Collection;
 
 class RuleController extends Controller
 {
@@ -40,7 +41,7 @@ class RuleController extends Controller
             'sends' => $request->sends ?? false,
         ]);
 
-        return new RuleResource($rule->refresh());
+        return $this->ruleResource($rule->refresh(), $actions);
     }
 
     public function update(StoreRuleRequest $request, $id)
@@ -65,7 +66,7 @@ class RuleController extends Controller
             'sends' => $request->sends ?? false,
         ]);
 
-        return new RuleResource($rule->refresh());
+        return $this->ruleResource($rule->refresh(), $actions);
     }
 
     public function destroy($id)
@@ -75,5 +76,23 @@ class RuleController extends Controller
         $rule->delete();
 
         return response('', 204);
+    }
+
+    /**
+     * @param  Collection<int, Collection<string, mixed>>  $actions
+     */
+    protected function ruleResource($rule, $actions): RuleResource
+    {
+        $resource = new RuleResource($rule);
+
+        if (collect($actions)->contains(fn ($action) => ($action['type'] ?? null) === 'webhook')) {
+            $resource->additional([
+                'meta' => [
+                    'webhook_secret' => $rule->user->ensureWebhookSecret(),
+                ],
+            ]);
+        }
+
+        return $resource;
     }
 }

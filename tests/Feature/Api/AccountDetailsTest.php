@@ -24,5 +24,9 @@ class AccountDetailsTest extends TestCase
         $response->assertSuccessful();
 
         $this->assertEquals($this->user->username, $response->json()['data']['username']);
+        $this->assertFalse($response->json('data.custom_alias_random_characters'));
+        $this->assertSame(5, $response->json('data.custom_alias_random_length'));
+        $this->assertSame('alphanumeric', $response->json('data.custom_alias_random_charset'));
+        $this->assertNull($response->json('data.webhook_secret'));
     }
 }

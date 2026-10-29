@@ -1,0 +1,51 @@
+Date: Wed, 20 Feb 2019 15:00:00 +0100 (CET)
+Return-Path: <>
+From: MAILER-DAEMON
+To: b_grudcmdvpi3w6ntjn5va_hfsggndegztgi@johndoe.anonaddy.com
+Message-ID: <df7ff73672n4660a4ebb4d52aff2f827@anonaddy.me>
+Subject: Undelivered Mail Returned to Sender
+MIME-Version: 1.0
+Content-Type: multipart/report; report-type=delivery-status; boundary="----=_Part_10031_1199410393.1550677940425"
+
+------=_Part_10031_1199410393.1550677940425
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+The following message to <john@doe.com> was undeliverable.
+The reason for the problem:
+smtp; 550 5.5.0 Requested action not taken: mailbox unavailable.
+
+------=_Part_10031_1199410393.1550677940425
+Content-Type: message/delivery-status;
+Content-Description: Delivery report
+
+Reporting-MTA: dns; mail.anonaddy.me
+X-Postfix-Queue-ID: 6G4D613B20
+X-Postfix-Sender: rfc822; b_grudcmdvpi3w6ntjn5va_hfsggndegztgi@johndoe.anonaddy.com
+Arrival-Date: Wed, 20 Feb 2019 15:00:00 +0100 (GMT)
+
+Final-Recipient: rfc822; john@doe.com
+Original-Recipient: rfc822;john@doe.com
+Action: failed
+Status: 5.5.0
+Remote-MTA: dns; mail.tutanota.de
+Diagnostic-Code: smtp; 550 5.5.0 Requested action not taken: mailbox unavailable.
+
+------=_Part_10031_1199410393.1550677940425
+Content-Description: Undelivered Message
+Content-Type: message/rfc822
+
+Return-Path: <b_grudcmdvpi3w6ntjn5va_hfsggndegztgi@johndoe.anonaddy.com>
+To: john@doe.com
+From: alias@johndoe.anonaddy.me
+Subject: Test
+Date: Wed, 20 Feb 2019 15:00:00 +0100
+Feedback-ID: F:a4e10657-3287-4848-9d21-f12f1f247c6e
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+
+Testing
+
+------=_Part_10031_1199410393.1550677940425--

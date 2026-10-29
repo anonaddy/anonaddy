@@ -144,4 +144,78 @@ class SendFromEmailTest extends TestCase
             return $mail->hasTo('contact@ebay.com');
         });
     }
+
+    #[Test]
+    public function it_does_not_send_from_alias_when_a_malformed_from_header_decodes_to_a_verified_address(): void
+    {
+        Mail::fake();
+
+        $path = $this->writeSendFromEmail('"=?UTF-8?B?PHdpbGxAYW5vbmFkZHkuY29tPg==?=" <attacker@evil.com>>');
+
+        try {
+            $this->receiveSendFromAliasEmailAtPath($path, 'attacker@evil.com');
+        } finally {
+            @unlink($path);
+        }
+
+        Mail::assertNotQueued(SendFromEmail::class);
+    }
+
+    #[Test]
+    public function it_does_not_send_from_alias_when_a_malformed_from_header_lists_multiple_addresses(): void
+    {
+        Mail::fake();
+
+        $path = $this->writeSendFromEmail('will@anonaddy.com, attacker@evil.com>');
+
+        try {
+            $this->receiveSendFromAliasEmailAtPath($path, 'will@anonaddy.com');
+        } finally {
+            @unlink($path);
+        }
+
+        Mail::assertNotQueued(SendFromEmail::class);
+    }
+
+    protected function receiveSendFromAliasEmailAtPath(string $path, string $sender): void
+    {
+        Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'email' => 'ebay@johndoe.'.config('anonaddy.domain'),
+            'local_part' => 'ebay',
+            'domain' => 'johndoe.'.config('anonaddy.domain'),
+        ]);
+
+        $extension = 'contact=ebay.com';
+
+        $this->artisan(
+            'anonaddy:receive-email',
+            [
+                'file' => $path,
+                '--sender' => $sender,
+                '--recipient' => ['ebay+'.$extension.'@johndoe.anonaddy.com'],
+                '--local_part' => ['ebay'],
+                '--extension' => [$extension],
+                '--domain' => ['johndoe.anonaddy.com'],
+                '--size' => '1000',
+            ]
+        )->assertExitCode(0);
+    }
+
+    protected function writeSendFromEmail(string $from): string
+    {
+        $content = "Date: Wed, 20 Feb 2019 15:00:00 +0100 (CET)\r\n"
+            ."From: {$from}\r\n"
+            ."To: ebay+contact=ebay.com@johndoe.anonaddy.com\r\n"
+            ."Subject: Test Email\r\n"
+            ."X-AnonAddy-Dmarc-Allow: Yes\r\n"
+            ."Content-Type: text/plain; charset=UTF-8\r\n"
+            ."\r\n"
+            ."This is a test email.\r\n";
+
+        $path = tempnam(sys_get_temp_dir(), 'send-from-');
+        file_put_contents($path, $content);
+
+        return $path;
+    }
 }

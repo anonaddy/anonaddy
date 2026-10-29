@@ -896,4 +896,92 @@ class AliasesTest extends TestCase
             'recipient_id' => $recipient->id,
         ]);
     }
+
+    #[Test]
+    public function custom_alias_random_characters_uses_a_free_suffix_when_others_are_taken()
+    {
+        $domain = $this->user->username.'.anonaddy.com';
+
+        $this->user->update([
+            'custom_alias_random_characters' => true,
+            'custom_alias_random_length' => 1,
+            'custom_alias_random_charset' => 'numbers',
+            'alias_separator' => '.',
+        ]);
+
+        foreach (range(0, 8) as $digit) {
+            Alias::factory()->create([
+                'user_id' => $this->user->id,
+                'local_part' => 'ab.'.$digit,
+                'domain' => $domain,
+                'email' => 'ab.'.$digit.'@'.$domain,
+                'deleted_at' => now(),
+            ]);
+        }
+
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $domain,
+            'format' => 'custom',
+            'local_part' => 'ab',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertSame('ab.9', $response->json('data.local_part'));
+    }
+
+    #[Test]
+    public function custom_alias_random_characters_rejects_when_every_suffix_is_taken()
+    {
+        $domain = $this->user->username.'.anonaddy.com';
+
+        $this->user->update([
+            'custom_alias_random_characters' => true,
+            'custom_alias_random_length' => 1,
+            'custom_alias_random_charset' => 'numbers',
+            'alias_separator' => '.',
+        ]);
+
+        foreach (range(0, 9) as $digit) {
+            Alias::factory()->create([
+                'user_id' => $this->user->id,
+                'local_part' => 'ab.'.$digit,
+                'domain' => $domain,
+                'email' => 'ab.'.$digit.'@'.$domain,
+            ]);
+        }
+
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $domain,
+            'format' => 'custom',
+            'local_part' => 'ab',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('local_part_without_extension');
+        $this->assertCount(10, $this->user->aliases()->withTrashed()->get());
+    }
+
+    #[Test]
+    public function user_cannot_generate_custom_alias_that_matches_a_deleted_alias()
+    {
+        Alias::factory()->create([
+            'user_id' => $this->user->id,
+            'local_part' => 'exists',
+            'domain' => $this->user->username.'.anonaddy.com',
+            'email' => 'exists@'.$this->user->username.'.anonaddy.com',
+            'deleted_at' => now(),
+        ]);
+
+        $response = $this->json('POST', '/api/v1/aliases', [
+            'domain' => $this->user->username.'.anonaddy.com',
+            'format' => 'custom',
+            'local_part' => 'exists',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'local_part_without_extension' => 'That alias already exists.',
+        ]);
+        $this->assertCount(1, $this->user->aliases()->withTrashed()->get());
+    }
 }

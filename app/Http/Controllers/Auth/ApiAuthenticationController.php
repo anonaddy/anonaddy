@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use PragmaRX\Google2FA\Google2FA;
 
 class ApiAuthenticationController extends Controller
@@ -26,11 +27,15 @@ class ApiAuthenticationController extends Controller
         $this->middleware('throttle:3,1');
 
         $this->middleware(['auth:sanctum', 'verified'])->only(['logout', 'destroy']);
+        $this->middleware('2fa')->only('destroy'); // A session that has not passed 2FA must not delete the account
     }
 
     public function login(ApiAuthenticationLoginRequest $request)
     {
-        $user = Username::select(['user_id', 'username'])->firstWhere('username', $request->username)?->user;
+        $user = Username::select(['user_id', 'username', 'can_login'])
+            ->where('username', $request->username)
+            ->where('can_login', true)
+            ->first()?->user;
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
@@ -108,6 +113,15 @@ class ApiAuthenticationController extends Controller
             ], 401);
         }
 
+        // Limit attempts per user as well as per IP, since a new mfa_key can be requested at any time
+        $rateLimiterKey = 'api-mfa:'.$user->id;
+
+        if (RateLimiter::tooManyAttempts($rateLimiterKey, 3)) {
+            return response()->json([
+                'message' => 'Too many attempts, please try again in a minute.',
+            ], 429);
+        }
+
         $google2fa = new Google2FA;
         $lastTimeStamp = Cache::get('2fa_ts:'.$user->id, 0);
 
@@ -115,6 +129,7 @@ class ApiAuthenticationController extends Controller
 
         if (! $timestamp) {
             event(new IncorrectOtpAttempted($user));
+            RateLimiter::hit($rateLimiterKey);
 
             return response()->json([
                 'message' => 'The \'One Time Password\' typed was wrong.',
@@ -150,7 +165,7 @@ class ApiAuthenticationController extends Controller
 
         if (! $token) {
             return response()->json([
-                'message', 'API key not found.',
+                'message' => 'API key not found.',
             ], 404);
         }
 

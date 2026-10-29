@@ -39,6 +39,7 @@ class ShowRuleControllerTest extends TestCase
                 ->has('labelOptions', 2)
                 ->where('labelOptions.0.name', 'news')
                 ->where('labelOptions.1.name', 'shopping')
+                ->where('webhookSecret', null)
                 ->where('labelOptions', fn ($options) => ! collect($options)->contains(
                     fn ($option) => ($option['name'] ?? null) === 'secret'
                 ))

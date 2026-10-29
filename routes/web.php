@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\WebauthnEnabledKeyController;
 use App\Http\Controllers\BannerLocationController;
 use App\Http\Controllers\BlocklistOneClickController;
 use App\Http\Controllers\BrowserSessionController;
+use App\Http\Controllers\CustomAliasRandomCharactersController;
 use App\Http\Controllers\DarkModeController;
 use App\Http\Controllers\DeactivateAliasController;
 use App\Http\Controllers\DefaultAliasDomainController;
@@ -65,8 +66,8 @@ Route::controller(ForgotUsernameController::class)->group(function () {
     Route::post('/username/email', 'sendReminderEmail')->name('username.email');
 });
 
-Route::get('/login/2fa', [TwoFactorAuthController::class, 'index'])->name('login.2fa.index')->middleware(['2fa', 'auth']);
-Route::post('/login/2fa', [TwoFactorAuthController::class, 'authenticateTwoFactor'])->name('login.2fa')->middleware(['2fa', 'throttle:3,1', 'auth']);
+Route::get('/login/2fa', [TwoFactorAuthController::class, 'index'])->name('login.2fa.index')->middleware(['auth', '2fa']);
+Route::post('/login/2fa', [TwoFactorAuthController::class, 'authenticateTwoFactor'])->name('login.2fa')->middleware(['auth', 'throttle:3,1', '2fa']); // Throttle before 2fa, which checks the one-time password
 
 Route::controller(BackupCodeController::class)->group(function () {
     Route::get('/login/backup-code', 'index')->name('login.backup_code.index');
@@ -95,17 +96,22 @@ Route::group([
     'domain' => config('webauthn.domain', null),
     'prefix' => config('webauthn.prefix', 'webauthn'),
 ], function () {
-    Route::controller(WebauthnController::class)->group(function () {
-        Route::get('keys', 'index')->name('webauthn.index');
-        Route::get('keys/create', 'create')->name('webauthn.create');
-        Route::post('keys', 'store')->name('webauthn.store');
-        Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
-        Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');
-    });
+    // Managing keys requires 2FA to have been passed, otherwise a password alone could register a key
+    Route::middleware('2fa')->group(function () {
+        Route::controller(WebauthnController::class)->group(function () {
+            Route::get('keys', 'index')->name('webauthn.index');
+            Route::get('keys/create', 'create')->name('webauthn.create');
+            Route::post('keys/options', 'create')->name('webauthn.store.options'); // To override the package route without 2fa
+            Route::post('keys', 'store')->name('webauthn.store');
+            Route::put('keys/{id}', 'update')->name('webauthn.update'); // To override the package route without 2fa
+            Route::delete('keys/{id}', 'delete'); // To override delete method and allow route caching
+            Route::post('keys/{id}', 'destroy')->name('webauthn.destroy');
+        });
 
-    Route::controller(WebauthnEnabledKeyController::class)->group(function () {
-        Route::post('enabled-keys', 'store')->name('webauthn.enabled_key.store');
-        Route::post('enabled-keys/{id}', 'destroy')->name('webauthn.enabled_key.destroy');
+        Route::controller(WebauthnEnabledKeyController::class)->group(function () {
+            Route::post('enabled-keys', 'store')->name('webauthn.enabled_key.store');
+            Route::post('enabled-keys/{id}', 'destroy')->name('webauthn.enabled_key.destroy');
+        });
     });
 });
 
@@ -180,6 +186,8 @@ Route::group([
     Route::post('/default-alias-format', [DefaultAliasFormatController::class, 'update'])->name('settings.default_alias_format');
 
     Route::post('/alias-separator', [AliasSeparatorController::class, 'update'])->name('settings.alias_separator');
+
+    Route::post('/custom-alias-random-characters', [CustomAliasRandomCharactersController::class, 'update'])->name('settings.custom_alias_random_characters');
 
     Route::post('/display-from-format', [DisplayFromFormatController::class, 'update'])->name('settings.display_from_format');
 
