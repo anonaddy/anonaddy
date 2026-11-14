@@ -8,9 +8,11 @@ use App\Notifications\UsernameReminder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
@@ -29,6 +31,8 @@ class LoginTest extends TestCase
     #[Test]
     public function user_can_login_successfully()
     {
+        Log::spy();
+
         $response = $this->post('/login', [
             'username' => 'johndoe',
             'password' => 'mypassword',
@@ -37,6 +41,45 @@ class LoginTest extends TestCase
         $response
             ->assertRedirect('/')
             ->assertSessionHasNoErrors();
+
+        Log::shouldNotHaveReceived('warning');
+    }
+
+    #[Test]
+    #[TestWith(['johndoe', '192.0.2.10'])]
+    #[TestWith(['unknownuser', '2001:db8::10'])]
+    public function failed_password_authentication_logs_only_the_client_ip(string $username, string $ip): void
+    {
+        Log::spy();
+
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $ip])
+            ->withHeader('X-Forwarded-For', '192.0.2.99')
+            ->from('/login')
+            ->post('/login', [
+                'username' => $username,
+                'password' => 'wrong-password',
+            ]);
+
+        $response->assertRedirect('/login')->assertSessionHasErrors('username');
+        $this->assertGuest();
+        Log::shouldHaveReceived('warning')->once()->with('Authentication failed', [
+            'source_ip' => $ip,
+        ]);
+    }
+
+    #[Test]
+    public function invalid_login_input_is_not_logged_as_failed_authentication(): void
+    {
+        Log::spy();
+
+        $response = $this->from('/login')->post('/login', [
+            'username' => 'johndoe',
+            'password' => '',
+        ]);
+
+        $response->assertRedirect('/login')->assertSessionHasErrors('password');
+        $this->assertGuest();
+        Log::shouldNotHaveReceived('warning');
     }
 
     #[Test]
