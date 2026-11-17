@@ -24,6 +24,8 @@ class ProxyAuthentication
 
     private string $emailHeaderName;
 
+    private bool $shouldSyncEmail;
+
     /**
      * Create a new instance.
      *
@@ -35,6 +37,7 @@ class ProxyAuthentication
         $this->externalUserIdHeaderName = config('anonaddy.proxy_authentication_external_user_id_header');
         $this->usernameHeaderName = config('anonaddy.proxy_authentication_username_header');
         $this->emailHeaderName = config('anonaddy.proxy_authentication_email_header');
+        $this->shouldSyncEmail = config('anonaddy.proxy_authentication_sync_email');
     }
 
     /**
@@ -180,6 +183,10 @@ class ProxyAuthentication
 
     private function updateDefaultRecipientIfNeeded(string $email): void
     {
+        if (! $this->shouldSyncEmail) {
+            return;
+        }
+
         $recipient = Auth::user()->defaultRecipient;
 
         if ($recipient->email === $email) {
